@@ -1,0 +1,37 @@
+*.fasl
+*.dx32fsl
+*.dx64fsl
+*.lx32fsl
+*.lx64fsl
+*.x86f
+.#*
+
+
+#####
+##### emacs
+#####
+*~
+\#*\#
+
+
+#####
+##### node
+#####
+node_modules
+example/node_modules
+dist/
+
+
+#####
+##### dev
+#####
+dev/.env.local
+dev/.eslintcache
+dev/node_modules
+
+
+#####
+##### documents
+#####
+documents/.env.local
+documents/node_modules
