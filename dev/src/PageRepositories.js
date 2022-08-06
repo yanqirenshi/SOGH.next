@@ -2,7 +2,7 @@ import React from 'react';
 
 
 import GlobalAppBar from './components/GlobalAppBar.js';
-import Repositories from './components/Repositories.js';
+import {Repositories} from './lib/index.js';
 
 export default function PageRepositories () {
     return (
