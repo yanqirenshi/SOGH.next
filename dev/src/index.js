@@ -1,15 +1,32 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-import reportWebVitals from './reportWebVitals';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+import './index.css';
+
+import store from './store.js';
+import { Provider } from 'react-redux';
+
+import * as serviceWorkerRegistration from './js/serviceWorkerRegistration';
+import reportWebVitals from './js/reportWebVitals';
+
+import * as page from './Pages.js';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+    <React.StrictMode>
+      <Provider store={store}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/"                                  element={<page.PageRepositories />} />
+            <Route path="/repositories/:id/issues"           element={<page.PageRepositoryIssues />} />
+            <Route path="/repositories/:id/projects"         element={<page.PageRepositoryProjects />} />
+            <Route path="/repositories/:id/classic-projects" element={<page.PageRepositoryClassicProjects />} />
+            <Route path="/samples/redux"                     element={<page.PageSampleRedux />} />
+          </Routes>
+        </BrowserRouter>
+      </Provider>
+    </React.StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change

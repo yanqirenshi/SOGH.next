@@ -1,0 +1,31 @@
+* exproler
+
+https://docs.github.com/ja/graphql/overview/explorer
+
+* route
+
+/issues
+/issues/:id
+/projects
+/projects/:id
+/classic-projects
+/classic-projects/:id
+/milestones
+/milestones/:id
+/labels
+/labels/:id
+/viewer
+
+/repositories
+/repositories/:id
+
+/repositories/:id/issues
+/repositories/:id/issues/:number
+/repositories/:id/projects
+/repositories/:id/projects/:number
+/repositories/:id/classic-projects
+/repositories/:id/classic-projects/:number
+/repositories/:id/milestones
+/repositories/:id/milestones/:number
+/repositories/:id/labels
+/repositories/:id/labels/:number
