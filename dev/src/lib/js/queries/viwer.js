@@ -1,10 +1,8 @@
+import * as attr from './attributes.js';
+
 const query = `{
   viewer {
-    login
-    email
-    id
-    name
-    url
+    ${attr.viewer}
   }
 }`;
 
