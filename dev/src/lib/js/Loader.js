@@ -32,35 +32,6 @@ export default class Loader {
 
         return this._api.v4;
     }
-    connect (token, success, error) {
-        const api = new GithubApiV4(token);
-
-        // api を実行するための Promis を返す。
-        return api.fetch(
-            query.viwer,
-            // コールバック： API実行結果 → 成功
-            // SOGH としての処理を実行する。
-            (results) => {
-                const data = results.data;
-
-                this.token(token);
-                this.viewer(new model.Viewer(data.viewer));
-                this.api(api);
-
-                success && success();
-            },
-            // コールバック： API実行結果 → エラー
-            // SOGH としての処理を実行する。
-            (r) => {
-                this.token(token);
-                this.viewer(null);
-                this.api(null);
-
-                console.erro(r);
-
-                error && error(r);
-            });
-    }
     isConnected () {
         return this._viewer !== null && this.api() !== null;
     }
@@ -762,5 +733,60 @@ export default class Loader {
         };
 
         getter();
+    }
+    /** **************************************************************** *
+     * New
+     * **************************************************************** */
+    connect (token, success, error) {
+        const api = new GithubApiV4(token);
+
+        // api を実行するための Promis を返す。
+        return api.fetch(
+            query.viwer,
+            // コールバック： API実行結果 → 成功
+            // SOGH としての処理を実行する。
+            (results) => {
+                const data = results.data;
+
+                this.token(token);
+                this.viewer(new model.Viewer(data.viewer));
+                this.api(api);
+
+                success && success();
+            },
+            // コールバック： API実行結果 → エラー
+            // SOGH としての処理を実行する。
+            (r) => {
+                this.token(token);
+                this.viewer(null);
+                this.api(null);
+
+                console.erro(r);
+
+                error && error(r);
+            });
+    }
+    fetchRepositoriesByViewer (success, error) {
+        const api = this.api();
+
+        const base = query.repositories_by_viewer;
+        const statmenet = this.ensureEndCursor(base, null);
+
+        return api.fetch(
+            statmenet,
+            // success
+            (results) => {
+                const data = results.data;
+
+                const list = data.viewer.repositories.nodes || [];
+
+                success && success(list.map(d=> new model.Repository(d)));
+            },
+            // error
+            (r) => {
+                console.erro(r);
+
+                error && error(r);
+            });
     }
 }

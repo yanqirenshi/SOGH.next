@@ -2,7 +2,10 @@ import moment from 'moment';
 
 import { createSlice } from '@reduxjs/toolkit';
 
-import {connectGithubAsync} from './github/actions.js';
+import {
+    connectGithubAsync,
+    fetchRepositoriesByViewer
+} from './github/actions.js';
 
 export const github = createSlice({
     name: 'sogh',
@@ -13,11 +16,10 @@ export const github = createSlice({
             end: null,
         },
         connected_at: null,
-        repositories: null, // new Pool(),
     },
-    reducers: {
-        fetchViwerRepositories: (state)=> {console.log('y');},
-    },
+    // reducers: {
+    //     fetchViwerRepositories: (state)=> {console.log('y');},
+    // },
     extraReducers: (builder) => {
         builder
             .addCase(connectGithubAsync.pending, (state) => {
@@ -32,13 +34,21 @@ export const github = createSlice({
                 state.viewer = null;
                 state.connect.end = moment().toISOString();
             });
+
+        builder
+            .addCase(fetchRepositoriesByViewer.pending, (state) => {
+            })
+            .addCase(fetchRepositoriesByViewer.fulfilled, (state, action) => {
+            })
+            .addCase(fetchRepositoriesByViewer.rejected, (state) => {
+            });
     },
 });
 
-export const {
-    fetchViwerRepositories,
-} = github.actions;
+// export const {
+//     fetchViwerRepositories,
+// } = github.actions;
 
 export default github.reducer;
 
-export { connectGithubAsync };
+export { connectGithubAsync, fetchRepositoriesByViewer };

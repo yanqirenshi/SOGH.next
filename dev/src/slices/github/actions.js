@@ -2,23 +2,24 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import SOGH from '../../sogh.js';
 
-function applyCallback (callbacks, type, args=[]) {
-    if (!callbacks || !callbacks[type])
+function applyCallback (payload, type, args=[]) {
+    if (!payload
+        || !payload.callbacks
+        || !payload.callbacks[type])
         return;
 
-    callbacks[type].apply(args);
+    payload.callbacks[type].apply(args);
 }
 
 export const connectGithubAsync = createAsyncThunk(
     'github/connect',
     async (payload) => {
         const token = payload.token;
-        const clbks = payload.callbacks;
 
         try {
             const response = await SOGH.connect(token);
 
-            applyCallback(clbks, 'success');
+            applyCallback(payload, 'success');
 
             return {
                 data: response.data.viewer.id,
@@ -26,7 +27,31 @@ export const connectGithubAsync = createAsyncThunk(
         } catch (e) {
             console.error(e);
 
-            applyCallback(clbks, 'fail');
+            applyCallback(payload, 'fail');
+
+            return {
+                data: null,
+                error: e,
+            };
+        }
+    },
+);
+
+export const fetchRepositoriesByViewer = createAsyncThunk(
+    'github/fetchRepositoriesByViewer',
+    async (payload) => {
+        try {
+            const response = await SOGH.fetchRepositoriesByViewer();
+
+            applyCallback(payload, 'success');
+
+            return {
+                data: null,
+            };
+        } catch (e) {
+            console.error(e);
+
+            applyCallback(payload, 'fail');
 
             return {
                 data: null,
