@@ -2,20 +2,33 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import SOGH from '../../sogh.js';
 
+function applyCallback (callbacks, type, args=[]) {
+    if (!callbacks || !callbacks[type])
+        return;
+
+    callbacks[type].apply(args);
+}
+
 export const connectGithubAsync = createAsyncThunk(
     'github/connect',
     async (payload) => {
+        const token = payload.token;
+        const clbks = payload.callbacks;
+
         try {
-            const response = await SOGH.connect(payload.token);
+            const response = await SOGH.connect(token);
+
+            applyCallback(clbks, 'success');
 
             return {
-                status: 'idle',
                 data: response.data.viewer.id,
             };
         } catch (e) {
             console.error(e);
+
+            applyCallback(clbks, 'fail');
+
             return {
-                status: 'failed',
                 data: null,
                 error: e,
             };

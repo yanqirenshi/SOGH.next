@@ -33,7 +33,12 @@ export default function ConnectGithub (props) {
 
     const changeToken = (e)=> setToken(e.target.value);
 
-    const clickConnect = ()=> dispatch(connectGithubAsync({token: token}));
+    const clickConnect = ()=> dispatch(connectGithubAsync({
+        token: token,
+        callbacks: {
+            success: ()=> console.log('xyz'),
+        },
+    }));
 
     return (
         <Modal open={true}

@@ -22,11 +22,10 @@ export const github = createSlice({
         builder
             .addCase(connectGithubAsync.pending, (state) => {
                 state.connect.start = moment().toISOString();
-                state.viewer = null;
                 state.connect.end = null;
             })
             .addCase(connectGithubAsync.fulfilled, (state, action) => {
-                state.viewer = action.data;
+                state.viewer = action.payload.data;
                 state.connect.end = moment().toISOString();
             })
             .addCase(connectGithubAsync.rejected, (state) => {
