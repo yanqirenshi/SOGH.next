@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import './index.css';
 
@@ -10,21 +9,13 @@ import { Provider } from 'react-redux';
 import * as serviceWorkerRegistration from './js/serviceWorkerRegistration';
 import reportWebVitals from './js/reportWebVitals';
 
-import * as page from './Pages.js';
+import App from './App.js';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
       <Provider store={store}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/"                                  element={<page.PageRepositories />} />
-            <Route path="/repositories/:id/issues"           element={<page.PageRepositoryIssues />} />
-            <Route path="/repositories/:id/projects"         element={<page.PageRepositoryProjects />} />
-            <Route path="/repositories/:id/classic-projects" element={<page.PageRepositoryClassicProjects />} />
-            <Route path="/samples/redux"                     element={<page.PageSampleRedux />} />
-          </Routes>
-        </BrowserRouter>
+        <App />
       </Provider>
     </React.StrictMode>
 );

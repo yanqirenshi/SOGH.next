@@ -4,19 +4,60 @@ import * as query from './queries/index.js';
 import GithubApiV4 from './GithubApiV4.js';
 
 export default class Loader {
-    constructor (token) {
+    constructor () {
         this._token = null;
 
         this._viewer = null;
 
-        this.api = {
+        this._api = {
             v4: null,
         };
     }
-    viewer () {
+    token (v) {
+        if (arguments.length>1)
+            this._token = v;
+
+        return this._token;
+    }
+    viewer (v) {
+        if (arguments.length>1)
+            this._viewer = v;
+
         return this._viewer;
     }
+    api (v) {
+        if (arguments.length>1)
+            this._api.v4 = v;
+
+        return this._api.v4;
+    }
     connect (token, success, error) {
+        const api = new GithubApiV4(token);
+        // api を実行するための Promis を返す。
+        return api.fetch(
+            query.viwer,
+            // コールバック： API実行結果 → 成功
+            // SOGH としての処理を実行する。
+            (results) => {
+                const data = results.data;
+
+                this.token(token);
+                this.viewer(new model.Viewer(data.viewer));
+                this.api(api);
+
+                if (success) success(this._viewer);
+            },
+            // コールバック： API実行結果 → エラー
+            // SOGH としての処理を実行する。
+            (r) => {
+                this.token(token);
+                this.viewer(null);
+                this.api(null);
+
+                error ? error(r) : console.log(r);
+            });
+    }
+    connectOld (token, success, error) {
         const api = new GithubApiV4(token);
 
         api.fetch(query.viwer, (results) => {
@@ -28,7 +69,7 @@ export default class Loader {
 
             this.api.v4 = api;
 
-            success(this);
+            success(this._viewer);
         }, (r) => {
             this._token = token;
             this._viewer = null;
@@ -37,7 +78,10 @@ export default class Loader {
             error(r);
         });
     }
-    ensureEndCursor(query, endCursor) {
+    isConnected () {
+        return this._viewer !== null && this.api() !== null;
+    }
+    ensureEndCursor (query, endCursor) {
         if (endCursor)
             return query.replace('after: "",', `after: "${endCursor}",`);
 
@@ -66,12 +110,12 @@ export default class Loader {
         return '{ ' + x.filter(d=>d!==null).join(', ') + ' }';
     }
     getIssuesByMilestone (milestone, cb) {
-        if (!this.api.v4._token)
+        if (!this.api()._token)
             cb([]);
 
         if (!milestone) return;
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.issues_by_milestone
               .replace('@milestone-id', milestone.id());
@@ -97,10 +141,10 @@ export default class Loader {
         getter();
     }
     getIssuesByRepository (repository, cb) {
-        if (!this.api.v4._token || !repository)
+        if (!this.api()._token || !repository)
             cb([]);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.issues_by_repository
               .replace('@owner', repository.owner().login)
@@ -128,13 +172,13 @@ export default class Loader {
     }
     getIssuesOpenByRepository (repository, cb, cb2) {
         console.warn('このメソッドは利用しないでください。\nGtd.getIssuesOpenByRepository の内容で置きかえる予定です。');
-        if (!this.api.v4._token || !repository)
+        if (!this.api()._token || !repository)
             cb([]);
 
         this._data.viwer.issues.fetch.start = new Date();
         this._data.viwer.issues.fetch.end = null;
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.issues_open_by_repository
               .replace('@owner', repository.owner().login)
@@ -174,13 +218,13 @@ export default class Loader {
     }
     getIssuesOpenByRepositoryAndViewer (repository, viewer, cb) {
         console.warn('このメソッドは利用しないでください。\nGtd.getIssuesOpenByRepository の内容で置きかえる予定です。');
-        if (!this.api.v4._token || !repository)
+        if (!this.api()._token || !repository)
             cb([]);
 
         this._data.viwer.issues.fetch.start = new Date();
         this._data.viwer.issues.fetch.end = null;
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.issues_open_by_repository
               .replace('@owner', repository.owner().login)
@@ -215,10 +259,10 @@ export default class Loader {
         getter();
     }
     getIssuesOpenByLabel (repository, label_name, cb) {
-        if (!this.api.v4._token || !repository)
+        if (!this.api()._token || !repository)
             cb([]);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.issues_open_by_label
               .replace('@owner', repository.owner().login)
@@ -250,13 +294,13 @@ export default class Loader {
         getter();
     }
     getIssuesByReportLabel (repository, cb) {
-        if (!this.api.v4._token)
+        if (!this.api()._token)
             cb([]);
 
         if (!repository)
             cb([]);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.issues_by_report_label
               .replace('@owner', repository.owner().login)
@@ -288,10 +332,10 @@ export default class Loader {
         getter();
     }
     getIssuesByRepositoryProject (repository, project, cb) {
-        if (!this.api.v4._token || !repository)
+        if (!this.api()._token || !repository)
             cb([]);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.issues_by_repository
               .replace('issues(after: "", first: 100)', 'issues(after: "", first: 100, states: OPEN)')
@@ -332,13 +376,13 @@ export default class Loader {
         getter();
     }
     getIssuesByViwer (cb) {
-        if (!this.api.v4._token)
+        if (!this.api()._token)
             return cb([]);
 
         this._data.viwer.issues.fetch.start = new Date();
         this._data.viwer.issues.fetch.end = null;
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.issues_by_viwer;
 
@@ -370,13 +414,13 @@ export default class Loader {
         return this;
     }
     getIssuesByProjectColumn (column, cb) {
-        if (!this.api.v4._token)
+        if (!this.api()._token)
             cb([]);
 
         if (!column)
             cb([]);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.issues_open_by_project_column
               .replace('@column-id', column.id);
@@ -412,10 +456,10 @@ export default class Loader {
         getter();
     }
     getMilestonesByRepository (repository, cb) {
-        if (!this.api.v4._token)
+        if (!this.api()._token)
             cb([]);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.milestone_by_reposigory
               .replace('@owner', repository.owner().login)
@@ -441,10 +485,10 @@ export default class Loader {
         getter();
     }
     getProjectByID (id, cb) {
-        if (!this.api.v4._token || !id)
+        if (!this.api()._token || !id)
             cb(null);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.project_by_id
               .replace('@id', id);
@@ -460,10 +504,10 @@ export default class Loader {
         getter();
     }
     getProjectsByRepository (repository, cb) {
-        if (!this.api.v4._token || !repository)
+        if (!this.api()._token || !repository)
             cb([]);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.projects_by_repository
               .replace('@owner', repository.owner().login)
@@ -490,10 +534,10 @@ export default class Loader {
         getter();
     }
     getAssigneesByRepository (repository, cb) {
-        if (!this.api.v4._token || !repository)
+        if (!this.api()._token || !repository)
             cb([]);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.assignees_by_repository
               .replace('@owner', repository.owner().login)
@@ -520,10 +564,10 @@ export default class Loader {
         getter();
     }
     getLabelsByRepository (repository, cb) {
-        if (!this.api.v4._token || !repository)
+        if (!this.api()._token || !repository)
             cb([]);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.labels_by_repository
               .replace('@owner', repository.owner().login)
@@ -550,10 +594,10 @@ export default class Loader {
         getter();
     }
     createIssue (data, cb_success, cb_error) {
-        if (!this.api.v4._token || !data)
+        if (!this.api()._token || !data)
             cb_success(null);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const q = query.create_issue
               .replace('@issue-data', this.makeGraphQLData(data));
@@ -569,10 +613,10 @@ export default class Loader {
         getter();
     }
     updateIssueBody (issue, cb_success, cb_error) {
-        if (!this.api.v4._token || !issue)
+        if (!this.api()._token || !issue)
             cb_success(null);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const q = query.update_issue_body
               .replace('@issue-data', this.makeGraphQLData({
@@ -591,10 +635,10 @@ export default class Loader {
         getter();
     }
     updateIssueMilestone (issue, milestoneId, cb_success, cb_error) {
-        if (!this.api.v4._token || !issue)
+        if (!this.api()._token || !issue)
             cb_success(null);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const q = query.update_issue_body
               .replace('@issue-data', this.makeGraphQLData({
@@ -613,10 +657,10 @@ export default class Loader {
         getter();
     }
     updateIssueProjects (issue, projectIds, cb_success, cb_error) {
-        if (!this.api.v4._token || !issue)
+        if (!this.api()._token || !issue)
             cb_success(null);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const q = query.update_issue_body
               .replace('@issue-data', this.makeGraphQLData({
@@ -635,10 +679,10 @@ export default class Loader {
         getter();
     }
     fetchRepositories (owner, name, cb) {
-        if (!this.api.v4._token || !owner || !name)
+        if (!this.api()._token || !owner || !name)
             cb(null);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.repository
               .replace('@owner', owner)
@@ -700,10 +744,10 @@ export default class Loader {
      * Search
      * **************************************************************** */
     searchIssues  (query_in, cb_success, cb_error)  {
-        if (!this.api.v4._token || !query)
+        if (!this.api()._token || !query)
             cb_success([]);
 
-        const api = this.api.v4;
+        const api = this.api();
 
         const base_query = query.search_issues
               .replace('@QUERY', query_in);

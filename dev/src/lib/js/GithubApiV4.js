@@ -24,23 +24,28 @@ export default class GithubApiV4 {
     }
     fetch (query, success, error) {
         const endpoint = 'https://api.github.com/graphql';
+        const post_data = this.postData(this._token, query);
 
-        fetch(endpoint, this.postData(this._token, query))
-            .then(response => {
-                if (response.ok)
-                    return response.json();
-                else
-                    return Promise.reject(response);
-            })
-            .then(data => {
-                if (success)
-                    success(data);
+        // Promis を返す
+        return fetch(endpoint, post_data)
+            .then(r => r.ok ? r.json() : Promise.reject(r))
+            .then(r => {
+                const out = { status: 'success', data: r.data };
+
+                // コールバック関数に結果を返す。
+                // SOGH の処理用。
+                if (success) success(out);
+
+                return out;
             })
             .catch(err => {
-                if (error)
-                    error(err);
-                else
-                    console.error(err);
+                const out = { status: 'error', error };
+
+                // コールバック関数に結果を返す。
+                // SOGH の処理用。
+                error ? error(out) : console.error(err);
+
+                return out;
             });
     }
 }
