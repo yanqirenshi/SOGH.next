@@ -18,7 +18,6 @@ export default function App() {
               <Route path="/repositories/:id/issues"           element={<page.PageRepositoryIssues />} />
               <Route path="/repositories/:id/projects"         element={<page.PageRepositoryProjects />} />
               <Route path="/repositories/:id/classic-projects" element={<page.PageRepositoryClassicProjects />} />
-              <Route path="/samples/redux"                     element={<page.PageSampleRedux />} />
             </Routes>
           </BrowserRouter>
         </>
