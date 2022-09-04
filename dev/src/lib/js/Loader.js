@@ -14,25 +14,27 @@ export default class Loader {
         };
     }
     token (v) {
-        if (arguments.length>1)
+        if (arguments.length > 0)
             this._token = v;
 
         return this._token;
     }
     viewer (v) {
-        if (arguments.length>1)
+        if (arguments.length > 0){
             this._viewer = v;
+        }
 
         return this._viewer;
     }
     api (v) {
-        if (arguments.length>1)
+        if (arguments.length > 0)
             this._api.v4 = v;
 
         return this._api.v4;
     }
     connect (token, success, error) {
         const api = new GithubApiV4(token);
+
         // api を実行するための Promis を返す。
         return api.fetch(
             query.viwer,
@@ -45,7 +47,7 @@ export default class Loader {
                 this.viewer(new model.Viewer(data.viewer));
                 this.api(api);
 
-                if (success) success(this._viewer);
+                success && success();
             },
             // コールバック： API実行結果 → エラー
             // SOGH としての処理を実行する。
@@ -54,29 +56,10 @@ export default class Loader {
                 this.viewer(null);
                 this.api(null);
 
-                error ? error(r) : console.log(r);
+                console.erro(r);
+
+                error && error(r);
             });
-    }
-    connectOld (token, success, error) {
-        const api = new GithubApiV4(token);
-
-        api.fetch(query.viwer, (results) => {
-            const data = results.data;
-
-            this._token = token;
-
-            this._viewer = new model.Viewer(data.viewer);
-
-            this.api.v4 = api;
-
-            success(this._viewer);
-        }, (r) => {
-            this._token = token;
-            this._viewer = null;
-            this.api.v4 = null;
-
-            error(r);
-        });
     }
     isConnected () {
         return this._viewer !== null && this.api() !== null;
