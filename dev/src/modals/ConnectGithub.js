@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { connect, connectGithubAsync } from '../slices/github.js';
+import { close } from '../slices/modals.js';
 
 import Modal from '@mui/material/Modal';
 import Card from '@mui/material/Card';
@@ -35,9 +36,7 @@ export default function ConnectGithub (props) {
 
     const clickConnect = ()=> dispatch(connectGithubAsync({
         token: token,
-        callbacks: {
-            success: ()=> console.log('xyz'),
-        },
+        callbacks: { success: ()=> dispatch(close()) },
     }));
 
     return (
