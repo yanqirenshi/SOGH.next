@@ -1,10 +1,7 @@
 import React from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
-import {
-    connectGithubAsync,
-    fetchRepositoriesByViewer
- } from '../slices/github.js';
+import { connectGithubAsync } from '../slices/github.js';
 import { close } from '../slices/modals.js';
 
 import Modal from '@mui/material/Modal';
@@ -40,10 +37,7 @@ export default function ConnectGithub (props) {
     const clickConnect = ()=> dispatch(connectGithubAsync({
         token: token,
         callbacks: {
-            success: ()=> {
-                dispatch(close());
-                dispatch(fetchRepositoriesByViewer());
-            }
+            success: ()=> dispatch(close()),
         },
     }));
 

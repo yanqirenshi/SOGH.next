@@ -2,6 +2,8 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import SOGH from '../../sogh.js';
 
+import * as model from '../../lib/js/models/index.js';
+
 function applyCallback (payload, type, args=[]) {
     if (!payload
         || !payload.callbacks
@@ -11,18 +13,21 @@ function applyCallback (payload, type, args=[]) {
     payload.callbacks[type].apply(args);
 }
 
-export const connectGithubAsync = createAsyncThunk(
-    'github/connect',
+export const fetchRepositoriesByViewer = createAsyncThunk(
+    'github/fetchRepositoriesByViewer',
     async (payload) => {
-        const token = payload.token;
+        const sogh = payload;
 
         try {
-            const response = await SOGH.connect(token);
+            const response = await sogh.fetchRepositoriesByViewer();
+            const nodes = response.data.viewer.repositories.nodes;
+
+            const repositories = nodes.map(node=>new model.Repository(node));
 
             applyCallback(payload, 'success');
 
             return {
-                data: response.data.viewer.id,
+                data: repositories.map(d=>d.id()),
             };
         } catch (e) {
             console.error(e);

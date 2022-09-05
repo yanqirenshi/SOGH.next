@@ -4,7 +4,6 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import {
     connectGithubAsync,
-    fetchRepositoriesByViewer
 } from './github/actions.js';
 
 export const github = createSlice({
@@ -34,14 +33,6 @@ export const github = createSlice({
                 state.viewer = null;
                 state.connect.end = moment().toISOString();
             });
-
-        builder
-            .addCase(fetchRepositoriesByViewer.pending, (state) => {
-            })
-            .addCase(fetchRepositoriesByViewer.fulfilled, (state, action) => {
-            })
-            .addCase(fetchRepositoriesByViewer.rejected, (state) => {
-            });
     },
 });
 
@@ -51,4 +42,4 @@ export const github = createSlice({
 
 export default github.reducer;
 
-export { connectGithubAsync, fetchRepositoriesByViewer };
+export { connectGithubAsync };
