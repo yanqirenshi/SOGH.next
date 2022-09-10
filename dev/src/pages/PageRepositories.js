@@ -20,9 +20,11 @@ export default function PageRepositories (props) {
         <div>
           <GlobalAppBar title="Repositories"/>
 
-          <div style={{margin:22}}>
-            <Repositories data={page_repositories.repositories}
-                          sogh={SOGH}/>
+          <div style={{margin:22, display:'flex', justifyContent: 'center'}}>
+            <div style={{width:1111}}>
+              <Repositories data={page_repositories.repositories}
+                            sogh={SOGH}/>
+            </div>
           </div>
         </div>
     );

@@ -42,11 +42,19 @@ export default function App() {
           <Modals github={github} callbacks={callbacks}/>
           <BrowserRouter>
             <Routes>
+
               <Route path="/"
                      element={<page.PageRepositories github={github} />} />
-              <Route path="/repositories/:id/issues"           element={<page.PageRepositoryIssues />} />
-              <Route path="/repositories/:id/projects"         element={<page.PageRepositoryProjects />} />
-              <Route path="/repositories/:id/classic-projects" element={<page.PageRepositoryClassicProjects />} />
+
+              <Route path="/repositories/:id/issues"
+                     element={<page.PageRepositoryIssues />} />
+
+              <Route path="/repositories/:id/projects"
+                     element={<page.PageRepositoryProjects />} />
+
+              <Route path="/repositories/:id/classic-projects"
+                     element={<page.PageRepositoryClassicProjects />} />
+
             </Routes>
           </BrowserRouter>
         </>
