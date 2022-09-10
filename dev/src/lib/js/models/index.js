@@ -6,6 +6,7 @@ import Label from './Label.js';
 import Milestone from './Milestone.js';
 import Project from './Project.js';
 import Repository from './Repository.js';
+import User from './User.js';
 import Viewer from './Viewer.js';
 
 export {
@@ -17,5 +18,6 @@ export {
     Milestone,
     Project,
     Repository,
+    User,
     Viewer,
 }
