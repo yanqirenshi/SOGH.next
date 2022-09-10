@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { DateTime } from 'luxon';
 
 import {
     fetchRepositoriesByViewer
@@ -17,10 +18,15 @@ export const page_repositories = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(fetchRepositoriesByViewer.pending, (state) => {
+                state.fetch.start = DateTime.now().toISO();
+                state.fetch.end = null;
             })
             .addCase(fetchRepositoriesByViewer.fulfilled, (state, action) => {
+                state.fetch.end = DateTime.now().toISO();
+                state.repositories = action.payload.data;
             })
             .addCase(fetchRepositoriesByViewer.rejected, (state) => {
+                state.fetch.end = DateTime.now().toISO();
             });
     },
 });

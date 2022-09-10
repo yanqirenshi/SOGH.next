@@ -761,12 +761,13 @@ export default class Loader {
                 this.viewer(null);
                 this.api(null);
 
-                console.erro(r);
+                console.error(r);
 
                 error && error(r);
             });
     }
     fetchRepositoriesByViewer (success, error) {
+        // success, error は不要だな。
         const api = this.api();
 
         const base = query.repositories_by_viewer;

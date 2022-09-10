@@ -20,14 +20,22 @@ export const fetchRepositoriesByViewer = createAsyncThunk(
 
         try {
             const response = await sogh.fetchRepositoriesByViewer();
+
             const nodes = response.data.viewer.repositories.nodes;
 
-            const repositories = nodes.map(node=>new model.Repository(node));
+            const id_list = [];
+            for (const node of nodes) {
+                const obj = new model.Repository(node);
+
+                SOGH.node2repository(node);
+
+                id_list.push(obj.id());
+            }
 
             applyCallback(payload, 'success');
 
             return {
-                data: repositories.map(d=>d.id()),
+                data: id_list,
             };
         } catch (e) {
             console.error(e);
