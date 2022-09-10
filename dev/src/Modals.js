@@ -5,7 +5,10 @@ import { close } from './slices/modals.js';
 
 import * as modal from './modals/index.js';
 
-export default function Modals () {
+export default function Modals (props) {
+    const github = props.github;
+    const callbacks = props.callbacks;
+
     const modals = useSelector(state => state.modals);
     const dispatch = useDispatch();
 
@@ -19,7 +22,11 @@ export default function Modals () {
     const closeModal = ()=> dispatch(close());
 
     if ('connect_github'===opend_modal_code)
-        return <modal.ConnectGithub code={opend_modal_code} data={data} close={closeModal}/>;
+        return <modal.ConnectGithub code={opend_modal_code}
+                                    data={data}
+                                    close={closeModal}
+                                    github={github}
+                                    callbacks={callbacks} />;
 
     return null;
 }

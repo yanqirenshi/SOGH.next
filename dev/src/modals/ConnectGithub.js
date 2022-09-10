@@ -1,9 +1,5 @@
 import React from 'react';
 
-import { useSelector, useDispatch } from 'react-redux';
-import { connectGithubAsync } from '../slices/github.js';
-import { close } from '../slices/modals.js';
-
 import Modal from '@mui/material/Modal';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -26,20 +22,15 @@ const style = {
 export default function ConnectGithub (props) {
     const [token, setToken] = React.useState('');
 
-    const modals = useSelector(state => state.modals);
-    const github = useSelector(state => state.github);
-    const dispatch = useDispatch();
-
+    const callbacks = props.callbacks;
     const close = props.close;
 
     const changeToken = (e)=> setToken(e.target.value);
 
-    const clickConnect = ()=> dispatch(connectGithubAsync({
-        token: token,
-        callbacks: {
-            success: ()=> dispatch(close()),
-        },
-    }));
+    const clickConnect = ()=> callbacks.github.auth(
+        token,
+        { success: ()=> close() },
+    );
 
     return (
         <Modal open={true}

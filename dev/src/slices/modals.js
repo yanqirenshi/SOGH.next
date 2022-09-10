@@ -1,7 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import Pool from '../js/Pool.js';
-
 export const modals = createSlice({
     name: 'sogh',
     initialState: {

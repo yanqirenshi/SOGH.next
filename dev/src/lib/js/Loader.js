@@ -680,11 +680,13 @@ export default class Loader {
             return ht;
         }, {});
 
-        let issues = [];
+        const issues = [];
 
         for (const column of columns)
             this.getIssuesByProjectColumn(column, (ret)=> {
-                issues = issues.concat(ret);
+                // TODO: テストしてない。。。。
+                // issues = issues.concat(ret);
+                issues.push.apply(issues, ret);
 
                 progress[column.id] = new Date();
 

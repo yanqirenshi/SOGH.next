@@ -8,8 +8,7 @@ import {Repositories} from '../lib/index.js';
 
 import SOGH from '../sogh.js';
 
-export default function PageRepositories () {
-    const github = useSelector(state => state.github);
+export default function PageRepositories (props) {
     const page_repositories = useSelector(state => state.page_repositories);
 
     const dispatch = useDispatch();
