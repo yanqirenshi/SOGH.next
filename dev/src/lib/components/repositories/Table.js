@@ -6,9 +6,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Link from '@mui/material/Link';
-
+// import Link from '@mui/material/Link';
 import Avatar from '@mui/material/Avatar';
+
+import LinkGithub from '../common/LinkGithub.js';
+import Link from '../common/Link.js';
 
 export default (props)=> {
     const data = props.data;
@@ -36,17 +38,26 @@ export default (props)=> {
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <TableCell>
                           <div style={{display:'flex', alignItems: 'center'}}>
-                            <Avatar src={owner.avatarUrl} />
-                            <Link href={owner.url} style={{marginLeft:11}}>
+                            <Avatar src={owner.avatarUrl}
+                                    style={{marginRight:22}}/>
+                            <p style={{marginRight:22}}>
                               {owner.login}
-                            </Link>
+                            </p>
+
+                            <LinkGithub href={obj.url(owner.url)}/>
                           </div>
                         </TableCell>
 
                         <TableCell>
-                          <Link href={obj.url()}>
-                            {obj.name()}
-                          </Link>
+                          <div style={{display:'flex', alignItems: 'center'}}>
+                            <p style={{marginRight:22}}>
+                              <Link href={`/repositories/${obj.id()}`}>
+                                {obj.name()}
+                              </Link>
+                            </p>
+
+                            <LinkGithub href={obj.url()}/>
+                          </div>
                         </TableCell>
                         <TableCell>{obj.pushedAt()}</TableCell>
                       </TableRow>
