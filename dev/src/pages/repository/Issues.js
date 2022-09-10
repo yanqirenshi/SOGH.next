@@ -1,8 +1,6 @@
 import React from 'react';
 
-export default (props)=> {
-    const anchor = 'left';
-
+export default function Issues (props) {
     return (
         <div></div>
     );

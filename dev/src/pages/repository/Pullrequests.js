@@ -1,8 +1,6 @@
 import React from 'react';
 
-export default (props)=> {
-    const anchor = 'left';
-
+export default function Pullrequests (props) {
     return (
         <div></div>
     );

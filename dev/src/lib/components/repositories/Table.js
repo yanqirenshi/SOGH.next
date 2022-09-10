@@ -1,5 +1,5 @@
 import React from 'react';
-import Table from '@mui/material/Table';
+import MTable from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -12,13 +12,13 @@ import Avatar from '@mui/material/Avatar';
 import LinkGithub from '../common/LinkGithub.js';
 import Link from '../common/Link.js';
 
-export default (props)=> {
+export default function Table (props) {
     const data = props.data;
     const sogh = props.sogh;
 
     return (
         <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <MTable sx={{ minWidth: 650 }} aria-label="simple table">
 
             <TableHead>
               <TableRow>
@@ -65,7 +65,7 @@ export default (props)=> {
               })}
             </TableBody>
 
-          </Table>
+          </MTable>
         </TableContainer>
     );
 }

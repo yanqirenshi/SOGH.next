@@ -1,15 +1,15 @@
 import React from 'react';
 
-import { Link } from "react-router-dom";
+import * as router from "react-router-dom";
 
-export default (props)=> {
+export default function Link (props) {
     const children = props.children;
 
     const href = props.href;
 
     return (
-        <Link to={href}>
+        <router.Link to={href}>
           {children}
-        </Link>
+        </router.Link>
     );
 }
