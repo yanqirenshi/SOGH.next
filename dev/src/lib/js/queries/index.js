@@ -13,6 +13,7 @@ import labels_by_repository from './labels_by_repository.js';
 import milestone_by_reposigory from './milestones_by_repository.js';
 import project_by_id from './project_by_id.js';
 import projects_by_repository from './projects_by_repository.js';
+import projects_next_by_id from './projects_next_by_id.js';
 import projects_next_by_user from './projects_next_by_user.js';
 import repositories_by_viewer from './repositories_by_viewer.js';
 import repository from './repository.js';
@@ -35,6 +36,7 @@ export {
     milestone_by_reposigory,
     project_by_id,
     projects_by_repository,
+    projects_next_by_id,
     projects_next_by_user,
     repositories_by_viewer,
     repository,

@@ -43,6 +43,15 @@ closedAt
 closed
 `;
 
+export const project_next_item = `
+id
+name
+dataType
+settings
+createdAt
+updatedAt
+`;
+
 
 export const page_nation = `after: "", first: 100`;
 
@@ -53,3 +62,4 @@ hasNextPage
 hasPreviousPage
 startCursor
 `;
+

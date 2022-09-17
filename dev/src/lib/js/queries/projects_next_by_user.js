@@ -16,6 +16,11 @@ const query = `{
             ${attr.user}
           }
         }
+        fields(first: 100) {
+          nodes {
+            ${attr.project_next_item}
+          }
+        }
       }
       pageInfo {
         ${attr.page_info}

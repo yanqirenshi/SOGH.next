@@ -49,6 +49,9 @@ export default function App() {
               <Route path="/owners/:id"
                      element={<page.PageOwner github={github} />} />
 
+              <Route path="/projects-next/:id"
+                     element={<page.PageProjectNext github={github} />} />
+
               <Route path="/repositories/:id"
                      element={<page.PageRepository github={github} />} />
 
