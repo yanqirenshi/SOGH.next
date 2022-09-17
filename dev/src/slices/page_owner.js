@@ -39,7 +39,7 @@ export const page_owner = createSlice({
             })
             .addCase(fetchUserByID.fulfilled, (state, action) => {
                 state.user.fetch.end = DateTime.now().toISO();
-                state.user.data = action.payload.data.id();
+                state.user.data = action.payload.data;
             })
             .addCase(fetchUserByID.rejected, (state) => {
                 state.user.fetch.end = DateTime.now().toISO();

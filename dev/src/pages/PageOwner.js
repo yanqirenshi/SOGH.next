@@ -13,19 +13,18 @@ import GlobalAppBar from '../components/GlobalAppBar.js';
 import sogh from '../sogh.js';
 
 export default function PageOwner (props) {
-    const owner_id = useParams().id;
-
     const data = useSelector(state => state.page_owner);
     const dispatch = useDispatch();
 
+    const owner_id = useParams().id;
     const user = sogh.user(owner_id);
 
     React.useEffect(()=> {
-        user && dispatch(fetchProjectsNextByUser({sogh: sogh, user: user}));
+        user && dispatch(fetchProjectsNextByUser(user));
     }, [user]);
 
     if (isNeedFirstLoad(data))
-        dispatch(fetchUserByID({sogh: sogh, id: owner_id}));
+        dispatch(fetchUserByID(owner_id));
 
     return (
         <div>
