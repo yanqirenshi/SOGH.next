@@ -13,6 +13,7 @@ export default class Sogh extends Loader {
         this._pools = {
             repository: new Pool(),
             user: new Pool(),
+            projectnext: new Pool(),
         };
     }
     pool (v) {
@@ -49,6 +50,21 @@ export default class Sogh extends Loader {
     }
     user (v) {
         const pool = this.pool('user');
+
+        return pool.get(v);
+    }
+    /* **************************************************************** *
+     *  ProjectNext                                                     *
+     * **************************************************************** */
+    node2projectnext (node) {
+        const pool = this.pool('projectnext');
+
+        this.matchmaker.user(node);
+
+        return pool.ensure(node, (d)=> new model.ProjectNext(d));
+    }
+    projectnext (v) {
+        const pool = this.pool('projectnext');
 
         return pool.get(v);
     }

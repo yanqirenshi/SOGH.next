@@ -793,10 +793,18 @@ export default class Loader {
             });
     }
     fetchUserByID (id) {
-        // success, error は不要だな。
         const api = this.api();
 
         const base = query.user_by_id.replace('@id', id);
+
+        const statmenet = this.ensureEndCursor(base, null);
+
+        return api.fetch(statmenet);
+    }
+    fetchProjectsNextByUser (user) {
+        const api = this.api();
+
+        const base = query.projects_next_by_user.replace('@login', user.login());
 
         const statmenet = this.ensureEndCursor(base, null);
 

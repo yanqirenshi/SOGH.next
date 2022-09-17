@@ -30,15 +30,26 @@ url
 
 export const project_next = `
 id
-url
 number
+url
 title
-public
 description
+public
+viewerCanUpdate
+shortDescription
 createdAt
 updatedAt
 closedAt
+closed
 `;
 
 
 export const page_nation = `after: "", first: 100`;
+
+
+export const page_info = `
+endCursor
+hasNextPage
+hasPreviousPage
+startCursor
+`;

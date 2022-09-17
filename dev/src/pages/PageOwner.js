@@ -1,7 +1,10 @@
 import React from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchUserByID } from '../slices/page_owner.js';
+import {
+    fetchUserByID,
+    fetchProjectsNextByUser,
+} from '../slices/page_owner.js';
 
 import {useParams} from "react-router-dom";
 
@@ -18,8 +21,7 @@ export default function PageOwner (props) {
     const user = sogh.user(owner_id);
 
     React.useEffect(()=> {
-        if (user)
-            console.log(user);
+        user && dispatch(fetchProjectsNextByUser({sogh: sogh, user: user}));
     }, [user]);
 
     if (isNeedFirstLoad(data))

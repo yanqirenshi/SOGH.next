@@ -12,8 +12,8 @@ import issues_open_by_repository from './issues_open_by_repository.js';
 import labels_by_repository from './labels_by_repository.js';
 import milestone_by_reposigory from './milestones_by_repository.js';
 import project_by_id from './project_by_id.js';
-import project_next_by_user from './project_next_by_user.js';
 import projects_by_repository from './projects_by_repository.js';
+import projects_next_by_user from './projects_next_by_user.js';
 import repositories_by_viewer from './repositories_by_viewer.js';
 import repository from './repository.js';
 import search_issues from './search_issues.js';
@@ -34,8 +34,8 @@ export {
     labels_by_repository,
     milestone_by_reposigory,
     project_by_id,
-    project_next_by_user,
     projects_by_repository,
+    projects_next_by_user,
     repositories_by_viewer,
     repository,
     search_issues,
