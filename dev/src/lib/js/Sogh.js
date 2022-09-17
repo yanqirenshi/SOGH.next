@@ -21,7 +21,24 @@ export default class Sogh extends Loader {
     }
     get (id) {
         return this.repository(id)
-            || this.user(id);
+            || this.user(id)
+            || this.projectNext(id);
+    }
+    href (obj, to, data) {
+        const x = {
+            'project-next': '/projects-next/:id'
+        };
+
+        const base = x[to];
+        const keys = Object.keys(data);
+
+        return keys.reduce((str, key)=> {
+            let out = str;
+
+            if (key==='id') out = str.replaceAll(':id', obj.id());
+
+            return out;
+        }, base);
     }
     /* **************************************************************** *
      *  Repository                                                      *
@@ -56,14 +73,14 @@ export default class Sogh extends Loader {
     /* **************************************************************** *
      *  ProjectNext                                                     *
      * **************************************************************** */
-    node2projectnext (node) {
+    node2projectNext (node) {
         const pool = this.pool('projectnext');
 
         this.matchmaker.user(node);
 
         return pool.ensure(node, (d)=> new model.ProjectNext(d));
     }
-    projectnext (v) {
+    projectNext (v) {
         const pool = this.pool('projectnext');
 
         return pool.get(v);

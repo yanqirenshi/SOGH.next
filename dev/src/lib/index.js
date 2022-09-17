@@ -1,4 +1,6 @@
 import Repositories from './components/Repositories.js';
+import ProjectNexts from './components/ProjectNexts.js';
+
 
 import Sogh from './js/Sogh.js';
 
@@ -16,6 +18,7 @@ export default Sogh;
 
 export {
     Repositories,
+    ProjectNexts,
     //
     Assignee,
     Card,

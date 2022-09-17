@@ -1,16 +1,18 @@
 import React from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
-import {
-    fetchUserByID,
-    fetchProjectsNextByUser,
-} from '../slices/page_owner.js';
-
 import {useParams} from "react-router-dom";
 
 import GlobalAppBar from '../components/GlobalAppBar.js';
 
 import sogh from '../sogh.js';
+
+import {ProjectNexts} from '../lib/index.js';
+
+import {
+    fetchUserByID,
+    fetchProjectsNextByUser,
+} from '../slices/page_owner.js';
 
 export default function PageOwner (props) {
     const data = useSelector(state => state.page_owner);
@@ -31,6 +33,7 @@ export default function PageOwner (props) {
           <GlobalAppBar title="Owner"/>
 
           <div style={{display:'flex', justifyContent: 'center'}}>
+            <ProjectNexts data={data.projects_next.data} sogh={sogh}/>
           </div>
         </div>
     );
