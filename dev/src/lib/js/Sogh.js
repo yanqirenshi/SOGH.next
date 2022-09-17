@@ -18,6 +18,10 @@ export default class Sogh extends Loader {
     pool (v) {
         return this._pools[v] || null;
     }
+    get (id) {
+        return this.repository(id)
+            || this.user(id);
+    }
     /* **************************************************************** *
      *  Repository                                                      *
      * **************************************************************** */
