@@ -41,7 +41,9 @@ export default function Table (props) {
                             <Avatar src={owner.avatarUrl}
                                     style={{marginRight:22}}/>
                             <p style={{marginRight:22}}>
-                              {owner.login}
+                              <Link href={`/owners/${owner.id}`}>
+                                {owner.login}
+                              </Link>
                             </p>
 
                             <LinkGithub href={obj.url(owner.url)}/>

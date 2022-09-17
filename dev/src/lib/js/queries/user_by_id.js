@@ -1,8 +1,10 @@
 import * as attr from './attributes.js';
 
 const query = `{
-  viewer {
-    ${attr.user}
+  node(id: "@id") {
+    ... on User {
+      ${attr.user}
+    }
   }
 }`;
 

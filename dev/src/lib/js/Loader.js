@@ -792,4 +792,14 @@ export default class Loader {
                 error && error(r);
             });
     }
+    fetchUserByID (id) {
+        // success, error は不要だな。
+        const api = this.api();
+
+        const base = query.user_by_id.replace('@id', id);
+
+        const statmenet = this.ensureEndCursor(base, null);
+
+        return api.fetch(statmenet);
+    }
 }

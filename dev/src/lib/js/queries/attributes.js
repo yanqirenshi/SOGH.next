@@ -1,9 +1,13 @@
-export const viewer = `
-login
-email
+export const user = `
 id
+login
 name
+avatarUrl
 url
+email
+company
+createdAt
+updatedAt
 `;
 
 export const repositories = `
@@ -23,5 +27,18 @@ login
 avatarUrl
 url
 `;
+
+export const project_next = `
+id
+url
+number
+title
+public
+description
+createdAt
+updatedAt
+closedAt
+`;
+
 
 export const page_nation = `after: "", first: 100`;
