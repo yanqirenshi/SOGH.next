@@ -12,12 +12,17 @@ import sogh from '../sogh.js';
 export default function PageOwner (props) {
     const owner_id = useParams().id;
 
-    const page_owner = useSelector(state => state.page_owner);
+    const data = useSelector(state => state.page_owner);
     const dispatch = useDispatch();
 
     const user = sogh.user(owner_id);
 
-    if (isNeedFirstLoad(page_owner))
+    React.useEffect(()=> {
+        if (user)
+            console.log(user);
+    }, [user]);
+
+    if (isNeedFirstLoad(data))
         dispatch(fetchUserByID({sogh: sogh, id: owner_id}));
 
     return (
