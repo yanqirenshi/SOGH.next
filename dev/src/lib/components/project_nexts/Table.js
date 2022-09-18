@@ -8,9 +8,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import LinkGithub from '../common/LinkGithub.js';
-import Link from '../common/Link.js';
-
 import TableCellLinkGithub from '../common/TableCellLinkGithub.js';
 import TableCellLinkSogh from '../common/TableCellLinkSogh.js';
 

@@ -5,7 +5,6 @@ import sogh from '../../sogh.js';
 import {
     applyCallback,
     errorDefaultProcess,
-    node2id,
 } from '../utils.js';
 
 const fetchUserByID = createAsyncThunk(
@@ -15,8 +14,6 @@ const fetchUserByID = createAsyncThunk(
 
         try {
             const response = await sogh.fetchUserByID(id);
-
-            const node = response.data.node;
 
             const out = response.data.id();
 

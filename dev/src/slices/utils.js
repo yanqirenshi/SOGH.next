@@ -19,11 +19,8 @@ export function errorDefaultProcess (e) {
 export function nodes2ids (nodes, make) {
     const id_list = [];
 
-    for (const node of nodes) {
-        const obj = make(node);
-
+    for (const node of nodes)
         id_list.push(node.id);
-    }
 
     return {
         data: id_list,
@@ -31,10 +28,6 @@ export function nodes2ids (nodes, make) {
 }
 
 export function node2id (node, make) {
-    const id_list = [];
-
-    const obj = make(node);
-
     return {
         data: node.id,
     };

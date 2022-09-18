@@ -1,7 +1,3 @@
-import * as model from './models/index.js';
-
-import * as query from './queries/index.js';
-
 export default class Loader {
     constructor () {
         this._token = null;

@@ -5,7 +5,6 @@ import sogh from '../../sogh.js';
 import {
     applyCallback,
     errorDefaultProcess,
-    nodes2ids,
 } from '../utils.js';
 
 const fetchProjectsNextByUser = createAsyncThunk(

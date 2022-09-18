@@ -1,13 +1,9 @@
-import Loader from './Loader.js';
+import Pooler from './Pooler.js';
 
 import * as queries from './queries/index.js';
 
-import Pooler from './Pooler.js';
-
 export default class Sogh extends Pooler {
-    constructor () {
-        super();
-    }
+    // constructor () { super(); }
     href (obj, to, data) {
         const x = {
             'project-next': '/projects-next/:id'
@@ -46,9 +42,6 @@ export default class Sogh extends Pooler {
      * fetch
      * **************************************************************** */
     fetchRepositoriesByViewer (success, error) {
-        // success, error は不要だな。
-        const api = this.api();
-
         const query = queries.repositories_by_viewer;
 
         const query_pageing = this.ensureEndCursor(query, null);
@@ -86,8 +79,6 @@ export default class Sogh extends Pooler {
             });
     }
     fetchProjectsNextByID (id) {
-        const api = this.api();
-
         const query = queries.projects_next_by_id.replace('@id', id);
 
         const query_pageing = this.ensureEndCursor(query, null);

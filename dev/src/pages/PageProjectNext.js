@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { useSelector, useDispatch } from 'react-redux';
-import { useParams } from "react-router-dom";
+// import { useSelector, useDispatch } from 'react-redux';
+// import { useParams } from "react-router-dom";
 
 import GlobalAppBar from '../components/GlobalAppBar.js';
 
-import sogh from '../sogh.js';
+// import sogh from '../sogh.js';
 
 // import {
 //     fetchUserByID,
@@ -13,11 +13,11 @@ import sogh from '../sogh.js';
 // } from '../slices/page_owner.js';
 
 export default function PageProjectNext (props) {
-    const data = useSelector(state => state.page_project_next);
-    const dispatch = useDispatch();
+    // const data = useSelector(state => state.page_project_next);
+    // const dispatch = useDispatch();
 
-    const project_next_id = useParams().id;
-    const user = sogh.projectNext(project_next_id);
+    // const project_next_id = useParams().id;
+    // const user = sogh.projectNext(project_next_id);
 
     // React.useEffect(()=> {
     //     user && dispatch(fetchProjectsNextByUser(user));

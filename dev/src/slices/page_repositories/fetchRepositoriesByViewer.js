@@ -1,9 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-import SOGH from '../../sogh.js';
-
-import * as model from '../../lib/js/models/index.js';
-
 import { applyCallback, errorDefaultProcess } from '../utils.js';
 
 export default createAsyncThunk(
@@ -18,8 +14,6 @@ export default createAsyncThunk(
                 throw response.error;
 
             const repositories = response.data;
-
-            const id_list = repositories.map(d=>d.id());
 
             applyCallback(payload, 'success');
 
