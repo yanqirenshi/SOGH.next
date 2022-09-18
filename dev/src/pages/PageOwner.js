@@ -15,18 +15,23 @@ import {
 } from '../slices/page_owner.js';
 
 export default function PageOwner (props) {
+    const [load, setLoad] = React.useState(false);
+
     const data = useSelector(state => state.page_owner);
     const dispatch = useDispatch();
 
     const owner_id = useParams().id;
     const user = sogh.user(owner_id);
 
-    React.useEffect(()=> {
-        user && dispatch(fetchProjectsNextByUser(user));
-    }, [user]);
+    React.useEffect(()=> setLoad(true), [user]);
 
     if (isNeedFirstLoad(data))
         dispatch(fetchUserByID(owner_id));
+
+    if (load) {
+        setLoad(false);
+        dispatch(fetchProjectsNextByUser(user));
+    }
 
     return (
         <div>

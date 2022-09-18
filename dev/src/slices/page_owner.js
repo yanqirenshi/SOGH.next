@@ -24,12 +24,6 @@ export const page_owner = createSlice({
                 pageInfo: null,
             },
         },
-        // fetch: {
-        //     start: null,
-        //     end: null,
-        //     pageInfo: null,
-        // },
-        // repositories: [],
     },
     extraReducers: (builder) => {
         builder
