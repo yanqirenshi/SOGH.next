@@ -68,20 +68,15 @@ export default class Sogh extends Pooler {
             contents: this.node2user(data.node).id(),
         };
     }
-    fetchRepositoriesByViewer (success, error) {
+    fetchRepositoriesByViewer () {
         const query = queries.repositories_by_viewer;
 
         const query_pageing = this.ensureEndCursor(query, null);
 
         return this.fetchX(
             query_pageing,
-            (results) => {
-                const data = results.data;
-
-                const list = data.viewer.repositories.nodes || [];
-
-                return list.map(node=> this.node2repository(node));
-            });
+            (response)=> this.yyy(response.data.viewer.repositories,
+                                  node=> this.node2repository(node)));
     }
     fetchUserByID (id) {
         const query = queries.user_by_id.replace('@id', id);

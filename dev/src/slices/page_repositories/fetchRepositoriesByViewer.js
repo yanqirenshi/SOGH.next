@@ -13,13 +13,11 @@ export default createAsyncThunk(
             if (response.status==='error')
                 throw response.error;
 
-            const repositories = response.data;
-
             applyCallback(payload, 'success');
 
-            return {
-                data: repositories.map(d=>d.id()),
-            };
+            return response.data;
+
+
         } catch (e) {
             applyCallback(payload, 'fail');
 

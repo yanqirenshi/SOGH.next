@@ -23,7 +23,9 @@ export const page_repositories = createSlice({
             })
             .addCase(fetchRepositoriesByViewer.fulfilled, (state, action) => {
                 state.fetch.end = DateTime.now().toISO();
-                state.repositories = action.payload.data;
+                state.fetch.pageInfo = action.payload.contents;
+
+                state.repositories = action.payload.contents;
             })
             .addCase(fetchRepositoriesByViewer.rejected, (state) => {
                 state.fetch.end = DateTime.now().toISO();
