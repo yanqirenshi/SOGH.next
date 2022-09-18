@@ -17,7 +17,7 @@ const fetchProjectsNextByUser = createAsyncThunk(
 
             applyCallback(payload, 'success');
 
-            return response.data.map(d=>d.id());
+            return response.data;
         } catch (e) {
             applyCallback(payload, 'fail');
 

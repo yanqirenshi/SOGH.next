@@ -46,7 +46,8 @@ export const page_owner = createSlice({
             })
             .addCase(fetchProjectsNextByUser.fulfilled, (state, action) => {
                 state.projects_next.fetch.end = DateTime.now().toISO();
-                state.projects_next.data = action.payload;
+                state.projects_next.fetch.pageInfo = action.payload.pageInfo;
+                state.projects_next.data = action.payload.contents;
             })
             .addCase(fetchProjectsNextByUser.rejected, (state) => {
                 state.projects_next.fetch.end = DateTime.now().toISO();

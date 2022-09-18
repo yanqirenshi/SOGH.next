@@ -7,7 +7,7 @@ import {
     errorDefaultProcess,
 } from '../utils.js';
 
-const fetchUserByID = createAsyncThunk(
+export default createAsyncThunk(
     'github/fetchUserByID',
     async (payload) => {
         const id = payload;
@@ -15,11 +15,9 @@ const fetchUserByID = createAsyncThunk(
         try {
             const response = await sogh.fetchUserByID(id);
 
-            const out = response.data.id();
-
             applyCallback(payload, 'success');
 
-            return out;
+            return response.data.contents;
         } catch (e) {
             applyCallback(payload, 'fail');
 
@@ -27,5 +25,3 @@ const fetchUserByID = createAsyncThunk(
         }
     },
 );
-
-export default fetchUserByID;

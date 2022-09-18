@@ -41,6 +41,33 @@ export default class Sogh extends Pooler {
     /** **************************************************************** *
      * fetch
      * **************************************************************** */
+    xxx (node_or_nodes, make) {
+        if (Array.isArray(node_or_nodes)) {
+            const nodes = node_or_nodes;
+
+            return nodes.map(node=> {
+                return make(node).id();
+            });
+        }
+
+        const node = make(node_or_nodes).id();
+
+        return node.id();
+    }
+    yyy (data, make) {
+        const out = {
+            contents: this.xxx(data.nodes, make),
+        };
+
+        out.pageInfo = data.pageInfo;
+
+        return out;
+    }
+    zzz (data, make) {
+        return {
+            contents: this.node2user(data.node).id(),
+        };
+    }
     fetchRepositoriesByViewer (success, error) {
         const query = queries.repositories_by_viewer;
 
@@ -63,7 +90,8 @@ export default class Sogh extends Pooler {
 
         return this.fetchX(
             query_pageing,
-            (results)=> this.node2user(results.data.node));
+            (response)=> this.zzz(response.data,
+                                  node=> this.node2user(node)));
     }
     fetchProjectsNextByUser (user) {
         const query = queries.projects_next_by_user.replace('@login', user.login());
@@ -72,11 +100,8 @@ export default class Sogh extends Pooler {
 
         return this.fetchX(
             query_pageing,
-            (results)=> {
-                const nodes = results.data.user.projectsNext.nodes;
-
-                return nodes.map(node=>this.node2projectNext(node));
-            });
+            (results)=> this.yyy(results.data.user.projectsNext,
+                                 node=> this.node2projectNext(node)));
     }
     fetchProjectsNextByID (id) {
         const query = queries.projects_next_by_id.replace('@id', id);

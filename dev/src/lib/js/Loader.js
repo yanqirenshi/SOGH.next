@@ -81,7 +81,7 @@ export default class Loader {
                 return out;
             });
     }
-    fetchX (query, node2obj, success, error) {
+    fetchX (query, response2data, success, error) {
         const endpoint = 'https://api.github.com/graphql';
         const post_data = this.postData(query);
 
@@ -90,7 +90,7 @@ export default class Loader {
             .then(r => {
                 const out = {
                     status: 'success',
-                    data: node2obj ? node2obj(r) : r,
+                    data: response2data ? response2data(r) : r,
                 };
 
                 success && success(out);
