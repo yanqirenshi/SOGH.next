@@ -43,26 +43,13 @@ export default function App() {
           <BrowserRouter>
             <Routes>
 
-              <Route path="/"
-                     element={<page.PageRepositories github={github} />} />
-
-              <Route path="/owners/:id"
-                     element={<page.PageOwner github={github} />} />
-
-              <Route path="/projects-next/:id"
-                     element={<page.PageProjectNext github={github} />} />
-
-              <Route path="/repositories/:id"
-                     element={<page.PageRepository github={github} />} />
-
-              <Route path="/repositories/:id/issues"
-                     element={<page.PageRepositoryIssues />} />
-
-              <Route path="/repositories/:id/projects"
-                     element={<page.PageRepositoryProjects />} />
-
-              <Route path="/repositories/:id/classic-projects"
-                     element={<page.PageRepositoryClassicProjects />} />
+              <Route path="/"                                  element={<page.PageRepositories/>} />
+              <Route path="/owners/:id"                        element={<page.PageOwner />} />
+              <Route path="/projects-next/:id"                 element={<page.PageProjectNext/>} />
+              <Route path="/repositories/:id"                  element={<page.PageRepository/>} />
+              <Route path="/repositories/:id/issues"           element={<page.PageRepositoryIssues />} />
+              <Route path="/repositories/:id/projects"         element={<page.PageRepositoryProjects />} />
+              <Route path="/repositories/:id/classic-projects" element={<page.PageRepositoryClassicProjects />} />
 
             </Routes>
           </BrowserRouter>

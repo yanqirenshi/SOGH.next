@@ -28,7 +28,7 @@ export default function PageOwner (props) {
     if (isNeedFirstLoad(data))
         dispatch(fetchUserByID(owner_id));
 
-    if (load) {
+    if (load && user) {
         setLoad(false);
         dispatch(fetchProjectsNextByUser(user));
     }
