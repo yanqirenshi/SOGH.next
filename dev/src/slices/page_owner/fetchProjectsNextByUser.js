@@ -16,13 +16,9 @@ const fetchProjectsNextByUser = createAsyncThunk(
         try {
             const response = await sogh.fetchProjectsNextByUser(user);
 
-            const nodes = response.data.user.projectsNext.nodes;
-
-            const out = nodes2ids(nodes, (node)=> sogh.node2projectNext(node));
-
             applyCallback(payload, 'success');
 
-            return out;
+            return response.data.map(d=>d.id());
         } catch (e) {
             applyCallback(payload, 'fail');
 

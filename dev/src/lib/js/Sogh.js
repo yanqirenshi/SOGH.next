@@ -1,5 +1,7 @@
 import Loader from './Loader.js';
 
+import * as queries from './queries/index.js';
+
 import Pooler from './Pooler.js';
 
 export default class Sogh extends Pooler {
@@ -21,5 +23,82 @@ export default class Sogh extends Pooler {
 
             return out;
         }, base);
+    }
+    /** **************************************************************** *
+     * Auth
+     * **************************************************************** */
+    connect (token) {
+        this.token(token);
+
+        return this.fetchX(
+            queries.viwer,
+            (node) => {
+                return this.node2user(node.data.viewer);
+            },
+            (results) => {
+                this.viewer(results.data);
+            },
+            (r) => {
+                this.viewer(null);
+            });
+    }
+    /** **************************************************************** *
+     * fetch
+     * **************************************************************** */
+    fetchRepositoriesByViewer (success, error) {
+        // success, error は不要だな。
+        const api = this.api();
+
+        const query = queries.repositories_by_viewer;
+
+        const query_pageing = this.ensureEndCursor(query, null);
+
+        return this.fetchX(
+            query_pageing,
+            (results) => {
+                const data = results.data;
+
+                const list = data.viewer.repositories.nodes || [];
+
+                return list.map(node=> this.node2repository(node));
+            });
+    }
+    fetchUserByID (id) {
+        const query = queries.user_by_id.replace('@id', id);
+
+        const query_pageing = this.ensureEndCursor(query, null);
+
+        return this.fetchX(
+            query_pageing,
+            (results)=> this.node2user(results.data.node));
+    }
+    fetchProjectsNextByUser (user) {
+        const query = queries.projects_next_by_user.replace('@login', user.login());
+
+        const query_pageing = this.ensureEndCursor(query, null);
+
+        return this.fetchX(
+            query_pageing,
+            (results)=> {
+                const nodes = results.data.user.projectsNext.nodes;
+
+                return nodes.map(node=>this.node2projectNext(node));
+            });
+    }
+    fetchProjectsNextByID (id) {
+        const api = this.api();
+
+        const query = queries.projects_next_by_id.replace('@id', id);
+
+        const query_pageing = this.ensureEndCursor(query, null);
+
+        return this.fetchX(
+            query_pageing,
+            (response)=> {
+                console.log(response);
+                const node = response.data.node;
+
+                return this.node2projectNext(node);
+            });
     }
 }

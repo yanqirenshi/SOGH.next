@@ -18,7 +18,7 @@ const fetchUserByID = createAsyncThunk(
 
             const node = response.data.node;
 
-            const out = node2id (node, (node)=>sogh.node2user(node));
+            const out = response.data.id();
 
             applyCallback(payload, 'success');
 

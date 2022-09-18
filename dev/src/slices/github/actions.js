@@ -11,28 +11,24 @@ function applyCallback (payload, type, args=[]) {
     payload.callbacks[type].apply(args);
 }
 
-export const connectGithubAsync = createAsyncThunk(
+export const connectGithub = createAsyncThunk(
     'github/connect',
     async (payload) => {
         const token = payload.token;
-
         try {
             const response = await SOGH.connect(token);
 
+            const viewer = response.data;
+
             applyCallback(payload, 'success');
 
-            return {
-                data: response.data.viewer.id,
-            };
+            return { data: viewer.id() };
         } catch (e) {
             console.error(e);
 
             applyCallback(payload, 'fail');
 
-            return {
-                data: null,
-                error: e,
-            };
+            return { data: null, error: e };
         }
     },
 );

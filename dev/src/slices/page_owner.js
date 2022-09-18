@@ -39,7 +39,7 @@ export const page_owner = createSlice({
             })
             .addCase(fetchUserByID.fulfilled, (state, action) => {
                 state.user.fetch.end = DateTime.now().toISO();
-                state.user.data = action.payload.data;
+                state.user.data = action.payload;
             })
             .addCase(fetchUserByID.rejected, (state) => {
                 state.user.fetch.end = DateTime.now().toISO();
@@ -52,7 +52,7 @@ export const page_owner = createSlice({
             })
             .addCase(fetchProjectsNextByUser.fulfilled, (state, action) => {
                 state.projects_next.fetch.end = DateTime.now().toISO();
-                state.projects_next.data = action.payload.data;
+                state.projects_next.data = action.payload;
             })
             .addCase(fetchProjectsNextByUser.rejected, (state) => {
                 state.projects_next.fetch.end = DateTime.now().toISO();

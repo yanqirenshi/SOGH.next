@@ -3,7 +3,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 
-import { connectGithubAsync } from './slices/github.js';
+import { connectGithub } from './slices/github.js';
 
 import * as page from './pages/index.js';
 import Modals from './Modals.js';
@@ -26,13 +26,13 @@ export default function App() {
 
         setGithubToken(token);
 
-        dispatch(connectGithubAsync({token: token}));
+        dispatch(connectGithub({token: token}));
     }, [githubToken]);
 
     const callbacks = {
         github: {
             auth: (token, cb)=> {
-                dispatch(connectGithubAsync({token: token, callbacks: cb}));
+                dispatch(connectGithub({token: token, callbacks: cb}));
             }
         }
     };

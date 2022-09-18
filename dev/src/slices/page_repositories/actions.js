@@ -4,14 +4,7 @@ import SOGH from '../../sogh.js';
 
 import * as model from '../../lib/js/models/index.js';
 
-function applyCallback (payload, type, args=[]) {
-    if (!payload
-        || !payload.callbacks
-        || !payload.callbacks[type])
-        return;
-
-    payload.callbacks[type].apply(args);
-}
+import { applyCallback, errorDefaultProcess } from '../utils.js';
 
 export const fetchRepositoriesByViewer = createAsyncThunk(
     'github/fetchRepositoriesByViewer',
@@ -21,31 +14,22 @@ export const fetchRepositoriesByViewer = createAsyncThunk(
         try {
             const response = await sogh.fetchRepositoriesByViewer();
 
-            const nodes = response.data.viewer.repositories.nodes;
+            if (response.status==='error')
+                throw response.error;
 
-            const id_list = [];
-            for (const node of nodes) {
-                const obj = new model.Repository(node);
+            const repositories = response.data;
 
-                SOGH.node2repository(node);
-
-                id_list.push(obj.id());
-            }
+            const id_list = repositories.map(d=>d.id());
 
             applyCallback(payload, 'success');
 
             return {
-                data: id_list,
+                data: repositories.map(d=>d.id()),
             };
         } catch (e) {
-            console.error(e);
-
             applyCallback(payload, 'fail');
 
-            return {
-                data: null,
-                error: e,
-            };
+            return errorDefaultProcess(e, payload);
         }
     },
 );

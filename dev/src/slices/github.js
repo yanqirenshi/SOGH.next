@@ -3,7 +3,7 @@ import moment from 'moment';
 import { createSlice } from '@reduxjs/toolkit';
 
 import {
-    connectGithubAsync,
+    connectGithub,
 } from './github/actions.js';
 
 export const github = createSlice({
@@ -21,15 +21,15 @@ export const github = createSlice({
     // },
     extraReducers: (builder) => {
         builder
-            .addCase(connectGithubAsync.pending, (state) => {
+            .addCase(connectGithub.pending, (state) => {
                 state.connect.start = moment().toISOString();
                 state.connect.end = null;
             })
-            .addCase(connectGithubAsync.fulfilled, (state, action) => {
+            .addCase(connectGithub.fulfilled, (state, action) => {
                 state.viewer = action.payload.data;
                 state.connect.end = moment().toISOString();
             })
-            .addCase(connectGithubAsync.rejected, (state) => {
+            .addCase(connectGithub.rejected, (state) => {
                 state.viewer = null;
                 state.connect.end = moment().toISOString();
             });
@@ -42,4 +42,4 @@ export const github = createSlice({
 
 export default github.reducer;
 
-export { connectGithubAsync };
+export { connectGithub };
