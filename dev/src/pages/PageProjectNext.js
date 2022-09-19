@@ -3,7 +3,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from "react-router-dom";
 
-import { ProjectNextsItems } from '../lib/index.js';
+import { ProjectNextItems } from '../lib/index.js';
 
 import GlobalAppBar from '../components/GlobalAppBar.js';
 
@@ -13,8 +13,6 @@ import {
     fetchProjectsNextByID,
     fetchProjectNextItemsByProjectNext,
 } from '../slices/page_project_next.js';
-
-let i = 0;
 
 export default function PageProjectNext (props) {
     const [load, setLoad] = React.useState(false);
@@ -46,7 +44,7 @@ export default function PageProjectNext (props) {
           <GlobalAppBar title="Project Next"/>
 
           <div style={{display:'flex', justifyContent: 'center', padding: 22}}>
-            <ProjectNextsItems data={data.project_next_items.data} sogh={sogh}/>
+            <ProjectNextItems data={data.project_next_items.data} sogh={sogh}/>
           </div>
         </div>
     );

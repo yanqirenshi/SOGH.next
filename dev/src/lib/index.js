@@ -1,6 +1,6 @@
 import Repositories from './components/Repositories.js';
 import ProjectsNext from './components/ProjectsNext.js';
-import ProjectNextsItems from './components/ProjectNextsItems.js';
+import ProjectNextItems from './components/ProjectNextItems.js';
 
 import Sogh from './js/Sogh.js';
 
@@ -17,7 +17,7 @@ import {Viewer}      from './js/models/index.js';
 export default Sogh;
 
 export {
-    ProjectNextsItems,
+    ProjectNextItems,
     ProjectsNext,
     Repositories,
 }
