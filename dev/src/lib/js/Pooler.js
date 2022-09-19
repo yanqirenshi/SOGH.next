@@ -80,7 +80,7 @@ export default class Pooler extends Loader {
 
         this.matchmaker.user(node);
 
-        return pool.ensure(node, (d)=> new model.ProjectNext(d));
+        return pool.ensure(node, (d)=> new model.ProjectNextItem(d));
     }
     projectNextItem (v) {
         const pool = this.pool('project-next-item');
