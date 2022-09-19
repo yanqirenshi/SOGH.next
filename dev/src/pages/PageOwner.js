@@ -37,7 +37,7 @@ export default function PageOwner (props) {
         <div>
           <GlobalAppBar title="Owner"/>
 
-          <div style={{display:'flex', justifyContent: 'center'}}>
+          <div style={{display:'flex', justifyContent: 'center', padding: 22}}>
             <ProjectsNext data={data.projects_next.data} sogh={sogh}/>
           </div>
         </div>

@@ -6,7 +6,9 @@ export default class Sogh extends Pooler {
     // constructor () { super(); }
     href (obj, to, data) {
         const x = {
-            'project-next': '/projects-next/:id'
+            'issue':             '/issues/:id',
+            'project-next':      '/projects-next/:id',
+            'project-next-item': '/project-next-items/:id',
         };
 
         const base = x[to];

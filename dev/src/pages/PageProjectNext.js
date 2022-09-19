@@ -3,6 +3,8 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from "react-router-dom";
 
+import { ProjectNextsItems } from '../lib/index.js';
+
 import GlobalAppBar from '../components/GlobalAppBar.js';
 
 import sogh from '../sogh.js';
@@ -39,13 +41,12 @@ export default function PageProjectNext (props) {
         dispatch(fetchProjectNextItemsByProjectNext(project_next));
     }
 
-    console.log(data.project_next_items.data);
-
     return (
         <div>
           <GlobalAppBar title="Project Next"/>
 
-          <div style={{display:'flex', justifyContent: 'center'}}>
+          <div style={{display:'flex', justifyContent: 'center', padding: 22}}>
+            <ProjectNextsItems data={data.project_next_items.data} sogh={sogh}/>
           </div>
         </div>
     );

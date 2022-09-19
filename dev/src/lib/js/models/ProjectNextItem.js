@@ -11,4 +11,7 @@ export default class ProjectNextItem extends GraphQLNode {
     type () {
         return this._core.type || null;
     }
+    content () {
+        return this._core.content || null;
+    }
 }
