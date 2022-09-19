@@ -1,30 +1,32 @@
 import React from 'react';
 
-// import { useSelector, useDispatch } from 'react-redux';
-// import { useParams } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
+import { useParams } from "react-router-dom";
 
 import GlobalAppBar from '../components/GlobalAppBar.js';
 
-// import sogh from '../sogh.js';
+import sogh from '../sogh.js';
 
-// import {
-//     fetchUserByID,
-//     fetchProjectsNextByUser,
-// } from '../slices/page_owner.js';
+import {
+    fetchProjectsNextByID,
+} from '../slices/page_project_next.js';
 
 export default function PageProjectNext (props) {
-    // const data = useSelector(state => state.page_project_next);
-    // const dispatch = useDispatch();
+    const [load, setLoad] = React.useState(false);
 
-    // const project_next_id = useParams().id;
-    // const user = sogh.projectNext(project_next_id);
+    const data = useSelector(state => state.page_project_next);
+    const dispatch = useDispatch();
 
-    // React.useEffect(()=> {
-    //     user && dispatch(fetchProjectsNextByUser(user));
-    // }, [user]);
+    const project_next_id = useParams().id;
 
-    // if (isNeedFirstLoad(data))
-    //     dispatch(fetchUserByID(project_next_id));
+    const project_next = sogh.projectNext(project_next_id);
+
+    React.useEffect(()=> setLoad(true), [project_next]);
+
+    if (load) {
+        setLoad(false);
+        dispatch(fetchProjectsNextByID(project_next_id));
+    }
 
     return (
         <div>
@@ -35,9 +37,3 @@ export default function PageProjectNext (props) {
         </div>
     );
 }
-
-// function isNeedFirstLoad (page_owner) {
-//     return sogh.isConnected()
-//         && page_owner.user.fetch.start===null
-//         && page_owner.user.fetch.end===null;
-// }

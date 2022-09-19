@@ -32,7 +32,8 @@ export const page_project_next = createSlice({
             })
             .addCase(fetchProjectsNextByID.fulfilled, (state, action) => {
                 state.project_next.fetch.end = DateTime.now().toISO();
-                // state.project_next.data = action.payload.data;
+
+                state.project_next.data = action.payload.contents;
             })
             .addCase(fetchProjectsNextByID.rejected, (state) => {
                 state.project_next.fetch.end = DateTime.now().toISO();

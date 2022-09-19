@@ -50,7 +50,7 @@ export default class Sogh extends Pooler {
             });
         }
 
-        const node = make(node_or_nodes).id();
+        const node = make(node_or_nodes);
 
         return node.id();
     }
@@ -65,7 +65,7 @@ export default class Sogh extends Pooler {
     }
     zzz (data, make) {
         return {
-            contents: this.node2user(data.node).id(),
+            contents: this.xxx(data.node, make),
         };
     }
     fetchRepositoriesByViewer () {
@@ -102,14 +102,9 @@ export default class Sogh extends Pooler {
         const query = queries.projects_next_by_id.replace('@id', id);
 
         const query_pageing = this.ensureEndCursor(query, null);
-
         return this.fetchX(
             query_pageing,
-            (response)=> {
-                console.log(response);
-                const node = response.data.node;
-
-                return this.node2projectNext(node);
-            });
+            (response)=> this.zzz(response.data,
+                                  node=> this.node2projectNext(node)));
     }
 }

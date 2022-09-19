@@ -8,21 +8,17 @@ import {
     node2id,
 } from '../utils.js';
 
-const fetchUserByID = createAsyncThunk(
-    'github/fetchUserByID',
+export default createAsyncThunk(
+    'github/fetchProjectsNextByID',
     async (payload) => {
         const id = payload;
 
         try {
-            const response = await sogh.fetchUserByID(id);
-
-            const node = response.data.node;
-
-            const out = node2id (node, (node)=>sogh.node2user(node));
+            const response = await sogh.fetchProjectsNextByID(id);
 
             applyCallback(payload, 'success');
 
-            return out;
+            return response.data;
         } catch (e) {
             applyCallback(payload, 'fail');
 
@@ -30,5 +26,3 @@ const fetchUserByID = createAsyncThunk(
         }
     },
 );
-
-export default fetchUserByID;
