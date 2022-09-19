@@ -9,10 +9,14 @@ import sogh from '../sogh.js';
 
 import {
     fetchProjectsNextByID,
+    fetchProjectNextItemsByProjectNext,
 } from '../slices/page_project_next.js';
+
+let i = 0;
 
 export default function PageProjectNext (props) {
     const [load, setLoad] = React.useState(false);
+    const [loadItems, setLoadItems] = React.useState(false);
 
     const data = useSelector(state => state.page_project_next);
     const dispatch = useDispatch();
@@ -25,8 +29,17 @@ export default function PageProjectNext (props) {
 
     if (load) {
         setLoad(false);
+        setLoadItems(true);
+
         dispatch(fetchProjectsNextByID(project_next_id));
     }
+
+    if (loadItems && project_next) {
+        setLoadItems(false);
+        dispatch(fetchProjectNextItemsByProjectNext(project_next));
+    }
+
+    console.log(data.project_next_items.data);
 
     return (
         <div>

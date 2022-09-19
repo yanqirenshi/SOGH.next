@@ -21,6 +21,17 @@ updatedAt
 pushedAt
 `;
 
+export const issue = `
+id
+url
+title
+createdAt
+closedAt
+updatedAt
+number
+body
+`;
+
 export const owner = `
 id
 login
@@ -43,7 +54,7 @@ closedAt
 closed
 `;
 
-export const project_next_item = `
+export const project_next_fields = `
 id
 name
 dataType
@@ -51,6 +62,23 @@ settings
 createdAt
 updatedAt
 `;
+
+export const project_next_item = `
+id
+title
+createdAt
+updatedAt
+isArchived
+type
+`;
+
+export const project_next_item_field_value = `
+id
+createdAt
+updatedAt
+value
+`;
+
 
 
 export const page_nation = `after: "", first: 100`;
@@ -62,4 +90,3 @@ hasNextPage
 hasPreviousPage
 startCursor
 `;
-

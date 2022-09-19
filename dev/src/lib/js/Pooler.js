@@ -12,9 +12,10 @@ export default class Pooler extends Loader {
         this.matchmaker = new Matchmaker(this);
 
         this._pools = {
-            repository: new Pool(),
-            user: new Pool(),
-            projectnext: new Pool(),
+            'repository': new Pool(),
+            'user': new Pool(),
+            'project-next': new Pool(),
+            'project-next-item': new Pool(),
         };
     }
     pool (v) {
@@ -23,7 +24,8 @@ export default class Pooler extends Loader {
     get (id) {
         return this.repository(id)
             || this.user(id)
-            || this.projectNext(id);
+            || this.projectNext(id)
+            || this.node2projectNextItem(id);
     }
     /* **************************************************************** *
      *  Repository                                                      *
@@ -59,14 +61,29 @@ export default class Pooler extends Loader {
      *  ProjectNext                                                     *
      * **************************************************************** */
     node2projectNext (node) {
-        const pool = this.pool('projectnext');
+        const pool = this.pool('project-next');
 
         this.matchmaker.user(node);
 
         return pool.ensure(node, (d)=> new model.ProjectNext(d));
     }
     projectNext (v) {
-        const pool = this.pool('projectnext');
+        const pool = this.pool('project-next');
+
+        return pool.get(v);
+    }
+    /* **************************************************************** *
+     *  ProjectNext                                                     *
+     * **************************************************************** */
+    node2projectNextItem (node) {
+        const pool = this.pool('project-next-item');
+
+        this.matchmaker.user(node);
+
+        return pool.ensure(node, (d)=> new model.ProjectNext(d));
+    }
+    projectNextItem (v) {
+        const pool = this.pool('project-next-item');
 
         return pool.get(v);
     }

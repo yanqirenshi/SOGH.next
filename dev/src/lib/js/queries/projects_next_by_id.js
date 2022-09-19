@@ -16,7 +16,7 @@ const query = `{
       }
       fields(first: 100) {
         nodes {
-          ${attr.project_next_item}
+          ${attr.project_next_fields}
         }
       }
     }
