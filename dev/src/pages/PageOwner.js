@@ -7,7 +7,7 @@ import GlobalAppBar from '../components/GlobalAppBar.js';
 
 import sogh from '../sogh.js';
 
-import {ProjectNexts} from '../lib/index.js';
+import {ProjectsNext} from '../lib/index.js';
 
 import {
     fetchUserByID,
@@ -38,7 +38,7 @@ export default function PageOwner (props) {
           <GlobalAppBar title="Owner"/>
 
           <div style={{display:'flex', justifyContent: 'center'}}>
-            <ProjectNexts data={data.projects_next.data} sogh={sogh}/>
+            <ProjectsNext data={data.projects_next.data} sogh={sogh}/>
           </div>
         </div>
     );
