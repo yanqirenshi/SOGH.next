@@ -19,4 +19,7 @@ export default class User extends GraphQLNode {
     company () {
         return this._core.company || null;
     }
+    avatarUrl () {
+        return this._core.avatarUrl || null;
+    }
 }

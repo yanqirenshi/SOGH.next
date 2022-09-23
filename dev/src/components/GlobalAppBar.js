@@ -1,7 +1,5 @@
 import React from 'react';
-
 import { useDispatch } from 'react-redux';
-import { open } from '../slices/modals.js';
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -10,18 +8,23 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
+// import Avatar from '@material-ui/core/Avatar';
 
-import SOGH from '../sogh.js';
+import sogh from '../sogh.js';
+
+import { open } from '../slices/modals.js';
 
 export default function GlobalAppBar (props) {
-    const dispatch = useDispatch();
-
     const title = props.title;
+
+    const dispatch = useDispatch();
 
     const clickConnect = ()=> dispatch(open({
         code: 'connect_github',
         data: { token: '' },
     }));
+
+    const user = sogh.viewer();
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -39,10 +42,9 @@ export default function GlobalAppBar (props) {
                 {title}
               </Typography>
 
-              {!SOGH.isConnected() && (
-                  <Button color="inherit" onClick={clickConnect}>
-                    Connect
-                  </Button>
+              {user && (
+                  null
+                  /* <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" /> */
               )}
             </Toolbar>
           </AppBar>
