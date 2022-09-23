@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
 
 const style ={
     height: 'auto',
@@ -10,12 +12,12 @@ export default function SideMenu (props) {
     const sogh = props.sogh;
 
     return (
-        <div style={style}>
-          {Menu('Issue')}
-          {Menu('Part')}
+        <Box style={style}>
+          {Menu('Comments')}
+          {Menu('PART')}
           {Menu('Project')}
           {Menu('Milestone')}
-        </div>
+        </Box>
     );
 }
 
@@ -23,12 +25,11 @@ function Menu (label) {
     const style = {
         margin: 8,
         padding: 11,
-        background: '#eee',
     };
 
     return (
-        <div style={style}>
+        <Paper elevation={3} style={style}>
           {label}
-        </div>
+        </Paper>
     );
 }

@@ -1,11 +1,16 @@
 import React from 'react';
 
+import Box from '@mui/material/Box';
+
 const style ={
+    background: 'rgba(254, 244, 244, 1.0)',
+    width: '100%',
+    height: '100%',
 };
 
 export default function Contents (props) {
     return (
-        <div style={style}>
-        </div>
+        <Box sx={style}>
+        </Box>
     );
 }
