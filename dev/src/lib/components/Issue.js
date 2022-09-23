@@ -22,6 +22,8 @@ const style = {
 };
 
 export default function Issue (props) {
+    const data = props.data;
+
     return (
         <div style={style}>
           <div style={style.side_menu}>

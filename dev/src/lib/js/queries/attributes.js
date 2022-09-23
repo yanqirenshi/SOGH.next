@@ -30,6 +30,7 @@ closedAt
 updatedAt
 number
 body
+bodyHTML
 `;
 
 export const owner = `

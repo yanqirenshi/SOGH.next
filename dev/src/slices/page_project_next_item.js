@@ -15,6 +15,35 @@ export const page_project_next_item = createSlice({
                 end: null,
             },
         },
+        issue: {
+            data: null,
+            fetch: {
+                start: null,
+                end: null,
+            },
+            comments: {
+                data: [],
+                fetch: {
+                    start: null,
+                    end: null,
+                    pageInfo: {},
+                },
+            }
+        },
+        pull_request: {
+            data: null,
+            fetch: {
+                start: null,
+                end: null,
+            },
+        },
+        redacted: {
+            data: null,
+            fetch: {
+                start: null,
+                end: null,
+            },
+        },
     },
     extraReducers: (builder) => {
         builder
