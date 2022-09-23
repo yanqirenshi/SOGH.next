@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-// import Avatar from '@material-ui/core/Avatar';
+import Avatar from '@mui/material/Avatar';
 
 import sogh from '../sogh.js';
 
@@ -43,8 +43,7 @@ export default function GlobalAppBar (props) {
               </Typography>
 
               {user && (
-                  null
-                  /* <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" /> */
+                  <Avatar alt={user.login()} src={user.avatarUrl()} />
               )}
             </Toolbar>
           </AppBar>
