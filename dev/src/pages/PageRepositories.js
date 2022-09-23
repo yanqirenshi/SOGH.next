@@ -3,7 +3,8 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchRepositoriesByViewer } from '../slices/page_repositories.js';
 
-import GlobalAppBar from '../components/GlobalAppBar.js';
+import Page from '../components/Page.js';
+
 import {Repositories} from '../lib/index.js';
 
 import sogh from '../sogh.js';
@@ -17,16 +18,12 @@ export default function PageRepositories (props) {
         dispatch(fetchRepositoriesByViewer(sogh));
 
     return (
-        <div>
-          <GlobalAppBar title="Repositories"/>
-
+        <Page>
           <div style={{margin:22, display:'flex', justifyContent: 'center'}}>
-            <div style={{width:1111}}>
-              <Repositories data={page_repositories.repositories}
-                            sogh={sogh}/>
-            </div>
+            <Repositories data={page_repositories.repositories}
+                          sogh={sogh}/>
           </div>
-        </div>
+        </Page>
     );
 }
 

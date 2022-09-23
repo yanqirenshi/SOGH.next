@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { ProjectNextItems } from '../lib/index.js';
 
-import GlobalAppBar from '../components/GlobalAppBar.js';
+import Page from '../components/Page.js';
 
 import sogh from '../sogh.js';
 
@@ -40,12 +40,10 @@ export default function PageProjectNext (props) {
     }
 
     return (
-        <div>
-          <GlobalAppBar title="Project Next"/>
-
+        <Page data={project_next}>
           <div style={{display:'flex', justifyContent: 'center', padding: 22}}>
             <ProjectNextItems data={data.project_next_items.data} sogh={sogh}/>
           </div>
-        </div>
+        </Page>
     );
 }

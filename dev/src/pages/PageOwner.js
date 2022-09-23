@@ -3,7 +3,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {useParams} from "react-router-dom";
 
-import GlobalAppBar from '../components/GlobalAppBar.js';
+import Page from '../components/Page.js';
 
 import sogh from '../sogh.js';
 
@@ -34,13 +34,11 @@ export default function PageOwner (props) {
     }
 
     return (
-        <div>
-          <GlobalAppBar title="Owner"/>
-
+        <Page data={user}>
           <div style={{display:'flex', justifyContent: 'center', padding: 22}}>
             <ProjectsNext data={data.projects_next.data} sogh={sogh}/>
           </div>
-        </div>
+        </Page>
     );
 }
 
