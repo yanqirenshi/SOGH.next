@@ -8,6 +8,7 @@ import Issue from './Issue.js';
 const style ={
     width: '100%',
     height: '100%',
+    overflow: 'hidden',
 };
 
 export default function ProjectNextItem (props) {
@@ -16,10 +17,10 @@ export default function ProjectNextItem (props) {
 
     return (
         <div style={style}>
-          {'DRAFT_ISSUE'===data.type() && <DraftIssue/>}
-          {'ISSUE'===data.type() && <Issue/>}
-          {'PULL_REQUEST'===data.type() && <PullRequest/>}
-          {'REDACTED'===data.type() && <RedactedItem/>}
+          {'DRAFT_ISSUE'===data.type()  && <DraftIssue data={data}/>}
+          {'ISSUE'===data.type()        && <Issue data={data}/>}
+          {'PULL_REQUEST'===data.type() && <PullRequest data={data}/>}
+          {'REDACTED'===data.type()     && <RedactedItem data={data}/>}
         </div>
     );
 }
