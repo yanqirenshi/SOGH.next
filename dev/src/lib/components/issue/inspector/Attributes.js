@@ -34,20 +34,17 @@ export default function Attributes (props) {
             </div>
 
             <div>
-              <p>Plans</p>
+              <p>Labels</p>
             </div>
 
             <div>
-              <p>Results</p>
+              <p>Milestones</p>
             </div>
 
             <div>
-              <p>Before</p>
+              <p>Assignees</p>
             </div>
 
-            <div>
-              <p>After</p>
-            </div>
           </LocalizationProvider>
         </Box>
     );

@@ -11,6 +11,15 @@ export default function Dependencies (props) {
 
     return (
         <Box sx={style}>
+
+          <div>
+            <p>Before</p>
+          </div>
+
+          <div>
+            <p>After</p>
+          </div>
+
         </Box>
     );
 }

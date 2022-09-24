@@ -11,6 +11,15 @@ export default function Points (props) {
 
     return (
         <Box sx={style}>
+
+          <div>
+            <p>Plans</p>
+          </div>
+
+          <div>
+            <p>Results</p>
+          </div>
+
         </Box>
     );
 }
