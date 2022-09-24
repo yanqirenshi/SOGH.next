@@ -26,12 +26,24 @@ const style ={
 };
 
 export default function Inspector (props) {
-    const [value, setValue] = React.useState('1');
+    const [menu, setMenu] = React.useState({
+        selected: '1',
+        list: [
+            { code: '1', label: 'Description', description: 'First comment' },
+            { code: '2', label: 'Attrs', description: 'Attributes' },
+            { code: '3', label: 'Points', description: 'Points of Plan and Result' },
+            { code: '4', label: 'Depends', description: 'Dependencies' },
+        ],
+    });
 
     const issue = props.data;
     const item = props.item;
 
-    const handleChange = (event, newValue) => setValue(newValue);
+    const handleChange = (event, new_value) => {
+        const new_menu = {...menu} ;
+        new_menu.selected = new_value;
+        setMenu(new_menu);
+    };
 
     return (
         <Box sx={style}>
@@ -39,15 +51,18 @@ export default function Inspector (props) {
             <IssueTitle data={issue}/>
           </div>
 
-          <TabContext value={value}>
+          <TabContext value={menu.selected}>
 
             <Box sx={style.tabs}>
               <TabList onChange={handleChange}
                        aria-label="lab API tabs example" centered>
-                <Tab label="Description" value="1" />
-                <Tab label="Attributes" value="2" />
-                <Tab label="Points" value="3" />
-                <Tab label="Dependenices" value="4" />
+                {menu.list.map(d=> {
+                    return (
+                        <Tab label={d.label}
+                             value={d.code}
+                             title={d.description}/>
+                    );
+                })}
               </TabList>
             </Box>
 

@@ -23,14 +23,30 @@ const style = {
 };
 
 export default function Issue (props) {
+    const [views, setViews] = React.useState({
+        selected: 'comments',
+        list: [
+            { code: 'comments',  label: 'Comments' },
+            { code: 'part',      label: 'PART' },
+            { code: 'project',   label: 'Project' },
+            { code: 'milestone', label: 'Milestone' },
+        ],
+    });
+
     const issue = props.data;
     const item = props.item;
     const comments = props.comments;
 
+    const clickMenuItem = (code) => {
+        const new_view = {...views};
+        new_view.selected = code;
+        setViews(new_view);
+    };
+
     return (
         <div style={style}>
           <div style={style.side_menu}>
-            <SideMenu />
+            <SideMenu data={views} onChange={clickMenuItem}/>
           </div>
 
           <div style={style.contents}>
