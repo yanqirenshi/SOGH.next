@@ -17,6 +17,7 @@ const style = {
     },
     inspector: {
         width: '30%',
+        maxWidth: 555,
         height: '100%',
     },
 };
