@@ -12,6 +12,8 @@ import BodyHtml from '../common/BodyHtml.js';
 import IssueTitle from '../common/IssueTitle.js';
 
 import Attributes from './inspector/Attributes.js';
+import Points from './inspector/Points.js';
+import Dependencies from './inspector/Dependencies.js';
 
 const style ={
     height: '100%',
@@ -44,6 +46,8 @@ export default function Inspector (props) {
                        aria-label="lab API tabs example" centered>
                 <Tab label="Description" value="1" />
                 <Tab label="Attributes" value="2" />
+                <Tab label="Points" value="3" />
+                <Tab label="Dependenices" value="4" />
               </TabList>
             </Box>
 
@@ -53,6 +57,14 @@ export default function Inspector (props) {
 
             <TabPanel value="2">
               <Attributes issue={issue} item={item}/>
+            </TabPanel>
+
+            <TabPanel value="3">
+              <Points issue={issue} item={item}/>
+            </TabPanel>
+
+            <TabPanel value="4">
+              <Dependencies issue={issue} item={item}/>
             </TabPanel>
 
           </TabContext>
