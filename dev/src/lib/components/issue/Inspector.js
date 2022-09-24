@@ -58,7 +58,8 @@ export default function Inspector (props) {
                        aria-label="lab API tabs example" centered>
                 {menu.list.map(d=> {
                     return (
-                        <Tab label={d.label}
+                        <Tab key={d.code}
+                             label={d.label}
                              value={d.code}
                              title={d.description}/>
                     );
