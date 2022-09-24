@@ -17,4 +17,22 @@ export default class ProjectNextItem extends GraphQLNode {
     fieldValues () {
         return this._core.fieldValues.nodes || [];
     }
+    dueDate () {
+        return null;
+    }
+    nextActionDate () {
+        return null;
+    }
+    plans () {
+        return {};
+    }
+    resutls () {
+        return {};
+    }
+    before () {
+        return [];
+    }
+    after () {
+        return [];
+    }
 }

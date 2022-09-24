@@ -11,6 +11,8 @@ import Link from '@mui/material/Link';
 import BodyHtml from '../common/BodyHtml.js';
 import IssueTitle from '../common/IssueTitle.js';
 
+import Attributes from './inspector/Attributes.js';
+
 const style ={
     height: '100%',
     background: '#fff',
@@ -25,6 +27,7 @@ export default function Inspector (props) {
     const [value, setValue] = React.useState('1');
 
     const issue = props.data;
+    const item = props.item;
 
     const handleChange = (event, newValue) => setValue(newValue);
 
@@ -49,6 +52,7 @@ export default function Inspector (props) {
             </TabPanel>
 
             <TabPanel value="2">
+              <Attributes issue={issue} item={item}/>
             </TabPanel>
 
           </TabContext>
