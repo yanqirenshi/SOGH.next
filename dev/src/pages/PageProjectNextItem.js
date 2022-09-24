@@ -52,10 +52,12 @@ function getIssue (data) {
 }
 
 function getIssueComments (data) {
-    if (!data)
+    const list = data.issue.comments.data;
+
+    if (!list)
         return [];
 
-    return data.issue.comments.data.map(id=> sogh.issueComment(id));
+    return list.map(id=> sogh.issueComment(id));
 }
 
 function isNeedLoad (data) {
