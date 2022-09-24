@@ -12,16 +12,17 @@ const style ={
 };
 
 export default function ProjectNextItem (props) {
-    const data = props.data;
+    const item = props.data;
     const sogh = props.sogh;
     const issue = props.issue;
+    const issue_comments = props.issue_comments;
 
     return (
         <div style={style}>
-          {'DRAFT_ISSUE'===data.type()  && <DraftIssue data={data}/>}
-          {'ISSUE'===data.type()        && <Issue data={issue}/>}
-          {'PULL_REQUEST'===data.type() && <PullRequest data={data}/>}
-          {'REDACTED'===data.type()     && <RedactedItem data={data}/>}
+          {'DRAFT_ISSUE'===item.type()  && <DraftIssue data={item}/>}
+          {'ISSUE'===item.type()        && <Issue data={issue} item={item} comments={issue_comments}/>}
+          {'PULL_REQUEST'===item.type() && <PullRequest data={item}/>}
+          {'REDACTED'===item.type()     && <RedactedItem data={item}/>}
         </div>
     );
 }

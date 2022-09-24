@@ -24,6 +24,8 @@ const style = {
 
 export default function Issue (props) {
     const issue = props.data;
+    const item = props.item;
+    const comments = props.comments;
 
     return (
         <div style={style}>
@@ -32,12 +34,12 @@ export default function Issue (props) {
           </div>
 
           <div style={style.contents}>
-            <Contents />
+            <Contents issue_comments={comments}/>
           </div>
 
           <div style={style.inspector}>
             {issue &&
-             <Inspector data={issue} />}
+             <Inspector data={issue} item={item} />}
           </div>
         </div>
     );

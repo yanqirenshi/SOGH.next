@@ -28,20 +28,34 @@ export default function PageProjectNextItem (props) {
     if (isNeedLoadIssue(project_next_item, data))
         dispatch(fetchIssueByID(project_next_item.content().id));
 
-    const issue_id = data.issue.data;
-    const issue = issue_id ? sogh.issue(issue_id) : null;
+    const issue = getIssue(data);
 
     if (isNeedLoadIssueComments(issue, data))
         dispatch(fetchIssueCommentsByIssueID(issue.id()));
 
+    const issue_comments = getIssueComments(data);
+
     return (
         <Page data={project_next_item}>
           {project_next_item
-           && <ProjectNextItem data={project_next_item}
+           && <ProjectNextItem sogh={sogh}
+                               data={project_next_item}
                                issue={issue}
-                               issue_comments={[]}/>}
+                               issue_comments={issue_comments}/>}
         </Page>
     );
+}
+
+function getIssue (data) {
+    const issue_id = data.issue.data;
+    return issue_id ? sogh.issue(issue_id) : null;
+}
+
+function getIssueComments (data) {
+    if (!data)
+        return [];
+
+    return data.issue.comments.data.map(id=> sogh.issueComment(id));
 }
 
 function isNeedLoad (data) {
