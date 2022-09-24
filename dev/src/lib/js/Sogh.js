@@ -130,4 +130,26 @@ export default class Sogh extends Pooler {
             (response)=> this.zzz(response.data,
                                   node=> this.node2projectNextItem(node)));
     }
+    fetchIssueByID (id) {
+        const query = queries.issue_by_id.replace('@id', id);
+
+        const query_pageing = this.ensureEndCursor(query, null);
+
+        return this.fetchX(
+            query_pageing,
+            (response)=> this.zzz(response.data,
+                                  node=> this.node2issue(node)));
+    }
+    fetchIssueCommentsByIssueID (id) {
+        const query = queries.issue_comments_by_issue_id.replace('@id', id);
+
+        const query_pageing = this.ensureEndCursor(query, null);
+
+        return this.fetchX(
+            query_pageing,
+            (response)=> {
+                return this.yyy(response.data.node.comments,
+                                node=> this.node2issueComment(node));
+            });
+    }
 }

@@ -16,7 +16,8 @@ export default class Pooler extends Loader {
             'user',
             'project-next',
             'project-next-item',
-            'issue'
+            'issue',
+            'issue-comment',
         ].reduce((ht, key)=> {
             ht[key] = new Pool();
             return ht;
@@ -68,7 +69,7 @@ export default class Pooler extends Loader {
     node2projectNext (node) {
         const pool = this.pool('project-next');
 
-        this.matchmaker.user(node);
+        // this.matchmaker.user(node);
 
         return pool.ensure(node, (d)=> new model.ProjectNext(d));
     }
@@ -83,7 +84,7 @@ export default class Pooler extends Loader {
     node2projectNextItem (node) {
         const pool = this.pool('project-next-item');
 
-        this.matchmaker.user(node);
+        // this.matchmaker.user(node);
 
         return pool.ensure(node, (d)=> new model.ProjectNextItem(d));
     }
@@ -98,12 +99,27 @@ export default class Pooler extends Loader {
     node2issue (node) {
         const pool = this.pool('issue');
 
-        this.matchmaker.user(node);
+        // this.matchmaker.user(node);
 
         return pool.ensure(node, (d)=> new model.Issue(d));
     }
     issue (v) {
         const pool = this.pool('issue');
+
+        return pool.get(v);
+    }
+    /* **************************************************************** *
+     *  Issue Comment                                                   *
+     * **************************************************************** */
+    node2issueComment (node) {
+        const pool = this.pool('issue-comment');
+
+        // this.matchmaker.user(node);
+
+        return pool.ensure(node, (d)=> new model.IssueComment(d));
+    }
+    issueComment (v) {
+        const pool = this.pool('issue-comment');
 
         return pool.get(v);
     }

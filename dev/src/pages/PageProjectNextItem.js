@@ -11,6 +11,8 @@ import sogh from '../sogh.js';
 
 import {
     fetchProjectNextItemByID,
+    fetchIssueByID,
+    fetchIssueCommentsByIssueID,
 } from '../slices/page_project_next_item.js';
 
 export default function PageProjectNextItem (props) {
@@ -23,6 +25,15 @@ export default function PageProjectNextItem (props) {
     if (isNeedLoad(data))
         dispatch(fetchProjectNextItemByID(project_next_item_id));
 
+    if (isNeedLoadIssue(project_next_item, data))
+        dispatch(fetchIssueByID(project_next_item.content().id));
+
+    const issue_id = data.issue.data;
+    const issue = issue_id ? sogh.issue(issue_id) : null;
+
+    if (isNeedLoadIssueComments(issue, data))
+        dispatch(fetchIssueCommentsByIssueID(issue.id()));
+
     return (
         <Page data={project_next_item}>
           {project_next_item
@@ -34,4 +45,17 @@ export default function PageProjectNextItem (props) {
 function isNeedLoad (data) {
     return data.project_next_item.data===null
         && data.project_next_item.fetch.start===null;
+}
+
+function isNeedLoadIssue (project_next_item, data) {
+    return project_next_item
+        && project_next_item.type()==='ISSUE'
+        && data.issue.data===null
+        && data.issue.fetch.start===null;
+}
+
+function isNeedLoadIssueComments (issue, data) {
+    return issue
+        && data.issue.comments.data===null
+        && data.issue.comments.fetch.start===null;
 }

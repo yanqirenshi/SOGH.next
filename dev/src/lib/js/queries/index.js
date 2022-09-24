@@ -1,7 +1,7 @@
-// https://docs.github.com/en/graphql/overview/explorer
-
 import assignees_by_repository from './assignees_by_repository.js';
 import create_issue from './create_issue.js';
+import issue_by_id from './issue_by_id.js';
+import issue_comments_by_issue_id from './issue_comments_by_issue_id.js';
 import issues_by_milestone from './issues_by_milestone.js';
 import issues_by_report_label from './issues_by_report_label.js';
 import issues_by_repository from './issues_by_repository.js';
@@ -27,6 +27,8 @@ import viwer from './viwer.js';
 export {
     assignees_by_repository,
     create_issue,
+    issue_by_id,
+    issue_comments_by_issue_id,
     issues_by_milestone,
     issues_by_report_label,
     issues_by_repository,
