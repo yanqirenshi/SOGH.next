@@ -14,11 +14,12 @@ const style ={
 export default function ProjectNextItem (props) {
     const data = props.data;
     const sogh = props.sogh;
+    const issue = props.issue;
 
     return (
         <div style={style}>
           {'DRAFT_ISSUE'===data.type()  && <DraftIssue data={data}/>}
-          {'ISSUE'===data.type()        && <Issue data={data}/>}
+          {'ISSUE'===data.type()        && <Issue data={issue}/>}
           {'PULL_REQUEST'===data.type() && <PullRequest data={data}/>}
           {'REDACTED'===data.type()     && <RedactedItem data={data}/>}
         </div>

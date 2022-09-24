@@ -37,7 +37,9 @@ export default function PageProjectNextItem (props) {
     return (
         <Page data={project_next_item}>
           {project_next_item
-           && <ProjectNextItem data={project_next_item} />}
+           && <ProjectNextItem data={project_next_item}
+                               issue={issue}
+                               issue_comments={[]}/>}
         </Page>
     );
 }

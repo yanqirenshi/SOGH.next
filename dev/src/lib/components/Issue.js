@@ -16,13 +16,13 @@ const style = {
         height: '100%',
     },
     inspector: {
-        width: 555,
+        width: '30%',
         height: '100%',
     },
 };
 
 export default function Issue (props) {
-    const data = props.data;
+    const issue = props.data;
 
     return (
         <div style={style}>
@@ -35,7 +35,8 @@ export default function Issue (props) {
           </div>
 
           <div style={style.inspector}>
-            <Inspector />
+            {issue &&
+             <Inspector data={issue} />}
           </div>
         </div>
     );

@@ -104,6 +104,12 @@ export default class Issue extends GraphQLNode {
 
         return core.body;
     }
+    bodyHTML () {
+        const core = this.core();
+
+        return core.bodyHTML;
+    }
+
     // due_date: "2021-08-31"
     dueDate (v) {
         const body = this.body();
