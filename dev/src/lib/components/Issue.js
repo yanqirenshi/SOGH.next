@@ -50,7 +50,7 @@ export default function Issue (props) {
           </div>
 
           <div style={style.contents}>
-            <Contents issue_comments={comments}/>
+            <Contents comments={comments} view={views.selected}/>
           </div>
 
           <div style={style.inspector}>

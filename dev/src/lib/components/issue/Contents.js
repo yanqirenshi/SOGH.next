@@ -9,8 +9,15 @@ const style ={
 };
 
 export default function Contents (props) {
+    const comments = props.comments;
+    const view = props.view;
+
     return (
         <Box sx={style}>
+          {'comments' && null}
+          {'part' && null}
+          {'project' && null}
+          {'milestone' && null}
         </Box>
     );
 }
