@@ -27,7 +27,7 @@ export default function Issue (props) {
         selected: 'comments',
         list: [
             { code: 'comments',  label: 'Comments' },
-            { code: 'part',      label: 'PART' },
+            { code: 'part',      label: 'PERT' },
             { code: 'project',   label: 'Project' },
             { code: 'milestone', label: 'Milestone' },
         ],
