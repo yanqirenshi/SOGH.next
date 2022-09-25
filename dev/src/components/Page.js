@@ -6,6 +6,9 @@ import GlobalAppBar from './GlobalAppBar.js';
 
 export default function Page (props) {
     const [bounds, setBounds] = React.useState({height:0});
+
+    const mode = props.mode;
+    const data = props.data;
     const children = props.children;
 
     return (
@@ -13,7 +16,7 @@ export default function Page (props) {
           <Measure bounds onResize={rect => setBounds(rect.bounds)}>
             {({ measureRef }) => (
                 <div ref={measureRef}>
-                  <GlobalAppBar title="Project Next Item"/>
+                  <GlobalAppBar mode={mode} data={data}/>
                 </div>
             )}
           </Measure>

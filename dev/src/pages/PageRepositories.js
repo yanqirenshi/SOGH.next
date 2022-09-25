@@ -18,7 +18,7 @@ export default function PageRepositories (props) {
         dispatch(fetchRepositoriesByViewer(sogh));
 
     return (
-        <Page>
+        <Page mode="repositories">
           <div style={{margin:22, display:'flex', justifyContent: 'center'}}>
             <Repositories data={page_repositories.repositories}
                           sogh={sogh}/>

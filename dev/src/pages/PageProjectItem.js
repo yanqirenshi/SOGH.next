@@ -15,7 +15,7 @@ import {
     fetchIssueCommentsByIssueID,
 } from '../slices/page_project_next_item.js';
 
-export default function PageProjectNextItem (props) {
+export default function PageProjectItem (props) {
     const data = useSelector(state => state.page_project_next_item);
     const dispatch = useDispatch();
 
@@ -36,7 +36,7 @@ export default function PageProjectNextItem (props) {
     const issue_comments = getIssueComments(data);
 
     return (
-        <Page data={project_next_item}>
+        <Page data={project_next_item} mode="project-item">
           {project_next_item
            && <ProjectNextItem sogh={sogh}
                                data={project_next_item}

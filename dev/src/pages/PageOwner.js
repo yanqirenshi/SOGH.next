@@ -34,7 +34,7 @@ export default function PageOwner (props) {
     }
 
     return (
-        <Page data={user}>
+        <Page data={user} mode="user">
           <div style={{display:'flex', justifyContent: 'center', padding: 22}}>
             <ProjectsNext data={data.projects_next.data} sogh={sogh}/>
           </div>

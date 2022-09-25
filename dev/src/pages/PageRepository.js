@@ -35,7 +35,7 @@ export default function PageRepository (props) {
     //     dispatch(fetchRepositoriesByViewer(SOGH));
 
     return (
-        <Page data={repository}>
+        <Page data={repository} mode="repository">
           <div style={{display:'flex', justifyContent: 'center'}}>
             <div style={{minWidth:222, maxWidth: 333}}>
               <SideMenu data={menu}/>

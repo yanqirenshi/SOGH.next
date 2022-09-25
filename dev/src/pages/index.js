@@ -1,6 +1,6 @@
 import PageOwner from './PageOwner.js';
-import PageProjectNext from './PageProjectNext.js';
-import PageProjectNextItem from './PageProjectNextItem.js';
+import PageProjects from './PageProjects.js';
+import PageProjectItem from './PageProjectItem.js';
 import PageRepositories from './PageRepositories.js';
 import PageRepository from './PageRepository.js';
 import PageRepositoryClassicProjects from './PageRepositoryClassicProjects.js';
@@ -9,8 +9,8 @@ import PageRepositoryProjects from './PageRepositoryProjects.js';
 
 export {
     PageOwner,
-    PageProjectNext,
-    PageProjectNextItem,
+    PageProjects,
+    PageProjectItem,
     PageRepositories,
     PageRepository,
     PageRepositoryClassicProjects,

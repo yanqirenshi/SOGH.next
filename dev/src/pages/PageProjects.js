@@ -14,7 +14,7 @@ import {
     fetchProjectNextItemsByProjectNext,
 } from '../slices/page_project_next.js';
 
-export default function PageProjectNext (props) {
+export default function PageProjects (props) {
     const [load, setLoad] = React.useState(false);
     const [loadItems, setLoadItems] = React.useState(false);
 
@@ -40,7 +40,7 @@ export default function PageProjectNext (props) {
     }
 
     return (
-        <Page data={project_next}>
+        <Page data={project_next} mode="projects">
           <div style={{display:'flex', justifyContent: 'center', padding: 22}}>
             <ProjectNextItems data={data.project_next_items.data} sogh={sogh}/>
           </div>
