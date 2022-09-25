@@ -56,10 +56,12 @@ export default class Sogh extends Pooler {
 
         return node.id();
     }
-    yyy (data, make) {
+    yyy (data, make, appender) {
         const out = {
             contents: this.xxx(data.nodes, make),
         };
+
+        appender && appender(data, out);
 
         out.pageInfo = data.pageInfo;
 
@@ -100,16 +102,18 @@ export default class Sogh extends Pooler {
             (results)=> this.yyy(results.data.user.projectsV2,
                                  node=> this.node2projectNext(node)));
     }
-    fetchProjectsNextByID (id) {
+    fetchProjectsV2ByID (id) {
         const query = queries.projects_next_by_id.replace('@id', id);
 
         const query_pageing = this.ensureEndCursor(query, null);
         return this.fetchX(
             query_pageing,
-            (response)=> this.zzz(response.data,
-                                  node=> this.node2projectNext(node)));
+            (response)=> {
+                return this.zzz(response.data,
+                                node=> this.node2projectNext(node));
+            });
     }
-    fetchProjectNextItemsByProjectNext (project_next) {
+    fetchProjectV2ItemsByProjectNext (project_next) {
         const query = queries.projects_next_items_by_projects_next.replace('@id', project_next.id());
         const query_pageing = this.ensureEndCursor(query, null);
 
@@ -117,7 +121,10 @@ export default class Sogh extends Pooler {
             query_pageing,
             (results)=> {
                 return this.yyy(results.data.node.items,
-                                node=> this.node2projectNextItem(node));
+                                node=> this.node2projectNextItem(node),
+                                (data, out)=>{
+                                    out.fields = results.data.node.fields.nodes;
+                                });
             });
     }
     fetchProjectNextItemByID (id) {

@@ -5,12 +5,12 @@ import sogh from '../../sogh.js';
 import { applyCallback, errorDefaultProcess } from '../utils.js';
 
 export default createAsyncThunk(
-    'github/page_project_next/fetchProjectNextItemsByProjectNext',
+    'github/page_project_next/fetchProjectV2ItemsByProjectNext',
     async (payload) => {
         const project_next = payload;
 
         try {
-            const response = await sogh.fetchProjectNextItemsByProjectNext(project_next);
+            const response = await sogh.fetchProjectV2ItemsByProjectNext(project_next);
 
             if (response.status==='error')
                 throw response.error;

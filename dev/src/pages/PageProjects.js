@@ -10,8 +10,8 @@ import Page from '../components/Page.js';
 import sogh from '../sogh.js';
 
 import {
-    fetchProjectsNextByID,
-    fetchProjectNextItemsByProjectNext,
+    fetchProjectsV2ByID,
+    fetchProjectV2ItemsByProjectNext,
 } from '../slices/page_project_next.js';
 
 export default function PageProjects (props) {
@@ -22,21 +22,22 @@ export default function PageProjects (props) {
     const dispatch = useDispatch();
 
     const project_next_id = useParams().id;
-
     const project_next = sogh.projectNext(project_next_id);
 
-    React.useEffect(()=> setLoad(true), [project_next]);
+    React.useEffect(()=> {
+        setLoad(true);
+    }, [project_next]);
 
     if (load) {
         setLoad(false);
         setLoadItems(true);
 
-        dispatch(fetchProjectsNextByID(project_next_id));
+        dispatch(fetchProjectsV2ByID(project_next_id));
     }
 
     if (loadItems && project_next) {
         setLoadItems(false);
-        dispatch(fetchProjectNextItemsByProjectNext(project_next));
+        dispatch(fetchProjectV2ItemsByProjectNext(project_next));
     }
 
     return (

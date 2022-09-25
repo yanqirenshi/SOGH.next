@@ -1,14 +1,62 @@
-export const page_nation = `after: "", first: 100`;
+export function page_nation () { return `after: "", first: 100`; }
 
-export const page_info = `
-endCursor
+export function page_info () {
+    return `endCursor
 hasNextPage
 hasPreviousPage
-startCursor
-`;
+startCursor`;
+}
 
-export const user = `
-id
+export function ProjectV2ItemFieldIterationValue () {
+    return `id
+title
+titleHTML
+duration
+iterationId
+startDate
+createdAt
+updatedAt`;
+}
+
+export function ProjectV2ItemFieldNumberValue () {
+    return `id
+number
+createdAt
+updatedAt`;
+}
+
+export function ProjectV2ItemFieldSingleSelectValue () {
+    return `id
+name
+nameHTML
+optionId
+createdAt
+updatedAt`;
+}
+
+export function ProjectV2ItemFieldTextValue () {
+    return `id
+text
+createdAt
+updatedAt`;
+}
+
+export function projectV2FieldValue_Creator () {
+    return `{
+url
+resourcePath
+login
+avatarUrl
+... on User { id }
+... on Organization { id }
+... on Mannequin { id }
+... on EnterpriseUserAccount { id }
+... on Bot { id }
+}`;
+}
+
+export function user () {
+    return `id
 login
 name
 avatarUrl
@@ -16,22 +64,22 @@ url
 email
 company
 createdAt
-updatedAt
-`;
+updatedAt`;
+}
 
-export const repositories = `
-id
+export function repositories () {
+    return `id
 name
 url
 description
 descriptionHTML
 createdAt
 updatedAt
-pushedAt
-`;
+pushedAt`;
+}
 
-export const issue = `
-id
+export function issue () {
+    return `id
 url
 title
 createdAt
@@ -39,11 +87,11 @@ closedAt
 updatedAt
 number
 body
-bodyHTML
-`;
+bodyHTML`;
+}
 
-export const issue_comment = `
-id
+export function issue_comment (){
+    return `id
 url
 body
 bodyHTML
@@ -57,57 +105,57 @@ databaseId
 createdViaEmail
 authorAssociation
 createdAt
-updatedAt
-`;
+updatedAt`;
+}
 
-export const milestone = `
-id
+export function milestone () {
+    return `id
 url
 title
 state
 number
-dueOn
-`;
+dueOn`;
+}
 
-export const label = `
-id
+export function label () {
+    return `id
 name
 url
-color
-`;
+color`;
+}
 
-export const project = `
-id
+export function project () {
+    return `id
 number
 name
 body
 createdAt
 updatedAt
 closedAt
-url
-`;
+url`;
+}
 
-export const project_card = `
-id
+export function project_card () {
+    return `id
 url
 note
-state
-`;
+state`;
+}
 
-export const project_column = `
-id
-name
-`;
+export function project_column () {
+    return `id
+name`;
+}
 
-export const owner = `
-id
+export function owner () {
+    return `id
 login
 avatarUrl
-url
-`;
+url`;
+}
 
-export const project_next = `
-id
+export function project_next () {
+    return `id
 number
 url
 title
@@ -118,12 +166,11 @@ shortDescription
 createdAt
 updatedAt
 closedAt
-closed
-`;
+closed`;
+}
 
 export function projectv2 () {
-    return `
-id
+    return `id
 number
 url
 public
@@ -135,68 +182,61 @@ viewerCanUpdate
 closed
 createdAt
 updatedAt
-closedAt
-`;
+closedAt`;
 }
 
 export function projectv2FieldIteration () {
-    return `
-id
+    return `id
 name
 dataType
 createdAt
-updatedAt
-`;
+updatedAt`;
 }
 
 export function projectv2FieldSelect () {
-    return `
-id
+    return `id
 name
 dataType
 createdAt
-updatedAt
-`;
+updatedAt`;
 }
 
 export function projectv2Field () {
-    return `
-id
+    return `id
 name
 dataType
 createdAt
-updatedAt
-`;
+updatedAt`;
 }
 
-export const project_next_fields = `
-id
+export function project_next_fields () {
+    return `id
 name
 dataType
 settings
 createdAt
-updatedAt
-`;
+updatedAt`;
+}
 
-export const project_next_item = `
-id
+export function project_next_item () {
+    return `id
 title
 createdAt
 updatedAt
 isArchived
-type
-`;
+type`;
+}
 
-export const project_next_item_field_value = `
-id
+export function project_next_item_field_value () {
+    return `id
 createdAt
 updatedAt
-value
-`;
+value`;
+}
 
-export const actor = `
-login
+export function actor () {
+    return `login
 url
 avatarUrl
-resourcePath
-`;
+resourcePath`;
+}

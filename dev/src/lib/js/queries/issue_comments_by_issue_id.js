@@ -3,10 +3,10 @@ import * as attr from './attributes.js';
 const query = `{
   node(id: "@id") {
     ... on Issue {
-      comments(orderBy: {field: UPDATED_AT, direction: DESC}, after: "", first: 100) {
+      comments(orderBy: {field: UPDATED_AT, direction: DESC}, ${attr.page_nation()}) {
         totalCount
         nodes {
-          ${attr.issue_comment}
+          ${attr.issue_comment()}
           pullRequest {
             id
             number
@@ -14,7 +14,7 @@ const query = `{
             url
           }
           author {
-            ${attr.actor}
+            ${attr.actor()}
             ... on Bot {
               id
             }
@@ -32,7 +32,7 @@ const query = `{
             }
           }
           editor {
-            ${attr.actor}
+            ${attr.actor()}
             avatarUrl
             ... on Bot {
               id
@@ -55,7 +55,7 @@ const query = `{
           }
         }
         pageInfo {
-          ${attr.page_info}
+          ${attr.page_info()}
         }
       }
     }

@@ -9,12 +9,12 @@ import {
 } from '../utils.js';
 
 export default createAsyncThunk(
-    'github/page_project_next//fetchProjectsNextByID',
+    'github/page_project_next/fetchProjectsV2ByID',
     async (payload) => {
         const id = payload;
 
         try {
-            const response = await sogh.fetchProjectsNextByID(id);
+            const response = await sogh.fetchProjectsV2ByID(id);
 
             applyCallback(payload, 'success');
 

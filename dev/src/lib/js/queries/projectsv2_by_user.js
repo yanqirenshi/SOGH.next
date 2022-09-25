@@ -2,7 +2,7 @@ import * as attr from './attributes.js';
 
 const query = `{
   user(login: "@login") {
-    projectsV2(${attr.page_nation}) {
+    projectsV2(${attr.page_nation()}) {
       nodes {
         ${attr.projectv2()}
         fields(first: 100) {
@@ -42,7 +42,7 @@ const query = `{
           }
         }
         creator {
-          ${attr.actor}
+          ${attr.actor()}
           ... on User { id }
           ... on Organization { id }
           ... on Mannequin { id }
@@ -58,7 +58,7 @@ const query = `{
         }
       }
       pageInfo {
-        ${attr.page_info}
+        ${attr.page_info()}
       }
     }
   }

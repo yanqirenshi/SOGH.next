@@ -3,13 +3,13 @@ import * as attr from './attributes.js';
 export default `{
   node(id: "@id") {
     ... on ProjectNextItem {
-      ${attr.project_next_item}
+      ${attr.project_next_item()}
       content {
         ... on DraftIssue {
           id
         }
         ... on Issue {
-          ${attr.issue}
+          ${attr.issue()}
         }
         ... on PullRequest {
           id
@@ -17,20 +17,20 @@ export default `{
       }
       fieldValues(first: 100) {
         nodes {
-          ${attr.project_next_item_field_value}
+          ${attr.project_next_item_field_value()}
           projectField {
-            ${attr.project_next_fields}
+            ${attr.project_next_fields()}
           }
           creator {
             ... on User {
-              ${attr.user}
+              ${attr.user()}
             }
           }
         }
       }
       creator {
         ... on User {
-          ${attr.user}
+          ${attr.user()}
         }
       }
     }

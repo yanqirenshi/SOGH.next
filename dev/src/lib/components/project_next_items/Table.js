@@ -17,21 +17,22 @@ export default function Table (props) {
     const data = props.data;
     const sogh = props.sogh;
 
-    const field_values = fields(data, sogh);
+    if (!data) return null;
+
+    const fields = data.fields;
+    const items = data.items;
 
     return (
         <TableContainer component={Paper}>
           <MTable sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>title</TableCell>
-
-                {field_values.map(field=> {
+                {fields.map(field=> {
                     return <TableCell key={field.id}>{field.name}</TableCell>;
                 })}
 
+                {/* <TableCell>title</TableCell> */}
                 <TableCell>type</TableCell>
-                <TableCell>Content</TableCell>
 
                 <TableCell>isArchived</TableCell>
                 <TableCell>Create</TableCell>
@@ -39,33 +40,25 @@ export default function Table (props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.map((id) => {
+              {items.map((id) => {
                   const obj = sogh.projectNextItem(id);
                   const href = sogh.href(obj,'project-next-item', {id: obj.id()});
-
-                  // creator: {id: 'MDQ6VXNlcjY2NjU4NzQw', login: 'iwasaki-booklista', name: '岩崎 仁是', avatarUrl: 'https://avatars.githubusercontent.com/u/66658740?u=51fd1df1ffc2f2c9bb7083b9eda6d54f69a7e782&v=4', url: 'https://github.com/iwasaki-booklista', …}
 
                   return (
                       <TableRow key={id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                        <TableCellLinkSogh  to="project-next-item" data={obj} sogh={sogh}>
-                          {obj.title()}
-                        </TableCellLinkSogh>
 
-                        {field_values.map((node,i)=> {
-                            const x = obj.fieldValues().find(d=>d.projectField.id===node.id) || null;
-                            if (!x)
-                                return <TableCell key={node.id+'_'+i}></TableCell>;
-
-                            return <TableCell key={x.id}>{x.value}</TableCell>;
+                        {fields.map(field=> {
+                            const value = obj.fieldValues().find(d=>d.field.id===field.id);
+                            return (
+                                <TableCell key={field.id}>
+                                  {value && value.text}
+                                  {/* {field.id} */}
+                                </TableCell>
+                            );
                         })}
 
                         <TableCell>{obj.type()}</TableCell>
-
-                        <TableCellProjectNextItemContent data={obj} sogh={sogh}>
-                          {obj.content()}
-                        </TableCellProjectNextItemContent>
-
 
                         <TableCell>{obj.isArchived()}</TableCell>
                         <TableCellDateTime data={obj.createdAt()}/>
@@ -77,16 +70,4 @@ export default function Table (props) {
           </MTable>
         </TableContainer>
     );
-}
-
-function fields (data, sogh) {
-    const first_row_id = data[0] || null;
-
-    const first_row = first_row_id ? sogh.projectNextItem(first_row_id) : null;
-
-    const field_values = first_row ? first_row.fieldValues().map(d=>d.projectField) : [];
-
-    return field_values.filter(d=> {
-        return !(d.dataType==='TITLE' && d.settings==='null');
-    });
 }

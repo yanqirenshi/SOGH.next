@@ -2,8 +2,8 @@ import { createSlice } from '@reduxjs/toolkit';
 import { DateTime } from 'luxon';
 
 import {
-    fetchProjectsNextByID,
-    fetchProjectNextItemsByProjectNext,
+    fetchProjectsV2ByID,
+    fetchProjectV2ItemsByProjectNext,
 } from './page_project_next/actions.js';
 
 export const page_project_next = createSlice({
@@ -17,7 +17,7 @@ export const page_project_next = createSlice({
             },
         },
         project_next_items: {
-            data: [],
+            data: null,
             fetch: {
                 start: null,
                 end: null,
@@ -27,31 +27,34 @@ export const page_project_next = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchProjectsNextByID.pending, (state) => {
+            .addCase(fetchProjectsV2ByID.pending, (state) => {
                 state.project_next.fetch.start = DateTime.now().toISO();
                 state.project_next.fetch.end = null;
             })
-            .addCase(fetchProjectsNextByID.fulfilled, (state, action) => {
+            .addCase(fetchProjectsV2ByID.fulfilled, (state, action) => {
                 state.project_next.fetch.end = DateTime.now().toISO();
 
                 state.project_next.data = action.payload.contents;
             })
-            .addCase(fetchProjectsNextByID.rejected, (state) => {
+            .addCase(fetchProjectsV2ByID.rejected, (state) => {
                 state.project_next.fetch.end = DateTime.now().toISO();
             });
 
         builder
-            .addCase(fetchProjectNextItemsByProjectNext.pending, (state) => {
+            .addCase(fetchProjectV2ItemsByProjectNext.pending, (state) => {
                 state.project_next_items.fetch.start = DateTime.now().toISO();
                 state.project_next_items.fetch.end = null;
             })
-            .addCase(fetchProjectNextItemsByProjectNext.fulfilled, (state, action) => {
+            .addCase(fetchProjectV2ItemsByProjectNext.fulfilled, (state, action) => {
                 state.project_next_items.fetch.end = DateTime.now().toISO();
                 state.project_next_items.fetch.pageInfo = action.payload.pageInfo;
 
-                state.project_next_items.data = action.payload.contents;
+                state.project_next_items.data = {
+                    fields: action.payload.fields,
+                    items: action.payload.contents,
+                };
             })
-            .addCase(fetchProjectNextItemsByProjectNext.rejected, (state) => {
+            .addCase(fetchProjectV2ItemsByProjectNext.rejected, (state) => {
                 state.project_next_items.fetch.end = DateTime.now().toISO();
             });
 
@@ -62,6 +65,6 @@ export const page_project_next = createSlice({
 export default page_project_next.reducer;
 
 export {
-    fetchProjectsNextByID,
-    fetchProjectNextItemsByProjectNext,
+    fetchProjectsV2ByID,
+    fetchProjectV2ItemsByProjectNext,
 };

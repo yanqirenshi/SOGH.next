@@ -1,7 +1,7 @@
-import fetchProjectNextItemsByProjectNext from './fetchProjectNextItemsByProjectNext.js';
-import fetchProjectsNextByID from './fetchProjectsNextByID.js';
+import fetchProjectV2ItemsByProjectNext from './fetchProjectV2ItemsByProjectNext.js';
+import fetchProjectsV2ByID from './fetchProjectsV2ByID.js';
 
 export {
-    fetchProjectNextItemsByProjectNext,
-    fetchProjectsNextByID,
+    fetchProjectV2ItemsByProjectNext,
+    fetchProjectsV2ByID,
 };

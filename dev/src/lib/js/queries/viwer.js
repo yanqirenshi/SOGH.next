@@ -2,7 +2,7 @@ import * as attr from './attributes.js';
 
 const query = `{
   viewer {
-    ${attr.user}
+    ${attr.user()}
   }
 }`;
 

@@ -3,16 +3,15 @@ import * as attr from './attributes.js';
 const query = `
 {
   viewer {
-    repositories(${attr.page_nation}) {
+    repositories(${attr.page_nation()}) {
       nodes {
-        ${attr.repositories}
+        ${attr.repositories()}
         owner {
-          ${attr.owner}
+          ${attr.owner()}
         }
       }
       pageInfo {
-        endCursor
-        hasNextPage
+        ${attr.page_info()}
       }
     }
   }
