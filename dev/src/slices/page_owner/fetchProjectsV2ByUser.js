@@ -7,13 +7,13 @@ import {
     errorDefaultProcess,
 } from '../utils.js';
 
-const fetchProjectsNextByUser = createAsyncThunk(
-    'github/fetchProjectsNextByUser',
+export default createAsyncThunk(
+    'github/fetchProjectsV2ByUser',
     async (payload) => {
         const user = payload;
 
         try {
-            const response = await sogh.fetchProjectsNextByUser(user);
+            const response = await sogh.fetchProjectsV2ByUser(user);
 
             applyCallback(payload, 'success');
 
@@ -25,5 +25,3 @@ const fetchProjectsNextByUser = createAsyncThunk(
         }
     },
 );
-
-export default fetchProjectsNextByUser;

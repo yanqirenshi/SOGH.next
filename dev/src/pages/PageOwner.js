@@ -11,7 +11,7 @@ import {ProjectsNext} from '../lib/index.js';
 
 import {
     fetchUserByID,
-    fetchProjectsNextByUser,
+    fetchProjectsV2ByUser,
 } from '../slices/page_owner.js';
 
 export default function PageOwner (props) {
@@ -30,7 +30,7 @@ export default function PageOwner (props) {
 
     if (load && user) {
         setLoad(false);
-        dispatch(fetchProjectsNextByUser(user));
+        dispatch(fetchProjectsV2ByUser(user));
     }
 
     return (

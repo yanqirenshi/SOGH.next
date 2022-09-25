@@ -121,6 +121,54 @@ closedAt
 closed
 `;
 
+export function projectv2 () {
+    return `
+id
+number
+url
+public
+title
+readme
+resourcePath
+shortDescription
+viewerCanUpdate
+closed
+createdAt
+updatedAt
+closedAt
+`;
+}
+
+export function projectv2FieldIteration () {
+    return `
+id
+name
+dataType
+createdAt
+updatedAt
+`;
+}
+
+export function projectv2FieldSelect () {
+    return `
+id
+name
+dataType
+createdAt
+updatedAt
+`;
+}
+
+export function projectv2Field () {
+    return `
+id
+name
+dataType
+createdAt
+updatedAt
+`;
+}
+
 export const project_next_fields = `
 id
 name

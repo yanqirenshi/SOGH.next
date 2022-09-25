@@ -1,7 +1,7 @@
 import fetchUserByID from './fetchUserByID.js';
-import fetchProjectsNextByUser from './fetchProjectsNextByUser.js';
+import fetchProjectsV2ByUser from './fetchProjectsV2ByUser.js';
 
 export {
     fetchUserByID,
-    fetchProjectsNextByUser,
+    fetchProjectsV2ByUser,
 };
