@@ -2,6 +2,7 @@ import Assignees from './Assignees.js';
 import Labels from './Labels.js';
 import Milestone from './Milestone.js';
 import Repository from './Repository.js';
+import SingleSelect from './SingleSelect.js';
 import Title from './Title.js';
 
 export {
@@ -9,5 +10,6 @@ export {
     Labels,
     Milestone,
     Repository,
+    SingleSelect,
     Title,
 }

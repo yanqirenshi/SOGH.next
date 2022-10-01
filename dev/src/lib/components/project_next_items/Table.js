@@ -23,14 +23,14 @@ export default function Table (props) {
         LABELS:               { num:  3, show: false },
         MILESTONE:            { num:  4, show: false },
         REPOSITORY:           { num:  5, show: false },
-        REVIEWERS:            { num:  6, show: true },
-        LINKED_PULL_REQUESTS: { num:  7, show: true },
-        TRACKS:               { num:  8, show: true },
+        LINKED_PULL_REQUESTS: { num:  7, show: false }, // TODO: 未調整
+        REVIEWERS:            { num:  6, show: false }, // TODO: 未調整
+        TRACKS:               { num:  8, show: false }, // TODO: 未調整
         // common fields
-        TYPE:                 { num:  9, show: false },
-        IS_ARCHIVED:          { num: 10, show: false },
-        CREATED_AT:           { num: 11, show: false },
-        UPDATED_AT:           { num: 12, show: false },
+        TYPE:                 { num:  9, show: true },
+        IS_ARCHIVED:          { num: 10, show: true },
+        CREATED_AT:           { num: 11, show: true },
+        UPDATED_AT:           { num: 12, show: true },
     });
 
     const data = props.data;

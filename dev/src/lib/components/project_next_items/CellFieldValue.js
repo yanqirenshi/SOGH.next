@@ -23,7 +23,7 @@ export default function CellFieldValue (props) {
 
     // org fields
     switch (field.dataType) {
-    case 'SINGLE_SELECT':        return <TableCell></TableCell>;
+    case 'SINGLE_SELECT':        return <cell.SingleSelect value={value} />;
     case 'TEXT':                 return <TableCell></TableCell>;
     case 'DATE':                 return <TableCell></TableCell>;
     default:                     return <TableCell>??? ({field.dataType})</TableCell>;
