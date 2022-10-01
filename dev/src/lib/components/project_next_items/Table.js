@@ -26,6 +26,11 @@ export default function Table (props) {
         REVIEWERS: { show: true },
         REPOSITORY: { show: true },
         MILESTONE: { show: true },
+        // common fields
+        TYPE: { show: false },
+        IS_ARCHIVED: { show: false },
+        CREATED_AT: { show: false },
+        UPDATED_AT: { show: false },
     });
 
     const data = props.data;
@@ -47,10 +52,17 @@ export default function Table (props) {
                 {fields.map(field=>
                     <CellFieldLabel  key={field.id} field={field}/>)}
 
-                <TableCell>type</TableCell>
-                <TableCell>isArchived</TableCell>
-                <TableCell>Create</TableCell>
-                <TableCell>Update</TableCell>
+                {common_fields.TYPE.show &&
+                 <TableCell>type</TableCell>}
+
+                {common_fields.IS_ARCHIVED.show &&
+                 <TableCell>isArchived</TableCell>}
+
+                {common_fields.CREATED_AT.show &&
+                 <TableCell>Create</TableCell>}
+
+                {common_fields.UPDATED_AT.show &&
+                 <TableCell>Update</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -65,10 +77,17 @@ export default function Table (props) {
                         {fields.map(field=>
                             <CellFieldValue field={field} row={row}/>)}
 
-                        <TableCell>{row.type()}</TableCell>
-                        <TableCell>{row.isArchived()}</TableCell>
-                        <TableCellDateTime data={row.createdAt()}/>
-                        <TableCellDateTime data={row.updatedAt()}/>
+                        {common_fields.TYPE.show &&
+                         <TableCell>{row.type()}</TableCell>}
+
+                        {common_fields.IS_ARCHIVED.show &&
+                         <TableCell>{row.isArchived()}</TableCell>}
+
+                        {common_fields.CREATED_AT.show &&
+                         <TableCellDateTime data={row.createdAt()}/>}
+
+                        {common_fields.UPDATED_AT.show &&
+                         <TableCellDateTime data={row.updatedAt()}/>}
                       </TableRow>
                   );
               })}
