@@ -41,8 +41,12 @@ export default function PageProjects (props) {
     }
 
     return (
-        <Page data={project_next} mode="projects">
-          <div style={{display:'flex', justifyContent: 'center', padding: 22}}>
+        <Page data={project_next} mode="project">
+          <div style={{
+              display:'flex',
+              justifyContent: 'center',
+              padding: 22,
+          }}>
             <ProjectNextItems data={data.project_next_items.data} sogh={sogh}/>
           </div>
         </Page>

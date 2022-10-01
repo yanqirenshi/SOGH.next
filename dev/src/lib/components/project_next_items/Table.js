@@ -13,13 +13,30 @@ import TableCellLinkGithub from '../common/TableCellLinkGithub.js';
 import TableCellLinkSogh from '../common/TableCellLinkSogh.js';
 import TableCellProjectNextItemContent from '../common/TableCellProjectNextItemContent.js';
 
+import CellFieldLabel from './CellFieldLabel.js';
+import CellFieldValue from './CellFieldValue.js';
+
 export default function Table (props) {
+    const [common_fields, setCommonFields] = React.useState({
+        TITLE: { show: true },
+        ASSIGNEES: { show: false },
+        LABELS: { show: true },
+        LINKED_PULL_REQUESTS: { show: true },
+        TRACKS: { show: true },
+        REVIEWERS: { show: true },
+        REPOSITORY: { show: true },
+        MILESTONE: { show: true },
+    });
+
     const data = props.data;
     const sogh = props.sogh;
 
     if (!data) return null;
 
-    const fields = data.fields;
+    const fields = data.fields.filter(d=> {
+        const common_field = common_fields[d.dataType];
+        return common_field ? common_field.show : true;
+    });
     const items = data.items;
 
     return (
@@ -27,13 +44,10 @@ export default function Table (props) {
           <MTable sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                {fields.map(field=> {
-                    return <TableCell key={field.id}>{field.name}</TableCell>;
-                })}
+                {fields.map(field=>
+                    <CellFieldLabel  key={field.id} field={field}/>)}
 
-                {/* <TableCell>title</TableCell> */}
                 <TableCell>type</TableCell>
-
                 <TableCell>isArchived</TableCell>
                 <TableCell>Create</TableCell>
                 <TableCell>Update</TableCell>
@@ -41,28 +55,20 @@ export default function Table (props) {
             </TableHead>
             <TableBody>
               {items.map((id) => {
-                  const obj = sogh.projectNextItem(id);
-                  const href = sogh.href(obj,'project-next-item', {id: obj.id()});
+                  const row = sogh.projectNextItem(id);
+                  const href = sogh.href(row,'project-next-item', {id: row.id()});
 
                   return (
                       <TableRow key={id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
 
-                        {fields.map(field=> {
-                            const value = obj.fieldValues().find(d=>d.field.id===field.id);
-                            return (
-                                <TableCell key={field.id}>
-                                  {value && value.text}
-                                  {/* {field.id} */}
-                                </TableCell>
-                            );
-                        })}
+                        {fields.map(field=>
+                            <CellFieldValue field={field} row={row}/>)}
 
-                        <TableCell>{obj.type()}</TableCell>
-
-                        <TableCell>{obj.isArchived()}</TableCell>
-                        <TableCellDateTime data={obj.createdAt()}/>
-                        <TableCellDateTime data={obj.updatedAt()}/>
+                        <TableCell>{row.type()}</TableCell>
+                        <TableCell>{row.isArchived()}</TableCell>
+                        <TableCellDateTime data={row.createdAt()}/>
+                        <TableCellDateTime data={row.updatedAt()}/>
                       </TableRow>
                   );
               })}

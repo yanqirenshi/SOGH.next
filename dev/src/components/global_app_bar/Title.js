@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
 
 export default function Title (props) {
     const data = props.data;
@@ -31,8 +32,8 @@ function label (mode, data) {
     if (mode==='user')
         return '【User】';
 
-    if (mode==='projects')
-        return '【Projects】';
+    if (mode==='project')
+        return '【Project】';
 
     return `【${mode}】`;
 }
@@ -54,8 +55,22 @@ function contents (mode, data) {
         return `${data.name()} (${data.login()})`;
     }
 
-    if (mode==='projects' && data)
-        return `${data.title()} (${data.number()})`;
+    if (mode==='project' && data) {
+        return (
+            <>
+              <span style={{marginRight:6}}>
+                {data.title()}
+              </span>
+              <span>
+                (
+                <Link href={data.url()}>
+                  {data.number()}
+                </Link>
+                )
+              </span>
+            </>
+        );
+    }
 
     return `????????`;
 }

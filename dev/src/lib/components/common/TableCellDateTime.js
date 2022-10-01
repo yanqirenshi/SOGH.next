@@ -4,11 +4,15 @@ import { DateTime } from 'luxon';
 
 import TableCell from '@mui/material/TableCell';
 
+const style = {
+    whiteSpace: 'nowrap',
+};
+
 export default function TableCellDateTime (props) {
     const value = props.data;
 
     return (
-        <TableCell>
+        <TableCell style={style}>
           {fmt(value)}
         </TableCell>
     );
