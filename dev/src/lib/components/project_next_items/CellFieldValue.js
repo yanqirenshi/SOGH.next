@@ -13,12 +13,16 @@ export default function CellFieldValue (props) {
     switch (field.dataType) {
     case 'TITLE':                return <cell.Title value={value} />;
     case 'ASSIGNEES':            return <cell.Assignees value={value} />;
-    case 'LABELS':               return <TableCell></TableCell>;
+    case 'LABELS':               return <cell.Labels value={value} />;
+    case 'MILESTONE':            return <cell.Milestone value={value} />;
+    case 'REPOSITORY':           return <cell.Repository value={value} />;
     case 'LINKED_PULL_REQUESTS': return <TableCell></TableCell>;
     case 'TRACKS':               return <TableCell></TableCell>;
     case 'REVIEWERS':            return <TableCell></TableCell>;
-    case 'REPOSITORY':           return <TableCell></TableCell>;
-    case 'MILESTONE':            return <TableCell></TableCell>;
+    }
+
+    // org fields
+    switch (field.dataType) {
     case 'SINGLE_SELECT':        return <TableCell></TableCell>;
     case 'TEXT':                 return <TableCell></TableCell>;
     case 'DATE':                 return <TableCell></TableCell>;

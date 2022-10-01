@@ -98,6 +98,7 @@ export default `{
                 repository {
                   name
                   id
+                  url
                 }
               }
               ... on ProjectV2ItemFieldReviewerValue {

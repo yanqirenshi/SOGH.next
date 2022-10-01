@@ -18,19 +18,19 @@ import CellFieldValue from './CellFieldValue.js';
 
 export default function Table (props) {
     const [common_fields, setCommonFields] = React.useState({
-        TITLE: { show: true },
-        ASSIGNEES: { show: false },
-        LABELS: { show: true },
-        LINKED_PULL_REQUESTS: { show: true },
-        TRACKS: { show: true },
-        REVIEWERS: { show: true },
-        REPOSITORY: { show: true },
-        MILESTONE: { show: true },
+        TITLE:                { num:  1, show: true },
+        ASSIGNEES:            { num:  2, show: false },
+        LABELS:               { num:  3, show: false },
+        MILESTONE:            { num:  4, show: false },
+        REPOSITORY:           { num:  5, show: false },
+        REVIEWERS:            { num:  6, show: true },
+        LINKED_PULL_REQUESTS: { num:  7, show: true },
+        TRACKS:               { num:  8, show: true },
         // common fields
-        TYPE: { show: false },
-        IS_ARCHIVED: { show: false },
-        CREATED_AT: { show: false },
-        UPDATED_AT: { show: false },
+        TYPE:                 { num:  9, show: false },
+        IS_ARCHIVED:          { num: 10, show: false },
+        CREATED_AT:           { num: 11, show: false },
+        UPDATED_AT:           { num: 12, show: false },
     });
 
     const data = props.data;
