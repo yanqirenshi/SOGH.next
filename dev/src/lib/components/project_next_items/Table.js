@@ -29,8 +29,13 @@ export default function Table (props) {
         // common fields
         TYPE:                 { num:  9, show: true },
         IS_ARCHIVED:          { num: 10, show: true },
-        CREATED_AT:           { num: 11, show: true },
-        UPDATED_AT:           { num: 12, show: true },
+        CREATED_AT:           { num: 11, show: false },
+        UPDATED_AT:           { num: 12, show: false },
+        // xxx
+        DATE: {
+            'Date.Due':        { num: 13, show: false },
+            'Date.NextAction': { num: 14, show: false },
+        },
     });
 
     const data = props.data;
@@ -38,10 +43,8 @@ export default function Table (props) {
 
     if (!data) return null;
 
-    const fields = data.fields.filter(d=> {
-        const common_field = common_fields[d.dataType];
-        return common_field ? common_field.show : true;
-    });
+    const fields = getFields(data, common_fields);
+
     const items = data.items;
 
     return (
@@ -95,4 +98,14 @@ export default function Table (props) {
           </MTable>
         </TableContainer>
     );
+}
+
+function getFields (data, common_fields) {
+    return data.fields.filter(d=> {
+        const common_field = common_fields[d.dataType];
+
+        console.log(d.dataType==='DATE');
+
+        return common_field ? common_field.show : true;
+    });
 }

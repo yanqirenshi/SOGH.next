@@ -21,11 +21,14 @@ export default function CellFieldValue (props) {
     case 'REVIEWERS':            return <TableCell></TableCell>;
     }
 
-    // org fields
-    switch (field.dataType) {
-    case 'SINGLE_SELECT':        return <cell.SingleSelect value={value} />;
-    case 'TEXT':                 return <TableCell></TableCell>;
-    case 'DATE':                 return <TableCell></TableCell>;
-    default:                     return <TableCell>??? ({field.dataType})</TableCell>;
-    }
+    if ('SINGLE_SELECT'===field.dataType)
+        return <cell.SingleSelect value={value} />;
+
+    if ('DATE'===field.dataType)
+        return <cell.Date value={value} />;
+
+    if ('TEXT'===field.dataType)
+        return <TableCell></TableCell>;
+
+    return <TableCell>??? ({field.dataType})</TableCell>;
 }

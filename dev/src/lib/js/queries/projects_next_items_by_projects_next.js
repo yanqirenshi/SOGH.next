@@ -24,6 +24,8 @@ export default `{
           fieldValues(first: ${MAX_FIELD_NUM}) {
             nodes {
               ... on ProjectV2ItemFieldDateValue {
+                id
+                date
                 field {
                   ... on ProjectV2Field { id }
                   ... on ProjectV2IterationField { id }
