@@ -1,3 +1,4 @@
+import PageIssue from './PageIssue.js';
 import PageOwner from './PageOwner.js';
 import PageProjects from './PageProjects.js';
 import PageProjectItem from './PageProjectItem.js';
@@ -8,6 +9,7 @@ import PageRepositoryIssues from './PageRepositoryIssues.js';
 import PageRepositoryProjects from './PageRepositoryProjects.js';
 
 export {
+    PageIssue,
     PageOwner,
     PageProjects,
     PageProjectItem,

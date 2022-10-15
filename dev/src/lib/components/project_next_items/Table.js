@@ -2,19 +2,10 @@ import React from 'react';
 
 import TableContainer from '@mui/material/TableContainer';
 import MTable from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
-import TableCellDateTime from '../common/TableCellDateTime.js';
-import TableCellLinkGithub from '../common/TableCellLinkGithub.js';
-import TableCellLinkSogh from '../common/TableCellLinkSogh.js';
-import TableCellProjectNextItemContent from '../common/TableCellProjectNextItemContent.js';
-
-import CellFieldLabel from './CellFieldLabel.js';
-import CellFieldValue from './CellFieldValue.js';
+import Header from './Header.js';
+import Body from './Body.js';
 
 export default function Table (props) {
     const [common_fields, setCommonFields] = React.useState({
@@ -50,51 +41,12 @@ export default function Table (props) {
     return (
         <TableContainer component={Paper}>
           <MTable sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                {fields.map(field=>
-                    <CellFieldLabel  key={field.id} field={field}/>)}
+            <Header fields={fields} common_fields={common_fields} />
 
-                {common_fields.TYPE.show &&
-                 <TableCell>type</TableCell>}
-
-                {common_fields.IS_ARCHIVED.show &&
-                 <TableCell>isArchived</TableCell>}
-
-                {common_fields.CREATED_AT.show &&
-                 <TableCell>Create</TableCell>}
-
-                {common_fields.UPDATED_AT.show &&
-                 <TableCell>Update</TableCell>}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items.map((id) => {
-                  const row = sogh.projectNextItem(id);
-                  const href = sogh.href(row,'project-next-item', {id: row.id()});
-
-                  return (
-                      <TableRow key={id}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-
-                        {fields.map(field=>
-                            <CellFieldValue field={field} row={row}/>)}
-
-                        {common_fields.TYPE.show &&
-                         <TableCell>{row.type()}</TableCell>}
-
-                        {common_fields.IS_ARCHIVED.show &&
-                         <TableCell>{row.isArchived()}</TableCell>}
-
-                        {common_fields.CREATED_AT.show &&
-                         <TableCellDateTime data={row.createdAt()}/>}
-
-                        {common_fields.UPDATED_AT.show &&
-                         <TableCellDateTime data={row.updatedAt()}/>}
-                      </TableRow>
-                  );
-              })}
-            </TableBody>
+            <Body data={items}
+                  fields={fields}
+                  common_fields={common_fields}
+                  sogh={sogh}/>
           </MTable>
         </TableContainer>
     );
@@ -103,8 +55,6 @@ export default function Table (props) {
 function getFields (data, common_fields) {
     return data.fields.filter(d=> {
         const common_field = common_fields[d.dataType];
-
-        console.log(d.dataType==='DATE');
 
         return common_field ? common_field.show : true;
     });
