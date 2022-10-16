@@ -4,58 +4,62 @@ import TableContainer from '@mui/material/TableContainer';
 import MTable from '@mui/material/Table';
 import Paper from '@mui/material/Paper';
 
-import Header from './Header.js';
-import Body from './Body.js';
+import Header from './table/Header.js';
+import Body from './table/Body.js';
 
 export default function Table (props) {
-    const [common_fields, setCommonFields] = React.useState({
-        TITLE:                { num:  1, show: true },
-        ASSIGNEES:            { num:  2, show: false },
-        LABELS:               { num:  3, show: false },
-        MILESTONE:            { num:  4, show: false },
-        REPOSITORY:           { num:  5, show: false },
-        LINKED_PULL_REQUESTS: { num:  7, show: false }, // TODO: 未調整
-        REVIEWERS:            { num:  6, show: false }, // TODO: 未調整
-        TRACKS:               { num:  8, show: false }, // TODO: 未調整
-        // common fields
-        TYPE:                 { num:  9, show: true },
-        IS_ARCHIVED:          { num: 10, show: true },
-        CREATED_AT:           { num: 11, show: false },
-        UPDATED_AT:           { num: 12, show: false },
-        // xxx
-        DATE: {
-            'Date.Due':        { num: 13, show: false },
-            'Date.NextAction': { num: 14, show: false },
-        },
-    });
+    const [columns, setColumns] = React.useState(props.columns || [
+        { num:  1, show:  true, type: 'FIELD',     label: null,          dataType: 'TITLE',                name: null },
+        { num:  2, show: false, type: 'FIELD',     label: null,          dataType: 'ASSIGNEES',            name: null },
+        { num:  3, show: false, type: 'FIELD',     label: null,          dataType: 'LABELS',               name: null },
+        { num:  4, show: false, type: 'FIELD',     label: null,          dataType: 'MILESTONE',            name: null },
+        { num:  5, show:  true, type: 'FIELD',     label: null,          dataType: 'REPOSITORY',           name: null },
+        { num:  7, show: false, type: 'FIELD',     label: null,          dataType: 'LINKED_PULL_REQUESTS', name: null },
+        { num:  6, show: false, type: 'FIELD',     label: null,          dataType: 'REVIEWERS',            name: null },
+        { num:  8, show: false, type: 'FIELD',     label: null,          dataType: 'TRACKS',               name: null },
+        { num:  9, show:  true, type: 'ATTRIBUTE', label: 'type',        dataType: 'text',     value: (row)=>row.type() },
+        { num: 10, show:  true, type: 'ATTRIBUTE', label: 'is_archived', dataType: 'text',     value: (row)=>row.isArchived() },
+        { num: 11, show: false, type: 'ATTRIBUTE', label: 'created_at',  dataType: 'datetime', value: (row)=>row.createdAt() },
+        { num: 12, show: false, type: 'ATTRIBUTE', label: 'updated_at',  dataType: 'datetime', value: (row)=>row.updatedAt() },
+        { num: 13, show:  true, type: 'FIELD',     label: null,          dataType: 'TEXT',                 name: 'From' },
+        { num: 14, show:  true, type: 'FIELD',     label: null,          dataType: 'DATE',                 name: 'Date.Due'},
+    ]);
 
     const data = props.data;
     const sogh = props.sogh;
 
     if (!data) return null;
 
-    const fields = getFields(data, common_fields);
+    const fields = data.fields.reduce(makeFields, {});
 
     const items = data.items;
 
     return (
         <TableContainer component={Paper}>
           <MTable sx={{ minWidth: 650 }} aria-label="simple table">
-            <Header fields={fields} common_fields={common_fields} />
+            <Header fields={fields} columns={columns} />
 
             <Body data={items}
                   fields={fields}
-                  common_fields={common_fields}
+                  columns={columns}
                   sogh={sogh}/>
           </MTable>
         </TableContainer>
     );
 }
 
-function getFields (data, common_fields) {
-    return data.fields.filter(d=> {
-        const common_field = common_fields[d.dataType];
+function makeFields (ht, d) {
+    const data_type = d.dataType;
 
-        return common_field ? common_field.show : true;
-    });
+    const is_multi_purpose = 'TEXT'===data_type || 'DATE'===data_type;
+
+    if (is_multi_purpose && !ht[data_type])
+        ht[data_type] = {};
+
+    if (is_multi_purpose)
+        ht[data_type][d.name] = d;
+    else
+        ht[data_type] = d;
+
+    return ht;
 }
