@@ -9,6 +9,11 @@ import TabPanel from '@mui/lab/TabPanel';
 import Page from '../components/Page.js';
 import ContentsWithTabs from '../components/ContentsWithTabs.js';
 
+import Comments from './issue/Comments.js';
+import Attributes from './issue/Attributes.js';
+import Project from './issue/Project.js';
+import Milestone from './issue/Milestone.js';
+
 import sogh from '../sogh.js';
 
 import {ProjectsNext} from '../lib/index.js';
@@ -62,19 +67,19 @@ export default function PageIssue (props) {
                             onChange={(code)=> setTabs(selectTab(code, tabs))}>
 
             <TabPanel value="1" style={style.contents}>
-              Comments
+              <Comments data={data} sogh={sogh}/>
             </TabPanel>
 
             <TabPanel value="2" style={style.contents}>
-              Attributes
+              <Attributes />
             </TabPanel>
 
             <TabPanel value="3" style={style.contents}>
-              Project
+              <Project />
             </TabPanel>
 
             <TabPanel value="4" style={style.contents}>
-              Milestone
+              <Milestone />
             </TabPanel>
 
           </ContentsWithTabs>
