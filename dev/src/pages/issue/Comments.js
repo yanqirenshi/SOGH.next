@@ -1,6 +1,7 @@
 import React from 'react';
 
-import Comment from './Comment.js';
+import Comment from './comments/Comment.js';
+import FormComment from './comments/FormComment.js';
 
 export default function Comments (props) {
     const data = props.data;
@@ -9,8 +10,10 @@ export default function Comments (props) {
     const comments = (data.comments.data || []).map(id=> sogh.issueComment(id));
 
     return (
-        <div style={{display:'flex', justifyContent: 'center'}}>
+        <div style={{display:'flex', justifyContent: 'center', overflow: 'auto'}}>
           <div style={{width:888}}>
+            <FormComment />
+
             {comments.map(comment=> <Comment key={comment.id()} data={comment}/>)}
           </div>
         </div>

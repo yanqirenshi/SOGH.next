@@ -30,6 +30,7 @@ const style = {
         height:'100%',
         background:'#eee',
         boxSizing: 'border-box',
+        overflow: 'auto',
     },
 };
 

@@ -20,7 +20,6 @@ export default function ContentsWithTabs (props) {
     const style_contents = {
         height:`calc(100% - ${bounds.height}px)`,
         width: '100%',
-        overflow: 'auto',
     };
 
     return (

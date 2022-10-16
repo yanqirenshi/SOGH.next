@@ -1,6 +1,6 @@
 import React from 'react';
 
-import BodyHtml from '../../lib/components/common/BodyHtml.js';
+import BodyHtml from '../../../lib/components/common/BodyHtml.js';
 
 const style = {
     background:'#fff',
