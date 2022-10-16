@@ -13,9 +13,7 @@ const style = {
 };
 
 export default function FormComment (props) {
-    const value = '';
-
-    const onChange = ()=> null;
+    const [text, setText] = React.useState('');
 
     return (
         <div style={style}>
@@ -25,14 +23,19 @@ export default function FormComment (props) {
                      multiline
                      minRows={20}
                      style={{width:'100%'}}
-                     value={value}
-                     onChange={onChange}
+                     value={text}
+                     onChange={(e)=> setText(e.target.value)}
                      variant="standard" />
 
           <div style={{marginTop:11}}>
             <Stack spacing={2} direction="row">
-              <Button variant="contained">Contained</Button>
-              <Button variant="outlined">Outlined</Button>
+              <Button variant="outlined">
+                Clear
+              </Button>
+
+              <Button variant="contained">
+                Create
+              </Button>
             </Stack>
           </div>
 
