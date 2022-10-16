@@ -7,7 +7,7 @@ import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
 
 import Page from '../components/Page.js';
-import Tabs from './Tabs.js';
+import ContentsWithTabs from '../components/ContentsWithTabs.js';
 
 import sogh from '../sogh.js';
 
@@ -22,6 +22,9 @@ const style = {
     tabs: {
     },
     contents: {
+        height:'100%',
+        background:'#eee',
+        boxSizing: 'border-box',
     },
 };
 
@@ -55,22 +58,26 @@ export default function PageIssue (props) {
 
     return (
         <Page data={issue} mode="issue">
-          <div style={{height:'100%'}}>
-            <TabContext value={tabs.selected}>
+          <ContentsWithTabs data={tabs}
+                            onChange={(code)=> setTabs(selectTab(code, tabs))}>
 
-              <div style={style.tabs}>
-                <Tabs data={tabs} onChange={(code)=> setTabs(selectTab(code, tabs))}/>
-              </div>
+            <TabPanel value="1" style={style.contents}>
+              Comments
+            </TabPanel>
 
-              <div style={style.contents}>
-                <TabPanel value="1">Item One</TabPanel>
-                <TabPanel value="2">Item Two</TabPanel>
-                <TabPanel value="3">Item Three</TabPanel>
-                <TabPanel value="4">Item Three</TabPanel>
-              </div>
+            <TabPanel value="2" style={style.contents}>
+              Attributes
+            </TabPanel>
 
-            </TabContext>
-          </div>
+            <TabPanel value="3" style={style.contents}>
+              Project
+            </TabPanel>
+
+            <TabPanel value="4" style={style.contents}>
+              Milestone
+            </TabPanel>
+
+          </ContentsWithTabs>
         </Page>
     );
 }
