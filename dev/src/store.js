@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import github from './slices/github.js';
 import modals from './slices/modals.js';
+import page_issue from './slices/page_issue.js';
 import page_owner from './slices/page_owner.js';
 import page_project_next from './slices/page_project_next.js';
 import page_project_next_item from './slices/page_project_next_item.js';
@@ -12,6 +13,7 @@ export default configureStore({
   reducer: {
       github: github,
       modals: modals,
+      page_issue: page_issue,
       page_owner: page_owner,
       page_project_next: page_project_next,
       page_project_next_item: page_project_next_item,

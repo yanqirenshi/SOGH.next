@@ -35,6 +35,9 @@ function label (mode, data) {
     if (mode==='project')
         return '【Project】';
 
+    if (mode==='issue')
+        return '【Issue】';
+
     return `【${mode}】`;
 }
 
@@ -71,6 +74,9 @@ function contents (mode, data) {
             </>
         );
     }
+
+    if (mode==='issue')
+        return '???issue???';
 
     return `????????`;
 }
