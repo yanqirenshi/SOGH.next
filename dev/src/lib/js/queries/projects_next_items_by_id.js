@@ -1,6 +1,6 @@
 import * as attr from './attributes.js';
 
-export default `{
+const query =`{
   node(id: "@id") {
     ... on ProjectNextItem {
       ${attr.project_next_item()}
@@ -36,3 +36,5 @@ export default `{
     }
   }
 }`;
+
+export default query;

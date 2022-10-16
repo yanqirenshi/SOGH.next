@@ -4,8 +4,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 
-import CellFieldLabel from './CellFieldLabel.js';
-
 export default function Header (props) {
     const fields = props.fields;
     const columns = props.columns;

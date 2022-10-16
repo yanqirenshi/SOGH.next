@@ -5,7 +5,6 @@ import sogh from '../../sogh.js';
 import {
     applyCallback,
     errorDefaultProcess,
-    node2id,
 } from '../utils.js';
 
 export default createAsyncThunk(

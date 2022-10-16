@@ -7,24 +7,24 @@ import Paper from '@mui/material/Paper';
 import Header from './table/Header.js';
 import Body from './table/Body.js';
 
-export default function Table (props) {
-    const [columns, setColumns] = React.useState(props.columns || [
-        { num:  1, show:  true, type: 'FIELD',     label: null,          dataType: 'TITLE',                name: null },
-        { num:  2, show: false, type: 'FIELD',     label: null,          dataType: 'ASSIGNEES',            name: null },
-        { num:  3, show: false, type: 'FIELD',     label: null,          dataType: 'LABELS',               name: null },
-        { num:  4, show: false, type: 'FIELD',     label: null,          dataType: 'MILESTONE',            name: null },
-        { num:  5, show:  true, type: 'FIELD',     label: null,          dataType: 'REPOSITORY',           name: null },
-        { num:  7, show: false, type: 'FIELD',     label: null,          dataType: 'LINKED_PULL_REQUESTS', name: null },
-        { num:  6, show: false, type: 'FIELD',     label: null,          dataType: 'REVIEWERS',            name: null },
-        { num:  8, show: false, type: 'FIELD',     label: null,          dataType: 'TRACKS',               name: null },
-        { num:  9, show:  true, type: 'ATTRIBUTE', label: 'type',        dataType: 'text',     value: (row)=>row.type() },
-        { num: 10, show:  true, type: 'ATTRIBUTE', label: 'is_archived', dataType: 'text',     value: (row)=>row.isArchived() },
-        { num: 11, show: false, type: 'ATTRIBUTE', label: 'created_at',  dataType: 'datetime', value: (row)=>row.createdAt() },
-        { num: 12, show: false, type: 'ATTRIBUTE', label: 'updated_at',  dataType: 'datetime', value: (row)=>row.updatedAt() },
-        { num: 13, show:  true, type: 'FIELD',     label: null,          dataType: 'TEXT',                 name: 'From' },
-        { num: 14, show:  true, type: 'FIELD',     label: null,          dataType: 'DATE',                 name: 'Date.Due'},
-    ]);
+const columns = [
+    { num:  1, show:  true, type: 'FIELD',     label: null,          dataType: 'TITLE',                name: null },
+    { num:  2, show: false, type: 'FIELD',     label: null,          dataType: 'ASSIGNEES',            name: null },
+    { num:  3, show: false, type: 'FIELD',     label: null,          dataType: 'LABELS',               name: null },
+    { num:  4, show: false, type: 'FIELD',     label: null,          dataType: 'MILESTONE',            name: null },
+    { num:  5, show:  true, type: 'FIELD',     label: null,          dataType: 'REPOSITORY',           name: null },
+    { num:  7, show: false, type: 'FIELD',     label: null,          dataType: 'LINKED_PULL_REQUESTS', name: null },
+    { num:  6, show: false, type: 'FIELD',     label: null,          dataType: 'REVIEWERS',            name: null },
+    { num:  8, show: false, type: 'FIELD',     label: null,          dataType: 'TRACKS',               name: null },
+    { num:  9, show:  true, type: 'ATTRIBUTE', label: 'type',        dataType: 'text',     value: (row)=>row.type() },
+    { num: 10, show:  true, type: 'ATTRIBUTE', label: 'is_archived', dataType: 'text',     value: (row)=>row.isArchived() },
+    { num: 11, show: false, type: 'ATTRIBUTE', label: 'created_at',  dataType: 'datetime', value: (row)=>row.createdAt() },
+    { num: 12, show: false, type: 'ATTRIBUTE', label: 'updated_at',  dataType: 'datetime', value: (row)=>row.updatedAt() },
+    { num: 13, show:  true, type: 'FIELD',     label: null,          dataType: 'TEXT',                 name: 'From' },
+    { num: 14, show:  true, type: 'FIELD',     label: null,          dataType: 'DATE',                 name: 'Date.Due'},
+];
 
+export default function Table (props) {
     const data = props.data;
     const sogh = props.sogh;
 

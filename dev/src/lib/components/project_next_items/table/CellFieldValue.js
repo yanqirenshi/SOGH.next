@@ -19,8 +19,11 @@ export default function CellFieldValue (props) {
     case 'LINKED_PULL_REQUESTS': return <TableCell></TableCell>;
     case 'TRACKS':               return <TableCell></TableCell>;
     case 'REVIEWERS':            return <TableCell></TableCell>;
+    default:                     return defaultCase(field, value);
     }
+}
 
+function defaultCase (field, value) {
     if ('SINGLE_SELECT'===field.dataType)
         return <cell.SingleSelect value={value} />;
 

@@ -4,7 +4,6 @@ import TableCell from '@mui/material/TableCell';
 
 import TableCellDateTime from '../../common/TableCellDateTime.js';
 
-import CellFieldValue from './CellFieldValue.js';
 import * as cell from './cell_field_value/index.js';
 
 export default function Cell (props) {
@@ -17,7 +16,7 @@ export default function Cell (props) {
         const data_type = column.dataType;
         const val = column.value(row);
 
-        switch (column.dataType) {
+        switch (data_type) {
         case 'text':     return <TableCell>{val}</TableCell>;
         case 'datetime': return <TableCellDateTime data={val} />;
         default:         return <TableCell>{val}</TableCell>;

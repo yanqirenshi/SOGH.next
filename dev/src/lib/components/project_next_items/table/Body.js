@@ -21,7 +21,6 @@ export default function Body (props) {
         <TableBody>
           {items.map((id) => {
               const row = sogh.projectNextItem(id);
-              const href = sogh.href(row,'project-next-item', {id: row.id()});
 
               return (
                   <TableRow key={id} sx={sx.row}>

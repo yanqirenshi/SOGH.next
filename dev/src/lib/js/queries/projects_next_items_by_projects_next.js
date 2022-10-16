@@ -4,7 +4,7 @@ const MAX_FIELD_NUM = 30;
 const MAX_LABEL_NUM = 30;
 const MAX_PR_NUM = 30;
 
-export default `{
+const query = `{
   node(id: "@id") {
     ... on ProjectV2 {
       fields(first: ${MAX_FIELD_NUM}) {
@@ -175,3 +175,5 @@ export default `{
     }
   }
 }`;
+
+export default query;
