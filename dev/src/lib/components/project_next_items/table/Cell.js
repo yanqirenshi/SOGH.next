@@ -34,7 +34,7 @@ export default function Cell (props) {
         switch (column.dataType) {
         case 'TEXT':                 return <TableCell>{val.text}</TableCell>;
         case 'DATE':                 return <TableCellDateTime data={val.date} />;
-        case 'TITLE':                return <cell.Title value={val} />;
+        case 'TITLE':                return <cell.Title value={val} row={row} sogh={sogh}/>;
         case 'ASSIGNEES':            return <cell.Assignees value={val} />;
         case 'LABELS':               return <cell.Labels value={val} />;
         case 'MILESTONE':            return <cell.Milestone value={val} />;

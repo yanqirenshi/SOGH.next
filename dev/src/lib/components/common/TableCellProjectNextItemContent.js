@@ -17,7 +17,9 @@ export default function TableCellProjectNextItemContent (props) {
 
         return (
             <TableCell>
-              <LinkSogh data={issue} sogh={sogh} to="issue"
+              <LinkSogh sogh={sogh}
+                        to="issue"
+                        data={{id: issue.id()}}
                         style={{marginRight:6}}>
                 {issue.title()}
               </LinkSogh>

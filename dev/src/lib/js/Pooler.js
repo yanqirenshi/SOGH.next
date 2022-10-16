@@ -28,7 +28,8 @@ export default class Pooler extends Loader {
         return this._pools[v] || null;
     }
     get (id) {
-        return this.repository(id)
+        return this.issue(id)
+            || this.repository(id)
             || this.user(id)
             || this.projectNext(id)
             || this.node2projectNextItem(id);

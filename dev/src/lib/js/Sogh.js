@@ -4,7 +4,7 @@ import * as queries from './queries/index.js';
 
 export default class Sogh extends Pooler {
     // constructor () { super(); }
-    href (obj, to, data) {
+    href (to, data) {
         const x = {
             'issue':             '/issues/:id',
             'project-next':      '/projects-next/:id',
@@ -17,7 +17,7 @@ export default class Sogh extends Pooler {
         return keys.reduce((str, key)=> {
             let out = str;
 
-            if (key==='id') out = str.replaceAll(':id', obj.id());
+            if (key==='id') out = str.replaceAll(':id', data[key]);
 
             return out;
         }, base);

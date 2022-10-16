@@ -9,7 +9,7 @@ export default function TableCellLinkSogh (props) {
     const to = props.to;
     const children = props.children;
 
-    const href = sogh.href(obj, to, { id: to });
+    const href = sogh.href(to, { id: obj.id() });
 
     return (
         <TableCell>

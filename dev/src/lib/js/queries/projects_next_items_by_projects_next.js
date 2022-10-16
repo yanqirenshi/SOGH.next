@@ -153,9 +153,22 @@ export default `{
           }
           creator ${attr.projectV2FieldValue_Creator()}
           content {
-            ... on DraftIssue { id }
-            ... on Issue { id }
-            ... on PullRequest { id }
+            ... on DraftIssue  {
+              id
+              title
+            }
+            ... on Issue       {
+              id
+              url
+              number
+              title
+            }
+            ... on PullRequest {
+              id
+              number
+              url
+              title
+            }
           }
         }
       }
