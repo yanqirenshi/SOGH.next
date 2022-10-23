@@ -10,8 +10,8 @@ const style ={
 };
 
 export default function Attributes (props) {
-    const issue = props.issue;
-    const item = props.item;
+    // const issue = props.issue;
+    // const item = props.item;
 
     const value = null;
     return (

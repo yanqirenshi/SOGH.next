@@ -14,7 +14,7 @@ const style ={
 };
 
 export default function Contents (props) {
-    const comments = props.comments;
+    // const comments = props.comments;
     const view = props.view;
 
     return (

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import TabContext from '@mui/lab/TabContext';
-import TabPanel from '@mui/lab/TabPanel';
 import Measure from 'react-measure';
 
 import Tabs from './Tabs.js';

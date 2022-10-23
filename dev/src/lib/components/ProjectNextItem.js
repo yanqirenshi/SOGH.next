@@ -13,7 +13,7 @@ const style ={
 
 export default function ProjectNextItem (props) {
     const item = props.data;
-    const sogh = props.sogh;
+    // const sogh = props.sogh;
     const issue = props.issue;
     const issue_comments = props.issue_comments;
 

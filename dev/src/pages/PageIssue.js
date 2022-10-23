@@ -3,7 +3,6 @@ import React from 'react';
 import {useSelector, useDispatch } from 'react-redux';
 import {useParams} from "react-router-dom";
 
-import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
 
 import Page from '../components/Page.js';
@@ -15,8 +14,6 @@ import Project from './issue/Project.js';
 import Milestone from './issue/Milestone.js';
 
 import sogh from '../sogh.js';
-
-import {ProjectsNext} from '../lib/index.js';
 
 import {
     fetchIssueByID,

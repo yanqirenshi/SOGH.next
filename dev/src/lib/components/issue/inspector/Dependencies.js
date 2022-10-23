@@ -6,8 +6,8 @@ const style ={
 };
 
 export default function Dependencies (props) {
-    const issue = props.issue;
-    const item = props.item;
+    // const issue = props.issue;
+    // const item = props.item;
 
     return (
         <Box sx={style}>
