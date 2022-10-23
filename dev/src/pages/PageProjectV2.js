@@ -3,7 +3,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from "react-router-dom";
 
-import { ProjectNextItems } from '../lib/index.js';
+import { ProjectV2Items } from '../lib/index.js';
 
 import Page from '../components/Page.js';
 
@@ -47,7 +47,7 @@ export default function PageProjectV2 (props) {
               justifyContent: 'center',
               padding: 22,
           }}>
-            <ProjectNextItems data={data.project_next_items.data} sogh={sogh}/>
+            <ProjectV2Items data={data.project_next_items.data} sogh={sogh}/>
           </div>
         </Page>
     );

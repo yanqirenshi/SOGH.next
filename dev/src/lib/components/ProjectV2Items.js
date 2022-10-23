@@ -6,7 +6,7 @@ const style = {
     overflow: 'auto',
 };
 
-export default function ProjectNextItems (props) {
+export default function ProjectV2Items (props) {
     const data = props.data;
     const sogh = props.sogh;
 

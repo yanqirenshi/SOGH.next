@@ -3,7 +3,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from "react-router-dom";
 
-import { ProjectNextItem } from '../lib/index.js';
+import { ProjectV2Item } from '../lib/index.js';
 
 import Page from '../components/Page.js';
 
@@ -15,7 +15,7 @@ import {
     fetchIssueCommentsByIssueID,
 } from '../slices/page_project_next_item.js';
 
-export default function PageProjectItem (props) {
+export default function PageProjectV2Item (props) {
     const data = useSelector(state => state.page_project_next_item);
     const dispatch = useDispatch();
 
@@ -38,10 +38,10 @@ export default function PageProjectItem (props) {
     return (
         <Page data={project_next_item} mode="project-item">
           {project_next_item
-           && <ProjectNextItem sogh={sogh}
-                               data={project_next_item}
-                               issue={issue}
-                               issue_comments={issue_comments}/>}
+           && <ProjectV2Item sogh={sogh}
+                             data={project_next_item}
+                             issue={issue}
+                             issue_comments={issue_comments}/>}
         </Page>
     );
 }

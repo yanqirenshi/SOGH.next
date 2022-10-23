@@ -11,7 +11,7 @@ const style ={
     overflow: 'hidden',
 };
 
-export default function ProjectNextItem (props) {
+export default function ProjectV2Item (props) {
     const item = props.data;
     // const sogh = props.sogh;
     const issue = props.issue;
