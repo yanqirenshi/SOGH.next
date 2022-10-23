@@ -1,6 +1,6 @@
 {
     "name": "sogh",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Scram on Github",
     "main": "dist/index.js",
     "scripts": {
@@ -24,6 +24,7 @@
         "@mui/lab": "^5.0.0-alpha.104",
         "@mui/material": "^5.10.10",
         "@mui/x-date-pickers": "^5.0.5",
+        "luxon": "^3.0.4",
         "moment": "^2.29.1"
     },
     "devDependencies": {
