@@ -1,5 +1,7 @@
+dev
 src
 documents
 examples
+node_modules
 .babelrc
 .gitignore
