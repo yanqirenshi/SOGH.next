@@ -1,8 +1,8 @@
 import React from 'react';
 
-import Table from './projects_next/Table.js';
+import Table from './repositories/Table.js';
 
-export default function ProjectsNext (props) {
+export default function Repositories (props) {
     const data = props.data;
     const sogh = props.sogh;
 

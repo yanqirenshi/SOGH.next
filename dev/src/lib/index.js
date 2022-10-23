@@ -1,6 +1,6 @@
 import ProjectNextItem from './components/ProjectNextItem.js';
 import ProjectNextItems from './components/ProjectNextItems.js';
-import ProjectsNext from './components/ProjectsNext.js';
+import ProjectsV2 from './components/ProjectsV2.js';
 import Repositories from './components/Repositories.js';
 
 import Sogh from './js/Sogh.js';
@@ -20,7 +20,7 @@ export default Sogh;
 export {
     ProjectNextItem,
     ProjectNextItems,
-    ProjectsNext,
+    ProjectsV2,
     Repositories,
 }
 

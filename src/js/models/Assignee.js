@@ -1,4 +1,4 @@
-import GraphQLNode from '../GraphQLNode.js';
+import GraphQLNode from './GraphQLNode.js';
 
 export default class Assignee extends GraphQLNode {
     // constructor (data) {

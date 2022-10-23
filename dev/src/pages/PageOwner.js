@@ -7,7 +7,7 @@ import Page from '../components/Page.js';
 
 import sogh from '../sogh.js';
 
-import {ProjectsNext} from '../lib/index.js';
+import {ProjectsV2} from '../lib/index.js';
 
 import {
     fetchUserByID,
@@ -36,7 +36,7 @@ export default function PageOwner (props) {
     return (
         <Page data={user} mode="user">
           <div style={{display:'flex', justifyContent: 'center', padding: 22}}>
-            <ProjectsNext data={data.projects_next.data} sogh={sogh}/>
+            <ProjectsV2 data={data.projects_next.data} sogh={sogh}/>
           </div>
         </Page>
     );

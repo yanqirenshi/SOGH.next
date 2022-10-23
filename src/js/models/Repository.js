@@ -1,19 +1,6 @@
-// id
-// name
-// url
-// description
-// descriptionHTML
-// createdAt
-// updatedAt
-// pushedAt
-// owner	model
-
-import GraphQLNode from '../GraphQLNode.js';
+import GraphQLNode from './GraphQLNode.js';
 
 export default class Repository extends GraphQLNode {
-    // constructor (data) {
-    //     super(data);
-    // }
     name () {
         return this._core.name || null;
     }

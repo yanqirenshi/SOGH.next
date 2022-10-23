@@ -14,7 +14,7 @@ import {
     fetchProjectV2ItemsByProjectNext,
 } from '../slices/page_project_next.js';
 
-export default function PageProjects (props) {
+export default function PageProjectV2 (props) {
     const [load, setLoad] = React.useState(false);
     const [loadItems, setLoadItems] = React.useState(false);
 

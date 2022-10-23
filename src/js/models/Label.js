@@ -1,4 +1,4 @@
-import GraphQLNode from '../GraphQLNode.js';
+import GraphQLNode from './GraphQLNode.js';
 
 // id
 // name

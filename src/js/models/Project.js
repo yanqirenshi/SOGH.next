@@ -3,7 +3,7 @@ import moment from 'moment';
 // import Column from './Column.js';
 // import Label  from './Label.js';
 
-import GraphQLNode from '../GraphQLNode.js';
+import GraphQLNode from './GraphQLNode.js';
 
 // id
 // number

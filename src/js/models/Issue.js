@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import GraphQLNode from '../GraphQLNode.js';
+import GraphQLNode from './GraphQLNode.js';
 
 // id
 // url
@@ -104,6 +104,12 @@ export default class Issue extends GraphQLNode {
 
         return core.body;
     }
+    bodyHTML () {
+        const core = this.core();
+
+        return core.bodyHTML;
+    }
+
     // due_date: "2021-08-31"
     dueDate (v) {
         const body = this.body();
@@ -152,7 +158,7 @@ export default class Issue extends GraphQLNode {
     }
     //
     getPointResultsFromBody (body) {
-        const rs = /\$Point.[R|r]esult:*\s+(\S+)\s+(\d+-\d+-\d+)\s+(\d+)/g;
+        const rs = /\$Point.[R|r]esult:*\s+(\S+)\s+(\d+-\d+-\d+)\s+(([1-9]\d*|0)(\.\d+)?)/g;
         const regex = new RegExp(rs);
 
         const result = [...body.matchAll(regex)];
@@ -172,7 +178,7 @@ export default class Issue extends GraphQLNode {
         }, { total: 0, details: [] });
     }
     getPointPlansFromBody (body) {
-        const rs = /\$[P|p]oint.[P|p]lan:*\s+(\S+)\s+(\d+-\d+-\d+)\s+(\d+)/g;
+        const rs = /\$[P|p]oint.[P|p]lan:*\s+(\S+)\s+(\d+-\d+-\d+)\s+(([1-9]\d*|0)(\.\d+)?)/g;
         const regex = new RegExp(rs);
 
         const result = [...body.matchAll(regex)];
@@ -192,8 +198,8 @@ export default class Issue extends GraphQLNode {
         }, { total: 0, details: [] });
     }
     getPointFromBody (body) {
-        const plan = /.*[@|$][P|p]oint\.[P|p]lan:*\s+(\d+).*/.exec(body);
-        const result = /.*[@|$][P|p]oint\.[R|r]esult:*\s+(\d+).*/.exec(body);
+        const plan = /.*[@|$][P|p]oint\.[P|p]lan:*\s+(([1-9]\d*|0)(\.\d+)?).*/.exec(body);
+        const result = /.*[@|$][P|p]oint\.[R|r]esult:*\s+(([1-9]\d*|0)(\.\d+)?).*/.exec(body);
         const results = this.getPointResultsFromBody(body);
 
         return {
