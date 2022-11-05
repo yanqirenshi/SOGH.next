@@ -1,3 +1,7 @@
+export function timestamp () {
+    return new Date().toISOString();
+}
+
 export function applyCallback (payload, type, args=[]) {
     if (!payload
         || !payload.callbacks

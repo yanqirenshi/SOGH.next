@@ -12,13 +12,13 @@ import sogh from '../sogh.js';
 import {
     fetchProjectsV2ByID,
     fetchProjectV2ItemsByProjectNext,
-} from '../slices/page_project_next.js';
+} from '../slices/page_projectV2.js';
 
 export default function PageProjectV2 (props) {
     const [load, setLoad] = React.useState(false);
     const [loadItems, setLoadItems] = React.useState(false);
 
-    const data = useSelector(state => state.page_project_next);
+    const data = useSelector(state => state.page_projectV2);
     const dispatch = useDispatch();
 
     const project_next_id = useParams().id;

@@ -18,12 +18,14 @@ export default function Table (props) {
     return (
         <TableContainer component={Paper}>
           <MTable sx={{ minWidth: 650 }} aria-label="simple table">
+
             <TableHead>
               <TableRow>
                 <TableCell>Number</TableCell>
                 <TableCell>Title</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
               {data.map((id) => {
                   const obj = sogh.projectNext(id);
@@ -40,6 +42,7 @@ export default function Table (props) {
                   );
               })}
             </TableBody>
+
           </MTable>
         </TableContainer>
     );

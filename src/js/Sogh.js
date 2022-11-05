@@ -7,8 +7,8 @@ export default class Sogh extends Pooler {
     href (to, data) {
         const x = {
             'issue':             '/issues/:id',
-            'project-next':      '/projects-next/:id',
-            'project-next-item': '/project-next-items/:id',
+            'project-next':      '/projectsV2/:id',
+            'project-next-item': '/projectV2-items/:id',
         };
 
         const base = x[to];
@@ -72,59 +72,88 @@ export default class Sogh extends Pooler {
             contents: this.xxx(data.node, make),
         };
     }
-    fetchRepositoriesByViewer () {
+    fetchRepositoriesByViewer (success, fail) {
         const query = queries.repositories_by_viewer;
 
         const query_pageing = this.ensureEndCursor(query, null);
 
-        return this.fetchX(
+        this.fetchX(
             query_pageing,
-            (response)=> this.yyy(response.data.viewer.repositories,
-                                  node=> this.node2repository(node)));
+            (response)=> {
+                const repositories = response.data.viewer.repositories;
+
+                const x = this.yyy(repositories, node=> this.node2repository(node));
+
+                if (success) success(x);
+            },
+            (error)=> {
+                if (fail) fail(error);
+            });
     }
-    fetchUserByID (id) {
+    fetchUserByID (id, success, fail) {
         const query = queries.user_by_id.replace('@id', id);
 
         const query_pageing = this.ensureEndCursor(query, null);
 
         return this.fetchX(
             query_pageing,
-            (response)=> this.zzz(response.data,
-                                  node=> this.node2user(node)));
+            (response)=> {
+                const x = this.zzz(response.data, node=> this.node2user(node));
+
+                if (success) success(x);
+            },
+            (error)=> {
+                if (fail) fail(error);
+            });
     }
-    fetchProjectsV2ByUser (user) {
+    fetchProjectsV2ByUser (user, success, fail) {
         const query = queries.projectsv2_by_user.replace('@login', user.login());
 
         const query_pageing = this.ensureEndCursor(query, null);
 
         return this.fetchX(
             query_pageing,
-            (results)=> this.yyy(results.data.user.projectsV2,
-                                 node=> this.node2projectNext(node)));
+            (results)=> {
+                const x = this.yyy(results.data.user.projectsV2, node=> this.node2projectNext(node));
+
+                if (success) success(x);
+            },
+            (error)=> {
+                if (fail) fail(error);
+            });
     }
-    fetchProjectsV2ByID (id) {
+    fetchProjectsV2ByID (id, success, fail) {
         const query = queries.projects_next_by_id.replace('@id', id);
 
         const query_pageing = this.ensureEndCursor(query, null);
         return this.fetchX(
             query_pageing,
             (response)=> {
-                return this.zzz(response.data,
-                                node=> this.node2projectNext(node));
+                const x =  this.zzz(response.data, node=> this.node2projectNext(node));
+
+                if (success) success(x);
+            },
+            (error)=> {
+                if (fail) fail(error);
             });
     }
-    fetchProjectV2ItemsByProjectNext (project_next) {
+    fetchProjectV2ItemsByProjectNext (project_next, success, fail) {
         const query = queries.projects_next_items_by_projects_next.replace('@id', project_next.id());
         const query_pageing = this.ensureEndCursor(query, null);
 
         return this.fetchX(
             query_pageing,
             (results)=> {
-                return this.yyy(results.data.node.items,
+                const x = this.yyy(results.data.node.items,
                                 node=> this.node2projectNextItem(node),
                                 (data, out)=>{
                                     out.fields = results.data.node.fields.nodes;
                                 });
+
+                if (success) success(x);
+            },
+            (error)=> {
+                if (fail) fail(error);
             });
     }
     fetchProjectNextItemByID (id) {

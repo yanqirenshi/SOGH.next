@@ -1,10 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { DateTime } from 'luxon';
 
-import {
-    fetchUserByID,
-    fetchProjectsV2ByUser,
-} from './page_owner/actions.js';
+import {timestamp} from './utils.js';
+
+import sogh from '../sogh.js';
 
 export const page_owner = createSlice({
     name: 'page/owner',
@@ -25,40 +24,67 @@ export const page_owner = createSlice({
             },
         },
     },
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchUserByID.pending, (state) => {
-                state.user.fetch.start = DateTime.now().toISO();
-                state.user.fetch.end = null;
-            })
-            .addCase(fetchUserByID.fulfilled, (state, action) => {
-                state.user.fetch.end = DateTime.now().toISO();
-                state.user.data = action.payload;
-            })
-            .addCase(fetchUserByID.rejected, (state) => {
-                state.user.fetch.end = DateTime.now().toISO();
-            });
+    reducers: {
+        //
+        started_fetchUserByID: (state, action) => {
+            state.user.fetch.start = timestamp();
+            state.user.fetch.end = null;
+        },
+        successed_fetchUserByID: (state, action) => {
+            state.user.fetch.end = timestamp();
+            state.user.data = action.payload;
+        },
+        failed_fetchUserByID: (state, action) => {
+            state.user.fetch.end = timestamp();
+        },
+        //
+        started_fetchProjectsV2ByUser: (state, action) => {
+            state.projects_next.fetch.start = timestamp();
+            state.projects_next.fetch.end = null;
+        },
+        successed_fetchProjectsV2ByUser: (state, action) => {
+            state.projects_next.fetch.end = timestamp();
 
-        builder
-            .addCase(fetchProjectsV2ByUser.pending, (state) => {
-                state.projects_next.fetch.start = DateTime.now().toISO();
-                state.projects_next.fetch.end = null;
-            })
-            .addCase(fetchProjectsV2ByUser.fulfilled, (state, action) => {
-                state.projects_next.fetch.end = DateTime.now().toISO();
-
-                state.projects_next.fetch.pageInfo = action.payload.pageInfo;
-                state.projects_next.data = action.payload.contents;
-            })
-            .addCase(fetchProjectsV2ByUser.rejected, (state) => {
-                state.projects_next.fetch.end = DateTime.now().toISO();
-            });
+            state.projects_next.fetch.pageInfo = action.payload.pageInfo;
+            state.projects_next.data = action.payload.contents;
+        },
+        failed_fetchProjectsV2ByUser: (state, action) => {
+            state.projects_next.fetch.end = timestamp();
+        },
     },
 });
 
-export default page_owner.reducer;
+export const {
+    //
+    started_fetchUserByID,
+    successed_fetchUserByID,
+    failed_fetchUserByID,
+    //
+    started_fetchProjectsV2ByUser,
+    successed_fetchProjectsV2ByUser,
+    failed_fetchProjectsV2ByUser,
+} = page_owner.actions;
 
-export {
-    fetchUserByID,
-    fetchProjectsV2ByUser,
+
+export function fetchUserByID (id) {
+    return (dispatch) => {
+        dispatch(started_fetchUserByID());
+
+        sogh.fetchUserByID(id,
+            (data)=>  dispatch(successed_fetchUserByID(data)),
+            (error)=> dispatch(failed_fetchUserByID(error)));
+    };
 };
+
+export function fetchProjectsV2ByUser (user) {
+    return (dispatch) => {
+        dispatch(started_fetchProjectsV2ByUser());
+
+        sogh.fetchProjectsV2ByUser(
+            user,
+            (data)=>  dispatch(successed_fetchProjectsV2ByUser(data)),
+            (error)=> dispatch(failed_fetchProjectsV2ByUser(error)));
+    };
+};
+
+export default page_owner.reducer;
