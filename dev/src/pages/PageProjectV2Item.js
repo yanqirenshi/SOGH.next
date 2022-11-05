@@ -20,7 +20,7 @@ export default function PageProjectV2Item (props) {
     const dispatch = useDispatch();
 
     const project_next_item_id = useParams().id;
-    const project_next_item = sogh.projectNextItem(project_next_item_id);
+    const project_next_item = sogh.projectV2Item(project_next_item_id);
 
     if (isNeedLoad(data))
         dispatch(fetchProjectNextItemByID(project_next_item_id));

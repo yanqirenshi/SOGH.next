@@ -14,8 +14,8 @@ export default class Pooler extends Loader {
         this._pools = [
             'repository',
             'user',
-            'project-next',
-            'project-next-item',
+            'project-v2',
+            'project-v2-item',
             'issue',
             'issue-comment',
         ].reduce((ht, key)=> {
@@ -31,8 +31,8 @@ export default class Pooler extends Loader {
         return this.issue(id)
             || this.repository(id)
             || this.user(id)
-            || this.projectNext(id)
-            || this.node2projectNextItem(id);
+            || this.projectV2(id)
+            || this.node2projectV2(id);
     }
     /* **************************************************************** *
      *  Repository                                                      *
@@ -67,30 +67,29 @@ export default class Pooler extends Loader {
     /* **************************************************************** *
      *  ProjectNext                                                     *
      * **************************************************************** */
-    node2projectNext (node) {
-        const pool = this.pool('project-next');
+    node2projectV2 (node) {
+        const pool = this.pool('project-v2');
 
         // this.matchmaker.user(node);
-
         return pool.ensure(node, (d)=> new model.ProjectNext(d));
     }
-    projectNext (v) {
-        const pool = this.pool('project-next');
+    projectV2 (v) {
+        const pool = this.pool('project-v2');
 
         return pool.get(v);
     }
     /* **************************************************************** *
      *  ProjectNext Item                                                *
      * **************************************************************** */
-    node2projectNextItem (node) {
-        const pool = this.pool('project-next-item');
+    node2projectV2Item (node) {
+        const pool = this.pool('project-v2-item');
 
         // this.matchmaker.user(node);
 
         return pool.ensure(node, (d)=> new model.ProjectNextItem(d));
     }
-    projectNextItem (v) {
-        const pool = this.pool('project-next-item');
+    projectV2Item (v) {
+        const pool = this.pool('project-v2-item');
 
         return pool.get(v);
     }

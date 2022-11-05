@@ -114,7 +114,9 @@ export default class Sogh extends Pooler {
         return this.fetchX(
             query_pageing,
             (results)=> {
-                const x = this.yyy(results.data.user.projectsV2, node=> this.node2projectNext(node));
+                const data = results.data.user.projectsV2;
+
+                const x = this.yyy(data, node=> this.node2projectV2(node));
 
                 if (success) success(x);
             },
@@ -129,7 +131,7 @@ export default class Sogh extends Pooler {
         return this.fetchX(
             query_pageing,
             (response)=> {
-                const x =  this.zzz(response.data, node=> this.node2projectNext(node));
+                const x =  this.zzz(response.data, node=> this.node2projectV2(node));
 
                 if (success) success(x);
             },
@@ -145,7 +147,7 @@ export default class Sogh extends Pooler {
             query_pageing,
             (results)=> {
                 const x = this.yyy(results.data.node.items,
-                                node=> this.node2projectNextItem(node),
+                                node=> this.node2projectV2Item(node),
                                 (data, out)=>{
                                     out.fields = results.data.node.fields.nodes;
                                 });
@@ -164,7 +166,7 @@ export default class Sogh extends Pooler {
         return this.fetchX(
             query_pageing,
             (response)=> this.zzz(response.data,
-                                  node=> this.node2projectNextItem(node)));
+                                  node=> this.node2projectV2Item(node)));
     }
     fetchIssueByID (id) {
         const query = queries.issue_by_id.replace('@id', id);

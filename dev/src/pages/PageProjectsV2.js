@@ -22,7 +22,7 @@ export default function PageProjectV2 (props) {
     const dispatch = useDispatch();
 
     const project_next_id = useParams().id;
-    const project_next = sogh.projectNext(project_next_id);
+    const project_next = sogh.projectV2(project_next_id);
 
     React.useEffect(()=> {
         setLoad(true);

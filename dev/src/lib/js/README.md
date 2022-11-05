@@ -25,8 +25,8 @@
         | repository (v)          |
         | node2user (node)        |
         | user (v)                |
-        | node2projectNext (node) |
-        | projectNext (v)         |
+        | node2projectV2 (node)   |
+        | projectV2 (v)           |
         +-------------------------+
              ^
              |

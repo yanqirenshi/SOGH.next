@@ -28,7 +28,7 @@ export default function Table (props) {
 
             <TableBody>
               {data.map((id) => {
-                  const obj = sogh.projectNext(id);
+                  const obj = sogh.projectV2(id);
 
                   return (
                       <TableRow key={id}

@@ -20,7 +20,7 @@ export default function Body (props) {
     return (
         <TableBody>
           {items.map((id) => {
-              const row = sogh.projectNextItem(id);
+              const row = sogh.projectV2Item(id);
 
               return (
                   <TableRow key={id} sx={sx.row}>
