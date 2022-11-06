@@ -11,4 +11,7 @@ export default class ProjectNext extends GraphQLNode {
     url () {
         return this._core.url || null;
     }
+    fields () {
+        return this._core.fields.nodes || [];
+    }
 }

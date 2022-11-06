@@ -35,7 +35,7 @@ export default function Table (props) {
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <TableCellLinkGithub data={obj}/>
 
-                        <TableCellLinkSogh  to="project-next" data={obj} sogh={sogh}>
+                        <TableCellLinkSogh to="project-v2" data={obj} sogh={sogh}>
                           {obj.title()}
                         </TableCellLinkSogh>
                       </TableRow>

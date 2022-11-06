@@ -3,15 +3,28 @@ import Pooler from './Pooler.js';
 import * as queries from './queries/index.js';
 
 export default class Sogh extends Pooler {
-    // constructor () { super(); }
-    href (to, data) {
-        const x = {
-            'issue':             '/issues/:id',
-            'project-next':      '/projectsV2/:id',
-            'project-next-item': '/projectV2-items/:id',
-        };
+    constructor () {
+        super();
 
-        const base = x[to];
+        this._routes = {
+            'issue':            '/issues/:id',
+            'project-v2':       '/projectsV2/:id',
+            'project-v2-items': '/projectV2-items/:id',
+        };
+    }
+    /** **************************************************************** *
+     * routes
+     * **************************************************************** */
+    routes (v) {
+        if (arguments.length>0)
+            this._routes = v;
+
+        return this._routes;
+    }
+    href (to, data) {
+        const routes = this.routes();
+
+        const base = routes[to];
         const keys = Object.keys(data);
 
         return keys.reduce((str, key)=> {
