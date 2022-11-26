@@ -27,9 +27,9 @@ const query = `{
                 id
                 date
                 field {
-                  ... on ProjectV2Field { id }
-                  ... on ProjectV2IterationField { id }
-                  ... on ProjectV2SingleSelectField { id }
+                  ... on ProjectV2Field { id name }
+                  ... on ProjectV2IterationField { id name }
+                  ... on ProjectV2SingleSelectField { id name }
                 }
                 creator ${attr.projectV2FieldValue_Creator()}
               }
@@ -37,17 +37,17 @@ const query = `{
                 ${attr.ProjectV2ItemFieldIterationValue()}
                 creator ${attr.projectV2FieldValue_Creator()}
                 field {
-                  ... on ProjectV2Field { id }
-                  ... on ProjectV2IterationField { id }
-                  ... on ProjectV2SingleSelectField { id }
+                  ... on ProjectV2Field { id name }
+                  ... on ProjectV2IterationField { id name }
+                  ... on ProjectV2SingleSelectField { id name }
                 }
               }
               ... on ProjectV2ItemFieldLabelValue {
                 __typename
                 field {
-                  ... on ProjectV2Field { id }
-                  ... on ProjectV2IterationField { id }
-                  ... on ProjectV2SingleSelectField { id }
+                  ... on ProjectV2Field { id name }
+                  ... on ProjectV2IterationField { id name }
+                  ... on ProjectV2SingleSelectField { id name }
                 }
                 labels(first: ${MAX_LABEL_NUM}) {
                   nodes {
@@ -58,9 +58,9 @@ const query = `{
               ... on ProjectV2ItemFieldMilestoneValue {
                 __typename
                 field {
-                  ... on ProjectV2Field { id }
-                  ... on ProjectV2IterationField { id }
-                  ... on ProjectV2SingleSelectField { id }
+                  ... on ProjectV2Field { id name }
+                  ... on ProjectV2IterationField { id name }
+                  ... on ProjectV2SingleSelectField { id name }
                 }
                 milestone {
                   ${attr.milestone()}
@@ -69,18 +69,18 @@ const query = `{
               ... on ProjectV2ItemFieldNumberValue {
                 ${attr.ProjectV2ItemFieldNumberValue()}
                 field {
-                  ... on ProjectV2Field { id }
-                  ... on ProjectV2IterationField { id }
-                  ... on ProjectV2SingleSelectField { id }
+                  ... on ProjectV2Field { id name }
+                  ... on ProjectV2IterationField { id name }
+                  ... on ProjectV2SingleSelectField { id name }
                 }
                 creator ${attr.projectV2FieldValue_Creator()}
               }
               ... on ProjectV2ItemFieldPullRequestValue {
                 __typename
                 field {
-                  ... on ProjectV2Field { id }
-                  ... on ProjectV2IterationField { id }
-                  ... on ProjectV2SingleSelectField { id }
+                  ... on ProjectV2Field { id name }
+                  ... on ProjectV2IterationField { id name }
+                  ... on ProjectV2SingleSelectField { id name }
                 }
                 pullRequests(first: ${MAX_PR_NUM}) {
                   nodes {
@@ -93,9 +93,9 @@ const query = `{
               ... on ProjectV2ItemFieldRepositoryValue {
                 __typename
                 field {
-                  ... on ProjectV2Field { id }
-                  ... on ProjectV2IterationField { id }
-                  ... on ProjectV2SingleSelectField { id }
+                  ... on ProjectV2Field { id name }
+                  ... on ProjectV2IterationField { id name }
+                  ... on ProjectV2SingleSelectField { id name }
                 }
                 repository {
                   name
@@ -106,9 +106,9 @@ const query = `{
               ... on ProjectV2ItemFieldReviewerValue {
                 __typename
                 field {
-                  ... on ProjectV2Field { id }
-                  ... on ProjectV2IterationField { id }
-                  ... on ProjectV2SingleSelectField { id }
+                  ... on ProjectV2Field { id name }
+                  ... on ProjectV2IterationField { id name }
+                  ... on ProjectV2SingleSelectField { id name }
                 }
                 reviewers(first: 10) {
                   nodes {
@@ -122,26 +122,26 @@ const query = `{
                 ${attr.ProjectV2ItemFieldSingleSelectValue()}
                 creator ${attr.projectV2FieldValue_Creator()}
                 field {
-                  ... on ProjectV2Field { id }
-                  ... on ProjectV2IterationField { id }
-                  ... on ProjectV2SingleSelectField { id }
+                  ... on ProjectV2Field { id name }
+                  ... on ProjectV2IterationField { id name }
+                  ... on ProjectV2SingleSelectField { id name }
                 }
               }
               ... on ProjectV2ItemFieldTextValue {
                 ${attr.ProjectV2ItemFieldTextValue()}
                 creator ${attr.projectV2FieldValue_Creator()}
                 field {
-                  ... on ProjectV2Field { id }
-                  ... on ProjectV2IterationField { id }
-                  ... on ProjectV2SingleSelectField { id }
+                  ... on ProjectV2Field { id name }
+                  ... on ProjectV2IterationField { id name }
+                  ... on ProjectV2SingleSelectField { id name }
                 }
               }
               ... on ProjectV2ItemFieldUserValue {
                 __typename
                 field {
-                  ... on ProjectV2Field { id }
-                  ... on ProjectV2IterationField { id }
-                  ... on ProjectV2SingleSelectField { id }
+                  ... on ProjectV2Field { id name }
+                  ... on ProjectV2IterationField { id name }
+                  ... on ProjectV2SingleSelectField { id name }
                 }
                 users(first: 10) {
                   nodes {

@@ -17,6 +17,16 @@ export default class ProjectNextItem extends GraphQLNode {
     fieldValues () {
         return this._core.fieldValues.nodes || [];
     }
+    getFieldValueByName(name) {
+        return this.fieldValues().find(fv=> {
+            return fv.field.name === name;
+        });
+    }
+    status () {
+        const field_value = this.getFieldValueByName('Status');
+
+        return field_value ? field_value.name : null;
+    }
     dueDate () {
         return null;
     }

@@ -9,11 +9,11 @@ const style = {
 };
 
 export default function TableCellDateTime (props) {
-    const value = props.data;
+    const value = props.value;
 
     return (
         <TableCell style={style}>
-          {fmt(value)}
+          {fmt(value.date)}
         </TableCell>
     );
 }

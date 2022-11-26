@@ -26,14 +26,11 @@ const columns = [
 ];
 
 export default function Table (props) {
-    const data = props.data;
     const sogh = props.sogh;
 
-    if (!data) return null;
+    const fields = props.fields.reduce(makeFields, {});
 
-    const fields = data.fields.reduce(makeFields, {});
-
-    const items = data.items;
+    const items = props.items;
 
     return (
         <TableContainer component={Paper}>
