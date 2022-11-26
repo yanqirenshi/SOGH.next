@@ -22,6 +22,7 @@ const columns = [
     { num: 12, show: false, type: 'ATTRIBUTE', label: 'updated_at',  dataType: 'datetime', value: (row)=>row.updatedAt() },
     { num: 13, show:  true, type: 'FIELD',     label: null,          dataType: 'TEXT',                 name: 'From' },
     { num: 14, show:  true, type: 'FIELD',     label: null,          dataType: 'DATE',                 name: 'Date.Due'},
+    { num: 15, show:  true, type: 'FIELD',     label: null,          dataType: 'SINGLE_SELECT',        name: 'Status' },
 ];
 
 export default function Table (props) {
@@ -51,7 +52,7 @@ export default function Table (props) {
 function makeFields (ht, d) {
     const data_type = d.dataType;
 
-    const is_multi_purpose = 'TEXT'===data_type || 'DATE'===data_type;
+    const is_multi_purpose = 'TEXT'===data_type || 'DATE'===data_type || 'SINGLE_SELECT'===data_type;
 
     if (is_multi_purpose && !ht[data_type])
         ht[data_type] = {};

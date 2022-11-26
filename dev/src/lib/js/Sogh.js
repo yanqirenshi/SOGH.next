@@ -153,7 +153,7 @@ export default class Sogh extends Pooler {
             });
     }
     fetchProjectV2ItemsByProjectNext (project_next, success, fail) {
-        const query = queries.projects_next_items_by_projects_next.replace('@id', project_next.id());
+        const query = queries.projects_v2_items_by_projects_v2.replace('@id', project_next.id());
         const query_pageing = this.ensureEndCursor(query, null);
 
         return this.fetchX(

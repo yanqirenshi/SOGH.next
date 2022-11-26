@@ -39,7 +39,7 @@ function getContents (column, fields) {
         if (!field) return '?';
 
         let y;
-        if ('DATE'===data_type || 'TEXT'===data_type)
+        if ('DATE'===data_type || 'TEXT'===data_type || 'SINGLE_SELECT'===data_type)
             y = field[column.name];
         else
             y = field;

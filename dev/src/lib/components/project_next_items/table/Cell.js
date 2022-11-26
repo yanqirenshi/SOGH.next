@@ -3,6 +3,7 @@ import React from 'react';
 import TableCell from '@mui/material/TableCell';
 
 import TableCellDateTime from '../../common/TableCellDateTime.js';
+import TableCellSingleSelect from '../../common/TableCellSingleSelect.js';
 
 import * as cell from './cell_field_value/index.js';
 
@@ -32,7 +33,8 @@ export default function Cell (props) {
 
         switch (column.dataType) {
         case 'TEXT':                 return <TableCell>{val.text}</TableCell>;
-        case 'DATE':                 return <TableCellDateTime data={val.date} />;
+        case 'DATE':                 return <TableCellDateTime value={val} />;
+        case 'SINGLE_SELECT':        return <TableCellSingleSelect value={val}/>;
         case 'TITLE':                return <cell.Title value={val} row={row} sogh={sogh}/>;
         case 'ASSIGNEES':            return <cell.Assignees value={val} />;
         case 'LABELS':               return <cell.Labels value={val} />;
@@ -61,8 +63,11 @@ function getField (fields, column) {
     if (!field)
         return null;
 
-    if ('TEXT'===column.dataType || 'DATE'===column.dataType)
+    if ('TEXT'===column.dataType ||
+        'DATE'===column.dataType ||
+        'SINGLE_SELECT'===column.dataType)
         return field[column.name];
+
 
     return fields[column.dataType];
 }

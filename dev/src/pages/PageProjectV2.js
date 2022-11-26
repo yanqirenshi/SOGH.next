@@ -14,6 +14,14 @@ import {
     fetchProjectV2ItemsByProjectNext,
 } from '../slices/page_projectV2.js';
 
+const style = {
+    contents: {
+              display:'flex',
+              justifyContent: 'center',
+              padding: 22,
+    },
+};
+
 export default function PageProjectV2 (props) {
     const [load, setLoad] = React.useState(false);
     const [loadItems, setLoadItems] = React.useState(false);
@@ -42,12 +50,9 @@ export default function PageProjectV2 (props) {
 
     return (
         <Page data={project_next} mode="project">
-          <div style={{
-              display:'flex',
-              justifyContent: 'center',
-              padding: 22,
-          }}>
-            <ProjectV2Items data={data.project_next_items.data} sogh={sogh}/>
+          <div style={style.contents}>
+            <ProjectV2Items data={data.project_next_items.data}
+                            sogh={sogh}/>
           </div>
         </Page>
     );
