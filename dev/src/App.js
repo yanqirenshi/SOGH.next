@@ -47,7 +47,7 @@ export default function App() {
               <Route path="/issues/:id"                        element={<page.PageIssue />} />
               <Route path="/owners/:id"                        element={<page.PageOwner />} />
               <Route path="/projectV2-items/:id"               element={<page.PageProjectV2Item/>} />
-              <Route path="/projectsV2/:id"                    element={<page.PageProjectsV2/>} />
+              <Route path="/projectsV2/:id"                    element={<page.PageProjectV2/>} />
               <Route path="/repositories/:id"                  element={<page.PageRepository/>} />
               <Route path="/repositories/:id/classic-projects" element={<page.PageRepositoryClassicProjects />} />
               <Route path="/repositories/:id/issues"           element={<page.PageRepositoryIssues />} />
