@@ -1,6 +1,6 @@
 {
     "name": "sogh",
-    "version": "0.0.10",
+    "version": "0.1.0",
     "description": "Scram on Github",
     "main": "dist/index.js",
     "scripts": {
@@ -14,8 +14,8 @@
     "author": "yanqirenshi <yanqirenshi@gmail.com> (https://www.npmjs.com/~yanqirenshi)",
     "license": "MIT",
     "peerDependencies": {
-        "react": "^17.0.1",
-        "react-dom": "^17.0.1"
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
     },
     "dependencies": {
         "@emotion/react": "^11.10.4",
@@ -33,7 +33,7 @@
         "@babel/preset-env": "^7.12.11",
         "@babel/preset-react": "^7.12.10",
         "babel-loader": "^8.2.2",
-        "react-dom": "^17.0.1",
-        "react": "^17.0.1"
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
     }
 }
