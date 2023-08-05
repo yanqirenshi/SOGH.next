@@ -1,8 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { DateTime } from 'luxon';
 
-import {timestamp} from './utils.js';
-
 import sogh from '../sogh.js';
 
 export const page_projectV2 = createSlice({

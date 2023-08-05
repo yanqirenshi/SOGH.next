@@ -1,7 +1,5 @@
 import React from 'react';
 
-import * as router from "react-router-dom";
-
 export default function LinkSogh (props) {
     const to = props.to;
     const data = props.data;
@@ -12,8 +10,8 @@ export default function LinkSogh (props) {
     const style = props.style;
 
     return (
-        <router.Link to={sogh.href(to, data)} style={style}>
+        <a href={sogh.href(to, data)} style={style}>
           {children}
-        </router.Link>
+        </a>
     );
 }
