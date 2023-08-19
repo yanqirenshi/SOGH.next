@@ -116,32 +116,32 @@ export default class Sogh extends Pooler {
 
             const post_data = this.postData(query_pageing);
 
-            const error = await fetch(endpoint, post_data)
+            const response = await fetch(endpoint, post_data)
                   .then(r => r.ok ? r.json() : Promise.reject(r))
                   .then(r => {
                       if (r.errors)
                           throw new Error(r.errors);
 
-                      const data = r.data.viewer.repositories;
-                      const page_info = data.pageInfo;
-                      const nodes = data.nodes;
-
-                      loop = page_info.hasNextPage;
-
-                      end_cursor = page_info.endCursor;
-
-                      out = out.concat(nodes);
-
-                      return null;
+                      return {
+                          type: 'success',
+                          data: r.data.viewer.repositories,
+                      };
                   })
                   .catch(err => {
-                      loop = false;
-
-                      return err;
+                      return { type: 'error', data: err };
                   });
 
-            if (error!==null)
-                return error;
+            if ('error'===response.type)
+                return response.data;
+
+            const page_info = response.data.pageInfo;
+            const nodes     = response.data.nodes;
+
+            loop = page_info.hasNextPage;
+
+            end_cursor = page_info.endCursor;
+
+            out = out.concat(nodes);
         }
 
         return out;

@@ -43,7 +43,7 @@ function isNeedFirstLoad (page_repositories) {
 }
 
 async function xxx (cb) {
-    const x = await sogh.asyncfetchRepositoriesByViewer();
+    const x = await sogh.asyncFetchRepositoriesByViewer();
 
     cb(x);
 }
