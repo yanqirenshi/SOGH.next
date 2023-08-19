@@ -103,6 +103,49 @@ export default class Sogh extends Pooler {
                 if (fail) fail(error);
             });
     }
+    async asyncFetchRepositoriesByViewer () {
+        const endpoint = 'https://api.github.com/graphql';
+        const query = queries.repositories_by_viewer;
+
+        let out = [];
+        let loop = true;
+        let end_cursor = null;
+
+        while (loop) {
+            const query_pageing = this.ensureEndCursor(query, end_cursor);
+
+            const post_data = this.postData(query_pageing);
+
+            const error = await fetch(endpoint, post_data)
+                  .then(r => r.ok ? r.json() : Promise.reject(r))
+                  .then(r => {
+                      if (r.errors)
+                          throw new Error(r.errors);
+
+                      const data = r.data.viewer.repositories;
+                      const page_info = data.pageInfo;
+                      const nodes = data.nodes;
+
+                      loop = page_info.hasNextPage;
+
+                      end_cursor = page_info.endCursor;
+
+                      out = out.concat(nodes);
+
+                      return null;
+                  })
+                  .catch(err => {
+                      loop = false;
+
+                      return err;
+                  });
+
+            if (error!==null)
+                return error;
+        }
+
+        return out;
+    }
     fetchUserByID (id, success, fail) {
         const query = queries.user_by_id.replace('@id', id);
 

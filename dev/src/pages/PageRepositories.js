@@ -10,12 +10,21 @@ import {Repositories} from '../lib/index.js';
 import sogh from '../sogh.js';
 
 export default function PageRepositories (props) {
+    const [y, setY] = React.useState(false);
+
     const page_repositories = useSelector(state => state.page_repositories);
 
     const dispatch = useDispatch();
 
     if (isNeedFirstLoad(page_repositories))
         dispatch(fetchRepositoriesByViewer(sogh));
+
+    if (!y) {
+        setY(true);
+        xxx((z)=> {
+            console.log(z);
+        });
+    }
 
     return (
         <Page mode="repositories">
@@ -31,4 +40,10 @@ function isNeedFirstLoad (page_repositories) {
     return sogh.isConnected()
         && page_repositories.fetch.start===null
         && page_repositories.fetch.end===null;
+}
+
+async function xxx (cb) {
+    const x = await sogh.asyncfetchRepositoriesByViewer();
+
+    cb(x);
 }

@@ -3,8 +3,6 @@ export default class Pool {
         this._ht = {};
         this._list = [];
     }
-    ht () { return this._ht || {}; }
-    list () { return this._list || [];}
     add (data) {
         const id = data.id();
 
