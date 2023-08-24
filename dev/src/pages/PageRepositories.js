@@ -21,9 +21,7 @@ export default function PageRepositories (props) {
 
     if (!y) {
         setY(true);
-        xxx((z)=> {
-            console.log(z);
-        });
+        xxx((z)=> z);
     }
 
     return (
@@ -44,6 +42,6 @@ function isNeedFirstLoad (page_repositories) {
 
 async function xxx (cb) {
     const x = await sogh.asyncFetchRepositoriesByViewer();
-
+    // const x = await sogh.asyncFetchViewer();
     cb(x);
 }

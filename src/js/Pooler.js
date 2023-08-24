@@ -11,6 +11,8 @@ export default class Pooler extends Loader {
 
         this.matchmaker = new Matchmaker(this);
 
+        this._viewer = null;
+
         this._pools = [
             'repository',
             'user',
@@ -33,6 +35,18 @@ export default class Pooler extends Loader {
             || this.user(id)
             || this.projectV2(id)
             || this.node2projectV2(id);
+    }
+    //
+    /* **************************************************************** *
+     *  Viewer                                                          *
+     * **************************************************************** */
+    node2viewer (d) {
+        this._viewer = d ? new model.Viewer(d) : null;
+
+        return this._viewer;
+    }
+    viewer () {
+        return this._viewer || null;
     }
     /* **************************************************************** *
      *  Repository                                                      *

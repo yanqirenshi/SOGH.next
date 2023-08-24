@@ -38,7 +38,7 @@ export default class Sogh extends Pooler {
     /** **************************************************************** *
      * Auth
      * **************************************************************** */
-    connect (token) {
+    connect (token, successed, failed) {
         this.token(token);
 
         return this.fetchX(
@@ -47,16 +47,23 @@ export default class Sogh extends Pooler {
                 return this.node2user(node.data.viewer);
             },
             (results) => {
-                this.viewer(results.data);
+                const viewer = results.data;
+
+                this.viewer(viewer);
+
+                if (successed) successed(viewer);
             },
-            (r) => {
+            (error) => {
                 this.viewer(null);
+
+                if (failed) failed(error);
             });
     }
     /** **************************************************************** *
-     * fetch
+     * fetch util
      * **************************************************************** */
-    xxx (node_or_nodes, make) {
+    node2objs (node_or_nodes, make) {
+        // case of nodes
         if (Array.isArray(node_or_nodes)) {
             const nodes = node_or_nodes;
 
@@ -65,13 +72,21 @@ export default class Sogh extends Pooler {
             });
         }
 
+        // case of node
         const node = make(node_or_nodes);
 
         return node.id();
     }
-    yyy (data, make, appender) {
+    // appender って何するんだ？
+    // response を 必要なものに絞ってるな。
+    // あと、合せて node2objs をコールしている。
+    // response -> { contents: [], pageInfo: {} }
+    // 今となってはあまりメリットを感じないない。。。
+    // 恐らく node2objs を適用したものを返したい。ってのが主な目的っぽいな。
+    // GraphQL は深くなるの response.hhh.iii.jjj.kkk 的になるし。
+    data2data (data, make, appender) {
         const out = {
-            contents: this.xxx(data.nodes, make),
+            contents: this.node2objs(data.nodes, make),
         };
 
         appender && appender(data, out);
@@ -82,9 +97,12 @@ export default class Sogh extends Pooler {
     }
     zzz (data, make) {
         return {
-            contents: this.xxx(data.node, make),
+            contents: this.node2objs(data.node, make),
         };
     }
+    /** **************************************************************** *
+     * fetch
+     * **************************************************************** */
     fetchRepositoriesByViewer (success, fail) {
         const query = queries.repositories_by_viewer;
 
@@ -95,56 +113,13 @@ export default class Sogh extends Pooler {
             (response)=> {
                 const repositories = response.data.viewer.repositories;
 
-                const x = this.yyy(repositories, node=> this.node2repository(node));
+                const x = this.data2data(repositories, node=> this.node2repository(node));
 
                 if (success) success(x);
             },
             (error)=> {
                 if (fail) fail(error);
             });
-    }
-    async asyncFetchRepositoriesByViewer () {
-        const endpoint = 'https://api.github.com/graphql';
-        const query = queries.repositories_by_viewer;
-
-        let out = [];
-        let loop = true;
-        let end_cursor = null;
-
-        while (loop) {
-            const query_pageing = this.ensureEndCursor(query, end_cursor);
-
-            const post_data = this.postData(query_pageing);
-
-            const response = await fetch(endpoint, post_data)
-                  .then(r => r.ok ? r.json() : Promise.reject(r))
-                  .then(r => {
-                      if (r.errors)
-                          throw new Error(r.errors);
-
-                      return {
-                          type: 'success',
-                          data: r.data.viewer.repositories,
-                      };
-                  })
-                  .catch(err => {
-                      return { type: 'error', data: err };
-                  });
-
-            if ('error'===response.type)
-                return response.data;
-
-            const page_info = response.data.pageInfo;
-            const nodes     = response.data.nodes;
-
-            loop = page_info.hasNextPage;
-
-            end_cursor = page_info.endCursor;
-
-            out = out.concat(nodes);
-        }
-
-        return out;
     }
     fetchUserByID (id, success, fail) {
         const query = queries.user_by_id.replace('@id', id);
@@ -172,7 +147,7 @@ export default class Sogh extends Pooler {
             (results)=> {
                 const data = results.data.user.projectsV2;
 
-                const x = this.yyy(data, node=> this.node2projectV2(node));
+                const x = this.data2data(data, node=> this.node2projectV2(node));
 
                 if (success) success(x);
             },
@@ -202,7 +177,7 @@ export default class Sogh extends Pooler {
         return this.fetchX(
             query_pageing,
             (results)=> {
-                const x = this.yyy(results.data.node.items,
+                const x = this.data2data(results.data.node.items,
                                 node=> this.node2projectV2Item(node),
                                 (data, out)=>{
                                     out.fields = results.data.node.fields.nodes;
@@ -242,8 +217,104 @@ export default class Sogh extends Pooler {
         return this.fetchX(
             query_pageing,
             (response)=> {
-                return this.yyy(response.data.node.comments,
+                return this.data2data(response.data.node.comments,
                                 node=> this.node2issueComment(node));
             });
+    }
+    async asyncFetchViewer () {
+        const query = queries.viwer;
+
+        const post_data = this.postData(query);
+        console.log(post_data);
+        // fetch
+        const response = await fetch(this.endpoint(), post_data)
+              .then(res  => this.text2json(res))
+              .then(res  => this.json2response(res, d=> {
+                  return d.data.viewer;
+              }))
+              .catch(err => this.error2response(err));
+
+        // case of error
+        if ('error'===response.type)
+            return response.data;
+
+        // nodes 2 objs and pooling
+        return this.node2viewer(response.data);
+    }
+    async asyncFetchRepositoriesByViewer () {
+        const query = queries.repositories_by_viewer;
+
+        let out = [];
+        let loop = true, cursor = null;
+
+        while (loop) {
+            const query_pageing = this.makeQuery(query, cursor);
+            const post_data = this.postData(query_pageing);
+
+            // fetch
+            const response = await fetch(this.endpoint(), post_data)
+                  .then(res  => this.text2json(res))
+                  .then(res  => this.json2response(res, d=> d.data.viewer.repositories))
+                  .catch(err => this.error2response(err));
+
+            // case of error
+            if ('error'===response.type)
+                return response.data;
+
+            // nodes 2 objs and pooling
+            const repositories
+                  = this.node2objs(
+                      response.data.nodes,
+                      node=> this.node2repository(node));
+
+            // concat out
+            out = out.concat(repositories);
+
+            // paging
+            const page_info = response.data.pageInfo;
+            cursor = page_info.endCursor;
+            loop   = page_info.hasNextPage;
+        }
+
+        return out;
+    }
+    async asyncfetchProjectsV2ByUser (user) {
+        const query = queries
+              .projectsv2_by_user
+              .replace('@login', user.login());
+
+        let out = [];
+        let loop = true, cursor = null;
+
+        while (loop) {
+            const query_pageing = this.makeQuery(query, cursor);
+            const post_data = this.postData(query_pageing);
+
+            // fetch
+            const response = await fetch(this.endpoint(), post_data)
+                  .then(res  => this.text2json(res))
+                  .then(res  => this.json2response(res, d=> d.data.user.projectsV2))
+                  .catch(err => this.error2response(err));
+
+            // case of error
+            if ('error'===response.type)
+                return response.data;
+
+            // nodes 2 objs and pooling
+            const projects
+                  = this.node2objs(
+                      response.data.nodes,
+                      node=> this.node2projectV2(node));
+
+            // concat out
+            out = out.concat(projects);
+
+            // paging
+            const page_info = response.data.pageInfo;
+            cursor = page_info.endCursor;
+            loop   = page_info.hasNextPage;
+        }
+
+        return out;
     }
 }

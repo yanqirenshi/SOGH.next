@@ -16,7 +16,10 @@ export const connectGithub = createAsyncThunk(
     async (payload) => {
         const token = payload.token;
         try {
-            const response = await SOGH.connect(token);
+            const response = await SOGH.connect(
+                token,
+                (viewer)=> console.log(viewer),
+                (error)=>  console.log(error));
 
             const viewer = response.data;
 

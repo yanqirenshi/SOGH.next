@@ -4,9 +4,14 @@ export default class Loader {
 
         this._viewer = null;
 
+        this._endpoint = 'https://api.github.com/graphql';
+
         this._api = {
             v4: null,
         };
+    }
+    endpoint () {
+        return this._endpoint;
     }
     /** *************************************************************** *
      *  Auth
@@ -31,11 +36,15 @@ export default class Loader {
     /** *************************************************************** *
      *  Query
      * **************************************************************** */
-    ensureEndCursor (query, endCursor) {
+    makeQuery (query, endCursor) {
         if (endCursor)
             return query.replace('after: "",', `after: "${endCursor}",`);
 
         return query.replace('after: "",', '');
+    }
+    // 廃止予定
+    ensureEndCursor (query, endCursor) {
+        return this.makeQuery(query,endCursor);
     }
     /** *************************************************************** *
      *  Api
@@ -128,5 +137,23 @@ export default class Loader {
         });
 
         return '{ ' + x.filter(d=>d!==null).join(', ') + ' }';
+    }
+    /** *************************************************************** *
+     *  Response
+     * **************************************************************** */
+    text2json (r) {
+        return r.ok ? r.json() : Promise.reject(r);
+    }
+    json2response (r, getData) {
+        if (r.errors)
+            throw new Error(r.errors);
+
+        return {
+            type: 'success',
+            data: getData(r),
+        };
+    }
+    error2response (error) {
+        return { type: 'error', data: error };
     }
 }
