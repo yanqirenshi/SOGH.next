@@ -58,6 +58,9 @@ export default class Pooler extends Loader {
 
         return pool.ensure(node, (d)=> new model.Repository(d));
     }
+    repositories (v) {
+        return this.pool('repository').list();
+    }
     repository (v) {
         const pool = this.pool('repository');
 
@@ -86,6 +89,9 @@ export default class Pooler extends Loader {
 
         // this.matchmaker.user(node);
         return pool.ensure(node, (d)=> new model.ProjectNext(d));
+    }
+    projectsV2 (v) {
+        return this.pool('project-v2').list();
     }
     projectV2 (v) {
         const pool = this.pool('project-v2');
@@ -116,6 +122,9 @@ export default class Pooler extends Loader {
         // this.matchmaker.user(node);
 
         return pool.ensure(node, (d)=> new model.Issue(d));
+    }
+    issues (v) {
+        return this.pool('issue').list();
     }
     issue (v) {
         const pool = this.pool('issue');
