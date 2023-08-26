@@ -278,7 +278,10 @@ export default class Sogh extends Pooler {
 
         return out;
     }
-    async asyncfetchProjectsV2ByUser (user) {
+    async asyncfetchProjectsV2ByViewer () {
+        // TODO: とりあえず、これで...
+        const user = this.viewer();
+
         const query = queries
               .projectsv2_by_user
               .replace('@login', user.login());
