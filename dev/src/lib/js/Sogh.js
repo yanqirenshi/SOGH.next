@@ -1,16 +1,21 @@
 import Pooler from './Pooler.js';
 
-import * as queries from './queries/index.js';
+import * as QUERIES from './queries/index.js';
 
 export default class Sogh extends Pooler {
     constructor () {
         super();
+
+        this._queries = QUERIES;
 
         this._routes = {
             'issue':            '/issues/:id',
             'project-v2':       '/projectsV2/:id',
             'project-v2-items': '/projectV2-items/:id',
         };
+    }
+    query (code) {
+        return this._queries[code];
     }
     /** **************************************************************** *
      * routes
@@ -42,7 +47,7 @@ export default class Sogh extends Pooler {
         this.token(token);
 
         return this.fetchX(
-            queries.viwer,
+            this.query('viwer'),
             (node) => {
                 return this.node2user(node.data.viewer);
             },
@@ -104,7 +109,7 @@ export default class Sogh extends Pooler {
      * fetch
      * **************************************************************** */
     fetchRepositoriesByViewer (success, fail) {
-        const query = queries.repositories_by_viewer;
+        const query = this.query('repositories_by_viewer');
 
         const query_pageing = this.ensureEndCursor(query, null);
 
@@ -122,7 +127,8 @@ export default class Sogh extends Pooler {
             });
     }
     fetchUserByID (id, success, fail) {
-        const query = queries.user_by_id.replace('@id', id);
+        const query = this.query('user_by_id')
+              .replace('@id', id);
 
         const query_pageing = this.ensureEndCursor(query, null);
 
@@ -138,7 +144,8 @@ export default class Sogh extends Pooler {
             });
     }
     fetchProjectsV2ByUser (user, success, fail) {
-        const query = queries.projectsv2_by_user.replace('@login', user.login());
+        const query = this.query('projectsv2_by_user')
+              .replace('@login', user.login());
 
         const query_pageing = this.ensureEndCursor(query, null);
 
@@ -156,7 +163,8 @@ export default class Sogh extends Pooler {
             });
     }
     fetchProjectsV2ByID (id, success, fail) {
-        const query = queries.projects_next_by_id.replace('@id', id);
+        const query = this.query('projects_next_by_id')
+              .replace('@id', id);
 
         const query_pageing = this.ensureEndCursor(query, null);
         return this.fetchX(
@@ -171,7 +179,9 @@ export default class Sogh extends Pooler {
             });
     }
     fetchProjectV2ItemsByProjectNext (project_next, success, fail) {
-        const query = queries.projects_v2_items_by_projects_v2.replace('@id', project_next.id());
+        const query = this.query('projects_v2_items_by_projects_v2')
+              .replace('@id', project_next.id());
+
         const query_pageing = this.ensureEndCursor(query, null);
 
         return this.fetchX(
@@ -190,7 +200,8 @@ export default class Sogh extends Pooler {
             });
     }
     fetchProjectNextItemByID (id) {
-        const query = queries.projects_next_items_by_id.replace('@id', id);
+        const query = this.query('projects_next_items_by_id')
+              .replace('@id', id);
 
         const query_pageing = this.ensureEndCursor(query, null);
 
@@ -200,7 +211,8 @@ export default class Sogh extends Pooler {
                                   node=> this.node2projectV2Item(node)));
     }
     fetchIssueByID (id) {
-        const query = queries.issue_by_id.replace('@id', id);
+        const query = this.query('issue_by_id')
+              .replace('@id', id);
 
         const query_pageing = this.ensureEndCursor(query, null);
 
@@ -210,7 +222,8 @@ export default class Sogh extends Pooler {
                                   node=> this.node2issue(node)));
     }
     fetchIssueCommentsByIssueID (id) {
-        const query = queries.issue_comments_by_issue_id.replace('@id', id);
+        const query = this.query('issue_comments_by_issue_id')
+              .replace('@id', id);
 
         const query_pageing = this.ensureEndCursor(query, null);
 
@@ -222,10 +235,10 @@ export default class Sogh extends Pooler {
             });
     }
     async asyncFetchViewer () {
-        const query = queries.viwer;
+        const query = this.query('viwer');
 
         const post_data = this.postData(query);
-        console.log(post_data);
+
         // fetch
         const response = await fetch(this.endpoint(), post_data)
               .then(res  => this.text2json(res))
@@ -242,7 +255,7 @@ export default class Sogh extends Pooler {
         return this.node2viewer(response.data);
     }
     async asyncFetchRepositoriesByViewer () {
-        const query = queries.repositories_by_viewer;
+        const query = this.query('repositories_by_viewer');
 
         let out = [];
         let loop = true, cursor = null;
@@ -278,12 +291,11 @@ export default class Sogh extends Pooler {
 
         return out;
     }
-    async asyncfetchProjectsV2ByViewer () {
+    async asyncFetchProjectsV2ByViewer () {
         // TODO: とりあえず、これで...
         const user = this.viewer();
 
-        const query = queries
-              .projectsv2_by_user
+        const query = this.query('projectsv2_by_user')
               .replace('@login', user.login());
 
         let out = [];
@@ -308,6 +320,43 @@ export default class Sogh extends Pooler {
                   = this.node2objs(
                       response.data.nodes,
                       node=> this.node2projectV2(node));
+
+            // concat out
+            out = out.concat(projects);
+
+            // paging
+            const page_info = response.data.pageInfo;
+            cursor = page_info.endCursor;
+            loop   = page_info.hasNextPage;
+        }
+
+        return out;
+    }
+    async asyncFetchIssueByViewer () {
+        const query = this.query('issues_by_viwer');
+
+        let out = [];
+        let loop = true, cursor = null;
+
+        while (loop) {
+            const query_pageing = this.makeQuery(query, cursor);
+            const post_data = this.postData(query_pageing);
+
+            // fetch
+            const response = await fetch(this.endpoint(), post_data)
+                  .then(res  => this.text2json(res))
+                  .then(res  => this.json2response(res, d=> d.data.viewer.issues))
+                  .catch(err => this.error2response(err));
+
+            // case of error
+            if ('error'===response.type)
+                return response.data;
+
+            // nodes 2 objs and pooling
+            const projects
+                  = this.node2objs(
+                      response.data.nodes,
+                      node=> this.node2issue(node));
 
             // concat out
             out = out.concat(projects);
