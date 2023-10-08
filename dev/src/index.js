@@ -1,22 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { RecoilRoot } from 'recoil';
+import { BrowserRouter } from "react-router-dom";
 
 import './index.css';
-
-import store from './store.js';
-import { Provider } from 'react-redux';
-
-import * as serviceWorkerRegistration from './js/serviceWorkerRegistration';
-import reportWebVitals from './js/reportWebVitals';
-
-import App from './App.js';
+import App from './App';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
-      <Provider store={store}>
-        <App />
-      </Provider>
+      <RecoilRoot>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </RecoilRoot>
     </React.StrictMode>
 );
 

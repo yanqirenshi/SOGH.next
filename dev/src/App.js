@@ -1,60 +1,53 @@
 import React from 'react';
+import { useRecoilState } from "recoil";
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useSelector, useDispatch } from 'react-redux';
+import Box from '@mui/material/Box';
 
-import { connectGithub } from './slices/github.js';
+import Account from './assemblies/Account.js';
+import Operators from './assemblies/Operators.js';
+import * as atoms from './recoil/ATOMS.js';
 
-import * as page from './pages/index.js';
-import Modals from './Modals.js';
+import Router from './Router.js';
+import Github from './Github.js';
 
-export default function App() {
-    const [githubToken, setGithubToken] = React.useState(null);
+export default function App () {
+    const [window_size, setWindowSize] = useRecoilState(atoms.WINDOW);
+    const [account_menu, setAccountMenu] = useRecoilState(atoms.ACCOUNT_MENU);
+    const [operators, setOperators] = useRecoilState(atoms.OPERATORS);
 
-    const github = useSelector(state => state.github);
-
-    const dispatch = useDispatch();
-
-    React.useState(()=> {
-    }, []);
-
-
-    React.useState(()=> {
-        const token = process.env.REACT_APP_GITHUB_TOKEN;
-        if (githubToken!==null || !token || !token.length===0)
-            return;
-
-        setGithubToken(token);
-
-        dispatch(connectGithub({token: token}));
-    }, [githubToken]);
-
-    const callbacks = {
-        github: {
-            auth: (token, cb)=> {
-                dispatch(connectGithub({token: token, callbacks: cb}));
-            }
-        }
+    const actions = {
+        menu: {
+            change: (new_menu)=> setAccountMenu(new_menu),
+        },
+        operator: {
+            change: (new_operators)=> setOperators(new_operators),
+        },
     };
 
+    React.useEffect(()=> {
+        const handleResize = ()=> setWindowSize({w: window.innerWidth, h: window.innerHeight});
+        handleResize();
+
+        window.addEventListener("resize", handleResize);
+    }, [setWindowSize]); // TODO: これなぁ。。。
+
     return (
-        <>
-          <Modals github={github} callbacks={callbacks}/>
-          <BrowserRouter>
-            <Routes>
+        <Box className="theme-color5">
 
-              <Route path="/"                                  element={<page.PageRepositories/>} />
-              <Route path="/issues/:id"                        element={<page.PageIssue />} />
-              <Route path="/owners/:id"                        element={<page.PageOwner />} />
-              <Route path="/projectV2-items/:id"               element={<page.PageProjectV2Item/>} />
-              <Route path="/projectsV2/:id"                    element={<page.PageProjectV2/>} />
-              <Route path="/repositories/:id"                  element={<page.PageRepository/>} />
-              <Route path="/repositories/:id/classic-projects" element={<page.PageRepositoryClassicProjects />} />
-              <Route path="/repositories/:id/issues"           element={<page.PageRepositoryIssues />} />
-              <Route path="/repositories/:id/projects"         element={<page.PageRepositoryProjects />} />
+          <Github/>
 
-            </Routes>
-          </BrowserRouter>
-        </>
+          <Account menu={account_menu}
+                   actions={actions}/>
+
+          <Operators operators={operators}
+                     window_size={window_size}
+                     actions={actions}>
+            {'a'===operators.active && <div/>}
+            {'b'===operators.active && <div/>}
+            {'c'===operators.active && <div/>}
+          </Operators>
+
+          <Router/>
+        </Box>
     );
 }
