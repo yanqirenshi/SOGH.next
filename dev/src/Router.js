@@ -26,7 +26,7 @@ export default function Router () {
           {/* Discussions */}
           <Route path='/scrum/:user/:repository/discussions/'     element={<page.Scrum/>} />
           <Route path='/scrum/:user/:repository/discussions/:num' element={<page.Scrum/>} />
-          
+
           {/* == iHub ================================================================ */}
           <Route path='/cockpit'
                  element={<Suspense fallback={<Loading/>}>

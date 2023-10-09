@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default function LinkSogh (props) {
-    const to = props.to;
+    const to = props.to || props.href;
     const data = props.data;
     const sogh = props.sogh;
 

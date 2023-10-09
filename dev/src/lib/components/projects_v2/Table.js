@@ -3,13 +3,17 @@ import React from 'react';
 import TableContainer from '@mui/material/TableContainer';
 import MTable from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
+import Cell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import S from '@mui/material/Typography';
 
-import TableCellLinkGithub from '../common/TableCellLinkGithub.js';
-import TableCellLinkSogh from '../common/TableCellLinkSogh.js';
+import LinkSogh from '../common/LinkSogh.js';
+import Description from '../common/Description.js';
+import CellLinkGithub from '../common/TableCellLinkGithub.js';
+import CellTimestamps from '../common/TableCellTimestamps.js';
+import CellTermPlanResult from '../common/TableCellTermPlanResult.js';
 
 export default function Table (props) {
     const data = props.data;
@@ -17,12 +21,24 @@ export default function Table (props) {
 
     return (
         <TableContainer component={Paper}>
-          <MTable sx={{ minWidth: 650 }} aria-label="simple table">
+          <MTable aria-label="simple table" size="small">
 
             <TableHead>
               <TableRow>
-                <TableCell>Number</TableCell>
-                <TableCell>Title</TableCell>
+                <Cell colSpan="3">Project</Cell>
+                <Cell colSpan="5">Readme Attributes</Cell>
+                <Cell rowSpan="2">Create<br/>Update</Cell>
+              </TableRow>
+
+              <TableRow>
+                <Cell>Number</Cell>
+                <Cell>Title</Cell>
+                <Cell>Public</Cell>
+                <Cell>Priority</Cell>
+                <Cell>Owner</Cell>
+                <Cell>Type</Cell>
+                <Cell>Release</Cell>
+                <Cell>Terms</Cell>
               </TableRow>
             </TableHead>
 
@@ -33,11 +49,42 @@ export default function Table (props) {
                   return (
                       <TableRow key={id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                        <TableCellLinkGithub data={obj}/>
+                        <CellLinkGithub data={obj}/>
 
-                        <TableCellLinkSogh to="project-v2" data={obj} sogh={sogh}>
-                          {obj.title()}
-                        </TableCellLinkSogh>
+                        <Cell>
+                          <S>
+                            <LinkSogh to="project-v2" data={{id: obj.id()}} sogh={sogh}>
+                              {obj.title()}
+                            </LinkSogh>
+                          </S>
+                          <Description value={obj.shortDescription()}/>
+                        </Cell>
+
+                        <Cell>
+                          {obj.public() ? '○' : '--'}
+                        </Cell>
+
+                        <Cell>
+                          {obj.priority()}
+                        </Cell>
+
+                        <Cell>
+                          {obj.owner()}
+                        </Cell>
+
+                        <Cell>
+                          {obj.type()}
+                        </Cell>
+
+                        <Cell>
+                          {obj.release()}
+                        </Cell>
+
+                        <CellTermPlanResult plan={obj.plan()}
+                                            result={obj.result()}/>
+
+                        <CellTimestamps create={obj.createdAt()}
+                                        update={obj.updatedAt()}/>
                       </TableRow>
                   );
               })}
