@@ -12,7 +12,7 @@ export default function Router () {
           <Route path='/'                                    element={<page.Scrum/>} />
           {/* ProjectV2 */}
           <Route path='/scrum/users/:user/projects'          element={<page.Scrum/>} />
-          <Route path='/scrum/users/:user/projects/:project' element={<page.Scrum/>} />
+          <Route path='/scrum/users/:user/projects/:project' element={<page.SoghProject/>} />
           {/* Issue */}
           <Route path='/scrum/:user/:repository'             element={<page.Scrum/>} />
           <Route path='/scrum/:user/:repository/issues'      element={<page.Scrum/>} />

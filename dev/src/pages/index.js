@@ -19,6 +19,7 @@ export { default as Parts                   } from './Parts.js';
 export { default as README                  } from './README.md';
 export { default as Screens                 } from './Screens.js';
 export { default as Scrum                   } from './Scrum.js';
+export { default as SoghProject             } from './SoghProject.js';
 export { default as SystemDynamics          } from './SystemDynamics.js';
 export { default as SystemEnvironment       } from './SystemEnvironment.js';
 export { default as SystemicDesign          } from './SystemicDesign.js';

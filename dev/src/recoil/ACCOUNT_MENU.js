@@ -23,7 +23,7 @@ const ACCOUNT_MENU = recoil.atom({
             {
                 label: 'iHub',
                 items: makeItems([
-                    'cockpit',
+                    'scrum',
                     'markets',
                     'business',
                     'design',
@@ -35,7 +35,7 @@ const ACCOUNT_MENU = recoil.atom({
                     'system-environment',
                     'message',
                     'devops',
-                    'scrum',
+                    'cockpit',
                     'help',
                 ]),
             },
