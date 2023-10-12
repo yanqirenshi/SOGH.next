@@ -8,9 +8,9 @@ export default function Description (props) {
     if (!value)
         return null;
 
-    return value.split('\n').map(line=> {
+    return value.split('\n').map((line,i)=> {
         return (
-            <S>
+            <S key={i}>
               {line}
               <br/>
             </S>

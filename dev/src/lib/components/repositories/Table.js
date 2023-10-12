@@ -10,6 +10,7 @@ import Avatar from '@mui/material/Avatar';
 
 import LinkGithub from '../common/LinkGithub.js';
 import Link from '../common/Link.js';
+import CellDateTime from '../common/TableCellDateTime.js';
 
 export default function Table (props) {
     const data = props.data;
@@ -17,7 +18,9 @@ export default function Table (props) {
 
     return (
         <TableContainer component={Paper}>
-          <MTable sx={{ minWidth: 650 }} aria-label="simple table">
+          <MTable sx={{ minWidth: 650 }}
+                  aria-label="simple table"
+                  size="small">
 
             <TableHead>
               <TableRow>
@@ -60,7 +63,8 @@ export default function Table (props) {
                             <LinkGithub href={obj.url()}/>
                           </div>
                         </TableCell>
-                        <TableCell>{obj.pushedAt()}</TableCell>
+
+                        <CellDateTime value={obj.pushedAt()}/>
                       </TableRow>
                   );
               })}
