@@ -53,7 +53,9 @@ export default function Table (props) {
 
                         <Cell>
                           <S>
-                            <LinkSogh to="project-v2" data={{id: obj.id()}} sogh={sogh}>
+                            <LinkSogh to="project-v2"
+                                      data={obj}
+                                      sogh={sogh}>
                               {obj.title()}
                             </LinkSogh>
                           </S>

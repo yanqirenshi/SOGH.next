@@ -87,7 +87,7 @@ export default class ProjectNext extends GraphQLNode {
         return this._core.owner;
     }
     creator () {
-        return this._core.owner.creator;
+        return this._core.creator;
     }
     /////
     ///// README Attributes

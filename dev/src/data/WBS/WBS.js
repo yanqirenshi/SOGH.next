@@ -141,6 +141,21 @@ const WBS = [
         parent: 1027,
         name: 'npm',
     },
+    {
+        id: 1029,
+        parent: 1002,
+        name: 'SOGH.Next',
+    },
+    {
+        id: 1030,
+        parent: 1029,
+        name: 'Github',
+    },
+    {
+        id: 1031,
+        parent: 1029,
+        name: 'Scrum',
+    },
 ];
 
 export default WBS;

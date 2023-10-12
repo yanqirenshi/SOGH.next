@@ -9,9 +9,9 @@ export default class Sogh extends Pooler {
         this._queries = QUERIES;
 
         this._routes = {
-            'issue':            '/issues/:id',
-            'project-v2':       '/projectsV2/:id',
-            'project-v2-items': '/projectV2-items/:id',
+            'issue':            '/scrum/users/:login/repositories/:repository/issues/:number',
+            'project-v2':       '/scrum/users/:login/projects/:number',
+            'project-v2-items': '/scrum/users/:login/projects/:project-number/items/:item-number',
         };
     }
     query (code) {
@@ -28,8 +28,13 @@ export default class Sogh extends Pooler {
     }
     href (to, data) {
         const routes = this.routes();
-
         const base = routes[to];
+
+        if ('project-v2'===to)
+            return base
+            .replace(':login',  data.creator().login)
+            .replace(':number', data.number());
+
         const keys = Object.keys(data);
 
         return keys.reduce((str, key)=> {
