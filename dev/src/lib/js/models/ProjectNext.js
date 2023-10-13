@@ -98,7 +98,7 @@ export default class ProjectNext extends GraphQLNode {
 
         return this._priority;
     }
-    owner (v) {
+    maneger (v) {
         if (arguments.length===1)
             this._owner = v;
 
