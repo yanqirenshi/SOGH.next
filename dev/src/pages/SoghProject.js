@@ -1,8 +1,10 @@
 import React, { Suspense } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { useRecoilState, useRecoilValue } from "recoil";
 import { GITHUB_AUTH } from '../recoil/GITHUB.js';
 import * as atoms from '../recoil/PAGE_SCRUM_PROJECT.js';
+
 
 import Frame from '../assemblies/frames/Frame.js';
 
@@ -16,7 +18,7 @@ import Frame from '../assemblies/frames/Frame.js';
 
 import {ProjectV2} from '../lib/index.js';
 
-export default function SoghProject () {
+export default function SoghProject (props) {
     return (
         <Suspense fallback={<div>サスペンドしたらこれが表示される</div>}>
           <XXX/>
@@ -25,21 +27,24 @@ export default function SoghProject () {
 }
 
 function XXX () {
+    let {login, number} = useParams();
+
     const [tabs, setTabs] = useRecoilState(atoms.PAGE_SCRUM_PROJECT_TABS);
     const authed = useRecoilValue(GITHUB_AUTH);
     const project = useRecoilValue(atoms.PROJECTV2({
         authed: authed ,
-        login: 'yanqirenshi',
-        number: 31,
+        login: login,
+        number: number,
     }));
-    /*
-      1. Project のデータを取得する。
-      2. Project Items を取得する。
-     */
+    const project_items = useRecoilValue(atoms.PROJECTV2_ITEMS({
+        authed: authed ,
+        login: login,
+        number: number,
+    }));
 
     return (
         <Frame>
-          <ProjectV2 project={project}/>
+          <ProjectV2 project={project} items={project_items}/>
         </Frame>
     );
 }

@@ -15,9 +15,10 @@ import project_by_id from './project_by_id.js';
 import projects_by_repository from './projects_by_repository.js';
 import projects_next_by_id from './projects_next_by_id.js';
 import projects_next_items_by_id from './projects_next_items_by_id.js';
-import projectsv2_items_by_projects_v2 from './projectsv2_items_by_projects_v2.js';
 import projectsv2_by_user from './projectsv2_by_user.js';
+import projectsv2_items_by_projects_v2 from './projectsv2_items_by_projects_v2.js';
 import projectv2_by_user_login_projectv2_number from './projectv2_by_user_login_projectv2_number.js';
+import projectv2items_by_user_login_projectv2_number from './projectv2items_by_user_login_projectv2_number.js';
 import repositories_by_viewer from './repositories_by_viewer.js';
 import repository from './repository.js';
 import search_issues from './search_issues.js';
@@ -43,9 +44,10 @@ export {
     projects_by_repository,
     projects_next_by_id,
     projects_next_items_by_id,
-    projectsv2_items_by_projects_v2,
     projectsv2_by_user,
+    projectsv2_items_by_projects_v2,
     projectv2_by_user_login_projectv2_number,
+    projectv2items_by_user_login_projectv2_number,
     repositories_by_viewer,
     repository,
     search_issues,

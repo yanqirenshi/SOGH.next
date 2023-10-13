@@ -44,3 +44,13 @@ export const PROJECTV2 = recoil.selectorFamily({
         return await sogh.asyncFetchProjectV2ByUserLoginProjectV2Number(login, number);
     },
 });
+
+export const PROJECTV2_ITEMS = recoil.selectorFamily({
+    key: 'PAGE_SCRUM_PROJECT_PROJECTV2_ITEMS',
+    get: ({authed, login, number})=> async () => {
+        if (!authed)
+            return null;
+
+        return await sogh.asyncFetchProjectV2ItemsByUserLoginProjectV2Number(login, number);
+    },
+});
