@@ -36,7 +36,6 @@ export default function ProjectV2 (props) {
     if (!project)
         return null;
 
-    // console.log(project.owner());
     return (
         <Box>
 

@@ -23,7 +23,7 @@ export default function TableProjectV2Items (props) {
                  size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Status</TableCell>
+                {/* <TableCell>Status</TableCell> */}
 
                 <TableCell>Title</TableCell>
 
@@ -42,7 +42,7 @@ export default function TableProjectV2Items (props) {
                       <TableRow key={item.id()}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
 
-                        <TableCell>{item.status()}</TableCell>
+                        {/* <TableCell>{item.status()}</TableCell> */}
 
                         <TableCell>
                             <S variant="h6">
@@ -55,7 +55,13 @@ export default function TableProjectV2Items (props) {
                             {issue.number &&
                              <>
                                <span>{issue.title}</span>
-                               <span>({issue.number})</span>
+                               <span>
+                                 (
+                                 <Link href={issue.url}>
+                                   {issue.number}
+                                 </Link>
+                                 )
+                               </span>
                              </>}
                           </S>
                           <S>
