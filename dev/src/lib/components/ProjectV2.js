@@ -1,14 +1,11 @@
 import React from 'react';
 
 import Box from '@mui/material/Box';
-import S from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
 import Container from '@mui/material/Container';
 
 import Title from './ProjectV2/Title.js';
 import Fields from './ProjectV2/Fields.js';
 import ReadmeAttributes from './ProjectV2/ReadmeAttributes.js';
-import Link from './common/Link.js';
 
 import Tabs from './ProjectV2/Tabs.js';
 
@@ -39,9 +36,6 @@ export default function ProjectV2 (props) {
     if (!project)
         return null;
 
-    const changeTab = ()=> {
-        };
-
     // console.log(project.owner());
     return (
         <Box>
@@ -65,7 +59,7 @@ export default function ProjectV2 (props) {
 
             {'items'===tabs.selected &&
              <Box sx={{pt:4}}>
-               <Items items={items} project={project}/>
+               <Items items={items}/>
              </Box>}
 
             {'metrix'===tabs.selected && <Metrix/>}

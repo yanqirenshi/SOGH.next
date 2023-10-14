@@ -19,7 +19,7 @@ export default class Pooler extends Loader {
             'issue',
             'issue-comment',
         ].reduce((ht, key)=> {
-            ht[key] = new Pool();
+            ht[key] = new Pool(this);
             return ht;
         }, {});
 
@@ -101,7 +101,11 @@ export default class Pooler extends Loader {
 
         // this.matchmaker.user(node);
 
-        return pool.ensure(node, (d)=> new model.ProjectV2Item(d));
+        const obj = pool.ensure(node, (d)=> new model.ProjectV2Item(d));
+
+        obj.sogh(this);
+
+        return obj;
     }
     projectV2Item (v) {
         const pool = this.pool('project-v2-item');

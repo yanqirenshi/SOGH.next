@@ -29,6 +29,17 @@ const query = `{
           isArchived
           createdAt
           updatedAt
+
+          project {
+            number
+            owner {
+              __typename
+              ... on User {
+                login
+              }
+            }
+          }
+
           fieldValues(first: ${MAX_FIELD_NUM}) {
             nodes {
               ... on ProjectV2ItemFieldDateValue {

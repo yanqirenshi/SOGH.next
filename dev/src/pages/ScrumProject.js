@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { GITHUB_AUTH } from '../recoil/GITHUB.js';
 import * as atoms from '../recoil/PAGE_SCRUM_PROJECT.js';
 
@@ -22,7 +22,6 @@ export default function ScrumProject (props) {
 function XXX () {
     let {login, number} = useParams();
 
-    const [tabs, setTabs] = useRecoilState(atoms.TABS);
     const authed = useRecoilValue(GITHUB_AUTH);
     const project = useRecoilValue(atoms.PROJECTV2({
         authed: authed ,

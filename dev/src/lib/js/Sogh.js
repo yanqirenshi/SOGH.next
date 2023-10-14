@@ -11,7 +11,7 @@ export default class Sogh extends Pooler {
         this._routes = {
             'issue':            '/scrum/users/:login/repositories/:repository/issues/:number',
             'project-v2':       '/scrum/users/:login/projects/:number',
-            'project-v2-items': '/scrum/users/:login/projects/:project-number/items/:item-number',
+            'project-v2-items': '/scrum/users/:login/projects/:project-number/items/:id',
         };
     }
     query (code) {
@@ -34,6 +34,12 @@ export default class Sogh extends Pooler {
             return base
             .replace(':login',  data.creator().login)
             .replace(':number', data.number());
+
+        if ('project-v2-items'===to)
+            return base
+            .replace(':login',  data.projectV2OwnerLogin())
+            .replace(':project-number', data.projectV2Number())
+            .replace(':id', data.id());
 
         const keys = Object.keys(data);
 

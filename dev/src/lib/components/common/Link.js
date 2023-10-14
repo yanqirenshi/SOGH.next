@@ -5,8 +5,15 @@ export default function Link (props) {
 
     const href = props.href;
 
+    const style = {
+        color: 'rgba(0, 0, 0, 0.87)',
+        textDecorationStyle: 'dotted',
+        textDecorationColor: '#ddd',
+    };
+
     return (
-        <a href={href}>
+        <a href={href}
+           style={style}>
           {children}
         </a>
     );

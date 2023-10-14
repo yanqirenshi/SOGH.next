@@ -17,8 +17,6 @@ export default class Pool {
         if (this._ht[id])
             return;
 
-        data.sogh(this._sogh);
-
         this._ht[id] = data;
         this._list.push(data);
     }

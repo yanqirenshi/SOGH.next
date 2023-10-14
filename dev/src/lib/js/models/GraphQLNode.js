@@ -5,7 +5,7 @@ export default class GraphQLNode {
     }
     sogh (v) {
         if (arguments.length===1)
-            this._sogh = v;
+            this._sogh = v || null;
 
         return this._sogh;
     }

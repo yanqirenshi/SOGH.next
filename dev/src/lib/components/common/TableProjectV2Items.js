@@ -10,15 +10,12 @@ import Paper from '@mui/material/Paper';
 import S from '@mui/material/Typography';
 
 import CellTimestamps from './TableCellTimestamps.js';
-import CellProjectV2ItemFieldValue from './TableCellProjectV2ItemFieldValue.js';
 import TableCellTerm from './TableCellTerm.js';
 import UserName from './UserName.js';
+import Link from './Link.js';
 
 export default function TableProjectV2Items (props) {
     const items = props.items;
-    const project = props.project;
-
-    const fields = project.fields();
 
     return (
         <TableContainer component={Paper}>
@@ -38,7 +35,6 @@ export default function TableProjectV2Items (props) {
             </TableHead>
             <TableBody>
               {items.map(item => {
-                  console.log(item.path());
                   const repository = item.repository();
                   const issue = item.core().content;
 
@@ -49,9 +45,11 @@ export default function TableProjectV2Items (props) {
                         <TableCell>{item.status()}</TableCell>
 
                         <TableCell>
-                          <S variant="h6">
-                            {item.title()}
-                          </S>
+                            <S variant="h6">
+                              <Link href={item.path()}>
+                                {item.title()}
+                              </Link>
+                            </S>
                           <S>
                             <span>{repository ? repository.name : null}</span>
                             {issue.number &&

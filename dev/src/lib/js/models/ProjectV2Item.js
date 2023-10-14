@@ -6,7 +6,7 @@ export default class ProjectV2Item extends GraphQLNode {
         return this._core.creator || null;
     }
     path () {
-        console.log(this.sogh());
+        return this.sogh().href('project-v2-items', this);
     }
     fieldValues () {
         return this._core.fieldValues.nodes || [];
@@ -20,6 +20,12 @@ export default class ProjectV2Item extends GraphQLNode {
             return null;
 
         return field_value;
+    }
+    projectV2Number () {
+        return this._core.project.number;
+    }
+    projectV2OwnerLogin () {
+        return this._core.project.owner.login;
     }
     type () {
         return this._core.type || null;
