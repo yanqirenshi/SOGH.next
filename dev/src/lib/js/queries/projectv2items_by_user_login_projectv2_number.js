@@ -5,7 +5,7 @@ const MAX_LABEL_NUM = 30;
 const MAX_PR_NUM = 30;
 
 const field = `
- field {
+ {
    ... on ProjectV2Field { id name }
    ... on ProjectV2IterationField { id name }
    ... on ProjectV2SingleSelectField { id name }
@@ -32,19 +32,21 @@ const query = `{
           fieldValues(first: ${MAX_FIELD_NUM}) {
             nodes {
               ... on ProjectV2ItemFieldDateValue {
+                __typename
                 id
                 date
-                ${field}
+                field ${field}
                 creator ${attr.projectV2FieldValue_Creator()}
               }
               ... on ProjectV2ItemFieldIterationValue {
+                __typename
                 ${attr.ProjectV2ItemFieldIterationValue()}
+                field ${field}
                 creator ${attr.projectV2FieldValue_Creator()}
-                ${field}
               }
               ... on ProjectV2ItemFieldLabelValue {
                 __typename
-                ${field}
+                field ${field}
                 labels(first: ${MAX_LABEL_NUM}) {
                   nodes {
                     ${attr.label()}
@@ -53,19 +55,20 @@ const query = `{
               }
               ... on ProjectV2ItemFieldMilestoneValue {
                 __typename
-                ${field}
+                field ${field}
                 milestone {
                   ${attr.milestone()}
                 }
               }
               ... on ProjectV2ItemFieldNumberValue {
+                __typename
                 ${attr.ProjectV2ItemFieldNumberValue()}
-                ${field}
+                field ${field}
                 creator ${attr.projectV2FieldValue_Creator()}
               }
               ... on ProjectV2ItemFieldPullRequestValue {
                 __typename
-                ${field}
+                field ${field}
                 pullRequests(first: ${MAX_PR_NUM}) {
                   nodes {
                     id
@@ -76,7 +79,7 @@ const query = `{
               }
               ... on ProjectV2ItemFieldRepositoryValue {
                 __typename
-                ${field}
+                field ${field}
                 repository {
                   name
                   id
@@ -85,7 +88,7 @@ const query = `{
               }
               ... on ProjectV2ItemFieldReviewerValue {
                 __typename
-                ${field}
+                field ${field}
                 reviewers(first: 10) {
                   nodes {
                     ... on User { id }
@@ -95,18 +98,20 @@ const query = `{
                 }
               }
               ... on ProjectV2ItemFieldSingleSelectValue {
+                __typename
                 ${attr.ProjectV2ItemFieldSingleSelectValue()}
+                field ${field}
                 creator ${attr.projectV2FieldValue_Creator()}
-                ${field}
               }
               ... on ProjectV2ItemFieldTextValue {
+                __typename
                 ${attr.ProjectV2ItemFieldTextValue()}
+                field ${field}
                 creator ${attr.projectV2FieldValue_Creator()}
-                ${field}
               }
               ... on ProjectV2ItemFieldUserValue {
                 __typename
-                ${field}
+                field ${field}
                 users(first: 10) {
                   nodes {
                     ${attr.user()}

@@ -6,8 +6,8 @@ import IssueComment from './IssueComment.js';
 import Label from './Label.js';
 import Milestone from './Milestone.js';
 import Project from './Project.js';
-import ProjectNext from './ProjectNext.js';
-import ProjectNextItem from './ProjectNextItem.js';
+import ProjectV2 from './ProjectV2.js';
+import ProjectV2Item from './ProjectV2Item.js';
 import Repository from './Repository.js';
 import User from './User.js';
 import Viewer from './Viewer.js';
@@ -21,8 +21,8 @@ export {
     Label,
     Milestone,
     Project,
-    ProjectNext,
-    ProjectNextItem,
+    ProjectV2,
+    ProjectV2Item,
     Repository,
     User,
     Viewer,

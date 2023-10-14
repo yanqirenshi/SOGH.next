@@ -20,8 +20,11 @@ import Part from './ProjectV2/Part.js';
 import Points from './ProjectV2/Points.js';
 
 export default function ProjectV2 (props) {
+    const project = props.project;
+    const items = props.items;
+
     const [tabs, setTabs] = React.useState({
-        selected: 'metrix',
+        selected: 'items',
         list: [
             { code: 'metrix',      label: 'Metrix' },
             { code: 'items',       label: 'Items' },
@@ -29,10 +32,9 @@ export default function ProjectV2 (props) {
             { code: 'part',        label: 'PART' },
             { code: 'points',      label: 'Points' },
             { code: 'description', label: 'Description' },
+            { code: 'fields',      label: 'Fields' },
         ],
     });
-
-    const project = props.project;
 
     if (!project)
         return null;
@@ -42,7 +44,7 @@ export default function ProjectV2 (props) {
 
     // console.log(project.owner());
     return (
-        <Box sx={{pt:2, pb: 22}}>
+        <Box>
 
           <Container maxWidth="xl">
             <Title project={project}/>
@@ -51,25 +53,28 @@ export default function ProjectV2 (props) {
           <Container maxWidth="lg">
 
             <Box sx={{mt:3}}>
-              <S variant="h6">Attributes</S>
               <ReadmeAttributes project={project}/>
             </Box>
 
-            <Box sx={{mt:3}}>
-              <S variant="h6">Fields</S>
-              <Fields project={project}/>
-            </Box>
-
-            <Box sx={{mt:8}}>
+            <Box sx={{mt:6}}>
               <Tabs data={tabs} onChange={new_tabs=>setTabs(new_tabs)}/>
             </Box>
 
             {'description'===tabs.selected && <Description/>}
             {'gantt-chart'===tabs.selected && <GanttChart/>}
-            {'items'===tabs.selected && <Items/>}
+
+            {'items'===tabs.selected &&
+             <Box sx={{pt:4}}>
+               <Items items={items} project={project}/>
+             </Box>}
+
             {'metrix'===tabs.selected && <Metrix/>}
             {'part'===tabs.selected && <Part/>}
             {'points'===tabs.selected && <Points/>}
+            {'fields'===tabs.selected &&
+             <Box sx={{pt:4}}>
+               <Fields project={project}/>
+             </Box>}
           </Container>
 
         </Box>

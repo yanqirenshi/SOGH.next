@@ -9,7 +9,7 @@ import HelpEmpty from '../panels/HelpEmpty.js';
 import Loading from '../panels/Loading.js';
 
 export default function Scrum () {
-    const [page, setPageScrum] = useRecoilState(atoms.PAGE_SCRUM);
+    const [page, setPageScrum] = useRecoilState(atoms.PAGE_SCRUM_TABS);
 
     const tabs = page.tabs;
     const tab = tabs.selected;
@@ -19,7 +19,7 @@ export default function Scrum () {
         new_page.tabs = tabs;
         setPageScrum(new_page);
     };
-
+    console.log(page);
     return (
         <Frame tabs={page.tabs}
                onChangeTabs={changeTabs}>

@@ -71,7 +71,7 @@ export default function Table (props) {
                         </Cell>
 
                         <Cell>
-                          {obj.owner()}
+                          {obj.maneger()}
                         </Cell>
 
                         <Cell>

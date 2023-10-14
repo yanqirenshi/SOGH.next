@@ -1,7 +1,7 @@
 import GraphQLNode from './GraphQLNode.js';
 import Term from './Term.js';
 
-export default class ProjectNext extends GraphQLNode {
+export default class ProjectV2 extends GraphQLNode {
     constructor (data) {
         super(data);
 

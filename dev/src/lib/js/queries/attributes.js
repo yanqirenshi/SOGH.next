@@ -47,7 +47,7 @@ url
 resourcePath
 login
 avatarUrl
-... on User { id }
+... on User { id name }
 ... on Organization { id }
 ... on Mannequin { id }
 ... on EnterpriseUserAccount { id }

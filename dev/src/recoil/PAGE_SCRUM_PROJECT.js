@@ -2,11 +2,11 @@ import * as recoil from 'recoil';
 
 import sogh from '../manegers/sogh.js';
 
-export const PAGE_SCRUM_PROJECT_TABS = recoil.atom({
-    key: "PAGE_SCRUM",
+export const TABS = recoil.atom({
+    key: "PAGE_SCRUM_PROJECT_TABS",
     default: {
         tabs: {
-            selected: 'projects',
+            selected: 'list',
             list: [
                 { code: 'metrix',      label: 'Metrix' },
                 { code: 'list',        label: 'List' },

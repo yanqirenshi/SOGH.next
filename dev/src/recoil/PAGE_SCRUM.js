@@ -2,7 +2,7 @@ import * as recoil from 'recoil';
 
 import sogh from '../manegers/sogh.js';
 
-export const PAGE_SCRUM = recoil.atom({
+export const PAGE_SCRUM_TABS = recoil.atom({
     key: "PAGE_SCRUM",
     default: {
         tabs: {
@@ -22,12 +22,12 @@ export const PAGE_SCRUM = recoil.atom({
 });
 
 export const FETCH_REPOSITORIES = recoil.atom({
-    key: "FETCH_REPOSITORIES",
+    key: "PAGE_SCRUM_FETCH_REPOSITORIES",
     default: null, // null, Date, true, error
 });
 
 export const REPOSITORIES = recoil.selectorFamily({
-    key: 'REPOSITORIES',
+    key: 'PAGE_SCRUM_REPOSITORIES',
     get: authed => async () => {
 
         if (authed!==true)
@@ -38,7 +38,7 @@ export const REPOSITORIES = recoil.selectorFamily({
 });
 
 export const PROJECTSV2 = recoil.selectorFamily({
-    key: 'PROJECTSV2',
+    key: 'PAGE_SCRUM_PROJECTSV2',
     get: authed => async () => {
 
         if (authed!==true)

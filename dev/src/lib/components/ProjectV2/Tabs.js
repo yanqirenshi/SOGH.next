@@ -21,7 +21,9 @@ export default function Tabs (props) {
                    aria-label="disabled tabs example">
             {tabs.list.map((tab)=> {
                 return (
-                    <MuiTab value={tab.code} label={tab.label} />
+                    <MuiTab key={tab.code}
+                            value={tab.code}
+                            label={tab.label}/>
                 );
             })}
           </MuiTabs>
