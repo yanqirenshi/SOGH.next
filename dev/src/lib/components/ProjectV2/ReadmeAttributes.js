@@ -3,9 +3,6 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import S from '@mui/material/Typography';
 
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-
 import Paper from '@mui/material/Paper';
 
 export default function ReadmeAttributes (props) {

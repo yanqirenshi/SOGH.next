@@ -1,7 +1,6 @@
 import React from 'react';
 
 import Box from '@mui/material/Box';
-import S from '@mui/material/Typography';
 
 import TableProjectV2Fields from '../common/TableProjectV2Fields.js';
 

@@ -28,7 +28,7 @@ export default function SystemConfigurationDiagram (props) {
 
     React.useEffect(()=>{
         rectum.data(graph_data);
-    }, [rectum, graph_data]);
+    }, [rectum]);
 
     return (
         <Box style={style}>

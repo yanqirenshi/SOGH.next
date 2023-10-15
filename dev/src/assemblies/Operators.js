@@ -19,7 +19,7 @@ export default function Operators (props) {
         if (!operators.initialized)
             actions.operator.change(
                 operator.initialize(window_size, operators));
-    }, [window_size]);
+    }, [window_size, actions.operator, operators]);
 
     if (!window_size) return null;
 

@@ -1,5 +1,3 @@
-import Box from '@mui/material/Box';
-
 import Link from './Link.js';
 
 export default function UserName (props) {
@@ -9,6 +7,7 @@ export default function UserName (props) {
         <span>
             <Link href={user.url}>
               <img src={user.avatarUrl}
+                   alt={user.avatarUrl}
                    style={{width:17,height:17, marginRight:2}}/>
             </Link>
 

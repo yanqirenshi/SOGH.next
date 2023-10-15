@@ -19,8 +19,8 @@ export default class ProjectV2 extends GraphQLNode {
         this._result = new Term();
     }
     initRegexs () {
-        const value = '(\S)';
-        const date = '(\d+-\d+-\d+)';
+        // const value = '(\S)';
+        // const date = '(\d+-\d+-\d+)';
 
         this._regexs = {
             priority: /.*\$[P|p]riority:\s+(\S).*/,
