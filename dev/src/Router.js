@@ -35,8 +35,8 @@ export default function Router () {
           <Route path='/scrum/users/:login/projects/:number' element={<page.ScrumProject/>} />
 
           {/* ProjectV2 Item */}
-          {/* /scrum/users/:user-login/projects/:project-num/items/:item-num */}
-          <Route path='/scrum/users/:login/projects/:project-number/items/:item-number' element={<page.ScrumProject/>} />
+          {/* /scrum/users/:user-login/projects/:project-num/items/:item-id */}
+          <Route path='/scrum/users/:login/projects/:number/items/:id' element={<page.ScrumProjectItem/>} />
 
           {/* Repository */}
           {/* /scrum/users/:user-login/repositories */}
