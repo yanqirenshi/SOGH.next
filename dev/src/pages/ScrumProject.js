@@ -7,13 +7,14 @@ import { useRecoilValue } from "recoil";
 import { GITHUB_AUTH } from '../recoil/GITHUB.js';
 import * as atoms from '../recoil/PAGE_SCRUM_PROJECT.js';
 
+import Loading from '../panels/Loading.js';
 import Frame from '../assemblies/frames/Frame.js';
 
 import {ProjectV2} from '../lib/index.js';
 
 export default function ScrumProject (props) {
     return (
-        <Suspense fallback={<div>サスペンドしたらこれが表示される</div>}>
+        <Suspense fallback={<Loading/>}>
           <XXX/>
         </Suspense>
     );
