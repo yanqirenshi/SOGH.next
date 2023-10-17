@@ -31,7 +31,10 @@ const query = `{
           updatedAt
 
           project {
+            id
             number
+            title
+            url
             owner {
               __typename
               ... on User {

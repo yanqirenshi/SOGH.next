@@ -21,10 +21,13 @@ export default class ProjectV2Item extends GraphQLNode {
 
         return field_value;
     }
-    projectV2Number () {
+    project () {
+        return this._core.project;
+    }
+    projectNumber () {
         return this._core.project.number;
     }
-    projectV2OwnerLogin () {
+    projectOwnerLogin () {
         return this._core.project.owner.login;
     }
     type () {
@@ -46,8 +49,8 @@ export default class ProjectV2Item extends GraphQLNode {
     }
     assignees () {
         const field_value = this.getFieldValueByName('Assignees');
-
-        return field_value ? field_value.date : [];
+        console.log(field_value);
+        return field_value ? field_value.users.nodes : [];
     }
     labels () {
         const field_value = this.getFieldValueByName('Labels');
@@ -73,6 +76,9 @@ export default class ProjectV2Item extends GraphQLNode {
         const field_value = this.getFieldValueByName('Milestone');
         return field_value ? field_value.date : null;
     }
+    contentTypename () {
+        return this.core().content.__typename;
+    }
     planStart () {
         const field_value = this.getFieldValueByName('Plan.Start');
         return field_value ? field_value.date : null;
@@ -81,17 +87,27 @@ export default class ProjectV2Item extends GraphQLNode {
         const field_value = this.getFieldValueByName('Plan.End');
         return field_value ? field_value.date : null;
     }
+    planPoint () {
+        const field_value = this.getFieldValueByName('Plan.Point');
+        return field_value ? field_value.date : null;
+    }
+    resultStart () {
+        const field_value = this.getFieldValueByName('Result.Start');
+        return field_value ? field_value.date : null;
+    }
+    resultEnd () {
+        const field_value = this.getFieldValueByName('Result.End');
+        return field_value ? field_value.date : null;
+    }
+    resultPoint () {
+        const field_value = this.getFieldValueByName('Result.Point');
+        return field_value ? field_value.date : null;
+    }
     // dueDate () {
     //     return null;
     // }
     // nextActionDate () {
     //     return null;
-    // }
-    // plans () {
-    //     return {};
-    // }
-    // resutls () {
-    //     return {};
     // }
     // before () {
     //     return [];

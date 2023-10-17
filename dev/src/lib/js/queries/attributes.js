@@ -55,6 +55,34 @@ avatarUrl
 }`;
 }
 
+export function projectV2ItemContentDraftIssue () {
+    return ` {
+ __typename
+ id
+ title
+ }`;
+}
+
+export function projectV2ItemContentIssue () {
+    return ` {
+ __typename
+ id
+ url
+ number
+ title
+ }`;
+}
+
+export function projectV2ItemContentPullRequest () {
+    return ` {
+ __typename
+ id
+ number
+ url
+ title
+ }`;
+}
+
 export function user () {
     return `id
 login
