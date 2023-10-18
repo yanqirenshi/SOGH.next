@@ -496,4 +496,44 @@ export default class Sogh extends Pooler {
         // nodes 2 objs and pooling
         return obj.id();
     }
+    async asyncFetchIssueCommentsByID (id) {
+        const query = this.query('issue_comments_by_issue_id')
+              .replace('@id', id);
+
+        let out = [];
+        let loop = true, cursor = null;
+
+        while (loop) {
+            const query_pageing = this.makeQuery(query, cursor);
+            const post_data = this.postData(query_pageing);
+
+            // fetch
+            const response = await fetch(this.endpoint(), post_data)
+                  .then(res  => this.text2json(res))
+                  .then(res  => this.json2response(res, d=> {
+                      return d.data.node.comments;
+                  }))
+                  .catch(err => this.error2response(err));
+
+            // case of error
+            if ('error'===response.type)
+                return response.data;
+
+            // nodes 2 objs and pooling
+            const projects
+                  = this.node2objs(
+                      response.data.nodes,
+                      node=> this.node2issueComment(node));
+
+            // concat out
+            out = out.concat(projects);
+
+            // paging
+            const page_info = response.data.pageInfo;
+            cursor = page_info.endCursor;
+            loop   = page_info.hasNextPage;
+        }
+
+        return out;
+    }
 }

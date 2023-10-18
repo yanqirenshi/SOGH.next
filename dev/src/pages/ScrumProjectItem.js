@@ -23,11 +23,13 @@ export default function ScrumProjectItem (props) {
 
     return (
         <Frame>
-          <Container>
-            <Suspense fallback={<Loading/>}>
-              <Item item_id={id}/>
-            </Suspense>
-          </Container>
+          <Box sx={{height:'100%', overflow:'auto'}}>
+            <Container sx={{mb:22}}>
+              <Suspense fallback={<Loading/>}>
+                <Item item_id={id}/>
+              </Suspense>
+            </Container>
+          </Box>
         </Frame>
     );
 }
@@ -62,20 +64,19 @@ function Item (props) {
             <ProjectV2Item item={item}/>
           </Box>
 
-          <Box>
+          <Box sx={{mt:3}}>
             <Tabs tabs={tabs}
                   onChange={new_tabs=> setTabs(new_tabs)}/>
           </Box>
 
           {/* Item Contents*/}
-          <Box>
-            {'Issue'===typename &&
-             <Box>
-               <Suspense fallback={<Loading/>}>
-                 <IssueContent issue_id={item.content().id}/>
-               </Suspense>
-             </Box>}
-          </Box>
+          {'content'===tabs.selected &&
+           <Box>
+             {'Issue'===typename &&
+              <Suspense fallback={<Loading/>}>
+                <IssueContent issue_id={item.content().id}/>
+              </Suspense>}
+           </Box>}
         </>
     );
 }
@@ -87,7 +88,11 @@ function IssueContent (props) {
 
     const issue = sogh.issue(issue_id);
 
+    const list = useRecoilValue(atoms.ISSUE_COMMENTS({id: id}));
+
+    const comments = list.map(id=> sogh.issueComment(id));
+
     return (
-        <PanelIssue data={issue}/>
+        <PanelIssue data={issue} comments={comments}/>
     );
 }

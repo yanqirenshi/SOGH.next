@@ -55,3 +55,10 @@ export const ISSUE = recoil.selectorFamily({
         return await sogh.asyncFetchIssueByID(id);
     },
 });
+
+export const ISSUE_COMMENTS = recoil.selectorFamily({
+    key: 'PAGE_SCRUM_PROJECTV2_ITEM_ISSUE_COMMENTS',
+    get: ({id})=> async () => {
+        return await sogh.asyncFetchIssueCommentsByID(id);
+    },
+});

@@ -22,21 +22,6 @@ export default function ProjectV2Item (props) {
             <S variant="h4">{item.title()}</S>
           </Box>
 
-          <Box sx={{mt: 2, display:'flex', flexWrap:'wrap'}}>
-            {item.assignees().map(assignee=> {
-                return (
-                    <S key={assignee.id}>
-                      <Link href={assignee.url}>
-                        <img style={{height:17,width:17}}
-                             src={assignee.avatarUrl}
-                             alt={assignee.avatarUrl}/>
-                      </Link>
-                      {assignee.name || assignee.login}
-                    </S>
-                );
-            })}
-          </Box>
-
           <Box sx={{mt: 1, display:'flex', flexWrap:'wrap'}}>
             <S>{item.planStart()}</S>
             <S>{item.planEnd()}</S>

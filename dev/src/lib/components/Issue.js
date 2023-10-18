@@ -3,7 +3,12 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import S from '@mui/material/Typography';
 
+import {DateTime} from 'luxon';
+
 import Link from './common/Link.js';
+import Comment from './common/Comment.js';
+import UserName from './common/UserNameBlock.js';
+import Label from './common/Label.js';
 
 export default function Issue (props) {
     const issue = props.data;
@@ -56,30 +61,43 @@ export default function Issue (props) {
             </Box>
 
             <Box sx={{m:1}}>
-              {issue.labels().map(label=> {
-                  return (
-                      <Box key={label.id}
-                           sx={{
-                               display: 'inline-block',
-                               background:'#'+label.color,
-                           }}>
-                        <Link href={milestone.url}>
-                          {label.name}
-                        </Link>
-                      </Box>
-                  );
-              })}
+              {issue.labels().map(label=> <Label value={label}/>)}
             </Box>
           </Box>
 
           <Box sx={{mt:3}}>
-            <div dangerouslySetInnerHTML={{
-                __html: issue.bodyHTML()
-            }}/>
+            <Comment body={issue.body}
+                     bodyHtml={issue.bodyHTML()}/>
           </Box>
 
           <Box sx={{mt:3}}>
-            issue comments
+            {comments.map(comment=> {
+                const author = comment.author();
+                const dt = DateTime.fromJSDate(new Date(comment.publishedAt()));
+
+                return (
+                    <Box key={comment.id()}
+                         sx={{display:'flex'}}>
+
+                      <Box sx={{pt:2, pl:3, pr:3, display:'flex', flexDirection: 'column'}}>
+                        <S>{dt.toFormat('yyyy-MM-dd EEE')}</S>
+                        <S>{dt.toFormat('HH:mm:ss')}</S>
+                      </Box>
+
+                      <Box sx={{flexGrow: 1, pb: 6}}>
+                        <Box sx={{mb:0.5, pl:0.5}}>
+                          <UserName user={author}/>
+                        </Box>
+
+                        <Box>
+                          <Comment body={comment.body}
+                                   bodyHtml={comment.bodyHTML()}/>
+                        </Box>
+                      </Box>
+
+                    </Box>
+                );
+            })}
           </Box>
         </Box>
     );
