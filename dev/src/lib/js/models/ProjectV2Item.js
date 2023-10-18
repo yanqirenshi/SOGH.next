@@ -49,7 +49,7 @@ export default class ProjectV2Item extends GraphQLNode {
     }
     assignees () {
         const field_value = this.getFieldValueByName('Assignees');
-        console.log(field_value);
+
         return field_value ? field_value.users.nodes : [];
     }
     labels () {
@@ -76,8 +76,11 @@ export default class ProjectV2Item extends GraphQLNode {
         const field_value = this.getFieldValueByName('Milestone');
         return field_value ? field_value.date : null;
     }
+    content () {
+        return this.core().content;
+    }
     contentTypename () {
-        return this.core().content.__typename;
+        return this.content().__typename;
     }
     planStart () {
         const field_value = this.getFieldValueByName('Plan.Start');

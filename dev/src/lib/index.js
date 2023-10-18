@@ -3,6 +3,7 @@ import ProjectV2Items from './components/ProjectV2Items.js';
 import ProjectsV2 from './components/ProjectsV2.js';
 import Repositories from './components/Repositories.js';
 import ProjectV2 from './components/ProjectV2.js';
+import PanelIssue from './components/Issue.js';
 
 import Sogh from './js/Sogh.js';
 
@@ -24,6 +25,7 @@ export {
     ProjectsV2,
     ProjectV2,
     Repositories,
+    PanelIssue,
 }
 
 export {

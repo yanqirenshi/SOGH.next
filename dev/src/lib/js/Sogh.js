@@ -37,8 +37,8 @@ export default class Sogh extends Pooler {
 
         if ('project-v2-items'===to)
             return base
-            .replace(':login',  data.projectV2OwnerLogin())
-            .replace(':project-number', data.projectV2Number())
+            .replace(':login',  data.projectOwnerLogin())
+            .replace(':project-number', data.projectNumber())
             .replace(':id', data.id());
 
         const keys = Object.keys(data);
@@ -447,5 +447,53 @@ export default class Sogh extends Pooler {
         }
 
         return out;
+    }
+    async asyncFetchItemByID (id) {
+        const query = this.query('issue_by_id')
+              .replace('@id', id);
+
+        const post_data = this.postData(query);
+
+        // fetch
+        const response = await fetch(this.endpoint(), post_data)
+              .then(res  => this.text2json(res))
+              .then(res  => this.json2response(res, d=> {
+                  return d.data.node;
+              }))
+              .catch(err => this.error2response(err));
+
+        // case of error
+        if ('error'===response.type)
+            return response.data;
+
+        // create object
+        const obj = this.node2issue(response.data);
+
+        // nodes 2 objs and pooling
+        return obj.id();
+    }
+    async asyncFetchIssueByID (id) {
+        const query = this.query('issue_by_id')
+              .replace('@id', id);
+
+        const post_data = this.postData(query);
+
+        // fetch
+        const response = await fetch(this.endpoint(), post_data)
+              .then(res  => this.text2json(res))
+              .then(res  => this.json2response(res, d=> {
+                  return d.data.node;
+              }))
+              .catch(err => this.error2response(err));
+
+        // case of error
+        if ('error'===response.type)
+            return response.data;
+
+        // create object
+        const obj = this.node2issue(response.data);
+
+        // nodes 2 objs and pooling
+        return obj.id();
     }
 }

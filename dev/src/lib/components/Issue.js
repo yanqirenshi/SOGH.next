@@ -1,62 +1,86 @@
 import React from 'react';
 
-import SideMenu from './issue/SideMenu.js';
-import Inspector from './issue/Inspector.js';
-import Contents from './issue/Contents.js';
+import Box from '@mui/material/Box';
+import S from '@mui/material/Typography';
 
-const style = {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    side_menu: {
-        position: 'absolute',
-    },
-    contents: {
-        flexGrow: 1,
-        height: '100%',
-    },
-    inspector: {
-        width: '30%',
-        maxWidth: 555,
-        height: '100%',
-    },
-};
+import Link from './common/Link.js';
 
 export default function Issue (props) {
-    const [views, setViews] = React.useState({
-        selected: 'comments',
-        list: [
-            { code: 'comments',  label: 'Comments' },
-            { code: 'part',      label: 'PERT' },
-            { code: 'project',   label: 'Project' },
-            { code: 'milestone', label: 'Milestone' },
-        ],
-    });
-
     const issue = props.data;
-    const item = props.item;
-    const comments = props.comments;
+    const comments = props.comments || [];
 
-    const clickMenuItem = (code) => {
-        const new_view = {...views};
-        new_view.selected = code;
-        setViews(new_view);
-    };
+    // TODO: これは表示する必要はないかも。。。
+    const milestone = issue.milestone();
 
     return (
-        <div style={style}>
-          <div style={style.side_menu}>
-            <SideMenu data={views} onChange={clickMenuItem}/>
-          </div>
+        <Box>
+          <Box sx={{mt: 3}}>
+            <S variant="h5">
+              <span>{issue.title()}</span>
+              <span style={{marginLeft:11}}>
+                (
+                <Link href={issue.url()}>
+                  {issue.number()}
+                </Link>
+                )
+              </span>
+            </S>
+          </Box>
 
-          <div style={style.contents}>
-            <Contents comments={comments} view={views.selected}/>
-          </div>
+          <Box sx={{mt:1, display: 'flex'}}>
+            <Box sx={{m:1}}>
+              <S>
+                <span>{milestone.title}</span>
+                <span style={{marginLeft:11}}>
+                  (
+                  <Link href={milestone.url}>
+                    {milestone.number}
+                  </Link>
+                  )
+                </span>
+              </S>
+            </Box>
 
-          <div style={style.inspector}>
-            {issue &&
-             <Inspector data={issue} item={item} />}
-          </div>
-        </div>
+            <Box sx={{m:1}}>
+              {issue.assignees().map(assignee=> {
+                  return (
+                      <Box key={assignee.id}>
+                        <Link href={milestone.url}>
+                          <img width="17px" height="17px"
+                               src={assignee.avatarUrl}/>
+                        </Link>
+                        <span>{assignee.name || assignee.login}</span>
+                      </Box>
+                  );
+              })}
+            </Box>
+
+            <Box sx={{m:1}}>
+              {issue.labels().map(label=> {
+                  return (
+                      <Box key={label.id}
+                           sx={{
+                               display: 'inline-block',
+                               background:'#'+label.color,
+                           }}>
+                        <Link href={milestone.url}>
+                          {label.name}
+                        </Link>
+                      </Box>
+                  );
+              })}
+            </Box>
+          </Box>
+
+          <Box sx={{mt:3}}>
+            <div dangerouslySetInnerHTML={{
+                __html: issue.bodyHTML()
+            }}/>
+          </Box>
+
+          <Box sx={{mt:3}}>
+            issue comments
+          </Box>
+        </Box>
     );
 }
