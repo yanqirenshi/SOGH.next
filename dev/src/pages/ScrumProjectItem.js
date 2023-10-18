@@ -15,7 +15,9 @@ import sogh from '../manegers/sogh.js';
 import Loading from '../panels/Loading.js';
 import Frame from '../assemblies/frames/Frame.js';
 
-import {ProjectV2Item, PanelIssue} from '../lib/index.js';
+import {
+    ProjectV2Item, PanelIssue, PanelIssueComments
+} from '../lib/index.js';
 
 export default function ScrumProjectItem (props) {
     // let {login, number, id} = useParams();
@@ -42,9 +44,6 @@ function Item (props) {
         list: [
             { code: 'content',   label: 'Content' },
             { code: 'points',    label: 'Points' },
-            { code: 'pert',      label: 'PERT' },
-            { code: 'project',   label: 'Project' },
-            { code: 'milestone', label: 'Milestone' },
         ],
     });
 
@@ -81,15 +80,6 @@ function Item (props) {
 
           {'points'===tabs.selected &&
            <Box>Points</Box>}
-
-          {'pert'===tabs.selected &&
-           <Box>PERT</Box>}
-
-          {'project'===tabs.selected &&
-           <Box>Project</Box>}
-
-          {'milestone'===tabs.selected &&
-           <Box>Milestone</Box>}
         </>
     );
 }
@@ -106,6 +96,9 @@ function IssueContent (props) {
     const comments = list.map(id=> sogh.issueComment(id));
 
     return (
-        <PanelIssue data={issue} comments={comments}/>
+        <>
+          <PanelIssue data={issue}/>
+          <PanelIssueComments comments={comments}/>
+        </>
     );
 }
