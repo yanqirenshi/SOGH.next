@@ -40,9 +40,10 @@ function Item (props) {
     const [tabs, setTabs] = React.useState({
         selected: 'content',
         list: [
-            { code: 'content', label: 'Content' },
-            { code: 'PERT', label: 'pert' },
-            { code: 'project', label: 'Project' },
+            { code: 'content',   label: 'Content' },
+            { code: 'points',    label: 'Points' },
+            { code: 'pert',      label: 'PERT' },
+            { code: 'project',   label: 'Project' },
             { code: 'milestone', label: 'Milestone' },
         ],
     });
@@ -77,6 +78,18 @@ function Item (props) {
                 <IssueContent issue_id={item.content().id}/>
               </Suspense>}
            </Box>}
+
+          {'points'===tabs.selected &&
+           <Box>Points</Box>}
+
+          {'pert'===tabs.selected &&
+           <Box>PERT</Box>}
+
+          {'project'===tabs.selected &&
+           <Box>Project</Box>}
+
+          {'milestone'===tabs.selected &&
+           <Box>Milestone</Box>}
         </>
     );
 }
