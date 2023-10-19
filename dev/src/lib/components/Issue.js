@@ -60,7 +60,7 @@ export default function Issue (props) {
             </Box>
 
             <Box sx={{m:1}}>
-              {issue.labels().map(label=> <Label value={label}/>)}
+              {issue.labels().map(label=> <Label key={label.id} value={label}/>)}
             </Box>
           </Box>
 

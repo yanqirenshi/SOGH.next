@@ -3,7 +3,7 @@ import * as recoil from 'recoil';
 import sogh from '../manegers/sogh.js';
 
 export const TABS = recoil.atom({
-    key: "PAGE_SCRUM_PROJECT_TABS",
+    key: "PAGE_SCRUM_PROJECT_ITEM_TABS",
     default: {
         tabs: {
             selected: 'list',
@@ -20,7 +20,7 @@ export const TABS = recoil.atom({
 });
 
 export const PROJECTV2 = recoil.selectorFamily({
-    key: 'PAGE_SCRUM_PROJECT_PROJECTV2',
+    key: 'PAGE_SCRUM_PROJECT_ITEM_PROJECTV2',
     get: ({authed, login, number})=> async () => {
         if (!authed)
             return null;
@@ -30,7 +30,7 @@ export const PROJECTV2 = recoil.selectorFamily({
 });
 
 export const PROJECTV2_ITEMS = recoil.selectorFamily({
-    key: 'PAGE_SCRUM_PROJECT_PROJECTV2_ITEMS',
+    key: 'PAGE_SCRUM_PROJECT_ITEM_PROJECTV2_ITEMS',
     get: ({authed, login, number})=> async () => {
         if (!authed)
             return null;
@@ -40,7 +40,7 @@ export const PROJECTV2_ITEMS = recoil.selectorFamily({
 });
 
 export const PROJECTV2_ITEM = recoil.selectorFamily({
-    key: 'PAGE_SCRUM_PROJECTV2_ITEM',
+    key: 'PAGE_SCRUM_PROJECT_ITEM_PROJECTV2_ITEM',
     get: ({authed, id})=> async () => {
         if (!authed)
             return null;
@@ -50,14 +50,14 @@ export const PROJECTV2_ITEM = recoil.selectorFamily({
 });
 
 export const ISSUE = recoil.selectorFamily({
-    key: 'PAGE_SCRUM_PROJECTV2_ITEM_ISSUE',
+    key: 'PAGE_SCRUM_PROJECT_ITEM_ISSUE',
     get: ({id})=> async () => {
         return await sogh.asyncFetchIssueByID(id);
     },
 });
 
 export const ISSUE_COMMENTS = recoil.selectorFamily({
-    key: 'PAGE_SCRUM_PROJECTV2_ITEM_ISSUE_COMMENTS',
+    key: 'PAGE_SCRUM_PROJECT_ITEM_ISSUE_COMMENTS',
     get: ({id})=> async () => {
         return await sogh.asyncFetchIssueCommentsByID(id);
     },

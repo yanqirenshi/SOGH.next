@@ -19,22 +19,6 @@ export const TABS = recoil.atom({
     },
 });
 
-// export const FETCH_REPOSITORIES = recoil.atom({
-//     key: "FETCH_REPOSITORIES",
-//     default: null, // null, Date, true, error
-// });
-
-// export const REPOSITORIES = recoil.selectorFamily({
-//     key: 'REPOSITORIES',
-//     get: authed => async () => {
-
-//         if (authed!==true)
-//             return [];
-
-//         return await sogh.asyncFetchRepositoriesByViewer();
-//     },
-// });
-
 export const PROJECTV2 = recoil.selectorFamily({
     key: 'PAGE_SCRUM_PROJECT_PROJECTV2',
     get: ({authed, login, number})=> async () => {
