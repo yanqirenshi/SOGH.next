@@ -30,6 +30,12 @@ export default class ProjectV2Item extends GraphQLNode {
     projectOwnerLogin () {
         return this._core.project.owner.login;
     }
+    projectPath () {
+        const project = this.project();
+        const sogh = this.sogh();
+
+        return sogh.href('project-v2-data', project);
+    }
     type () {
         return this._core.type || null;
     }
@@ -82,36 +88,77 @@ export default class ProjectV2Item extends GraphQLNode {
     contentTypename () {
         return this.content().__typename;
     }
-    planStart () {
-        const field_value = this.getFieldValueByName('Plan.Start');
+    planPoints () {
+        const field_value = this.getFieldValueByName('Plan.Points');
+        return field_value ? field_value.text : null;
+    }
+    planPointsSummary () {
+        const points = this.planPoints();
+
+        let total = 0;
+
+        if (!points)
+            return total;
+
+        const summary = points
+              .split(',')
+              .reduce((total, line)=> {
+                  const row = line.trim().split(':');
+                  if (row.length!==2)
+                      return total;
+
+                  const parson = row[0];
+                  const point = row[1] * 1;
+
+                  total += point;
+
+                  return total;
+              }, total);
+
+        return summary;
+    }
+    resultPoints () {
+        const field_value = this.getFieldValueByName('Result.Points');
+        return field_value ? field_value.text : null;
+    }
+    resultPointsSummary () {
+        const points = this.resultPoints();
+
+        const out = { total: 0, detail: {}};
+
+        if (!points)
+            return out;
+
+        const summary = points
+              .split(',')
+              .reduce((out, line)=> {
+                  const row = line.trim().split(':');
+                  if (row.length!==3)
+                      return out;
+
+                  const parson = row[0];
+                  const date = row[1];
+                  const point = row[2] * 1;
+
+                  out.total += point;
+                  if (!out.detail[parson])
+                      out.detail[parson] = 0;
+
+                  out.detail[parson] += point;
+
+                  return out;
+              }, out);
+
+        return summary;
+    }
+    nextActionDate () {
+        const field_value = this.getFieldValueByName('NextAction.Date');
         return field_value ? field_value.date : null;
     }
-    planEnd () {
-        const field_value = this.getFieldValueByName('Plan.End');
+    dueDate () {
+        const field_value = this.getFieldValueByName('Due.Date');
         return field_value ? field_value.date : null;
     }
-    planPoint () {
-        const field_value = this.getFieldValueByName('Plan.Point');
-        return field_value ? field_value.date : null;
-    }
-    resultStart () {
-        const field_value = this.getFieldValueByName('Result.Start');
-        return field_value ? field_value.date : null;
-    }
-    resultEnd () {
-        const field_value = this.getFieldValueByName('Result.End');
-        return field_value ? field_value.date : null;
-    }
-    resultPoint () {
-        const field_value = this.getFieldValueByName('Result.Point');
-        return field_value ? field_value.date : null;
-    }
-    // dueDate () {
-    //     return null;
-    // }
-    // nextActionDate () {
-    //     return null;
-    // }
     // before () {
     //     return [];
     // }

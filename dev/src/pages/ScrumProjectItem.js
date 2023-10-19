@@ -76,6 +76,9 @@ function Item (props) {
               <Suspense fallback={<Loading/>}>
                 <IssueContent issue_id={item.content().id}/>
               </Suspense>}
+
+             {'DraftIssue'===typename &&
+              <div>DraftIssue</div>}
            </Box>}
 
           {'points'===tabs.selected &&
