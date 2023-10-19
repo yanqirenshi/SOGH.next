@@ -19,7 +19,7 @@ export default function Scrum () {
         new_page.tabs = tabs;
         setPageScrum(new_page);
     };
-    console.log(page);
+
     return (
         <Frame tabs={page.tabs}
                onChangeTabs={changeTabs}>

@@ -71,8 +71,8 @@ export default function TableProjectV2Items (props) {
                         </TableCell>
 
                         <TableCellTerm term={{
-                            start: item.planStart(),
-                            end: item.planEnd(),
+                            start: null,
+                            end: null,
                         }}/>
 
                         {/* <TableCell>{item.type()}</TableCell> */}

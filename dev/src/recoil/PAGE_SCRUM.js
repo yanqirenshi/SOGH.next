@@ -29,7 +29,6 @@ export const FETCH_REPOSITORIES = recoil.atom({
 export const REPOSITORIES = recoil.selectorFamily({
     key: 'PAGE_SCRUM_REPOSITORIES',
     get: authed => async () => {
-
         if (authed!==true)
             return [];
 
@@ -40,7 +39,6 @@ export const REPOSITORIES = recoil.selectorFamily({
 export const PROJECTSV2 = recoil.selectorFamily({
     key: 'PAGE_SCRUM_PROJECTSV2',
     get: authed => async () => {
-
         if (authed!==true)
             return [];
 

@@ -12,6 +12,8 @@ import Frame from '../assemblies/frames/Frame.js';
 
 import {ProjectV2} from '../lib/index.js';
 
+import sogh from '../manegers/sogh.js';
+
 export default function ScrumProject (props) {
     return (
         <Suspense fallback={<Loading/>}>
@@ -38,7 +40,8 @@ function XXX () {
     return (
         <Frame>
           <Box sx={{width:'100%', height:'100%', overflow: 'auto'}}>
-            <ProjectV2 project={project} items={project_items}/>
+            <ProjectV2 project={sogh.projectV2(project)}
+                       items={project_items.map(id=> sogh.projectV2Item(id))}/>
           </Box>
         </Frame>
     );

@@ -370,7 +370,7 @@ export default class Sogh extends Pooler {
             return response.data;
 
         // nodes 2 objs and pooling
-        return this.node2projectV2(response.data);
+        return this.node2projectV2(response.data).id();
     }
     async asyncFetchProjectV2ItemsByUserLoginProjectV2Number (login, number) {
         const query = this.query('projectv2items_by_user_login_projectv2_number')
@@ -392,7 +392,7 @@ export default class Sogh extends Pooler {
             return response.data;
 
         // nodes 2 objs and pooling
-        return response.data.map(d=> this.node2projectV2Item(d));
+        return response.data.map(d=> this.node2projectV2Item(d).id());
     }
     async asyncFetchProjectV2ItemByID (id) {
         const query = this.query('projectv2item_by_id')

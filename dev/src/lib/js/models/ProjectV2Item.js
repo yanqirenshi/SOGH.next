@@ -88,6 +88,9 @@ export default class ProjectV2Item extends GraphQLNode {
     contentTypename () {
         return this.content().__typename;
     }
+    /* ****************************************************************
+     *  Plan
+     * ****************************************************************/
     planPoints () {
         const field_value = this.getFieldValueByName('Plan.Points');
         return field_value ? field_value.text : null;
@@ -117,6 +120,9 @@ export default class ProjectV2Item extends GraphQLNode {
 
         return summary;
     }
+    /* ****************************************************************
+     *  Results
+     * ****************************************************************/
     resultPoints () {
         const field_value = this.getFieldValueByName('Result.Points');
         return field_value ? field_value.text : null;
@@ -151,6 +157,9 @@ export default class ProjectV2Item extends GraphQLNode {
 
         return summary;
     }
+    /* ****************************************************************
+     *  Dates
+     * ****************************************************************/
     nextActionDate () {
         const field_value = this.getFieldValueByName('NextAction.Date');
         return field_value ? field_value.date : null;
