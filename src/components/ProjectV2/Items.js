@@ -22,12 +22,13 @@ export default function Items (props) {
     return (
         <Box sx={{pb:22}}>
           {statuses.map(status=> {
+              const status_items = x[status] || [];
               return (
                   <Box key={status} sx={{mb: 6}}>
                     <S variant="h5">
                       {status}
                     </S>
-                    <TableProjectV2Items items={x[status]}/>
+                    <TableProjectV2Items items={status_items}/>
                   </Box>
               );
           })}

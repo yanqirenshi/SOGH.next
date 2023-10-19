@@ -32,18 +32,19 @@ export default function Issue (props) {
           </Box>
 
           <Box sx={{mt:1, display: 'flex'}}>
-            <Box sx={{m:1}}>
-              <S>
-                <span>{milestone.title}</span>
-                <span style={{marginLeft:11}}>
-                  (
-                  <Link href={milestone.url}>
-                    {milestone.number}
-                  </Link>
-                  )
-                </span>
-              </S>
-            </Box>
+            {milestone &&
+             <Box sx={{m:1}}>
+               <S>
+                 <span>{milestone.title}</span>
+                 <span style={{marginLeft:11}}>
+                   (
+                   <Link href={milestone.url}>
+                     {milestone.number}
+                   </Link>
+                   )
+                 </span>
+               </S>
+             </Box>}
 
             <Box sx={{m:1}}>
               {issue.assignees().map(assignee=> {
