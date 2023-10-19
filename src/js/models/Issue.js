@@ -2,21 +2,6 @@ import moment from 'moment';
 
 import GraphQLNode from './GraphQLNode.js';
 
-// id
-// url
-// title
-// createdAt
-// closedAt
-// updatedAt
-// number
-// body
-// bodyHTML
-// state
-// projectCard	model
-// milestone	model
-// assignees	model
-// labels	model
-
 export default class Issue extends GraphQLNode {
     constructor (data) {
         super(data);

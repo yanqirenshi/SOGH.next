@@ -9,9 +9,10 @@ export default class Sogh extends Pooler {
         this._queries = QUERIES;
 
         this._routes = {
-            'issue':            '/issues/:id',
-            'project-v2':       '/projectsV2/:id',
-            'project-v2-items': '/projectV2-items/:id',
+            'issue':            '/scrum/users/:login/repositories/:repository/issues/:number',
+            'project-v2':       '/scrum/users/:login/projects/:number',
+            'project-v2-data':  '/scrum/users/:login/projects/:number',
+            'project-v2-items': '/scrum/users/:login/projects/:project-number/items/:id',
         };
     }
     query (code) {
@@ -28,8 +29,25 @@ export default class Sogh extends Pooler {
     }
     href (to, data) {
         const routes = this.routes();
-
         const base = routes[to];
+
+        if ('project-v2'===to)
+            return base
+            .replace(':login',  data.creator().login)
+            .replace(':number', data.number());
+
+        if ('project-v2-data'===to) {
+            return base
+            .replace(':login',  data.owner.login)
+            .replace(':number', data.number);
+        }
+
+        if ('project-v2-items'===to)
+            return base
+            .replace(':login',  data.projectOwnerLogin())
+            .replace(':project-number', data.projectNumber())
+            .replace(':id', data.id());
+
         const keys = Object.keys(data);
 
         return keys.reduce((str, key)=> {
@@ -332,6 +350,74 @@ export default class Sogh extends Pooler {
 
         return out;
     }
+    async asyncFetchProjectV2ByUserLoginProjectV2Number (login, number) {
+        const query = this.query('projectv2_by_user_login_projectv2_number')
+              .replace('@user-login', login)
+              .replace('@projectv2-number', number);
+
+        const post_data = this.postData(query);
+
+        // fetch
+        const response = await fetch(this.endpoint(), post_data)
+              .then(res  => this.text2json(res))
+              .then(res  => this.json2response(res, d=> {
+                  return d.data.user.projectV2;
+              }))
+              .catch(err => this.error2response(err));
+
+        // case of error
+        if ('error'===response.type)
+            return response.data;
+
+        // nodes 2 objs and pooling
+        return this.node2projectV2(response.data).id();
+    }
+    async asyncFetchProjectV2ItemsByUserLoginProjectV2Number (login, number) {
+        const query = this.query('projectv2items_by_user_login_projectv2_number')
+              .replace('@user-login', login)
+              .replace('@projectv2-number', number);
+
+        const post_data = this.postData(query);
+
+        // fetch
+        const response = await fetch(this.endpoint(), post_data)
+              .then(res  => this.text2json(res))
+              .then(res  => this.json2response(res, d=> {
+                  return d.data.user.projectV2.items.nodes;
+              }))
+              .catch(err => this.error2response(err));
+
+        // case of error
+        if ('error'===response.type)
+            return response.data;
+
+        // nodes 2 objs and pooling
+        return response.data.map(d=> this.node2projectV2Item(d).id());
+    }
+    async asyncFetchProjectV2ItemByID (id) {
+        const query = this.query('projectv2item_by_id')
+              .replace('@id', id);
+
+        const post_data = this.postData(query);
+
+        // fetch
+        const response = await fetch(this.endpoint(), post_data)
+              .then(res  => this.text2json(res))
+              .then(res  => this.json2response(res, d=> {
+                  return d.data.node;
+              }))
+              .catch(err => this.error2response(err));
+
+        // case of error
+        if ('error'===response.type)
+            return response.data;
+
+        // create object
+        const obj = this.node2projectV2Item(response.data);
+
+        // nodes 2 objs and pooling
+        return obj.id();
+    }
     async asyncFetchIssueByViewer () {
         const query = this.query('issues_by_viwer');
 
@@ -357,6 +443,94 @@ export default class Sogh extends Pooler {
                   = this.node2objs(
                       response.data.nodes,
                       node=> this.node2issue(node));
+
+            // concat out
+            out = out.concat(projects);
+
+            // paging
+            const page_info = response.data.pageInfo;
+            cursor = page_info.endCursor;
+            loop   = page_info.hasNextPage;
+        }
+
+        return out;
+    }
+    async asyncFetchItemByID (id) {
+        const query = this.query('issue_by_id')
+              .replace('@id', id);
+
+        const post_data = this.postData(query);
+
+        // fetch
+        const response = await fetch(this.endpoint(), post_data)
+              .then(res  => this.text2json(res))
+              .then(res  => this.json2response(res, d=> {
+                  return d.data.node;
+              }))
+              .catch(err => this.error2response(err));
+
+        // case of error
+        if ('error'===response.type)
+            return response.data;
+
+        // create object
+        const obj = this.node2issue(response.data);
+
+        // nodes 2 objs and pooling
+        return obj.id();
+    }
+    async asyncFetchIssueByID (id) {
+        const query = this.query('issue_by_id')
+              .replace('@id', id);
+
+        const post_data = this.postData(query);
+
+        // fetch
+        const response = await fetch(this.endpoint(), post_data)
+              .then(res  => this.text2json(res))
+              .then(res  => this.json2response(res, d=> {
+                  return d.data.node;
+              }))
+              .catch(err => this.error2response(err));
+
+        // case of error
+        if ('error'===response.type)
+            return response.data;
+
+        // create object
+        const obj = this.node2issue(response.data);
+
+        // nodes 2 objs and pooling
+        return obj.id();
+    }
+    async asyncFetchIssueCommentsByID (id) {
+        const query = this.query('issue_comments_by_issue_id')
+              .replace('@id', id);
+
+        let out = [];
+        let loop = true, cursor = null;
+
+        while (loop) {
+            const query_pageing = this.makeQuery(query, cursor);
+            const post_data = this.postData(query_pageing);
+
+            // fetch
+            const response = await fetch(this.endpoint(), post_data)
+                  .then(res  => this.text2json(res))
+                  .then(res  => this.json2response(res, d=> {
+                      return d.data.node.comments;
+                  }))
+                  .catch(err => this.error2response(err));
+
+            // case of error
+            if ('error'===response.type)
+                return response.data;
+
+            // nodes 2 objs and pooling
+            const projects
+                  = this.node2objs(
+                      response.data.nodes,
+                      node=> this.node2issueComment(node));
 
             // concat out
             out = out.concat(projects);

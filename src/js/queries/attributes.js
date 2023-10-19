@@ -47,12 +47,40 @@ url
 resourcePath
 login
 avatarUrl
-... on User { id }
+... on User { id name }
 ... on Organization { id }
 ... on Mannequin { id }
 ... on EnterpriseUserAccount { id }
 ... on Bot { id }
 }`;
+}
+
+export function projectV2ItemContentDraftIssue () {
+    return ` {
+ __typename
+ id
+ title
+ }`;
+}
+
+export function projectV2ItemContentIssue () {
+    return ` {
+ __typename
+ id
+ url
+ number
+ title
+ }`;
+}
+
+export function projectV2ItemContentPullRequest () {
+    return ` {
+ __typename
+ id
+ number
+ url
+ title
+ }`;
 }
 
 export function user () {

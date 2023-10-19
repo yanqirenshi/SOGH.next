@@ -3,17 +3,20 @@ import React from 'react';
 import { DateTime } from 'luxon';
 
 import TableCell from '@mui/material/TableCell';
+import S from '@mui/material/Typography';
 
 const style = {
     whiteSpace: 'nowrap',
 };
 
-export default function TableCellDateTime (props) {
-    const value = props.value;
+export default function TableCellTimestamps (props) {
+    const create = props.create;
+    const update = props.update;
 
     return (
         <TableCell style={style}>
-          {fmt(value)}
+          <S>{fmt(create)}</S>
+          <S>{fmt(update)}</S>
         </TableCell>
     );
 }

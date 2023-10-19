@@ -1,7 +1,9 @@
 import React from 'react';
 
 import TableCell from '@mui/material/TableCell';
-import Link from '../common/Link.js';
+import S from '@mui/material/Typography';
+
+import LinkSogh from '../common/LinkSogh.js';
 
 export default function TableCellLinkSogh (props) {
     const obj = props.data;
@@ -13,11 +15,11 @@ export default function TableCellLinkSogh (props) {
 
     return (
         <TableCell>
-          <p style={{marginRight:22}}>
-            <Link href={href}>
+          <S>
+            <LinkSogh to={to} data={{id: obj.id()}} sogh={sogh}>
               {children}
-            </Link>
-          </p>
+            </LinkSogh>
+          </S>
         </TableCell>
     );
 }

@@ -1,6 +1,13 @@
 export default class GraphQLNode {
     constructor (data) {
         this._core = data;
+        this._sogh = null;
+    }
+    sogh (v) {
+        if (arguments.length===1)
+            this._sogh = v || null;
+
+        return this._sogh;
     }
     core () {
         return this._core;

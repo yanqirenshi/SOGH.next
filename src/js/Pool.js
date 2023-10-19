@@ -1,5 +1,7 @@
 export default class Pool {
-    constructor () {
+    constructor (sogh) {
+        this._sogh = sogh;
+
         this._ht = {};
         this._list = [];
     }

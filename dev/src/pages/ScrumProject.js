@@ -17,12 +17,12 @@ import sogh from '../manegers/sogh.js';
 export default function ScrumProject (props) {
     return (
         <Suspense fallback={<Loading/>}>
-          <XXX/>
+          <Project/>
         </Suspense>
     );
 }
 
-function XXX () {
+function Project () {
     let {login, number} = useParams();
 
     const authed = useRecoilValue(GITHUB_AUTH);

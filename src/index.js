@@ -2,10 +2,13 @@ import ProjectV2Item from './components/ProjectV2Item.js';
 import ProjectV2Items from './components/ProjectV2Items.js';
 import ProjectsV2 from './components/ProjectsV2.js';
 import Repositories from './components/Repositories.js';
+import ProjectV2 from './components/ProjectV2.js';
+import PanelIssue from './components/Issue.js';
+import PanelIssueComments from './components/IssueComments.js';
 
 import Sogh from './js/Sogh.js';
 
-import {Assignee} from './js/models/index.js';
+import {Assignee}    from './js/models/index.js';
 import {Card}        from './js/models/index.js';
 import {Column}      from './js/models/index.js';
 import {Issue}       from './js/models/index.js';
@@ -21,7 +24,10 @@ export {
     ProjectV2Item,
     ProjectV2Items,
     ProjectsV2,
+    ProjectV2,
     Repositories,
+    PanelIssue,
+    PanelIssueComments,
 }
 
 export {
