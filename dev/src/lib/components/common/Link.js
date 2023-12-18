@@ -16,7 +16,9 @@ export default function Link (props) {
 
     return (
         <a href={href}
-           style={style_a}>
+           style={style_a}
+           target="_blank"
+           rel="noopener noreferrer">
           {children}
         </a>
     );

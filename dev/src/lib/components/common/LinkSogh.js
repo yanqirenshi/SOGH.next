@@ -9,8 +9,17 @@ export default function LinkSogh (props) {
 
     const style = props.style;
 
+    const style_a = {
+        ...{
+            color: 'rgba(0, 0, 0, 0.87)',
+            textDecorationStyle: 'dotted',
+            textDecorationColor: '#ddd',
+        },
+        ...style,
+    };
+
     return (
-        <a href={sogh.href(to, data)} style={style}>
+        <a href={sogh.href(to, data)} style={style_a}>
           {children}
         </a>
     );
