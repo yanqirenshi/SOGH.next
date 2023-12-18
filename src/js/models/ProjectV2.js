@@ -83,8 +83,11 @@ export default class ProjectV2 extends GraphQLNode {
     public () {
         return this._core.public;
     }
-    owner () {
-        return this._core.owner;
+    owner (v) {
+        if (arguments.length===1)
+            this._owner = v;
+
+        return this._owner;
     }
     creator () {
         return this._core.creator;
