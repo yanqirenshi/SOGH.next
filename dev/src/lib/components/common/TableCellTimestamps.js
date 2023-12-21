@@ -15,8 +15,8 @@ export default function TableCellTimestamps (props) {
 
     return (
         <TableCell style={style}>
-          <S>{fmt(create)}</S>
-          <S>{fmt(update)}</S>
+          <S sx={{fontSize:12}}>{fmt(create)}</S>
+          <S sx={{fontSize:12}}>{fmt(update)}</S>
         </TableCell>
     );
 }

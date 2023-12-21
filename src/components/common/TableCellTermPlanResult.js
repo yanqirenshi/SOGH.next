@@ -15,8 +15,8 @@ export default function TableCellTermPlanResult (props) {
 
     return (
         <TableCell style={style}>
-          <S>{`${fmt(plan.start)} - ${fmt(plan.end)}`}</S>
-          <S>{`${fmt(result.start)} - ${fmt(result.end)}`}</S>
+          <S style={{fontSize:12}}>{`${fmt(plan.start)} - ${fmt(plan.end)}`}</S>
+          <S style={{fontSize:12}}>{`${fmt(result.start)} - ${fmt(result.end)}`}</S>
         </TableCell>
     );
 }

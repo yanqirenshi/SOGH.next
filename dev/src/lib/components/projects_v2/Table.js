@@ -25,7 +25,7 @@ export default function Table (props) {
 
             <TableHead>
               <TableRow>
-                <Cell colSpan="3">Project</Cell>
+                <Cell colSpan="2">Project</Cell>
                 <Cell colSpan="5">Readme Attributes</Cell>
                 <Cell rowSpan="2">Create<br/>Update</Cell>
               </TableRow>
@@ -33,7 +33,7 @@ export default function Table (props) {
               <TableRow>
                 <Cell>Number</Cell>
                 <Cell>Title</Cell>
-                <Cell>Public</Cell>
+                {/* <Cell>Public</Cell> */}
                 <Cell>Priority</Cell>
                 <Cell>Owner</Cell>
                 <Cell>Type</Cell>
@@ -62,9 +62,9 @@ export default function Table (props) {
                           <Description value={obj.shortDescription()}/>
                         </Cell>
 
-                        <Cell>
-                          {obj.public() ? '○' : '--'}
-                        </Cell>
+                        {/* <Cell> */}
+                        {/*   {obj.public() ? '○' : '--'} */}
+                        {/* </Cell> */}
 
                         <Cell>
                           {obj.priority()}
