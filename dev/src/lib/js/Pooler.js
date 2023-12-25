@@ -156,10 +156,10 @@ export default class Pooler extends Loader {
 
         return pool.ensure(node, (d)=> new model.PullRequest(d));
     }
-    issues (v) {
+    pullRequest (v) {
         return this.pool('pull-request').list();
     }
-    issue (v) {
+    pullRequest (v) {
         const pool = this.pool('pull-request');
 
         return pool.get(v);
