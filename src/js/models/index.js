@@ -8,6 +8,7 @@ import Milestone from './Milestone.js';
 import Project from './Project.js';
 import ProjectV2 from './ProjectV2.js';
 import ProjectV2Item from './ProjectV2Item.js';
+import PullRequest from './PullRequest.js';
 import Repository from './Repository.js';
 import User from './User.js';
 import Viewer from './Viewer.js';
@@ -23,6 +24,7 @@ export {
     Project,
     ProjectV2,
     ProjectV2Item,
+    PullRequest,
     Repository,
     User,
     Viewer,

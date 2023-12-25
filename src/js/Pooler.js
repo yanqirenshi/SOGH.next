@@ -18,6 +18,7 @@ export default class Pooler extends Loader {
             'project-v2-item',
             'issue',
             'issue-comment',
+            'pull-request',
         ].reduce((ht, key)=> {
             ht[key] = new Pool(this);
             return ht;
@@ -142,6 +143,24 @@ export default class Pooler extends Loader {
     }
     issueComment (v) {
         const pool = this.pool('issue-comment');
+
+        return pool.get(v);
+    }
+    /* **************************************************************** *
+     *  Issue                                                           *
+     * **************************************************************** */
+    node2pullRequest (node) {
+        const pool = this.pool('pull-request');
+
+        // this.matchmaker.user(node);
+
+        return pool.ensure(node, (d)=> new model.PullRequest(d));
+    }
+    issues (v) {
+        return this.pool('pull-request').list();
+    }
+    issue (v) {
+        const pool = this.pool('pull-request');
 
         return pool.get(v);
     }
