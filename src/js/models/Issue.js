@@ -94,8 +94,27 @@ export default class Issue extends GraphQLNode {
 
         return core.bodyHTML;
     }
+    /* **************************************************************** *
+     * Field Values
+     * **************************************************************** */
+    fieldValues () {
+        const items = this.core().projectItems.edges;
 
-    // due_date: "2021-08-31"
+        if (!items)
+            return []; // TODO: このケースある？
+
+        return items.map(edge=>edge.node.fieldValues.nodes)[0] || [];
+    }
+    getFieldValueByName (name) {
+        const field_value = this.fieldValues.find(fv=> {
+            return fv.field.name === name;
+        });
+
+        return field_value || null;
+    };
+    /* **************************************************************** *
+     * Dates
+     * **************************************************************** */
     dueDate (v) {
         const body = this.body();
 
@@ -120,7 +139,6 @@ export default class Issue extends GraphQLNode {
 
         return this.getDueDateFromBody(body);
     }
-    // date_next_action: "2021-08-24"
     nextActionDate (v) {
         const body = this.body();
 
@@ -141,7 +159,9 @@ export default class Issue extends GraphQLNode {
 
         return this.getNextActionFromBody(body);
     }
-    //
+    /* **************************************************************** *
+     * ???
+     * **************************************************************** */
     getPointResultsFromBody (body) {
         const rs = /\$Point.[R|r]esult:*\s+(\S+)\s+(\d+-\d+-\d+)\s+(([1-9]\d*|0)(\.\d+)?)/g;
         const regex = new RegExp(rs);
