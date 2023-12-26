@@ -106,7 +106,7 @@ export default class Issue extends GraphQLNode {
         return items.map(edge=>edge.node.fieldValues.nodes)[0] || [];
     }
     getFieldValueByName (name) {
-        const field_value = this.fieldValues.find(fv=> {
+        const field_value = this.fieldValues().find(fv=> {
             return fv.field.name === name;
         });
 
@@ -116,48 +116,50 @@ export default class Issue extends GraphQLNode {
      * Dates
      * **************************************************************** */
     dueDate (v) {
-        const body = this.body();
+        return this.getFieldValueByName('Due.Date');
+        // const body = this.body();
 
-        if (arguments.length===0 || this.dueDate()===v)
-            return this.getDueDateFromBody(body);
+        // if (arguments.length===0 || this.dueDate()===v)
+        //     return this.getDueDateFromBody(body);
 
-        const replacer = () => '$Date.Due ' + (v ? v : 'yyyy-mm-dd');
+        // const replacer = () => '$Date.Due ' + (v ? v : 'yyyy-mm-dd');
 
-        if (body.match(/.*[@|$]Date\.Due:*\s+.*/)) {
-            const newString = body.replace(/.*[@|$]Date\.Due:*\s+(\S+).*/, replacer);
+        // if (body.match(/.*[@|$]Date\.Due:*\s+.*/)) {
+        //     const newString = body.replace(/.*[@|$]Date\.Due:*\s+(\S+).*/, replacer);
 
-            this.body(newString);
-        } else if (body.match(/.*[@|$]Due\.Date:*\s+.*/)) {
-            const newString = body.replace(/.*[@|$]Due\.Date:*\s+(\S+).*/, replacer);
+        //     this.body(newString);
+        // } else if (body.match(/.*[@|$]Due\.Date:*\s+.*/)) {
+        //     const newString = body.replace(/.*[@|$]Due\.Date:*\s+(\S+).*/, replacer);
 
-            this.body(newString);
-        } else {
-            this.body(body + '\n$Date.Due ' + (v ? v : 'yyyy-mm-dd'));
-        }
+        //     this.body(newString);
+        // } else {
+        //     this.body(body + '\n$Date.Due ' + (v ? v : 'yyyy-mm-dd'));
+        // }
 
-        this.addAnotetionValueNew(this.core());
+        // this.addAnotetionValueNew(this.core());
 
-        return this.getDueDateFromBody(body);
+        // return this.getDueDateFromBody(body);
     }
     nextActionDate (v) {
-        const body = this.body();
+        return this.getFieldValueByName('NextAction.Date');
+        // const body = this.body();
 
-        if (arguments.length===0 || this.dueDate()===v)
-            return this.getNextActionFromBody(body);
+        // if (arguments.length===0 || this.dueDate()===v)
+        //     return this.getNextActionFromBody(body);
 
-        const replacer = () => '$Date.Next ' + (v ? v : 'yyyy-mm-dd');
+        // const replacer = () => '$Date.Next ' + (v ? v : 'yyyy-mm-dd');
 
-        if (body.match(/.*[@|$]Date\.Next:*\s+.*/)) {
-            const newString = body.replace(/.*[@|$]Date\.Next:*\s+(\S+).*/, replacer);
+        // if (body.match(/.*[@|$]Date\.Next:*\s+.*/)) {
+        //     const newString = body.replace(/.*[@|$]Date\.Next:*\s+(\S+).*/, replacer);
 
-            this.body(newString);
-        } else {
-            this.body(body + '\n$Date.Next ' + (v ? v : 'yyyy-mm-dd'));
-        }
+        //     this.body(newString);
+        // } else {
+        //     this.body(body + '\n$Date.Next ' + (v ? v : 'yyyy-mm-dd'));
+        // }
 
-        this.addAnotetionValueNew(this.core());
+        // this.addAnotetionValueNew(this.core());
 
-        return this.getNextActionFromBody(body);
+        // return this.getNextActionFromBody(body);
     }
     /* **************************************************************** *
      * ???
