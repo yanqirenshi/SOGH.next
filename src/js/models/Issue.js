@@ -116,50 +116,14 @@ export default class Issue extends GraphQLNode {
      * Dates
      * **************************************************************** */
     dueDate (v) {
-        return this.getFieldValueByName('Due.Date');
-        // const body = this.body();
+        const field_value = this.getFieldValueByName('Due.Date');
 
-        // if (arguments.length===0 || this.dueDate()===v)
-        //     return this.getDueDateFromBody(body);
-
-        // const replacer = () => '$Date.Due ' + (v ? v : 'yyyy-mm-dd');
-
-        // if (body.match(/.*[@|$]Date\.Due:*\s+.*/)) {
-        //     const newString = body.replace(/.*[@|$]Date\.Due:*\s+(\S+).*/, replacer);
-
-        //     this.body(newString);
-        // } else if (body.match(/.*[@|$]Due\.Date:*\s+.*/)) {
-        //     const newString = body.replace(/.*[@|$]Due\.Date:*\s+(\S+).*/, replacer);
-
-        //     this.body(newString);
-        // } else {
-        //     this.body(body + '\n$Date.Due ' + (v ? v : 'yyyy-mm-dd'));
-        // }
-
-        // this.addAnotetionValueNew(this.core());
-
-        // return this.getDueDateFromBody(body);
+        return field_value ? field_value.date : null;
     }
     nextActionDate (v) {
-        return this.getFieldValueByName('NextAction.Date');
-        // const body = this.body();
+        const field_value = this.getFieldValueByName('NextAction.Date');
 
-        // if (arguments.length===0 || this.dueDate()===v)
-        //     return this.getNextActionFromBody(body);
-
-        // const replacer = () => '$Date.Next ' + (v ? v : 'yyyy-mm-dd');
-
-        // if (body.match(/.*[@|$]Date\.Next:*\s+.*/)) {
-        //     const newString = body.replace(/.*[@|$]Date\.Next:*\s+(\S+).*/, replacer);
-
-        //     this.body(newString);
-        // } else {
-        //     this.body(body + '\n$Date.Next ' + (v ? v : 'yyyy-mm-dd'));
-        // }
-
-        // this.addAnotetionValueNew(this.core());
-
-        // return this.getNextActionFromBody(body);
+        return field_value ? field_value.date : null;
     }
     /* **************************************************************** *
      * ???
