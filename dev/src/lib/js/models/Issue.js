@@ -36,17 +36,8 @@ export default class Issue extends GraphQLNode {
     url () {
         return this._core.url || null;
     }
-    closedAt () {
-        return this._core.closedAt || null;
-    }
     milestone () {
         return this._core.milestone || null;
-    }
-    projectCards () {
-        if (!this._core.projectCards)
-            return [];
-
-        return this._core.projectCards.nodes;
     }
     assignees () {
         if (!this._core.assignees)
@@ -60,9 +51,39 @@ export default class Issue extends GraphQLNode {
 
         return this._core.labels.nodes;
     }
+    /* ****************************************************************
+     *  Owner
+     * **************************************************************** */
     owner () {
         return this._owner || null;
     }
+    getOwnerFromBody (body) {
+        const owner = /.*\$[O|o]wner:*\s+(\S+).*/.exec(body);
+        return owner ? owner[1] : null;
+    }
+    /* **************************************************************** *
+     * Timestamps
+     * **************************************************************** */
+    closedAt () {
+        return this._core.closedAt || null;
+    }
+    /* **************************************************************** *
+     *  Project
+     * **************************************************************** */
+    project () {
+        const field_Item = this.fieldItem ();
+
+        return field_Item ? field_Item.project : null;
+    }
+    /* **************************************************************** *
+     *  Repository
+     * **************************************************************** */
+    repository () {
+        return this.core().repository;
+    }
+    /* **************************************************************** *
+     *  Points
+     * **************************************************************** */
     points () {
         return this._points || null;
     }
@@ -79,69 +100,6 @@ export default class Issue extends GraphQLNode {
 
         return points.results.total;
     }
-    body (v) {
-        const core = this.core();
-
-        if (arguments.length===0)
-            return core.body || null;
-
-        core.body = v || '';
-
-        return core.body;
-    }
-    bodyHTML () {
-        const core = this.core();
-
-        return core.bodyHTML;
-    }
-
-    // due_date: "2021-08-31"
-    dueDate (v) {
-        const body = this.body();
-
-        if (arguments.length===0 || this.dueDate()===v)
-            return this.getDueDateFromBody(body);
-
-        const replacer = () => '$Date.Due ' + (v ? v : 'yyyy-mm-dd');
-
-        if (body.match(/.*[@|$]Date\.Due:*\s+.*/)) {
-            const newString = body.replace(/.*[@|$]Date\.Due:*\s+(\S+).*/, replacer);
-
-            this.body(newString);
-        } else if (body.match(/.*[@|$]Due\.Date:*\s+.*/)) {
-            const newString = body.replace(/.*[@|$]Due\.Date:*\s+(\S+).*/, replacer);
-
-            this.body(newString);
-        } else {
-            this.body(body + '\n$Date.Due ' + (v ? v : 'yyyy-mm-dd'));
-        }
-
-        this.addAnotetionValueNew(this.core());
-
-        return this.getDueDateFromBody(body);
-    }
-    // date_next_action: "2021-08-24"
-    nextActionDate (v) {
-        const body = this.body();
-
-        if (arguments.length===0 || this.dueDate()===v)
-            return this.getNextActionFromBody(body);
-
-        const replacer = () => '$Date.Next ' + (v ? v : 'yyyy-mm-dd');
-
-        if (body.match(/.*[@|$]Date\.Next:*\s+.*/)) {
-            const newString = body.replace(/.*[@|$]Date\.Next:*\s+(\S+).*/, replacer);
-
-            this.body(newString);
-        } else {
-            this.body(body + '\n$Date.Next ' + (v ? v : 'yyyy-mm-dd'));
-        }
-
-        this.addAnotetionValueNew(this.core());
-
-        return this.getNextActionFromBody(body);
-    }
-    //
     getPointResultsFromBody (body) {
         const rs = /\$Point.[R|r]esult:*\s+(\S+)\s+(\d+-\d+-\d+)\s+(([1-9]\d*|0)(\.\d+)?)/g;
         const regex = new RegExp(rs);
@@ -193,6 +151,66 @@ export default class Issue extends GraphQLNode {
             results : results,
         };
     }
+    /* **************************************************************** *
+     *  Body
+     * **************************************************************** */
+    body (v) {
+        const core = this.core();
+
+        if (arguments.length===0)
+            return core.body || null;
+
+        core.body = v || '';
+
+        return core.body;
+    }
+    bodyHTML () {
+        const core = this.core();
+
+        return core.bodyHTML;
+    }
+    /* **************************************************************** *
+     *  Field Values
+     * **************************************************************** */
+    fieldItem () {
+        const x = this.core().projectItems.edges;
+
+        if (!x[0])
+            return null;
+
+        return x[0].node;
+    }
+    fieldValues () {
+        const items = this.core().projectItems.edges;
+
+        if (!items)
+            return []; // TODO: このケースある？
+
+        return items.map(edge=>edge.node.fieldValues.nodes)[0] || [];
+    }
+    getFieldValueByName (name) {
+        if (!name)
+            return null;
+
+        const field_value = this.fieldValues().find(fv=> {
+            return fv.field.name === name;
+        });
+
+        return field_value || null;
+    };
+    /* **************************************************************** *
+     *  Dates
+     * **************************************************************** */
+    dueDate (v) {
+        const field_value = this.getFieldValueByName('Due.Date');
+
+        return field_value ? field_value.date : null;
+    }
+    nextActionDate (v) {
+        const field_value = this.getFieldValueByName('NextAction.Date');
+
+        return field_value ? field_value.date : null;
+    }
     getDueDateFromBody (body) {
         const a = /.*[@|$]Date\.Due:*\s+(\d+-\d+-\d+).*/.exec(body);
 
@@ -208,10 +226,9 @@ export default class Issue extends GraphQLNode {
         const next_action = /.*[@|$]Date\.Next:*\s+(\d+-\d+-\d+).*/.exec(body);
         return next_action ? next_action[1] : null;;
     }
-    getOwnerFromBody (body) {
-        const owner = /.*\$[O|o]wner:*\s+(\S+).*/.exec(body);
-        return owner ? owner[1] : null;
-    }
+    /* **************************************************************** *
+     * ???
+     * **************************************************************** */
     addAnotetionValue (issue) {
         const body = issue.body();
 
@@ -286,9 +303,15 @@ export default class Issue extends GraphQLNode {
             assigneeIds:  ids(data.assignees),
         };
     }
-    /** ****************************************************************
-     *
+    /* ****************************************************************
+     * Project (Classic)
      * **************************************************************** */
+    projectCards () {
+        if (!this._core.projectCards)
+            return [];
+
+        return this._core.projectCards.nodes;
+    }
     getColumnFirst () {
         const cards = this.projectCards();
 
