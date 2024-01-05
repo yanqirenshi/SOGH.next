@@ -27,16 +27,16 @@ export default function Table (props) {
               <TableRow>
                 <Cell colSpan="2">Project</Cell>
                 <Cell colSpan="5">Readme Attributes</Cell>
-                <Cell rowSpan="2">Create<br/>Update</Cell>
+                {/* <Cell rowSpan="2">Create<br/>Update</Cell> */}
               </TableRow>
 
               <TableRow>
                 <Cell>Number</Cell>
                 <Cell>Title</Cell>
                 {/* <Cell>Public</Cell> */}
+                <Cell>Type</Cell>
                 <Cell>Priority</Cell>
                 <Cell>Owner</Cell>
-                <Cell>Type</Cell>
                 <Cell>Release</Cell>
                 <Cell>Terms</Cell>
               </TableRow>
@@ -66,17 +66,18 @@ export default function Table (props) {
                         {/*   {obj.public() ? '○' : '--'} */}
                         {/* </Cell> */}
 
+                        <Cell sx={{wordBreak: 'keep-all'}}>
+                          {obj.type()}
+                        </Cell>
+
                         <Cell>
                           {obj.priority()}
                         </Cell>
 
-                        <Cell>
+                        <Cell sx={{wordBreak: 'keep-all'}}>
                           {obj.maneger()}
                         </Cell>
 
-                        <Cell>
-                          {obj.type()}
-                        </Cell>
 
                         <Cell>
                           {obj.release()}
@@ -85,8 +86,8 @@ export default function Table (props) {
                         <CellTermPlanResult plan={obj.plan()}
                                             result={obj.result()}/>
 
-                        <CellTimestamps create={obj.createdAt()}
-                                        update={obj.updatedAt()}/>
+                        {/* <CellTimestamps create={obj.createdAt()} */}
+                        {/*                 update={obj.updatedAt()}/> */}
                       </TableRow>
                   );
               })}
