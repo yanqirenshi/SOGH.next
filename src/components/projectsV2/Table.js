@@ -18,6 +18,7 @@ import CellTermPlanResult from '../common/TableCellTermPlanResult.js';
 export default function Table (props) {
     const data = props.data;
     const sogh = props.sogh;
+    const actions = props.actions;
 
     return (
         <TableContainer component={Paper}>
@@ -27,37 +28,39 @@ export default function Table (props) {
               <TableRow>
                 <Cell colSpan="2">Project</Cell>
                 <Cell colSpan="5">Readme Attributes</Cell>
-                {/* <Cell rowSpan="2">Create<br/>Update</Cell> */}
+                <Cell rowSpan="2">Create<br/>Update</Cell>
               </TableRow>
 
               <TableRow>
                 <Cell>Number</Cell>
                 <Cell>Title</Cell>
                 {/* <Cell>Public</Cell> */}
-                <Cell>Type</Cell>
                 <Cell>Priority</Cell>
                 <Cell>Owner</Cell>
+                <Cell>Type</Cell>
                 <Cell>Release</Cell>
                 <Cell>Terms</Cell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {data.map((id) => {
-                  const obj = sogh.projectV2(id);
+              {data.map((project) => {
+                  const obj = project;
 
                   return (
-                      <TableRow key={id}
+                      <TableRow key={project.id()}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <CellLinkGithub data={obj}/>
 
                         <Cell>
-                          <S>
-                            <LinkSogh to="project-v2"
-                                      data={obj}
-                                      sogh={sogh}>
-                              {obj.title()}
-                            </LinkSogh>
+                          <S sx={{
+                              color: 'rgba(0, 0, 0, 0.87)',
+                              textDecorationStyle: 'dotted',
+                              textDecorationColor: '#ddd',
+                              cursor: 'pointer',
+                          }}
+                             onClick={()=> actions.title.click(project.id())}>
+                            {obj.title()}
                           </S>
                           <Description value={obj.shortDescription()}/>
                         </Cell>
@@ -66,18 +69,17 @@ export default function Table (props) {
                         {/*   {obj.public() ? '○' : '--'} */}
                         {/* </Cell> */}
 
-                        <Cell sx={{wordBreak: 'keep-all'}}>
-                          {obj.type()}
-                        </Cell>
-
                         <Cell>
                           {obj.priority()}
                         </Cell>
 
-                        <Cell sx={{wordBreak: 'keep-all'}}>
+                        <Cell>
                           {obj.maneger()}
                         </Cell>
 
+                        <Cell>
+                          {obj.type()}
+                        </Cell>
 
                         <Cell>
                           {obj.release()}
@@ -86,8 +88,8 @@ export default function Table (props) {
                         <CellTermPlanResult plan={obj.plan()}
                                             result={obj.result()}/>
 
-                        {/* <CellTimestamps create={obj.createdAt()} */}
-                        {/*                 update={obj.updatedAt()}/> */}
+                        <CellTimestamps create={obj.createdAt()}
+                                        update={obj.updatedAt()}/>
                       </TableRow>
                   );
               })}

@@ -15,6 +15,7 @@ export { default as project_by_id } from './project_by_id.js';
 export { default as projects_by_repository } from './projects_by_repository.js';
 export { default as projects_next_by_id } from './projects_next_by_id.js';
 export { default as projects_next_items_by_id } from './projects_next_items_by_id.js';
+export { default as projectsv2_by_team } from './projectsv2_by_team.js';
 export { default as projectsv2_by_user } from './projectsv2_by_user.js';
 export { default as projectsv2_items_by_projects_v2 } from './projectsv2_items_by_projects_v2.js';
 export { default as projectv2_by_user_login_projectv2_number } from './projectv2_by_user_login_projectv2_number.js';
