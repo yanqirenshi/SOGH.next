@@ -45,3 +45,9 @@ export const PROJECTSV2 = recoil.selectorFamily({
         return await sogh.asyncFetchProjectsV2ByViewer();
     },
 });
+
+
+export const STATUS_FETCH_PROJECTSV2 = recoil.atom({
+    key: 'PAGE_SCRUM_STATUS_FETCH_PROJECTSV2',
+    default: null,
+});

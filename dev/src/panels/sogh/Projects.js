@@ -1,9 +1,11 @@
+import React from 'react';
+
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 
 import {ProjectsV2} from '../../lib/index.js';
 
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import { GITHUB_AUTH } from '../../recoil/GITHUB.js';
 import * as atoms from '../../recoil/PAGE_SCRUM.js';
 
@@ -12,7 +14,25 @@ import sogh from '../../manegers/sogh.js';
 export default function Projects () {
     const authed = useRecoilValue(GITHUB_AUTH);
 
+    const [state_fetch, setStateFetch] = useRecoilState(atoms.STATUS_FETCH_PROJECTSV2);
+
     const projects = useRecoilValue(atoms.PROJECTSV2(authed));
+
+    React.useEffect(()=> {
+        if (state_fetch===null)
+            sogh.asyncFetchProjectsV2ByTeam(
+                process.env.REACT_APP_GITHU_TEAM_ID,
+                {
+                    start:     ()=> setStateFetch('STARTED'),
+                    fetched:   (projects)=> console.log(projects),
+                    successed: (projects)=> {
+                        console.log(projects);
+                        setStateFetch('SUCCESSED');
+                    },
+                    failed:    ()=> setStateFetch('FAILED'),
+                },
+            );
+    }, []);
 
     return (
         <Box sx={{ p:2, overflow: 'auto', height: '100%' }}>
