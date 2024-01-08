@@ -91,6 +91,23 @@ export default class ProjectV2Item extends GraphQLNode {
     /* ****************************************************************
      *  Plan
      * ****************************************************************/
+    planStart () {
+        const value = this.getFieldValueByName('Plan.Start');
+        return value ? value.date : null;
+    }
+    planEnd () {
+        const value = this.getFieldValueByName('Plan.End');
+        return value ? value.date : null;
+    }
+    planTerm () {
+        const start = this.planStart();
+        const end   = this.planEnd();
+
+        if ((!start || !end) || start>end)
+            return null;
+
+        return { start: start, end: end };
+    }
     planPoints () {
         const field_value = this.getFieldValueByName('Plan.Points');
         return field_value ? field_value.text : null;
