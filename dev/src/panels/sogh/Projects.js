@@ -16,7 +16,7 @@ export default function Projects () {
 
     const [state_fetch, setStateFetch] = useRecoilState(atoms.STATUS_FETCH_PROJECTSV2);
 
-    const projects = useRecoilValue(atoms.PROJECTSV2(authed));
+    const projects = sogh.projectsV2();
 
     React.useEffect(()=> {
         if (state_fetch===null)
@@ -24,11 +24,8 @@ export default function Projects () {
                 process.env.REACT_APP_GITHU_TEAM_ID,
                 {
                     start:     ()=> setStateFetch('STARTED'),
-                    fetched:   (projects)=> console.log(projects),
-                    successed: (projects)=> {
-                        console.log(projects);
-                        setStateFetch('SUCCESSED');
-                    },
+                    fetched:   ()=> setStateFetch('FETCHED-' + new Date().toISOString()),
+                    successed: ()=> setStateFetch('SUCCESSED'),
                     failed:    ()=> setStateFetch('FAILED'),
                 },
             );
@@ -37,7 +34,13 @@ export default function Projects () {
     return (
         <Box sx={{ p:2, overflow: 'auto', height: '100%' }}>
           <Container maxWidth="lg">
-            <ProjectsV2 data={projects} sogh={sogh}/>
+            <ProjectsV2 data={projects}
+                        sogh={sogh}
+                        actions={{
+                            title: {
+                                click: (project_id)=> console.log(project_id),
+                            },
+                        }}/>
           </Container>
         </Box>
     );

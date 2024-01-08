@@ -521,7 +521,7 @@ export default class Sogh extends Pooler {
             // concat out
             out = out.concat(projects);
 
-            if (callbacks.fetched) callbacks.fetched(projects);
+            if (callbacks.fetched) callbacks.fetched(projects, out);
 
             // paging
             const page_info = response.data.pageInfo;

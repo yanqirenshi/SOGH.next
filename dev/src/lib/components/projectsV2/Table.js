@@ -18,6 +18,7 @@ import CellTermPlanResult from '../common/TableCellTermPlanResult.js';
 export default function Table (props) {
     const data = props.data;
     const sogh = props.sogh;
+    const actions = props.actions;
 
     return (
         <TableContainer component={Paper}>
@@ -43,21 +44,23 @@ export default function Table (props) {
             </TableHead>
 
             <TableBody>
-              {data.map((id) => {
-                  const obj = sogh.projectV2(id);
+              {data.map((project) => {
+                  const obj = project;
 
                   return (
-                      <TableRow key={id}
+                      <TableRow key={project.id()}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <CellLinkGithub data={obj}/>
 
                         <Cell>
-                          <S>
-                            <LinkSogh to="project-v2"
-                                      data={obj}
-                                      sogh={sogh}>
-                              {obj.title()}
-                            </LinkSogh>
+                          <S sx={{
+                              color: 'rgba(0, 0, 0, 0.87)',
+                              textDecorationStyle: 'dotted',
+                              textDecorationColor: '#ddd',
+                              cursor: 'pointer',
+                          }}
+                             onClick={()=> actions.title.click(project.id())}>
+                            {obj.title()}
                           </S>
                           <Description value={obj.shortDescription()}/>
                         </Cell>
