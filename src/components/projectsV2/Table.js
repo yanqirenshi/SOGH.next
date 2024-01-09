@@ -26,20 +26,14 @@ export default function Table (props) {
 
             <TableHead>
               <TableRow>
-                <Cell colSpan="2">Project</Cell>
-                <Cell colSpan="5">Readme Attributes</Cell>
-                {/* <Cell rowSpan="2">Create<br/>Update</Cell> */}
-              </TableRow>
-
-              <TableRow>
                 <Cell>Number</Cell>
+                <Cell>Type</Cell>
                 <Cell>Title</Cell>
                 {/* <Cell>Public</Cell> */}
-                <Cell>Type</Cell>
                 <Cell>Priority</Cell>
                 <Cell>Owner</Cell>
                 <Cell>Release</Cell>
-                <Cell>Terms</Cell>
+                <Cell>Plan/Result</Cell>
               </TableRow>
             </TableHead>
 
@@ -51,6 +45,10 @@ export default function Table (props) {
                       <TableRow key={project.id()}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <CellLinkGithub data={obj}/>
+
+                        <Cell sx={{wordBreak: 'keep-all'}}>
+                          {obj.type()}
+                        </Cell>
 
                         <Cell>
                           <S sx={{
@@ -68,10 +66,6 @@ export default function Table (props) {
                         {/* <Cell> */}
                         {/*   {obj.public() ? '○' : '--'} */}
                         {/* </Cell> */}
-
-                        <Cell sx={{wordBreak: 'keep-all'}}>
-                          {obj.type()}
-                        </Cell>
 
                         <Cell>
                           {obj.priority()}
