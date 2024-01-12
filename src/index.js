@@ -5,6 +5,7 @@ import Repositories from './components/Repositories.js';
 import ProjectV2 from './components/ProjectV2.js';
 import PanelIssue from './components/Issue.js';
 import PanelIssueComments from './components/IssueComments.js';
+import TableProjectV2Items from './components/common/TableProjectV2Items.js';
 
 import Sogh from './js/Sogh.js';
 
@@ -28,6 +29,7 @@ export {
     Repositories,
     PanelIssue,
     PanelIssueComments,
+    TableProjectV2Items,
 }
 
 export {
