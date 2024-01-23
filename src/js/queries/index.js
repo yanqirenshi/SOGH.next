@@ -19,6 +19,7 @@ export { default as projectsv2_by_team } from './projectsv2_by_team.js';
 export { default as projectsv2_by_user } from './projectsv2_by_user.js';
 export { default as projectsv2_items_by_projects_v2 } from './projectsv2_items_by_projects_v2.js';
 export { default as projectv2_by_user_login_projectv2_number } from './projectv2_by_user_login_projectv2_number.js';
+export { default as projectv2_by_org_login_projectv2_number } from './projectv2_by_org_login_projectv2_number.js';
 export { default as projectv2item_by_id } from './projectv2item_by_id.js';
 export { default as projectv2items_by_user_login_projectv2_number } from './projectv2items_by_user_login_projectv2_number.js';
 export { default as repositories_by_viewer } from './repositories_by_viewer.js';

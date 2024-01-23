@@ -25,10 +25,6 @@ export default class Pool {
     }
     ensure (node, makeInstance) {
         let obj = this.get(node.id);
-        console.log('----');
-        console.log(node.number===50);
-        console.log(node);
-        console.log(obj);
 
         if (obj) {
             obj.core(node);

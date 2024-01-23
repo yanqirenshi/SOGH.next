@@ -9,7 +9,10 @@ export default class GraphQLNode {
 
         return this._sogh;
     }
-    core () {
+    core (v) {
+        if (arguments.length===1)
+            this._core = v || null;
+
         return this._core;
     }
     id () {
