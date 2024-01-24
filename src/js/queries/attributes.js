@@ -516,24 +516,15 @@ export function projectV2Items (MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM) {
 
      content {
        ... on DraftIssue  {
-         id
-         title
+         ${projectV2ItemContentDraftIssue()}
        }
        ... on Issue       {
-         id
-         url
-         number
-         title
+         ${projectV2ItemContentIssue()}
        }
        ... on PullRequest {
-         id
-         number
-         url
-         title
+         ${projectV2ItemContentPullRequest()}
        }
      }
-
-
    }
  }
 `;
