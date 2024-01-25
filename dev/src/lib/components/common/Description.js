@@ -10,7 +10,8 @@ export default function Description (props) {
 
     return value.split('\n').map((line,i)=> {
         return (
-            <S key={i}>
+            <S key={i}
+               sx={{wordBreak: 'break-all'}}>
               {line}
               <br/>
             </S>

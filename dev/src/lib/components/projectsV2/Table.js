@@ -62,12 +62,13 @@ export default function Table (props) {
                           {obj.type()}
                         </Cell>
 
-                        <Cell sx={{maxWidth: 333}}>
+                        <Cell>
                           <S sx={{
                               color: 'rgba(0, 0, 0, 0.87)',
                               textDecorationStyle: 'dotted',
                               textDecorationColor: '#ddd',
                               cursor: 'pointer',
+
                           }}
                              onClick={()=> actions.title.click(project.id())}>
                             {obj.title()}
@@ -83,27 +84,27 @@ export default function Table (props) {
                           {obj.priority()}
                         </Cell>
 
-                        <Cell sx={{wordBreak: 'keep-all'}}>
+                        <Cell sx={{whiteSpace: 'nowrap'}}>
                           {obj.maneger()}
                         </Cell>
 
-                        <Cell sx={{wordBreak: 'keep-all'}}>
+                        <Cell sx={{whiteSpace: 'nowrap'}}>
                           {obj.release()}
                         </Cell>
 
-                        <Cell sx={{wordBreak: 'keep-all'}} title={plan.start}>
+                        <Cell sx={{whiteSpace: 'nowrap'}} title={plan.start}>
                           {dt(plan.start)}
                         </Cell>
 
-                        <Cell sx={{wordBreak: 'keep-all'}} title={plan.end}>
+                        <Cell sx={{whiteSpace: 'nowrap'}} title={plan.end}>
                           {dt(plan.end)}
                         </Cell>
 
-                        <Cell sx={{wordBreak: 'keep-all'}} title={result.start}>
+                        <Cell sx={{whiteSpace: 'nowrap'}} title={result.start}>
                           {dt(result.start)}
                         </Cell>
 
-                        <Cell sx={{wordBreak: 'keep-all'}} title={result.end}>
+                        <Cell sx={{whiteSpace: 'nowrap'}} title={result.end}>
                           {dt(result.end)}
                         </Cell>
 
