@@ -515,25 +515,10 @@ export function projectV2Items (MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM) {
      creator ${projectV2FieldValue_Creator()}
 
      content {
-       ... on DraftIssue  {
-         id
-         title
-       }
-       ... on Issue       {
-         id
-         url
-         number
-         title
-       }
-       ... on PullRequest {
-         id
-         number
-         url
-         title
-       }
+       ... on DraftIssue  ${projectV2ItemContentDraftIssue()}
+       ... on Issue       ${projectV2ItemContentIssue()}
+       ... on PullRequest ${projectV2ItemContentPullRequest()}
      }
-
-
    }
  }
 `;

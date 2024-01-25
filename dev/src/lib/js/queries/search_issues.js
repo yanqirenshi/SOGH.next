@@ -1,69 +1,56 @@
+import * as attr from './attributes.js';
+
+const MAX_FIELD_NUM = 30;
+const MAX_LABEL_NUM = 30;
+const MAX_PR_NUM = 30;
+
 const query = `{
   search(query: "@QUERY", type: ISSUE, first: 100) {
     edges {
       node {
         ... on Issue {
-          id
-          url
-          title
-          createdAt
-          closedAt
-          updatedAt
-          number
-          body
-          projectCards(first: 1) {
-            nodes {
-              id
-              url
-              note
-              state
-              column {
-                id
-                name
-                project {
-                  id
-                  number
-                  name
-                  body
-                  url
-                  createdAt
-                  updatedAt
-                  closedAt
-                }
-              }
-            }
+          ${attr.issue()}
+
+          repository {
+            ${attr.repositories()}
           }
+
           milestone {
-            id
-            url
-            title
-            state
-            number
-            dueOn
+            ${attr.milestone()}
           }
+
           assignees(first: 10) {
             nodes {
-              email
-              id
-              name
-              login
-              url
+              ${attr.user()}
             }
           }
+
           labels(first: 10) {
             nodes {
-              color
-              id
-              name
-              url
+              ${attr.label()}
+            }
+          }
+
+          projectItems (first:1) {
+            ${attr.projectV2Items(MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM)}
+          }
+
+          projectCards(first: 1) {
+            nodes {
+              ${attr.project_card()}
+              column {
+                ${attr.project_column()}
+                project {
+                  ${attr.project()}
+                }
+              }
             }
           }
         }
       }
     }
     pageInfo {
-      endCursor
-      hasNextPage
+      ${attr.page_info()}
     }
   }
 }`;
