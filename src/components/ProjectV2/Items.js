@@ -7,8 +7,10 @@ import TableProjectV2Items from '../common/TableProjectV2Items.js';
 
 export default function Items (props) {
     const items = props.items;
-
+    console.log('----------------');
+    console.log(items);
     const x = items.reduce((ht,item)=> {
+        console.log(item.status());
         if (!ht[item.status()])
             ht[item.status()] = [];
 
