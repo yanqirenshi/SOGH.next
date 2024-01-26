@@ -9,17 +9,32 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import S from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 
 import LinkSogh from '../common/LinkSogh.js';
 import Description from '../common/Description.js';
 import CellLinkGithub from '../common/TableCellLinkGithub.js';
 import CellTimestamps from '../common/TableCellTimestamps.js';
 import CellTermPlanResult from '../common/TableCellTermPlanResult.js';
+import TableBodyRow from './TableBodyRow.js';
+import TableBodyRowTasks from './TableBodyRowTasks.js';
 
 export default function Table (props) {
     const data = props.data;
     const sogh = props.sogh;
     const actions = props.actions;
+
+    const [open_tasks_projects, setOpenTasksProjects] = React.useState({});
+
+    const onChangeOpenTaskProject = (id)=> {
+        const new_state = {...open_tasks_projects};
+        if (new_state[id]===true)
+            new_state[id] = false;
+        else
+            new_state[id] = true;
+
+        setOpenTasksProjects(new_state);
+    };
 
     return (
         <TableContainer component={Paper}>
@@ -33,9 +48,10 @@ export default function Table (props) {
                 {/* <HeadCell rowSpan="2">Public</HeadCell> */}
                 <HeadCell rowSpan="2">Priority</HeadCell>
                 <HeadCell rowSpan="2">Owner</HeadCell>
-                <HeadCell rowSpan="2">Release</HeadCell>
+                {/* <HeadCell rowSpan="2">Release</HeadCell> */}
                 <HeadCell colSpan="2">Plan</HeadCell>
                 <HeadCell colSpan="2">Result</HeadCell>
+                <HeadCell rowSpan="2">Task</HeadCell>
               </TableRow>
 
               <TableRow>
@@ -48,72 +64,19 @@ export default function Table (props) {
 
             <TableBody>
               {data.map((project) => {
-                  const obj = project;
-
-                  const plan = obj.plan();
-                  const result = obj.result();
+                  const project_id = project.id();
+                  const is_open = open_tasks_projects[project_id];
 
                   return (
-                      <TableRow key={project.id()}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                        <CellLinkGithub data={obj}/>
-
-                        <Cell sx={{wordBreak: 'keep-all'}}>
-                          {obj.type()}
-                        </Cell>
-
-                        <Cell>
-                          <S sx={{
-                              color: 'rgba(0, 0, 0, 0.87)',
-                              textDecorationStyle: 'dotted',
-                              textDecorationColor: '#ddd',
-                              cursor: 'pointer',
-
-                          }}
-                             onClick={()=> actions.title.click(project.id())}>
-                            {obj.title()}
-                          </S>
-                          <Description value={obj.shortDescription()}/>
-                        </Cell>
-
-                        {/* <Cell> */}
-                        {/*   {obj.public() ? '○' : '--'} */}
-                        {/* </Cell> */}
-
-                        <Cell>
-                          {obj.priority()}
-                        </Cell>
-
-                        <Cell sx={{whiteSpace: 'nowrap'}}>
-                          {obj.maneger()}
-                        </Cell>
-
-                        <Cell sx={{whiteSpace: 'nowrap'}}>
-                          {obj.release()}
-                        </Cell>
-
-                        <Cell sx={{whiteSpace: 'nowrap'}} title={plan.start}>
-                          {dt(plan.start)}
-                        </Cell>
-
-                        <Cell sx={{whiteSpace: 'nowrap'}} title={plan.end}>
-                          {dt(plan.end)}
-                        </Cell>
-
-                        <Cell sx={{whiteSpace: 'nowrap'}} title={result.start}>
-                          {dt(result.start)}
-                        </Cell>
-
-                        <Cell sx={{whiteSpace: 'nowrap'}} title={result.end}>
-                          {dt(result.end)}
-                        </Cell>
-
-                        {/* <CellTermPlanResult plan={obj.plan()} */}
-                        {/*                     result={obj.result()}/> */}
-
-                        {/* <CellTimestamps create={obj.createdAt()} */}
-                        {/*                 update={obj.updatedAt()}/> */}
-                      </TableRow>
+                      <>
+                        <TableBodyRow key={project_id}
+                                      project={project}
+                                      actions={actions}
+                                      opened={is_open}
+                                      onChange={onChangeOpenTaskProject}/>
+                        {is_open &&
+                         <TableBodyRowTasks project={project}/>}
+                      </>
                   );
               })}
             </TableBody>
@@ -121,13 +84,6 @@ export default function Table (props) {
           </MTable>
         </TableContainer>
     );
-}
-
-function dt (v) {
-    if (!v)
-        return '?';
-
-    return moment(v).format('MM-DD');
 }
 
 function HeadCell (props) {

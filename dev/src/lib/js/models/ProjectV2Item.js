@@ -61,7 +61,7 @@ export default class ProjectV2Item extends GraphQLNode {
     labels () {
         const field_value = this.getFieldValueByName('Labels');
 
-        return field_value ? field_value.date : [];
+        return field_value ? field_value.labels.nodes : [];
     }
     linkedPullRequests () {
         const field_value = this.getFieldValueByName('Linked pull requests');

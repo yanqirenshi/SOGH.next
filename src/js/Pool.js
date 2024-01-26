@@ -33,6 +33,8 @@ export default class Pool {
             this.add(obj);
         }
 
+        obj.sogh(this._sogh);
+
         return obj;
     }
 }

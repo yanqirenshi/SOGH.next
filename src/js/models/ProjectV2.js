@@ -92,6 +92,24 @@ export default class ProjectV2 extends GraphQLNode {
     creator () {
         return this._core.creator;
     }
+    items () {
+        const data = this.core().items;
+
+        if (!data)
+            return [];
+
+        const nodes = data.edges.map(edge=> edge.node);
+
+        return nodes;
+    }
+    itemsWith2ProjectV2Item () {
+        const sogh = this.sogh();
+
+        if (!sogh)
+            return [];
+
+        return this.items().map(d=> sogh.node2projectV2Item(d));
+    }
     /////
     ///// README Attributes
     /////
