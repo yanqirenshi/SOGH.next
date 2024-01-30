@@ -1,6 +1,6 @@
 {
     "name": "sogh",
-    "version": "0.1.40",
+    "version": "0.1.41",
     "description": "Scram on Github",
     "main": "dist/index.js",
     "scripts": {

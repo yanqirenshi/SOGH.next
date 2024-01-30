@@ -49,7 +49,7 @@ export default function TableBodyRow (props) {
           {/*   {obj.public() ? '○' : '--'} */}
           {/* </Cell> */}
 
-          <Cell>
+          <Cell sx={{whiteSpace: 'nowrap'}}>
             {priority(obj.priority())}
           </Cell>
 
