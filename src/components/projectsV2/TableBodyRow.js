@@ -42,7 +42,7 @@ export default function TableBodyRow (props) {
                onClick={()=> actions.title.click(project.id())}>
               {obj.title()}
             </S>
-            <Description value={obj.shortDescription()}/>
+            {/* <Description value={obj.shortDescription()}/> */}
           </Cell>
 
           {/* <Cell> */}
@@ -50,7 +50,7 @@ export default function TableBodyRow (props) {
           {/* </Cell> */}
 
           <Cell>
-            {obj.priority()}
+            {priority(obj.priority())}
           </Cell>
 
           <Cell sx={{whiteSpace: 'nowrap'}}>
@@ -100,4 +100,21 @@ function dt (v) {
         return '?';
 
     return moment(v).format('MM-DD');
+}
+
+function priority (v) {
+    const table = {
+        's': '緊急',
+        'h': '高',
+        'n': '普通',
+        'l': '低',
+        '?': 'なぞ',
+    };
+
+    const label = table[v] || null;
+
+    if (!label)
+        return v;
+
+    return `${label} (${v})`;
 }
