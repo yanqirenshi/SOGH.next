@@ -50,7 +50,7 @@ export default function Issue (props) {
               {issue.assignees().map(assignee=> {
                   return (
                       <Box key={assignee.id}>
-                        <Link href={milestone.url}>
+                        <Link href={assignee.url}>
                           <img width="17px" height="17px"
                                src={assignee.avatarUrl}/>
                         </Link>
