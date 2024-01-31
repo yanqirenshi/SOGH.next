@@ -27,7 +27,9 @@ export default function IssueComments (props) {
                       <Box sx={{mb:0.5, pl:0.5, display:'flex'}}>
                         <UserName user={author}/>
                         <S sx={{ml:3}}>
-                          {dt.toFormat('yyyy-MM-dd EEE HH:mm:ss')}
+                          <Link href={comment.url()}>
+                            {dt.toFormat('yyyy-MM-dd EEE HH:mm:ss')}
+                          </Link>
                         </S>
                       </Box>
 

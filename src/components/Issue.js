@@ -46,7 +46,7 @@ export default function Issue (props) {
                </S>
              </Box>}
 
-            <Box sx={{m:1}}>
+            <Box sx={{m:1, display: 'flex'}}>
               {issue.assignees().map(assignee=> {
                   return (
                       <Box key={assignee.id}>
@@ -60,7 +60,7 @@ export default function Issue (props) {
               })}
             </Box>
 
-            <Box sx={{m:1}}>
+            <Box sx={{m:1, display: 'flex'}}>
               {issue.labels().map(label=> <Label key={label.id} value={label}/>)}
             </Box>
           </Box>
