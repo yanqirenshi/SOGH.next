@@ -28,7 +28,10 @@ export default class ProjectV2 extends GraphQLNode {
             type: /.*\$[T|t]ype:\s+(\S+).*/,
             release: /.*\$[R|r]elease:\s+(\S+).*/,
             plan: /.*\$[P|p]lan:\s+(\d+-\d+-\d+)\s+(\d+-\d+-\d+).*/,
-            result: /.*\$[R|r]esult:\s+(\d+-\d+-\d+)\s+(\d+-\d+-\d+).*/,
+            result: [
+                /.*\$[R|r]esult:\s+(\d+-\d+-\d+)\s+(\d+-\d+-\d+).*/,
+                /.*\$[R|r]esult:\s+(\d+-\d+-\d+).*/,
+            ],
             // cost: /.*\$[C|c]ost:\s+(\S+).*/,
             // scope: /.*\$[S|s]cope:\s+(\S+).*/,
             // estimate: /.*\$[E|c]stimate:\s+(\S+).*/,
@@ -38,25 +41,46 @@ export default class ProjectV2 extends GraphQLNode {
             // phase: /.*\$[P|p]hase:\s+(\S+).*/,
         };
     }
+    parseReadmeItem (readme, regex) {
+        const ret = regex.exec(readme);
+
+        return ret ? ret[1] : null;
+    }
+    parseReadmeItemPlan (readme, regex) {
+        const ret = regex.exec(readme);
+
+        if (!ret)
+            return;
+
+        this.plan(ret[1], ret[2]);
+    }
+    parseReadmeItemResult (readme, regexs) {
+        for (const regex of regexs) {
+            const ret = regex.exec(readme);
+
+            if (!ret) continue;
+
+            return this.result(ret[1], ret[2]);
+        }
+
+        return this.result(null, null);
+    }
     parseReadme () {
         const regexs = this._regexs;
         const readme = this.readme();
 
         for (const k in regexs) {
             const regex = regexs[k];
-            const ret = regex.exec(readme);
 
-            if (!ret) continue;
-
-            const val = ret[1];
+            if (!regex) continue;
 
             switch (k) {
-            case 'priority': this.priority(val);          break;
-            case 'owner':    this.owner(val);             break;
-            case 'type':     this.type(val);              break;
-            case 'release':  this.release(val);           break;
-            case 'plan':     this.plan(ret[1], ret[2]);   break;
-            case 'result':   this.result(ret[1], ret[2]); break;
+            case 'priority': this.priority(this.parseReadmeItem(readme, regex)); break;
+            case 'owner':    this.owner(this.parseReadmeItem(readme, regex));    break;
+            case 'type':     this.type(this.parseReadmeItem(readme, regex));     break;
+            case 'release':  this.release(this.parseReadmeItem(readme, regex));  break;
+            case 'plan':     this.parseReadmeItemPlan (readme, regex);           break;
+            case 'result':   this.parseReadmeItemResult(readme, regex);         break;
             default: throw new Error(`Not found key. key=${k}`);
             }
 

@@ -18,17 +18,17 @@ export default function TableBodyRow (props) {
     const is_opened = props.opened;
     const onChange = props.onChange;
 
-    const obj = project;
+    const plan = project.plan();
+    const result = project.result();
 
-    const plan = obj.plan();
-    const result = obj.result();
+    const priority = getPriority(project.priority());
 
     return (
         <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-          <CellLinkGithub data={obj}/>
+          <CellLinkGithub data={project}/>
 
           <Cell sx={{whiteSpace: 'nowrap'}}>
-            {obj.type()}
+            {project.type()}
           </Cell>
 
           <Cell>
@@ -40,7 +40,7 @@ export default function TableBodyRow (props) {
 
             }}
                onClick={()=> actions.title.click(project.id())}>
-              {obj.title()}
+              {project.title()}
             </S>
             {/* <Description value={obj.shortDescription()}/> */}
           </Cell>
@@ -49,12 +49,12 @@ export default function TableBodyRow (props) {
           {/*   {obj.public() ? '○' : '--'} */}
           {/* </Cell> */}
 
-          <Cell sx={{whiteSpace: 'nowrap'}}>
-            {priority(obj.priority())}
+          <Cell sx={{whiteSpace: 'nowrap'}} title={priority.label}>
+            {`${priority.label_short} (${priority.code})`}
           </Cell>
 
           <Cell sx={{whiteSpace: 'nowrap'}}>
-            {obj.maneger()}
+            {project.maneger()}
           </Cell>
 
           {/* <Cell sx={{whiteSpace: 'nowrap'}}> */}
@@ -102,19 +102,18 @@ function dt (v) {
     return moment(v).format('MM-DD');
 }
 
-function priority (v) {
+function getPriority (v) {
     const table = {
-        's': '緊急',
-        'h': '高',
-        'n': '普通',
-        'l': '低',
-        '?': 'なぞ',
+        's': { code: 's', label: '緊急', label_short: '緊', },
+        'h': { code: 'h', label: '高い', label_short: '高', },
+        'n': { code: 'n', label: '普通', label_short: '普', },
+        'l': { code: 'l', label: '低い', label_short: '低', },
+        '?': { code: '?', label: 'なぞ', label_short: '謎', },
     };
 
-    const label = table[v] || null;
-
-    if (!label)
-        return v;
-
-    return `${label} (${v})`;
+    return table[v] || {
+        code: v,
+        label: 'なぞ',
+        label_short: '謎',
+    };
 }
