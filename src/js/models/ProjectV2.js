@@ -17,6 +17,8 @@ export default class ProjectV2 extends GraphQLNode {
         this._release = '?';
         this._plan = new Term();
         this._result = new Term();
+        this._action = '';
+        this._backlog = '';
     }
     initRegexs () {
         // const value = '(\S)';
@@ -32,6 +34,8 @@ export default class ProjectV2 extends GraphQLNode {
                 /.*\$[R|r]esult:\s+(\d+-\d+-\d+)\s+(\d+-\d+-\d+).*/,
                 /.*\$[R|r]esult:\s+(\d+-\d+-\d+).*/,
             ],
+            action: /.*\$[A|a]action:\s+(\S+).*/,
+            backlog: /.*\$[B|b]acklog:\s+(\S+).*/,
             // cost: /.*\$[C|c]ost:\s+(\S+).*/,
             // scope: /.*\$[S|s]cope:\s+(\S+).*/,
             // estimate: /.*\$[E|c]stimate:\s+(\S+).*/,
@@ -80,7 +84,9 @@ export default class ProjectV2 extends GraphQLNode {
             case 'type':     this.type(this.parseReadmeItem(readme, regex));     break;
             case 'release':  this.release(this.parseReadmeItem(readme, regex));  break;
             case 'plan':     this.parseReadmeItemPlan (readme, regex);           break;
-            case 'result':   this.parseReadmeItemResult(readme, regex);         break;
+            case 'result':   this.parseReadmeItemResult(readme, regex);          break;
+            case 'action':   this.action(this.parseReadmeItem(readme, regex));   break;
+            case 'backlog':  this.backlog(this.parseReadmeItem(readme, regex));  break;
             default: throw new Error(`Not found key. key=${k}`);
             }
 
@@ -172,5 +178,17 @@ export default class ProjectV2 extends GraphQLNode {
             this._result = new Term(start, end);
 
         return this._result;
+    }
+    action (v) {
+        if (arguments.length===1)
+            this._action = v;
+
+        return this._action;
+    }
+    backlog (v) {
+        if (arguments.length===1)
+            this._backlog = v;
+
+        return this._backlog;
     }
 }
