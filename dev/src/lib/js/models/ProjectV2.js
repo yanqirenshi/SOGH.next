@@ -34,7 +34,7 @@ export default class ProjectV2 extends GraphQLNode {
                 /.*\$[R|r]esult:\s+(\d+-\d+-\d+)\s+(\d+-\d+-\d+).*/,
                 /.*\$[R|r]esult:\s+(\d+-\d+-\d+).*/,
             ],
-            action: /.*\$[A|a]action:\s+(\S+).*/,
+            action: /.*\$[A|a]ction:\s+(\S+).*/,
             backlog: /.*\$[B|b]acklog:\s+(\S+).*/,
             // cost: /.*\$[C|c]ost:\s+(\S+).*/,
             // scope: /.*\$[S|s]cope:\s+(\S+).*/,
