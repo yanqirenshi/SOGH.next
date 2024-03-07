@@ -42,6 +42,7 @@ export default function Table (props) {
 
             <TableHead>
               <TableRow>
+                <HeadCell rowSpan="2">Action</HeadCell>
                 <HeadCell rowSpan="2">Number</HeadCell>
                 <HeadCell rowSpan="2">Type</HeadCell>
                 <HeadCell rowSpan="2">Title</HeadCell>
@@ -51,6 +52,7 @@ export default function Table (props) {
                 {/* <HeadCell rowSpan="2">Release</HeadCell> */}
                 <HeadCell colSpan="2">Plan</HeadCell>
                 <HeadCell colSpan="2">Result</HeadCell>
+                <HeadCell colSpan="1">Dependencies</HeadCell>
                 <HeadCell rowSpan="2">Task</HeadCell>
               </TableRow>
 
@@ -59,6 +61,7 @@ export default function Table (props) {
                 <HeadCell>End</HeadCell>
                 <HeadCell>Start</HeadCell>
                 <HeadCell>End</HeadCell>
+                <HeadCell>Backlog</HeadCell>
               </TableRow>
             </TableHead>
 

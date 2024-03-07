@@ -25,6 +25,10 @@ export default function TableBodyRow (props) {
 
     return (
         <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+          <Cell sx={{whiteSpace: 'nowrap'}}>
+            {project.action()}
+          </Cell>
+
           <CellLinkGithub data={project}/>
 
           <Cell sx={{whiteSpace: 'nowrap'}}>
@@ -82,6 +86,10 @@ export default function TableBodyRow (props) {
 
           {/* <CellTimestamps create={obj.createdAt()} */}
           {/*                 update={obj.updatedAt()}/> */}
+
+          <Cell sx={{whiteSpace: 'nowrap'}}>
+            {project.backlog()}
+          </Cell>
 
           <Cell sx={{p:0.1}}>
             <Button variant="text"

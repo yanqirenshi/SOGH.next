@@ -22,7 +22,7 @@ export default function TableBodyRowTasks (props) {
 
     return (
         <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-          <Cell colSpan="10" sx={{background: 'rgba(234, 228, 208, 0.3)'}}>
+          <Cell colSpan="12" sx={{background: 'rgba(234, 228, 208, 0.3)'}}>
             <Box sx={{p:1}}>
               <TableTasks items={items}/>
             </Box>
