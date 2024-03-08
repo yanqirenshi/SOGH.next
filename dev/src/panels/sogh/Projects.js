@@ -3,7 +3,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 
-import {ProjectsV2} from '../../lib/index.js';
+import { ProjectsV2 } from '../../lib/index.js';
 
 import { useRecoilValue, useRecoilState } from "recoil";
 import { GITHUB_AUTH } from '../../recoil/GITHUB.js';
@@ -33,7 +33,7 @@ export default function Projects () {
 
     return (
         <Box sx={{ p:2, overflow: 'auto', height: '100%' }}>
-          <Container maxWidth="lg">
+          <Container maxWidth="xl">
             <ProjectsV2 data={projects}
                         sogh={sogh}
                         actions={{
