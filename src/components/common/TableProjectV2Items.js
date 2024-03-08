@@ -11,8 +11,13 @@ import S from '@mui/material/Typography';
 
 import CellTimestamps from './TableCellTimestamps.js';
 import TableCellTerm from './TableCellTerm.js';
-import UserName from './UserName.js';
+// import UserName from './UserName.js';
 import Link from './Link.js';
+
+import TableCellTitle from './TableProjectV2Items/TableCellTitle.js';
+import TableCellDate from './TableProjectV2Items/TableCellDate.js';
+import TableCellAssignees from './TableProjectV2Items/TableCellAssignees.js';
+import TableCellClosed from './TableProjectV2Items/TableCellClosed.js';
 
 export default function TableProjectV2Items (props) {
     const items = props.items;
@@ -23,62 +28,37 @@ export default function TableProjectV2Items (props) {
                  size="small">
             <TableHead>
               <TableRow>
-                {/* <TableCell>Status</TableCell> */}
-
                 <TableCell>Title</TableCell>
 
-                {/* <TableCell>Type</TableCell> */}
+                <TableCell>Assignees</TableCell>
 
-                <TableCell>Plan</TableCell>
-                <TableCell>Timestamp</TableCell>
+                <TableCell>Due</TableCell>
+                <TableCell>NextAction</TableCell>
+                <TableCell>Closed</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
               {items.map(item => {
                   const repository = item.repository();
                   const issue = item.core().content;
 
+                  const status = item.status();
+
                   return (
                       <TableRow key={item.id()}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
 
-                        {/* <TableCell>{item.status()}</TableCell> */}
+                        <TableCellTitle item={item}/>
 
-                        <TableCell>
-                            <S variant="h6">
-                              <Link href={item.path()}>
-                                {item.title()}
-                              </Link>
-                            </S>
-                          <S>
-                            <span>{repository ? repository.name : null}</span>
-                            {issue.number &&
-                             <>
-                               <span>{issue.title}</span>
-                               <span>
-                                 (
-                                 <Link href={issue.url}>
-                                   {issue.number}
-                                 </Link>
-                                 )
-                               </span>
-                             </>}
-                          </S>
-                          <S>
-                            Create: <UserName user={item.creator()}/>
-                            <span>{item.archived() ? 'archived' : ''}</span>
-                          </S>
-                        </TableCell>
+                        <TableCellAssignees item={item}/>
 
-                        <TableCellTerm term={{
-                            start: null,
-                            end: null,
-                        }}/>
+                        <TableCellDate date={item.dueDate()} status={status}/>
 
-                        {/* <TableCell>{item.type()}</TableCell> */}
+                        <TableCellDate date={item.nextActionDate()} status={status}/>
 
-                        <CellTimestamps create={item.createdAt()}
-                                        update={item.updatedAt()}/>
+                        <TableCellClosed item={item}/>
+
                       </TableRow>
                   );
               })}

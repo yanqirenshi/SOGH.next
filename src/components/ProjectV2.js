@@ -37,7 +37,7 @@ export default function ProjectV2 (props) {
         return null;
 
     return (
-        <Box>
+        <Box sx={{pt:3}}>
 
           <Container maxWidth="xl">
             <Title project={project}/>
@@ -54,6 +54,7 @@ export default function ProjectV2 (props) {
             </Box>
 
             {'description'===tabs.selected && <Description/>}
+
             {'gantt-chart'===tabs.selected && <GanttChart/>}
 
             {'items'===tabs.selected &&
@@ -62,8 +63,11 @@ export default function ProjectV2 (props) {
              </Box>}
 
             {'metrix'===tabs.selected && <Metrix/>}
+
             {'part'===tabs.selected && <Part/>}
+
             {'points'===tabs.selected && <Points/>}
+
             {'fields'===tabs.selected &&
              <Box sx={{pt:4}}>
                <Fields project={project}/>

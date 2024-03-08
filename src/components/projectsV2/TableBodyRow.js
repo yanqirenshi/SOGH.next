@@ -12,6 +12,8 @@ import CellLinkGithub from '../common/TableCellLinkGithub.js';
 import CellTimestamps from '../common/TableCellTimestamps.js';
 import CellTermPlanResult from '../common/TableCellTermPlanResult.js';
 
+import TableCellPlan from './TableCellPlan.js';
+
 export default function TableBodyRow (props) {
     const project = props.project;
     const actions = props.actions;
@@ -23,17 +25,15 @@ export default function TableBodyRow (props) {
 
     const priority = getPriority(project.priority());
 
+    const now = moment().startOf('day');
+
     return (
         <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
           <Cell sx={{whiteSpace: 'nowrap'}}>
-            {project.action()}
+            {project.type()}
           </Cell>
 
           <CellLinkGithub data={project}/>
-
-          <Cell sx={{whiteSpace: 'nowrap'}}>
-            {project.type()}
-          </Cell>
 
           <Cell>
             <S sx={{
@@ -41,7 +41,6 @@ export default function TableBodyRow (props) {
                 textDecorationStyle: 'dotted',
                 textDecorationColor: '#ddd',
                 cursor: 'pointer',
-
             }}
                onClick={()=> actions.title.click(project.id())}>
               {project.title()}
@@ -65,13 +64,7 @@ export default function TableBodyRow (props) {
           {/*   {obj.release()} */}
           {/* </Cell> */}
 
-          <Cell sx={{whiteSpace: 'nowrap'}} title={plan.start}>
-            {dt(plan.start)}
-          </Cell>
-
-          <Cell sx={{whiteSpace: 'nowrap'}} title={plan.end}>
-            {dt(plan.end)}
-          </Cell>
+          <TableCellPlan project={project} now={now}/>
 
           <Cell sx={{whiteSpace: 'nowrap'}} title={result.start}>
             {dt(result.start)}
@@ -86,6 +79,10 @@ export default function TableBodyRow (props) {
 
           {/* <CellTimestamps create={obj.createdAt()} */}
           {/*                 update={obj.updatedAt()}/> */}
+
+          <Cell sx={{whiteSpace: 'nowrap'}}>
+            {project.action()}
+          </Cell>
 
           <Cell sx={{whiteSpace: 'nowrap'}}>
             {project.backlog()}
