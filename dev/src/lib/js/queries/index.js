@@ -22,6 +22,7 @@ export { default as projectv2_by_user_login_projectv2_number } from './projectv2
 export { default as projectv2_by_org_login_projectv2_number } from './projectv2_by_org_login_projectv2_number.js';
 export { default as projectv2item_by_id } from './projectv2item_by_id.js';
 export { default as projectv2items_by_user_login_projectv2_number } from './projectv2items_by_user_login_projectv2_number.js';
+export { default as projectv2items_by_org_login_projectv2_number } from './projectv2items_by_org_login_projectv2_number.js';
 export { default as repositories_by_viewer } from './repositories_by_viewer.js';
 export { default as repository } from './repository.js';
 export { default as search_issues } from './search_issues.js';

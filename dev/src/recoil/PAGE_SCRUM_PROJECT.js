@@ -25,7 +25,7 @@ export const PROJECTV2 = recoil.selectorFamily({
         if (!authed)
             return null;
 
-        return await sogh.asyncFetchProjectV2ByUserLoginProjectV2Number(login, number);
+        return await sogh.asyncFetchProjectV2ByOrgLoginProjectV2Number(login, number);
     },
 });
 
@@ -35,6 +35,6 @@ export const PROJECTV2_ITEMS = recoil.selectorFamily({
         if (!authed)
             return null;
 
-        return await sogh.asyncFetchProjectV2ItemsByUserLoginProjectV2Number(login, number);
+        return await sogh.asyncFetchProjectV2ItemsByOrgLoginProjectV2Number(login, number);
     },
 });

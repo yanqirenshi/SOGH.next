@@ -2,7 +2,8 @@ import React from 'react';
 
 import Box from '@mui/material/Box';
 import S from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
+// import Paper from '@mui/material/Paper';
+import Chip from '@mui/material/Chip';
 
 import Link from '../common/Link.js';
 
@@ -12,6 +13,10 @@ export default function Title (props) {
     return (
         <Box style={{display:'flex', flexDirection: 'column', justifyContent:'center'}}>
           <Box style={{display:'flex', justifyContent:'center'}}>
+            <S variant="h3" sx={{mr:6}}>
+              {project.type()}
+            </S>
+
             <S variant="h3">
               <span style={{marginRight:22}}>
                 {project.title()}
@@ -28,13 +33,14 @@ export default function Title (props) {
           </Box>
 
           <Box sx={{display:'flex', justifyContent:'center'}}>
-            <Paper sx={{m: 0.5, pt: 0.5, pb: 0.5, pl: 2, pr: 2 }}>
-              <S>{project.public() ? "public" : "private"}</S>
-            </Paper>
+            <Chip label={project.creator().login}
+                  sx={{m:1}}/>
 
-            <Paper sx={{m: 0.5, pt: 0.5, pb: 0.5, pl: 2, pr: 2 }}>
-              <S>{project.creator().login}</S>
-            </Paper>
+            <Chip label={project.release()}
+                  sx={{m:1}}/>
+
+            <Chip label={project.public() ? "public" : "private"}
+                  sx={{m:1}}/>
           </Box>
 
           <S>{project.shortDescription()}</S>

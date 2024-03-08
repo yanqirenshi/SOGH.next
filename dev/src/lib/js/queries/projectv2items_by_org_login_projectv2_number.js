@@ -12,7 +12,7 @@ const field = `
  } `;
 
 const query = `{
-  user (login: "@user-login") {
+  organization (login: "@user-login") {
     projectV2 (number: @projectv2-number) {
       ${attr.projectv2()}
       fields(first: ${MAX_FIELD_NUM}) {

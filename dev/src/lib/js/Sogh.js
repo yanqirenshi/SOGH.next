@@ -592,6 +592,28 @@ export default class Sogh extends Pooler {
         // nodes 2 objs and pooling
         return response.data.map(d=> this.node2projectV2Item(d).id());
     }
+    async asyncFetchProjectV2ItemsByOrgLoginProjectV2Number (login, number) {
+        const query = this.query('projectv2items_by_org_login_projectv2_number')
+              .replace('@user-login', login)
+              .replace('@projectv2-number', number);
+
+        const post_data = this.postData(query);
+
+        // fetch
+        const response = await fetch(this.endpoint(), post_data)
+              .then(res  => this.text2json(res))
+              .then(res  => this.json2response(res, d=> {
+                  return d.data.organization.projectV2.items.nodes;
+              }))
+              .catch(err => this.error2response(err));
+
+        // case of error
+        if ('error'===response.type)
+            return response.data;
+
+        // nodes 2 objs and pooling
+        return response.data.map(d=> this.node2projectV2Item(d).id());
+    }
     async asyncFetchProjectV2ItemByID (id) {
         const query = this.query('projectv2item_by_id')
               .replace('@id', id);

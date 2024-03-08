@@ -10,7 +10,7 @@ import * as atoms from '../recoil/PAGE_SCRUM_PROJECT.js';
 import Loading from '../panels/Loading.js';
 import Frame from '../assemblies/frames/Frame.js';
 
-import {ProjectV2} from '../lib/index.js';
+import { ProjectV2 } from '../lib/index.js';
 
 import sogh from '../manegers/sogh.js';
 
