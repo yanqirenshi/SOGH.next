@@ -22,14 +22,21 @@ updatedAt`;
 }
 
 export function repositories () {
-    return `id
+    return `
+id
 name
 url
 description
 descriptionHTML
 createdAt
 updatedAt
-pushedAt`;
+pushedAt
+owner {
+  id
+  login
+  resourcePath
+}
+`;
 }
 
 export function issue () {
@@ -429,12 +436,17 @@ export function projectV2ItemContentDraftIssue () {
 }
 
 export function projectV2ItemContentIssue () {
-    return ` {
- __typename
- id
- url
- number
- title
+    return `
+ {
+   __typename
+   id
+   url
+   number
+   title
+   repository {
+     ${repositories()}
+   }
+
  }`;
 }
 

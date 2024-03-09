@@ -12,12 +12,19 @@ export default function TableCellTitleIssue (props) {
     const repository = item.repository();
     const issue = item.core().content;
 
+    const click = ()=> {
+        actions.issue.title.click(
+            issue.repository.owner.login,
+            issue.repository.name,
+            issue.number);
+    };
+
     return (
         <TableCell>
           <S>
             {issue.number &&
              <>
-               <span onClick={()=> actions.issue.title.click(issue.id)}>
+               <span onClick={()=> click()}>
                  {issue.title}
                </span>
                <span style={{marginLeft:8}}>
