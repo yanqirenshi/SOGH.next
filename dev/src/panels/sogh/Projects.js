@@ -12,8 +12,6 @@ import * as atoms from '../../recoil/PAGE_SCRUM.js';
 import sogh from '../../manegers/sogh.js';
 
 export default function Projects () {
-    const authed = useRecoilValue(GITHUB_AUTH);
-
     const [state_fetch, setStateFetch] = useRecoilState(atoms.STATUS_FETCH_PROJECTSV2);
 
     const projects = sogh.projectsV2();

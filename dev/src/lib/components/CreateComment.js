@@ -13,6 +13,16 @@ import TabMemo from './CreateComment/TabMemo.js';
 export default function CreateComment (props) {
     const [tabs, setTabs] = React.useState(defaultTabsData());
 
+    const onChange = (code, target, contents)=> {
+        const new_tabs = JSON.parse(JSON.stringify(tabs));
+        const tab = new_tabs.list.find(tab=> tab.code===code);
+
+        if ('contents'===target)
+            tab.contents = contents;
+
+        setTabs(new_tabs);
+    };
+
     return (
         <Box>
 
@@ -22,13 +32,16 @@ export default function CreateComment (props) {
 
           <Box sx={{pl:2, pr:2}}>
             {'finish today'===tabs.selected &&
-             <TabFinishToday data={tabs.list.find(d=>d.code==='finish today')}/>}
+             <TabFinishToday data={tabs.list.find(d=>d.code==='finish today')}
+                             onChange={onChange}/>}
 
             {'request'===tabs.selected &&
-             <TabRequest data={tabs.list.find(d=>d.code==='request')}/>}
+             <TabRequest data={tabs.list.find(d=>d.code==='request')}
+                         onChange={onChange}/>}
 
             {'memo'===tabs.selected &&
-             <TabMemo data={tabs.list.find(d=>d.code==='memo')}/>}
+             <TabMemo data={tabs.list.find(d=>d.code==='memo')}
+                      onChange={onChange}/>}
 
             <Box sx={{mt:1}}>
               <Button variant="contained">Commit</Button>
@@ -47,7 +60,7 @@ function defaultTabsData () {
                 label: 'Memo',
                 contents: [
                     '## Memo'
-                ],
+                ].join('\n'),
             },
             {
                 code: 'request',
@@ -56,7 +69,7 @@ function defaultTabsData () {
                 next_action_date: moment().add(1, 'd').format('YYYY-MM-DD'),
                 contents: [
                     ''
-                ],
+                ].join('\n'),
             },
             {
                 code: 'finish today',
@@ -64,7 +77,7 @@ function defaultTabsData () {
                 next_action_date: moment().add(1, 'd').format('YYYY-MM-DD'),
                 contents: [
                     ''
-                ],
+                ].join('\n'),
             },
         ],
     };

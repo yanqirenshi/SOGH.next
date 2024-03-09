@@ -4,10 +4,11 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 
 import Parsons from './Parsons.js';
-import Editor from './Editor.js';
+import Editor from '../Editor.js';
 
 export default function TabRequest (props) {
     const data = props.data;
+    const onChange = props.onChange;
 
     // console.log(data.parson);
 
@@ -21,11 +22,11 @@ export default function TabRequest (props) {
                        size="small"
                        label="Next Action Date"
                        value={data.next_action_date}
-                       onChange={()=> null}/>
+                       onChange={onChange}/>
           </Box>
 
           <Box sx={{mt:2}}>
-            <Editor/>
+            <Editor data={data} onChange={onChange}/>
           </Box>
         </Box>
     );
