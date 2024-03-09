@@ -15,7 +15,7 @@ import Label from './common/Label.js';
 
 import Title from './Issue/Title.js';
 import SubTitle from './Issue/SubTitle.js';
-import CreateComment from './Issue/CreateComment.js';
+import CreateComment from './CreateComment.js';
 
 export default function Issue (props) {
     const issue = props.data;
@@ -41,7 +41,7 @@ export default function Issue (props) {
           </Box>
 
           <Card sx={{
-              mt:6, p:2, pt:0,
+              mt:6, pb:2,
           }}>
             <CreateComment/>
           </Card>
