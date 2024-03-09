@@ -14,12 +14,9 @@ export const fetchIssue = recoil.selectorFamily({
     },
 });
 
-// export const PROJECTV2_ITEMS = recoil.selectorFamily({
-//     key: 'PAGE_SCRUM_PROJECT_PROJECTV2_ITEMS',
-//     get: ({authed, login, number})=> async () => {
-//         if (!authed)
-//             return null;
-
-//         return await sogh.asyncFetchProjectV2ItemsByOrgLoginProjectV2Number(login, number);
-//     },
-// });
+export const fetchIssueComments = recoil.selectorFamily({
+    key: 'PAGE_SCRUM_ISSUE_FETCH_ISSUE_COMMENTS',
+    get: ({login, repository, number})=> async () => {
+        return sogh.asyncFetchIssueCommentsByOrgRepoIssueNumber(login, repository, number);
+    },
+});

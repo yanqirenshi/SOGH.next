@@ -6,7 +6,10 @@ import Container from '@mui/material/Container';
 
 import { useRecoilValue,  useRecoilState } from "recoil";
 import { GITHUB_AUTH, UPDATE_SOGH } from '../recoil/GITHUB.js';
-import { fetchIssue } from '../recoil/PAGE_SCRUM_ISSUE.js';
+import {
+    fetchIssue,
+    fetchIssueComments,
+} from '../recoil/PAGE_SCRUM_ISSUE.js';
 
 import Loading from '../panels/Loading.js';
 import Frame from '../assemblies/frames/Frame.js';
@@ -46,11 +49,19 @@ function Issue (props) {
         number: number,
     }));
 
+    const issue_comments_id = useRecoilValue(fetchIssueComments({
+        login: login,
+        repository: repository,
+        number: number,
+    }));
+
     if (!issue_id) return null;
 
     const issue = sogh.issue(issue_id);
 
     if (!issue) return null;
+
+    const comments = issue_comments_id.map(id=> sogh.issueComment(id));
 
     return (
         <Frame>
@@ -60,16 +71,11 @@ function Issue (props) {
                 <PanelIssue data={issue}/>
 
                 <Box>
-                  {/* <PanelIssueComments comments={comments}/> */}
+                  <PanelIssueComments comments={comments}/>
                 </Box>
               </Box>
             </Container>
           </Box>
         </Frame>
     );
-}
-
-function issue2comments (issue) {
-    const comments = issue.core().comments;
-    return comments.nodes.map(d=> sogh.node2issueComment(d));
 }

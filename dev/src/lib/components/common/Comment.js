@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
 
 import BodyHtml from './BodyHtml.js';
 
@@ -9,20 +10,13 @@ export default function Comment (props) {
     const bodyHtml = props.bodyHtml;
 
     return (
-        <Box>
+        <Card>
           <Box sx={{
-              background:'rgba(234, 228, 208, 0.3)',
-              p: 0.5,
-              borderRadius: 1,
+              background:'#fff',
+              pt:0.5, pb:1, pl:2, pr:2,
           }}>
-            <Box sx={{
-                background:'#fff',
-                pt:0.5, pb:0.5, pl:3, pr:3,
-                borderRadius: 0.8,
-            }}>
-              <BodyHtml value={bodyHtml}/>
-            </Box>
+            <BodyHtml value={bodyHtml}/>
           </Box>
-        </Box>
+        </Card>
     );
 }

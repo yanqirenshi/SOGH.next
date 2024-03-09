@@ -3,6 +3,7 @@ export { default as create_issue } from './create_issue.js';
 export { default as issue_by_id } from './issue_by_id.js';
 export { default as issue_by_org_repo_issue_number } from './issue_by_org_repo_issue_number.js';
 export { default as issue_comments_by_issue_id } from './issue_comments_by_issue_id.js';
+export { default as issue_comments_by_org_repo_issue_number } from './issue_comments_by_org_repo_issue_number.js';
 export { default as issues_by_milestone } from './issues_by_milestone.js';
 export { default as issues_by_report_label } from './issues_by_report_label.js';
 export { default as issues_by_repository } from './issues_by_repository.js';
