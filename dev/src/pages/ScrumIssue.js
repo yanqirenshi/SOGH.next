@@ -66,15 +66,15 @@ function Issue (props) {
     return (
         <Frame>
           <Box sx={{width:'100%', height:'100%', overflow: 'auto'}}>
-            <Container>
-              <Box sx={{pt:1}}>
+            <Box sx={{pt:1, pb:33}}>
+              <Container>
                 <PanelIssue data={issue}/>
 
                 <Box>
                   <PanelIssueComments comments={comments}/>
                 </Box>
-              </Box>
-            </Container>
+              </Container>
+            </Box>
           </Box>
         </Frame>
     );

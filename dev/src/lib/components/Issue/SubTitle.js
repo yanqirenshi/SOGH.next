@@ -5,6 +5,7 @@ import S from '@mui/material/Typography';
 import Label from '../common/Label.js';
 import Avatar from '@mui/material/Avatar';
 import Chip from '@mui/material/Chip';
+import Button from '@mui/material/Button';
 
 import {DateTime} from 'luxon';
 
@@ -12,11 +13,21 @@ import Link from '../common/Link.js';
 
 export default function SubTitle (props) {
     const issue = props.issue;
+    const is_view_description = props.view_description;
+    const onChange = props.onChange;
 
     const milestone = issue.milestone();
 
     return (
         <Box sx={{mt:0.5, display: 'flex'}}>
+          <Box sx={{m:1}}>
+            <Button variant={is_view_description ? "contained" : "outlined"}
+                    size="small"
+                    onClick={()=> onChange(!is_view_description)}>
+              Description
+            </Button>
+          </Box>
+
           {milestone &&
            <Box sx={{m:1}}>
              <Chip key={milestone.id}
