@@ -23,7 +23,9 @@ export default function Title (props) {
           </S>
 
           <S variant="h3">
+
             <span>{issue.title()}</span>
+
             <span style={{marginLeft:11}}>
               (
               <Link href={issue.url()}>
@@ -31,6 +33,7 @@ export default function Title (props) {
               </Link>
               )
             </span>
+
           </S>
         </Box>
     );

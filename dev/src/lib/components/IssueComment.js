@@ -27,9 +27,10 @@ export default function IssueComment (props) {
               justifyContent: 'space-between',
               mt:1,
           }}>
-            <Button variant="outlined" size="small">Edit</Button>
-            <Button variant="outlined" size="small">Delete</Button>
+            <Button variant="contained" size="small">Edit</Button>
+            <Button variant="text" size="small">Delete</Button>
           </Box>
+
         </Box>
     );
 }

@@ -3,6 +3,8 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import S from '@mui/material/Typography';
 import Label from '../common/Label.js';
+import Avatar from '@mui/material/Avatar';
+import Chip from '@mui/material/Chip';
 
 import {DateTime} from 'luxon';
 
@@ -11,41 +13,53 @@ import Link from '../common/Link.js';
 export default function SubTitle (props) {
     const issue = props.issue;
 
-    // TODO: これは表示する必要はないかも。。。
     const milestone = issue.milestone();
 
     return (
         <Box sx={{mt:0.5, display: 'flex'}}>
           {milestone &&
            <Box sx={{m:1}}>
-             <S>
-               <span>{milestone.title}</span>
-               <span style={{marginLeft:11}}>
-                 (
-                 <Link href={milestone.url}>
-                   {milestone.number}
-                 </Link>
-                 )
-               </span>
-             </S>
+             <Chip key={milestone.id}
+                   sx={{background:'#fff'}}
+                   label={
+                       <>
+                         <span>{milestone.title}</span>
+                         <span style={{marginLeft:11}}>
+                           (
+                           <Link href={milestone.url}>
+                             {milestone.number}
+                           </Link>
+                           )
+                         </span>
+                       </>
+                   }/>
            </Box>}
 
           <Box sx={{m:1, display: 'flex'}}>
-            {issue.assignees().map(assignee=> {
+            {issue.labels().map(label=> {
                 return (
-                    <Box key={assignee.id}>
-                      <Link href={assignee.url}>
-                        <img width="17px" height="17px"
-                             src={assignee.avatarUrl}/>
-                      </Link>
-                      <span>{assignee.name || assignee.login}</span>
-                    </Box>
+                    <Chip key={label.id}
+                          sx={{
+                              background:'#'+label.color,
+                              ml:0.3, mr:0.3,
+                          }}
+                          label={label.name}/>
                 );
             })}
           </Box>
 
           <Box sx={{m:1, display: 'flex'}}>
-            {issue.labels().map(label=> <Label key={label.id} value={label}/>)}
+            {issue.assignees().map(assignee=> {
+                return (
+                    <Link href={assignee.url}>
+                      <Chip key={assignee.id}
+                            sx={{background:'#fff'}}
+                            avatar={<Avatar alt={assignee.login}
+                                            src={assignee.avatarUrl} />}
+                            label={assignee.name || assignee.login}/>
+                    </Link>
+                );
+            })}
           </Box>
         </Box>
     );
