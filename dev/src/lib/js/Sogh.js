@@ -538,8 +538,6 @@ export default class Sogh extends Pooler {
     async asyncFetchProjectsV2ByTeam (team_id, callbacks={}) {
         if (callbacks.start) callbacks.start();
 
-        const user = this.viewer();
-
         const query = this.query('projectsv2_by_team')
               .replace('@team-id', team_id);
 

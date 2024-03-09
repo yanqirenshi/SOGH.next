@@ -4,13 +4,6 @@ const MAX_FIELD_NUM = 30;
 const MAX_LABEL_NUM = 30;
 const MAX_PR_NUM = 30;
 
-const field = `
- {
-   ... on ProjectV2Field { id name }
-   ... on ProjectV2IterationField { id name }
-   ... on ProjectV2SingleSelectField { id name }
- } `;
-
 const query = `{
   organization (login: "@user-login") {
     projectV2 (number: @projectv2-number) {

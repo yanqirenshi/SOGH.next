@@ -5,8 +5,7 @@ import Container from '@mui/material/Container';
 
 import { ProjectsV2 } from '../../lib/index.js';
 
-import { useRecoilValue, useRecoilState } from "recoil";
-import { GITHUB_AUTH } from '../../recoil/GITHUB.js';
+import { useRecoilState } from "recoil";
 import * as atoms from '../../recoil/PAGE_SCRUM.js';
 
 import sogh from '../../manegers/sogh.js';

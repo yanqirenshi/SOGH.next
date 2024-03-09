@@ -3,8 +3,6 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import S from '@mui/material/Typography';
 
-import {DateTime} from 'luxon';
-
 import Link from '../common/Link.js';
 
 export default function Title (props) {

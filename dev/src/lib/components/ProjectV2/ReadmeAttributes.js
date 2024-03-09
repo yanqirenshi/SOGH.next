@@ -1,10 +1,6 @@
 import React from 'react';
 
 import Box from '@mui/material/Box';
-import S from '@mui/material/Typography';
-
-import Paper from '@mui/material/Paper';
-import TextField from '@mui/material/TextField';
 
 import Priority from './ReadmeAttributes/Priority.js';
 import Term from './ReadmeAttributes/Term.js';

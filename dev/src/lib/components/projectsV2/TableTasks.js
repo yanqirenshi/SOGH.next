@@ -1,5 +1,4 @@
 import React from 'react';
-import moment from 'moment';
 
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -83,8 +82,6 @@ export default function TableTasks (props) {
 
 function CellLabels (props) {
     const item = props.item;
-
-    const labels = item.labels();
 
     return (
         <Cell sx={{p:0}}>

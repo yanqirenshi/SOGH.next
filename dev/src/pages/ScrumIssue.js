@@ -4,8 +4,8 @@ import { useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 
-import { useRecoilValue,  useRecoilState } from "recoil";
-import { GITHUB_AUTH, UPDATE_SOGH } from '../recoil/GITHUB.js';
+import { useRecoilValue } from "recoil";
+import { GITHUB_AUTH } from '../recoil/GITHUB.js';
 import {
     fetchIssue,
     fetchIssueComments,

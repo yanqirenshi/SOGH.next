@@ -4,8 +4,6 @@ import Box from '@mui/material/Box';
 
 import MDEditor from '@uiw/react-md-editor';
 
-import Comment from './common/Comment.js';
-
 export default function Editor (props) {
     const data = props.data;
     const onChange = props.onChange;

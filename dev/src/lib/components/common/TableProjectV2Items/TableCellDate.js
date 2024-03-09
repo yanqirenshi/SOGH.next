@@ -3,7 +3,6 @@ import * as React from 'react';
 import { DateTime } from "luxon";
 
 import TableCell from '@mui/material/TableCell';
-import S from '@mui/material/Typography';
 
 export default function TableCellDate (props) {
     const date = props.date;

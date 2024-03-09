@@ -9,7 +9,6 @@ import { DateTime } from 'luxon';
 import Link from './common/Link.js';
 import Comment from './common/Comment.js';
 import UserName from './common/UserNameBlock.js';
-import Label from './common/Label.js';
 
 export default function IssueComment (props) {
     const comment = props.comment;

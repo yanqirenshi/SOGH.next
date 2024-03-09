@@ -6,7 +6,7 @@ import Card from '@mui/material/Card';
 import BodyHtml from './BodyHtml.js';
 
 export default function Comment (props) {
-    const body = props.body;
+    // const body = props.body;
     const bodyHtml = props.bodyHtml;
 
     return (

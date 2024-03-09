@@ -6,11 +6,7 @@ import TableRow from '@mui/material/TableRow';
 import S from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 
-import LinkSogh from '../common/LinkSogh.js';
-import Description from '../common/Description.js';
 import CellLinkGithub from '../common/TableCellLinkGithub.js';
-import CellTimestamps from '../common/TableCellTimestamps.js';
-import CellTermPlanResult from '../common/TableCellTermPlanResult.js';
 
 import TableCellPlan from './TableCellPlan.js';
 
@@ -20,7 +16,6 @@ export default function TableBodyRow (props) {
     const is_opened = props.opened;
     const onChange = props.onChange;
 
-    const plan = project.plan();
     const result = project.result();
 
     const priority = getPriority(project.priority());

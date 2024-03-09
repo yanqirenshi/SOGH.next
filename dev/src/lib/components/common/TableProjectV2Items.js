@@ -7,12 +7,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import S from '@mui/material/Typography';
-
-import CellTimestamps from './TableCellTimestamps.js';
-import TableCellTerm from './TableCellTerm.js';
-// import UserName from './UserName.js';
-import Link from './Link.js';
 
 import TableCellTitle from './TableProjectV2Items/TableCellTitle.js';
 import TableCellDate from './TableProjectV2Items/TableCellDate.js';
@@ -42,8 +36,6 @@ export default function TableProjectV2Items (props) {
 
             <TableBody>
               {items.map(item => {
-                  const repository = item.repository();
-                  const issue = item.core().content;
 
                   const status = item.status();
 
