@@ -7,6 +7,7 @@ import Link from '../Link.js';
 
 export default function TableCellTitleIssue (props) {
     const item = props.item;
+    const actions = props.actions;
 
     const repository = item.repository();
     const issue = item.core().content;
@@ -16,7 +17,9 @@ export default function TableCellTitleIssue (props) {
           <S>
             {issue.number &&
              <>
-               <span>{issue.title}</span>
+               <span onClick={()=> actions.issue.title.click(issue.id)}>
+                 {issue.title}
+               </span>
                <span style={{marginLeft:8}}>
                  (
                  <Link href={issue.url}>

@@ -21,11 +21,13 @@ import TableCellClosed from './TableProjectV2Items/TableCellClosed.js';
 
 export default function TableProjectV2Items (props) {
     const items = props.items;
+    const actions = props.actions;
 
     return (
         <TableContainer component={Paper}>
           <Table aria-label="simple table"
                  size="small">
+
             <TableHead>
               <TableRow>
                 <TableCell>Title</TableCell>
@@ -49,7 +51,7 @@ export default function TableProjectV2Items (props) {
                       <TableRow key={item.id()}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
 
-                        <TableCellTitle item={item}/>
+                        <TableCellTitle item={item} actions={actions}/>
 
                         <TableCellAssignees item={item}/>
 

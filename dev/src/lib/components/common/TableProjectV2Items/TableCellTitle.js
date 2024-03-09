@@ -11,6 +11,7 @@ import TableCellTitleIssue from './TableCellTitleIssue.js';
 
 export default function TableCellTitle (props) {
     const item = props.item;
+    const actions = props.actions;
 
     const repository = item.repository();
     const issue = item.core().content;
@@ -19,15 +20,16 @@ export default function TableCellTitle (props) {
     const is_issue = content_type==="ISSUE";
 
     if (is_issue)
-        return <TableCellTitleIssue item={item}/>;
+        return <TableCellTitleIssue item={item}
+                                    actions={actions}/>;
 
     return (
         <TableCell>
 
           <S variant="h6">
-            <Link href={item.path()}>
+            <span onClick={()=> actions.item.title.click(item.id())}>
               {item.title()}
-            </Link>
+            </span>
           </S>
 
           <Chip label={content_type} size="small" sx={{fontSize:11, mt:0.5}}/>
