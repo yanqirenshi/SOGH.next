@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import S from '@mui/material/Typography';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Card from '@mui/material/Card';
 
 import {DateTime} from 'luxon';
 
@@ -39,9 +40,11 @@ export default function Issue (props) {
              </Box>}
           </Box>
 
-          <Box sx={{mt:6}}>
+          <Card sx={{
+              mt:6, p:2, pt:0,
+          }}>
             <CreateComment/>
-          </Box>
+          </Card>
 
         </Box>
     );
