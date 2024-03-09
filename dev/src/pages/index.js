@@ -19,6 +19,7 @@ export { default as Parts                   } from './Parts.js';
 export { default as README                  } from './README.md';
 export { default as Screens                 } from './Screens.js';
 export { default as Scrum                   } from './Scrum.js';
+export { default as ScrumIssue              } from './ScrumIssue.js';
 export { default as ScrumProject            } from './ScrumProject.js';
 export { default as ScrumProjectItem        } from './ScrumProjectItem.js';
 export { default as SystemDynamics          } from './SystemDynamics.js';
