@@ -67,7 +67,7 @@ function Issue (props) {
         <Frame>
           <Box sx={{width:'100%', height:'100%', overflow: 'auto'}}>
             <Container>
-              <Box sx={{pt:3}}>
+              <Box sx={{pt:1}}>
                 <PanelIssue data={issue}/>
 
                 <Box>

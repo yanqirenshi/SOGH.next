@@ -3,6 +3,7 @@ import moment from 'moment';
 
 import Box from '@mui/material/Box';
 import S from '@mui/material/Typography';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
 import IssueComment from './IssueComment.js';
 
@@ -43,8 +44,10 @@ function Distance (current, before) {
     const distance_h = Math.ceil(distance_remainder / (60 * 60));
 
     return (
-        <Box sx={{mt:3 , mb:3, pl: 22}}>
+        <Box sx={{mb:3, pl: 22}}>
           <S variant="h5" sx={{color:'#ddd'}}>
+            <ArrowUpwardIcon sx={{mr:2}}/>
+
             {distance_day > 0 &&
              <span style={{marginRight:6}}>
                {distance_day}日
