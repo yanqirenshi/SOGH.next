@@ -7,6 +7,9 @@ import Comment from './common/Comment.js';
 
 import Title from './Issue/Title.js';
 import SubTitle from './Issue/SubTitle.js';
+import FirstComment from './Issue/FirstComment.js';
+
+
 import CreateComment from './CreateComment.js';
 
 export default function Issue (props) {
@@ -22,13 +25,10 @@ export default function Issue (props) {
                     view_description={is_view_description}
                     onChange={(v)=> setIsViewDescription(v)}/>
 
-          <Box sx={{mt:2}}>
-            {is_view_description &&
-             <Box sx={{mt:1}}>
-               <Comment body={issue.body}
-                        bodyHtml={issue.bodyHTML()}/>
-             </Box>}
-          </Box>
+          {is_view_description &&
+           <Box sx={{mt:2}}>
+             <FirstComment issue={issue}/>
+           </Box>}
 
           <Card sx={{
               mt:6, pb:2,
