@@ -37,13 +37,15 @@ export default function Issue (props) {
 
           {is_view_description &&
            <Box sx={{mt:2}}>
-             <FirstComment issue={issue}/>
+             <FirstComment issue={issue}
+                           actions={actions}/>
            </Box>}
 
           <Card sx={{
-              mt:2, pb:2,
+              mt:3, pb:2,
           }}>
-            <CreateComment actions={actions} onClick={clickCreate}/>
+            <CreateComment actions={actions}
+                           onClick={clickCreate}/>
           </Card>
 
         </Box>

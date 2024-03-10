@@ -26,9 +26,11 @@ export default function IssueComment (props) {
         setEditContents(comment.body());
 
     const clickUpdate = ()=> {
+        setMode('view');
         actions.issue.comment.update(comment.id(), edit_contents);
     };
     const clickDelete = ()=> {
+        setMode('view');
         actions.issue.comment.delete(comment.id());
     };
 

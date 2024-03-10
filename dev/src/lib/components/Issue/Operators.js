@@ -3,6 +3,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 export default function Operators (props) {
     const issue = props.issue;
@@ -14,6 +15,9 @@ export default function Operators (props) {
         actions.issue.next_action_date.change(
             issue.id(),
             e.target.value,
+            issue.repository().owner.login,
+            issue.repository().name,
+            issue.number(),
         );
     };
 
@@ -21,6 +25,18 @@ export default function Operators (props) {
         actions.issue.due_date.change(
             issue.id(),
             e.target.value,
+            issue.repository().owner.login,
+            issue.repository().name,
+            issue.number(),
+        );
+    };
+
+    const clickRefresh = ()=> {
+        actions.issue.refresh(
+            issue.id,
+            issue.repository().owner.login,
+            issue.repository().name,
+            issue.number(),
         );
     };
 
@@ -28,6 +44,13 @@ export default function Operators (props) {
         <Box sx={{mt:0.5}}>
 
           <Box sx={{display: 'flex'}}>
+
+            <Box sx={{m:1, mr:2}}>
+              <Button variant="outlined"
+                      onClick={clickRefresh} >
+                <RefreshIcon/>
+              </Button>
+            </Box>
 
             <Box sx={{m:1}}>
               <Button variant={is_view_description ? "contained" : "outlined"}

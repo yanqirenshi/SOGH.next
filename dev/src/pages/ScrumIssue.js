@@ -68,12 +68,12 @@ function Issue (props) {
             click: (owner, number)=> console.log([owner, number]),
         },
         issue: {
-            refresh: ()=> null,
+            refresh: (issue_id, owner, repo, number)=> console.log(issue_id),
             next_action_date: {
-                change: (issue_id, date)=> console.log([issue_id, date]),
+                change: (issue_id, date, owner, repo, number)=> console.log([issue_id, date]),
             },
             due_date: {
-                change: (issue_id, date)=> console.log([issue_id, date]),
+                change: (issue_id, date, owner, repo, number)=> console.log([issue_id, date]),
             },
             comment: {
                 create: (id, data)=> console.log([id, data]),

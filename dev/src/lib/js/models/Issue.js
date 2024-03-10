@@ -312,6 +312,9 @@ export default class Issue extends GraphQLNode {
 
         return this.core().projectItems.edges.map(e=> e.node);
     }
+    projectV2Item () {
+        return this.projectV2Items()[0] || null;
+    }
     projectsV2 () {
         const items = this.projectV2Items();
 
