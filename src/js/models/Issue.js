@@ -304,6 +304,23 @@ export default class Issue extends GraphQLNode {
         };
     }
     /* ****************************************************************
+     * ProjectV2
+     * **************************************************************** */
+    projectV2Items () {
+        if (!this.core().projectItems)
+            return [];
+
+        return this.core().projectItems.edges.map(e=> e.node);
+    }
+    projectsV2 () {
+        const items = this.projectV2Items();
+
+        return items.map(item=> item.project);
+    }
+    projectV2 () {
+        return this.projectsV2()[0] || null;
+    }
+    /* ****************************************************************
      * Project (Classic)
      * **************************************************************** */
     projectCards () {

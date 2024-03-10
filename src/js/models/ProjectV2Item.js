@@ -127,7 +127,6 @@ export default class ProjectV2Item extends GraphQLNode {
                   if (row.length!==2)
                       return total;
 
-                  const parson = row[0];
                   const point = row[1] * 1;
 
                   total += point;
@@ -160,7 +159,6 @@ export default class ProjectV2Item extends GraphQLNode {
                       return out;
 
                   const parson = row[0];
-                  const date = row[1];
                   const point = row[2] * 1;
 
                   out.total += point;

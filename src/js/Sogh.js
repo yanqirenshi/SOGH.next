@@ -339,7 +339,74 @@ export default class Sogh extends Pooler {
         // nodes 2 objs and pooling
         return obj.id();
     }
+    async asyncFetchIssueByViewer () {
+        const query = this.query('issues_by_viwer');
+
+        let out = [];
+        let loop = true, cursor = null;
+
+        while (loop) {
+            const query_pageing = this.makeQuery(query, cursor);
+            const post_data = this.postData(query_pageing);
+
+            // fetch
+            const response = await fetch(this.endpoint(), post_data)
+                  .then(res  => this.text2json(res))
+                  .then(res  => this.json2response(res, d=> d.data.viewer.issues))
+                  .catch(err => this.error2response(err));
+
+            // case of error
+            if ('error'===response.type)
+                return response.data;
+
+            // nodes 2 objs and pooling
+            const projects
+                  = this.node2objs(
+                      response.data.nodes,
+                      node=> this.node2issue(node));
+
+            // concat out
+            out = out.concat(projects);
+
+            // paging
+            const page_info = response.data.pageInfo;
+            cursor = page_info.endCursor;
+            loop   = page_info.hasNextPage;
+        }
+
+        return out;
+    }
+    async asyncFetchIssueByOrgRepoIssueNumber (org_login, repo_name, issue_number) {
+        const query = this.query('issue_by_org_repo_issue_number')
+              .replace('@login',  org_login)
+              .replace('@name',   repo_name)
+              .replace('@number', issue_number);
+
+        const post_data = this.postData(query);
+
+        // fetch
+        const response = await fetch(this.endpoint(), post_data)
+              .then(res  => this.text2json(res))
+              .then(res  => this.json2response(res, d=> {
+                  return d.data.organization.repository.issue;
+              }))
+              .catch(err => this.error2response(err));
+
+        // case of error
+        if ('error'===response.type)
+            return response.data;
+
+        // create object
+        const obj = this.node2issue(response.data);
+
+        // nodes 2 objs and pooling
+        return obj.id();
+    }
+    /////
+    ///// Issue Comments
+    /////
     async asyncFetchIssueCommentsByID (id) {
+        // issue_by_org_repo_issue_number.js
         const query = this.query('issue_comments_by_issue_id')
               .replace('@id', id);
 
@@ -379,8 +446,11 @@ export default class Sogh extends Pooler {
 
         return out;
     }
-    async asyncFetchIssueByViewer () {
-        const query = this.query('issues_by_viwer');
+    async asyncFetchIssueCommentsByOrgRepoIssueNumber (org_login, repo_name, issue_number) {
+        const query = this.query('issue_comments_by_org_repo_issue_number')
+              .replace('@login',  org_login)
+              .replace('@name',   repo_name)
+              .replace('@number', issue_number);
 
         let out = [];
         let loop = true, cursor = null;
@@ -392,7 +462,9 @@ export default class Sogh extends Pooler {
             // fetch
             const response = await fetch(this.endpoint(), post_data)
                   .then(res  => this.text2json(res))
-                  .then(res  => this.json2response(res, d=> d.data.viewer.issues))
+                  .then(res  => this.json2response(res, d=> {
+                      return d.data.organization.repository.issue.comments;
+                  }))
                   .catch(err => this.error2response(err));
 
             // case of error
@@ -403,7 +475,7 @@ export default class Sogh extends Pooler {
             const projects
                   = this.node2objs(
                       response.data.nodes,
-                      node=> this.node2issue(node));
+                      node=> this.node2issueComment(node));
 
             // concat out
             out = out.concat(projects);
@@ -465,8 +537,6 @@ export default class Sogh extends Pooler {
     }
     async asyncFetchProjectsV2ByTeam (team_id, callbacks={}) {
         if (callbacks.start) callbacks.start();
-
-        const user = this.viewer();
 
         const query = this.query('projectsv2_by_team')
               .replace('@team-id', team_id);

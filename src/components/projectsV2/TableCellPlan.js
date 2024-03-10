@@ -2,7 +2,6 @@ import React from 'react';
 import moment from 'moment';
 
 import Cell from '@mui/material/TableCell';
-import S from '@mui/material/Typography';
 
 export default function TableCellPlan (props) {
     const project = props.project;

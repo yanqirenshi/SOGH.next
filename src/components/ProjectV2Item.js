@@ -1,6 +1,5 @@
 import React from 'react';
 import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
 import S from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 
@@ -11,8 +10,6 @@ export default function ProjectV2Item (props) {
 
     if (!item)
         return null;
-
-    const type = item.contentTypename();
 
     const project = item.project();
 

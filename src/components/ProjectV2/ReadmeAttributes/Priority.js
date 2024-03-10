@@ -4,12 +4,8 @@ import Box from '@mui/material/Box';
 import S from '@mui/material/Typography';
 
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-
-import Paper from '@mui/material/Paper';
-import TextField from '@mui/material/TextField';
 
 export default function Priority (props) {
     const project = props.project;

@@ -1,9 +1,6 @@
 import * as React from 'react';
 
-import { DateTime } from "luxon";
-
 import TableCell from '@mui/material/TableCell';
-import S from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 
 export default function TableCellAssignees (props) {

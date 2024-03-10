@@ -7,6 +7,7 @@ import TableProjectV2Items from '../common/TableProjectV2Items.js';
 
 export default function Items (props) {
     const items = props.items;
+    const actions = props.actions;
 
     const x = items.reduce((ht,item)=> {
         if (!ht[item.status()])
@@ -28,7 +29,8 @@ export default function Items (props) {
                     <S variant="h5">
                       {status}
                     </S>
-                    <TableProjectV2Items items={status_items}/>
+                    <TableProjectV2Items items={status_items}
+                                         actions={actions}/>
                   </Box>
               );
           })}

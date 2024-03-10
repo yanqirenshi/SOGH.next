@@ -1,5 +1,4 @@
 import React from 'react';
-import moment from 'moment';
 
 import TableContainer from '@mui/material/TableContainer';
 import MTable from '@mui/material/Table';
@@ -8,20 +7,12 @@ import Cell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import S from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 
-import LinkSogh from '../common/LinkSogh.js';
-import Description from '../common/Description.js';
-import CellLinkGithub from '../common/TableCellLinkGithub.js';
-import CellTimestamps from '../common/TableCellTimestamps.js';
-import CellTermPlanResult from '../common/TableCellTermPlanResult.js';
 import TableBodyRow from './TableBodyRow.js';
 import TableBodyRowTasks from './TableBodyRowTasks.js';
 
 export default function Table (props) {
     const data = props.data;
-    const sogh = props.sogh;
     const actions = props.actions;
 
     const [open_tasks_projects, setOpenTasksProjects] = React.useState({});

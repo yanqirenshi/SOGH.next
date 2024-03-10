@@ -19,6 +19,7 @@ import Points from './ProjectV2/Points.js';
 export default function ProjectV2 (props) {
     const project = props.project;
     const items = props.items;
+    const actions = ensureActions(props.actions);
 
     const [tabs, setTabs] = React.useState({
         selected: 'items',
@@ -59,7 +60,7 @@ export default function ProjectV2 (props) {
 
             {'items'===tabs.selected &&
              <Box sx={{pt:4}}>
-               <Items items={items}/>
+               <Items items={items} actions={actions}/>
              </Box>}
 
             {'metrix'===tabs.selected && <Metrix/>}
@@ -76,4 +77,22 @@ export default function ProjectV2 (props) {
 
         </Box>
     );
+}
+
+function ensureActions (actions) {
+    if (actions)
+        return actions;
+
+    return {
+        item: {
+            title: {
+                click: (id, type)=> console.log(id),
+            },
+        },
+        issue: {
+            title: {
+                click: (id, type)=> console.log(id),
+            },
+        },
+    };
 }

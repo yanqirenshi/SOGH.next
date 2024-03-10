@@ -21,7 +21,7 @@ export default function Term (props) {
                      type="date"
                      size="small"
                      sx={{width:144}}
-                     value={term.start}
+                     value={term.start || ''}
                      onChange={()=>null}/>
 
           <S sx={{ml:1,mr:1}}>-</S>
@@ -30,7 +30,7 @@ export default function Term (props) {
                      type="date"
                      size="small"
                      sx={{width:144}}
-                     value={term.end}
+                     value={term.end || ''}
                      onChange={()=>null}/>
         </Box>
     );

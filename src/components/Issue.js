@@ -1,74 +1,38 @@
 import React from 'react';
 
 import Box from '@mui/material/Box';
-import S from '@mui/material/Typography';
+import Card from '@mui/material/Card';
 
-import {DateTime} from 'luxon';
+import Title from './Issue/Title.js';
+import SubTitle from './Issue/SubTitle.js';
+import FirstComment from './Issue/FirstComment.js';
 
-import Link from './common/Link.js';
-import Comment from './common/Comment.js';
-import UserName from './common/UserNameBlock.js';
-import Label from './common/Label.js';
+
+import CreateComment from './CreateComment.js';
 
 export default function Issue (props) {
     const issue = props.data;
 
-    // TODO: これは表示する必要はないかも。。。
-    const milestone = issue.milestone();
+    const [is_view_description, setIsViewDescription] = React.useState(true);
 
     return (
         <Box>
-          <Box sx={{mt: 3}}>
-            <S variant="h5">
-              <span>{issue.title()}</span>
-              <span style={{marginLeft:11}}>
-                (
-                <Link href={issue.url()}>
-                  {issue.number()}
-                </Link>
-                )
-              </span>
-            </S>
-          </Box>
+          <Title issue={issue}/>
 
-          <Box sx={{mt:1, display: 'flex'}}>
-            {milestone &&
-             <Box sx={{m:1}}>
-               <S>
-                 <span>{milestone.title}</span>
-                 <span style={{marginLeft:11}}>
-                   (
-                   <Link href={milestone.url}>
-                     {milestone.number}
-                   </Link>
-                   )
-                 </span>
-               </S>
-             </Box>}
+          <SubTitle issue={issue}
+                    view_description={is_view_description}
+                    onChange={(v)=> setIsViewDescription(v)}/>
 
-            <Box sx={{m:1, display: 'flex'}}>
-              {issue.assignees().map(assignee=> {
-                  return (
-                      <Box key={assignee.id}>
-                        <Link href={assignee.url}>
-                          <img width="17px" height="17px"
-                               src={assignee.avatarUrl}/>
-                        </Link>
-                        <span>{assignee.name || assignee.login}</span>
-                      </Box>
-                  );
-              })}
-            </Box>
+          {is_view_description &&
+           <Box sx={{mt:2}}>
+             <FirstComment issue={issue}/>
+           </Box>}
 
-            <Box sx={{m:1, display: 'flex'}}>
-              {issue.labels().map(label=> <Label key={label.id} value={label}/>)}
-            </Box>
-          </Box>
-
-          <Box sx={{mt:3}}>
-            <Comment body={issue.body}
-                     bodyHtml={issue.bodyHTML()}/>
-          </Box>
+          <Card sx={{
+              mt:2, pb:2,
+          }}>
+            <CreateComment/>
+          </Card>
 
         </Box>
     );
