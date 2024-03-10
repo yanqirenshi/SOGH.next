@@ -3,8 +3,6 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 
-import Comment from './common/Comment.js';
-
 import Title from './Issue/Title.js';
 import SubTitle from './Issue/SubTitle.js';
 import FirstComment from './Issue/FirstComment.js';
@@ -31,7 +29,7 @@ export default function Issue (props) {
            </Box>}
 
           <Card sx={{
-              mt:6, pb:2,
+              mt:2, pb:2,
           }}>
             <CreateComment/>
           </Card>
