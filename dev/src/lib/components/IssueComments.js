@@ -19,7 +19,7 @@ export default function IssueComments (props) {
               comment_before = comment;
 
               return (
-                  <Box>
+                  <Box key={comment.id()}>
                     {distance}
                     <IssueComment key={comment.id()}
                                   comment={comment}/>

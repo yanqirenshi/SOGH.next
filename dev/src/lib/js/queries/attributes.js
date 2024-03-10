@@ -38,7 +38,7 @@ owner {
 }
 `;
 }
-
+// iwasaki
 export function issue () {
     return `id
 url
@@ -186,8 +186,8 @@ export function projectv2Fields () {
 export function projectv2Creator () {
     return `
  ${actor()}
- ... on User { id }
- ... on Organization { id }
+ ... on User { id login }
+ ... on Organization { id login }
  ... on Mannequin { id }
  ... on EnterpriseUserAccount { id }
  ... on Bot { id }
@@ -197,10 +197,10 @@ export function projectv2Creator () {
 export function projectv2Owner () {
     return `
  id
- ... on Issue { id }
- ... on User { id }
- ... on PullRequest { id }
- ... on Organization { id }
+ ... on Issue { id number }
+ ... on User { id login }
+ ... on PullRequest { id number }
+ ... on Organization { id login }
 `;
 }
 

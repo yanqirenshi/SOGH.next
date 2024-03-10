@@ -27,10 +27,10 @@ const query = `{
               id
               ${attr.projectV2ItemFieldValues(30, 30, 30)}
               project {
-                id
-                number
-                title
-                url
+                ${attr.projectv2()}
+                owner {
+                  ${attr.projectv2Owner()}
+                }
               }
             }
           }
