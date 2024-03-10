@@ -13,6 +13,7 @@ import MDEditor from '@uiw/react-md-editor';
 
 export default function IssueComment (props) {
     const comment = props.comment;
+    const actions = props.actions;
 
     const [mode, setMode] = React.useState('view');
     const [edit_contents, setEditContents] = React.useState(null);
@@ -23,6 +24,15 @@ export default function IssueComment (props) {
 
     if ('edit'===mode && null===edit_contents)
         setEditContents(comment.body());
+
+    const clickUpdate = ()=> {
+        setMode('view');
+        actions.issue.comment.update(comment.id(), edit_contents);
+    };
+    const clickDelete = ()=> {
+        setMode('view');
+        actions.issue.comment.delete(comment.id());
+    };
 
     return (
         <Box>
@@ -48,13 +58,15 @@ export default function IssueComment (props) {
             <Box>
               <OperatorEdit mode={mode}
                             onChange={changeMode}
-                            onClick={click}/>
+                            onClick={clickUpdate}
+                            actions={actions}/>
             </Box>
 
             <Box>
               <OperatorDelete mode={mode}
                               onChange={changeMode}
-                              onClick={click}/>
+                              onClick={clickDelete}
+                              actions={actions}/>
             </Box>
 
           </Box>

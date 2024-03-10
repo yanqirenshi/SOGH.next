@@ -1,6 +1,6 @@
 {
     "name": "sogh",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "description": "Scram on Github",
     "main": "dist/index.js",
     "scripts": {
@@ -24,7 +24,6 @@
         "@mui/lab": "^5.0.0-alpha.104",
         "@mui/material": "^5.10.10",
         "@mui/x-date-pickers": "^5.0.5",
-        "@uiw/react-md-editor": "^4.0.3",
         "luxon": "^3.0.4",
         "moment": "^2.29.1"
     },
@@ -35,6 +34,7 @@
         "@babel/preset-react": "^7.12.10",
         "babel-loader": "^8.2.2",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-dom": "^18.2.0",
+        "@uiw/react-md-editor": "^4.0.3"
     }
 }

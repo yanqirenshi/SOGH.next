@@ -1,21 +1,71 @@
 import React from 'react';
 
 import Box from '@mui/material/Box';
+import MDEditor from '@uiw/react-md-editor';
 
 import BodyHtml from '../common/BodyHtml.js';
-
+import OperatorEdit from '../IssueComment/OperatorEdit.js';
+import OperatorDelete from '../IssueComment/OperatorDelete.js';
 
 export default function FirstComment (props) {
     const issue = props.issue;
+    const actions = props.actions;
+
+    const [mode, setMode] = React.useState('view');
+    const [edit_contents, setEditContents] = React.useState(issue.body());
+
+    const changeMode = (m)=> setMode(m);
+
+    const clickUpdate = ()=> {
+        setMode('view');
+        actions.issue.comment.update(issue.id(), edit_contents);
+    };
+    const clickDelete = ()=> {
+        setMode('view');
+        actions.issue.comment.delete(issue.id());
+    };
 
     return (
         <Box>
+          {'edit'!==mode &&
+           <Box sx={{
+               background:'rgba(255,255,255,0.3)',
+               pt:0.5, pb:1, pl:2, pr:2,
+               borderRadius: 2,
+           }}>
+             <BodyHtml value={issue.bodyHTML()}/>
+           </Box>}
+
+          {'edit'===mode &&
+           <Box sx={{
+               background:'rgba(255,255,255,0.3)',
+               borderRadius: 2,
+           }}>
+             <MDEditor height={444}
+                       value={edit_contents || ''}
+                       onChange={(v)=> setEditContents(v)}/>
+           </Box>}
+
           <Box sx={{
-              background:'rgba(255,255,255,0.3)',
-              pt:0.5, pb:1, pl:2, pr:2,
-              borderRadius: 2,
+              display:'flex',
+              justifyContent: 'space-between',
+              mt:1,
           }}>
-            <BodyHtml value={issue.bodyHTML()}/>
+
+            <Box>
+              <OperatorEdit mode={mode}
+                            onChange={changeMode}
+                            onClick={clickUpdate}
+                            actions={actions}/>
+            </Box>
+
+            <Box>
+              <OperatorDelete mode={mode}
+                              onChange={changeMode}
+                              onClick={clickDelete}
+                              actions={actions}/>
+            </Box>
+
           </Box>
         </Box>
     );

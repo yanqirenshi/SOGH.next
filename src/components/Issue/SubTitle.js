@@ -9,19 +9,24 @@ import Link from '../common/Link.js';
 
 export default function SubTitle (props) {
     const issue = props.issue;
-    const is_view_description = props.view_description;
-    const onChange = props.onChange;
+    const actions = props.actions;
 
     const milestone = issue.milestone();
 
     const project = issue.projectV2();
+
+    const clickProject = ()=> {
+        actions.project.click(project.owner.login, project.number);
+    };
 
     return (
         <Box sx={{mt:0.5}}>
 
           <Box>
             <>
-              <span>{project.title}</span>
+              <span onClick={clickProject}>
+                {project.title}
+              </span>
               <span style={{marginLeft:11}}>
                 (
                 <Link href={project.url}>
@@ -33,14 +38,6 @@ export default function SubTitle (props) {
           </Box>
 
           <Box sx={{display: 'flex'}}>
-            <Box sx={{m:1}}>
-              <Button variant={is_view_description ? "contained" : "outlined"}
-                      size="small"
-                      onClick={()=> onChange(!is_view_description)}>
-                Description
-              </Button>
-            </Box>
-
             {milestone &&
              <Box sx={{m:1}}>
                <Chip key={milestone.id}

@@ -10,6 +10,8 @@ import TabRequest from './CreateComment/TabRequest.js';
 import TabMemo from './CreateComment/TabMemo.js';
 
 export default function CreateComment (props) {
+    const onClick = props.onClick;
+
     const [tabs, setTabs] = React.useState(defaultTabsData());
 
     const onChange = (code, target, contents)=> {
@@ -20,6 +22,36 @@ export default function CreateComment (props) {
             tab.contents = contents;
 
         setTabs(new_tabs);
+    };
+
+    const click = ()=> {
+        const tab = tabs.list.find(tab=> {
+            return tab.code===tabs.selected;
+        });
+
+        if ('memo'===tab.code) {
+            onClick({
+                type: tab.code,
+                contents: tab.contents,
+            });
+        }
+
+        if ('request'===tab.code) {
+            onClick({
+                type: tab.code,
+                to_parson: tab.parson,
+                next_action_date: tab.next_action_date,
+                contents: tab.contents,
+            });
+        }
+
+        if ('finish today'===tab.code) {
+            onClick({
+                type: tab.code,
+                next_action_date: tab.next_action_date,
+                contents: tab.contents,
+            });
+        }
     };
 
     return (
@@ -43,7 +75,10 @@ export default function CreateComment (props) {
                       onChange={onChange}/>}
 
             <Box sx={{mt:1}}>
-              <Button variant="contained">Commit</Button>
+              <Button variant="contained"
+                      onClick={click}>
+                Commit
+              </Button>
             </Box>
           </Box>
         </Box>

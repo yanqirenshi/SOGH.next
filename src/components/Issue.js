@@ -5,15 +5,21 @@ import Card from '@mui/material/Card';
 
 import Title from './Issue/Title.js';
 import SubTitle from './Issue/SubTitle.js';
-import FirstComment from './Issue/FirstComment.js';
+import Operators from './Issue/Operators.js';
 
+import FirstComment from './Issue/FirstComment.js';
 
 import CreateComment from './CreateComment.js';
 
 export default function Issue (props) {
     const issue = props.data;
+    const actions = props.actions;
 
     const [is_view_description, setIsViewDescription] = React.useState(true);
+
+    const clickCreate = (data)=> {
+        actions.issue.comment.create(issue.id(), data);
+    };
 
     return (
         <Box>
@@ -21,17 +27,25 @@ export default function Issue (props) {
 
           <SubTitle issue={issue}
                     view_description={is_view_description}
-                    onChange={(v)=> setIsViewDescription(v)}/>
+                    onChange={(v)=> setIsViewDescription(v)}
+                    actions={actions}/>
+
+          <Operators issue={issue}
+                     view_description={is_view_description}
+                     onChange={(v)=> setIsViewDescription(v)}
+                     actions={actions}/>
 
           {is_view_description &&
            <Box sx={{mt:2}}>
-             <FirstComment issue={issue}/>
+             <FirstComment issue={issue}
+                           actions={actions}/>
            </Box>}
 
           <Card sx={{
-              mt:2, pb:2,
+              mt:3, pb:2,
           }}>
-            <CreateComment/>
+            <CreateComment actions={actions}
+                           onClick={clickCreate}/>
           </Card>
 
         </Box>
