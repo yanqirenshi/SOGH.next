@@ -63,15 +63,37 @@ function Issue (props) {
 
     const comments = issue_comments_id.map(id=> sogh.issueComment(id));
 
+    const actions = {
+        project: {
+            click: (owner, number)=> console.log([owner, number]),
+        },
+        issue: {
+            refresh: ()=> null,
+            next_action_date: {
+                change: (issue_id, date)=> console.log([issue_id, date]),
+            },
+            due_date: {
+                change: (issue_id, date)=> console.log([issue_id, date]),
+            },
+            comment: {
+                create: (id, data)=> console.log([id, data]),
+                update: (id,contents)=> console.log([id, contents]),
+                delete: (id,)=> console.log(id),
+            },
+        },
+    };
+
     return (
         <Frame>
           <Box sx={{width:'100%', height:'100%', overflow: 'auto'}}>
             <Box sx={{pt:1, pb:33}}>
               <Container>
-                <PanelIssue data={issue}/>
+                <PanelIssue data={issue}
+                            actions={actions}/>
 
                 <Box>
-                  <PanelIssueComments comments={comments}/>
+                  <PanelIssueComments comments={comments}
+                                      actions={actions}/>
                 </Box>
               </Container>
             </Box>

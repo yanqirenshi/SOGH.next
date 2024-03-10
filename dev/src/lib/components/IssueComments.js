@@ -9,6 +9,7 @@ import IssueComment from './IssueComment.js';
 
 export default function IssueComments (props) {
     const comments = props.comments || [];
+    const actions = props.actions;
 
     let comment_before = null;
     return (
@@ -22,7 +23,8 @@ export default function IssueComments (props) {
                   <Box key={comment.id()}>
                     {distance}
                     <IssueComment key={comment.id()}
-                                  comment={comment}/>
+                                  comment={comment}
+                                  actions={actions}/>
                   </Box>
               );
           })}
@@ -44,9 +46,9 @@ function Distance (current, before) {
     const distance_h = Math.ceil(distance_remainder / (60 * 60));
 
     return (
-        <Box sx={{mb:3, pl: 22}}>
-          <S variant="h5" sx={{color:'#ddd'}}>
-            <ArrowUpwardIcon sx={{mr:2}}/>
+        <Box sx={{mt: 2, mb:3, pl: 11}}>
+          <S variant="h5" sx={{color:'#ddd', display:'flex', alignItems: 'center'}}>
+            <ArrowUpwardIcon sx={{mr:2, color:'#aaa'}}/>
 
             {distance_day > 0 &&
              <span style={{marginRight:6}}>
