@@ -4,11 +4,12 @@ import { useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import { GITHUB_AUTH } from '../recoil/GITHUB.js';
 import {
     fetchIssue,
     fetchIssueComments,
+    REFRESH,
 } from '../recoil/PAGE_SCRUM_ISSUE.js';
 
 import Loading from '../panels/Loading.js';
@@ -43,6 +44,8 @@ function Issue (props) {
     const number = props.number;
     const repository = props.repository;
 
+    const refresh = useRecoilState(REFRESH)[1];
+
     const issue_id = useRecoilValue(fetchIssue({
         login: login,
         repository: repository,
@@ -68,7 +71,7 @@ function Issue (props) {
             click: (owner, number)=> console.log([owner, number]),
         },
         issue: {
-            refresh: (issue_id, owner, repo, number)=> console.log(issue_id),
+            refresh: (issue_id, owner, repo, number)=> refresh(new Date().toISOString()),
             next_action_date: {
                 change: (issue_id, date, owner, repo, number)=> console.log([issue_id, date]),
             },
