@@ -73,10 +73,10 @@ function Issue (props) {
         issue: {
             refresh: (issue_id, owner, repo, number)=> refresh(new Date().toISOString()),
             next_action_date: {
-                change: (issue_id, date, owner, repo, number)=> console.log([issue_id, date]),
+                change: (new_val, project, item, field_item, value)=> console.log([new_val, project, item, field_item, value]),
             },
             due_date: {
-                change: (issue_id, date, owner, repo, number)=> console.log([issue_id, date]),
+                change: (new_val, project, item, field_item, value)=> console.log([new_val, project, item, field_item, value]),
             },
             comment: {
                 create: (id, data)=> console.log([id, data]),

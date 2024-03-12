@@ -13,22 +13,26 @@ export default function Operators (props) {
     const actions = props.actions;
 
     const changeNextActionDate = (e)=> {
+        const field = issue.fieldValueContents('NextAction.Date');
+
         actions.issue.next_action_date.change(
-            issue.id(),
             e.target.value,
-            issue.repository().owner.login,
-            issue.repository().name,
-            issue.number(),
+            field.project,
+            field.item,
+            field.field_item,
+            field.value,
         );
     };
 
     const changeDueDate = (e)=> {
+        const field = issue.fieldValueContents('Due.Date');
+
         actions.issue.due_date.change(
-            issue.id(),
             e.target.value,
-            issue.repository().owner.login,
-            issue.repository().name,
-            issue.number(),
+            field.project,
+            field.item,
+            field.field_item,
+            field.value,
         );
     };
 
@@ -74,7 +78,7 @@ export default function Operators (props) {
                              }
                          }}
                          type="date"
-                         label="Due Date"
+                         label="Next Action Date"
                          variant="outlined"
                          InputLabelProps={{
                              shrink: true,

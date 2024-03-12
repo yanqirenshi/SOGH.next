@@ -283,9 +283,9 @@ avatarUrl
 
 const field = `
  {
-   ... on ProjectV2Field { id name }
-   ... on ProjectV2IterationField { id name }
-   ... on ProjectV2SingleSelectField { id name }
+   ... on ProjectV2Field { id name dataType }
+   ... on ProjectV2IterationField { id name dataType }
+   ... on ProjectV2SingleSelectField { id name dataType }
  } `;
 
 export function ProjectV2ItemFieldDateValue () {
