@@ -12,24 +12,27 @@ export default function Title (props) {
 
     return (
         <Box style={{display:'flex', flexDirection: 'column', justifyContent:'center'}}>
+
           <Box style={{display:'flex', justifyContent:'center'}}>
-            <S variant="h3" sx={{mr:6}}>
-              {project.type()}
-            </S>
+            <Box>
+              <S sx={{mr:6}}>
+                {project.type()}
+              </S>
 
-            <S variant="h3">
-              <span style={{marginRight:22}}>
-                {project.title()}
-              </span>
+              <S variant="h3">
+                <span style={{marginRight:22}}>
+                  {project.title()}
+                </span>
 
-              <span>
-                (
-                <Link href={project.url()}>
-                  {project.number()}
-                </Link>
-                )
-              </span>
-            </S>
+                <span>
+                  (
+                  <Link href={project.url()}>
+                    {project.number()}
+                  </Link>
+                  )
+                </span>
+              </S>
+            </Box>
           </Box>
 
           <Box sx={{display:'flex', justifyContent:'center'}}>

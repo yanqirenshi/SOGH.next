@@ -38,7 +38,7 @@ owner {
 }
 `;
 }
-// iwasaki
+
 export function issue () {
     return `id
 url
@@ -428,11 +428,14 @@ export function ProjectV2ItemFieldUserValue () {
 }
 
 export function projectV2ItemContentDraftIssue () {
-    return ` {
- __typename
- id
- title
- }`;
+    return `
+{
+   __typename
+  id
+  title
+  createdAt
+  updatedAt
+}`;
 }
 
 export function projectV2ItemContentIssue () {
@@ -443,6 +446,10 @@ export function projectV2ItemContentIssue () {
    url
    number
    title
+   createdAt
+   updatedAt
+   closedAt
+   state
    repository {
      ${repositories()}
    }
@@ -451,13 +458,17 @@ export function projectV2ItemContentIssue () {
 }
 
 export function projectV2ItemContentPullRequest () {
-    return ` {
- __typename
- id
- number
- url
- title
- }`;
+    return `
+{
+  __typename
+  id
+  number
+  url
+  title
+  createdAt
+  updatedAt
+  state
+}`;
 }
 
 export function projectV2ItemFieldValues (MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM) {

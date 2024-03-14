@@ -23,8 +23,11 @@ export default function ScrumProject (props) {
 }
 
 function Project () {
-    let {login, number} = useParams();
+    const [priority, setPriority] = React.useState(null);
+    const [plan, setPlan] = React.useState(null);
+    const [result, setResult] = React.useState(null);
 
+    const {login, number} = useParams();
     const nav = useNavigate();
 
     const authed = useRecoilValue(GITHUB_AUTH);
@@ -54,6 +57,21 @@ function Project () {
                 },
             },
         },
+        priority: {
+            change: (project_id, v)=> console.log(['priority', project_id, v])
+        },
+        plan: {
+            change: (project_id, start, end)=> console.log(['plan', project_id, start, end])
+        },
+        result: {
+            change: (project_id, start, end)=> console.log(['result', project_id, start, end])
+        }
+    };
+
+    const change = (type,v)=> {
+        if ('priority'===type) setPriority(v);
+        if ('plan'===type)     setPlan(v);
+        if ('result'===type)   setResult(v);
     };
 
     return (
@@ -61,7 +79,13 @@ function Project () {
           <Box sx={{width:'100%', height:'100%', overflow: 'auto'}}>
             <ProjectV2 project={sogh.projectV2(project)}
                        items={project_items.map(id=> sogh.projectV2Item(id))}
-                       actions={actions}/>
+                       actions={actions}
+                       values={{
+                           priority: priority,
+                           plan: plan,
+                           result: result,
+                       }}
+                       onChange={change}/>
           </Box>
         </Frame>
     );

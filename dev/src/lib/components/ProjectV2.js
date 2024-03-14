@@ -20,6 +20,8 @@ export default function ProjectV2 (props) {
     const project = props.project;
     const items = props.items;
     const actions = ensureActions(props.actions);
+    const values = props.values;
+    const onChange = props.onChange;
 
     const [tabs, setTabs] = React.useState({
         selected: 'items',
@@ -47,7 +49,10 @@ export default function ProjectV2 (props) {
           <Container maxWidth="lg">
 
             <Box sx={{mt:3}}>
-              <ReadmeAttributes project={project}/>
+              <ReadmeAttributes project={project}
+                                actions={actions}
+                                values={values}
+                                onChange={onChange}/>
             </Box>
 
             <Box sx={{mt:6}}>
