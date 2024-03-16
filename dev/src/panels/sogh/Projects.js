@@ -1,4 +1,5 @@
 import React from 'react';
+import { DateTime } from 'luxon';
 
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -54,7 +55,9 @@ const columns = [
         code: 'number',
         label: '#',
         sx: null,
-        val: (column, project, actions)=> {
+        val: (column, data)=> {
+            const project = data.project;
+
             return (
                 <Link href={project.url()}>
                   {project.number()}
@@ -66,7 +69,10 @@ const columns = [
         code: 'title',
         label: 'Title',
         sx: null,
-        val: (column, project, actions)=> {
+        val: (column, data)=> {
+            const project = data.project;
+            const actions = data.actions;
+
             return (
                 <S sx={{
                     color: 'rgba(0, 0, 0, 0.87)',
@@ -94,7 +100,9 @@ const columns = [
         code: 'priority',
         label: 'Priority',
         sx: {whiteSpace: 'nowrap'},
-        val: (column, project, actions)=> {
+        val: (column, data)=> {
+            const project = data.project;
+
             const priority = project.priorityData();
 
             return (
@@ -108,7 +116,9 @@ const columns = [
         code: 'owner',
         label: 'Owner',
         sx: {whiteSpace: 'nowrap'},
-        val: (column, project, actions)=> {
+        val: (column, data)=> {
+            const project = data.project;
+
             return (
                 project.maneger()
             );
@@ -129,8 +139,18 @@ const columns = [
         group: 'Plan',
         label: 'Start',
         sx: null,
-        val: (column, project, actions)=> {
-            return null;
+        val: (column, data)=> {
+            const project = data.project;
+
+            return (
+                <span style={{
+                    whiteSpace: 'nowrap',
+                    fontWeight: (data.is_in_term || data.is_passed) ? 'bold' : null,
+                    color: data.is_passed ? '#ec6d71' : null,
+                }}>
+                  {fmt(project.plan().start)}
+                </span>
+            );
         },
     },
     {
@@ -138,8 +158,18 @@ const columns = [
         group: 'Plan',
         label: 'End',
         sx: null,
-        val: (column, project, actions)=> {
-            return null;
+        val: (column, data)=> {
+            const project = data.project;
+
+            return (
+                <span style={{
+                    whiteSpace: 'nowrap',
+                    fontWeight: (data.is_in_term || data.is_passed) ? 'bold' : null,
+                    color: data.is_passed ? '#ec6d71' : null,
+                }}>
+                  {fmt(project.plan().end)}
+                </span>
+            );
         },
     },
     {
@@ -147,8 +177,14 @@ const columns = [
         group: 'Result',
         label: 'Start',
         sx: null,
-        val: (column, project, actions)=> {
-            return null;
+        val: (column, data)=> {
+            const project = data.project;
+
+            return (
+                <span style={{whiteSpace: 'nowrap'}}>
+                  {fmt(project.result().start)}
+                </span>
+            );
         },
     },
     {
@@ -156,15 +192,23 @@ const columns = [
         group: 'Result',
         label: 'End',
         sx: null,
-        val: (column, project, actions)=> {
-            return null;
+        val: (column, data)=> {
+            const project = data.project;
+
+            return (
+                <span style={{whiteSpace: 'nowrap'}}>
+                  {fmt(project.result().end)}
+                </span>
+            );
         },
     },
     {
         code: 'action',
         label: 'Action',
         sx: {whiteSpace: 'nowrap'},
-        val: (column, project, actions)=> {
+        val: (column, data)=> {
+            const project = data.project;
+
             return (
                 project.action()
             );
@@ -175,7 +219,9 @@ const columns = [
         group: 'Dependencies',
         label: 'Backlog',
         sx: {whiteSpace: 'nowrap'},
-        val: (column, project, actions)=> {
+        val: (column, data)=> {
+            const project = data.project;
+
             return (
                 project.backlog()
             );
@@ -185,7 +231,12 @@ const columns = [
         code: 'task',
         label: 'Task',
         sx: {p:0.1},
-        val: (column, project, actions, is_opened, onChange)=> {
+        val: (column, data)=> {
+            const project = data.project;
+            const actions = data.actions;
+            const is_opened = data.is_opened;
+            const onChange = data.onChange;
+
             return (
                 <Button variant="text"
                         sx={{p:0.2}}
@@ -197,3 +248,15 @@ const columns = [
         },
     },
 ];
+
+function fmt (v) {
+    if (!v)
+        return null;
+
+    const dt = DateTime.fromISO(v);
+
+    if (!dt.isValid)
+        return null;
+
+    return dt.toFormat('LL-dd');
+}

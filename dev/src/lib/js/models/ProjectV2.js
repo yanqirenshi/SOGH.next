@@ -170,7 +170,9 @@ export default class ProjectV2 extends GraphQLNode {
 
         return this._priority;
     }
-    priorityData (v) {
+    priorityData () {
+        const v = this.priority();
+
         const table = this._priorities;
 
         return table[v] || {

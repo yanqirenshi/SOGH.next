@@ -102,6 +102,10 @@ export default class Pooler extends Loader {
             node,
             (d)=> new item_class(d),
             (obj, node)=> {
+                obj.core('----------');
+                obj.core(obj.core());
+                obj.core(node);
+
                 obj.core(node);
             });
     }

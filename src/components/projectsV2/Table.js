@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 
 import TableContainer from '@mui/material/TableContainer';
 import MTable from '@mui/material/Table';
@@ -9,6 +10,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 import TableBodyRow from './TableBodyRow.js';
+import TableBodyRowProject from './TableBodyRowProject.js';
 import TableBodyRowTasks from './TableBodyRowTasks.js';
 import HeadCell from './HeadCell.js';
 
@@ -31,6 +33,8 @@ export default function Table (props) {
 
     const header_rows = makeHeaderRows(columns);
 
+    const now = moment();
+
     return (
         <TableContainer component={Paper}>
           <MTable aria-label="simple table" size="small">
@@ -38,10 +42,11 @@ export default function Table (props) {
             <TableHead>
               {header_rows.map((row,i)=> {
                   return (
-                      <TableRow>
-                        {row.map(d=> {
+                      <TableRow key={i}>
+                        {row.map((d,i)=> {
                             return (
-                                <HeadCell rowSpan={d.row_span}
+                                <HeadCell key={d+'_'+i}
+                                          rowSpan={d.row_span}
                                           colSpan={d.col_span}>
                                   {d.label}
                                 </HeadCell>
@@ -55,20 +60,16 @@ export default function Table (props) {
             <TableBody>
               {data.map((project) => {
                   const project_id = project.id();
-                  const is_open = open_tasks_projects[project_id];
+                  const is_opened = open_tasks_projects[project_id];
 
                   return (
-                      <>
-                        <TableBodyRow key={project_id}
-                                      project={project}
-                                      columns={columns}
-                                      actions={actions}
-                                      opened={is_open}
-                                      onChange={onChangeOpenTaskProject}/>
-                        {is_open &&
-                         <TableBodyRowTasks project={project}
-                                            columns={columns}/>}
-                      </>
+                      <TableBodyRow key={project_id}
+                                    project={project}
+                                    columns={columns}
+                                    now={now}
+                                    actions={actions}
+                                    is_opened={is_opened}
+                                    onChange={onChangeOpenTaskProject}/>
                   );
               })}
             </TableBody>
@@ -115,7 +116,7 @@ function makeHeaderRows (columns) {
 
     if (!tmp.is_double_row)
         return tmp.list;
-    console.log(tmp.list);
+
     return tmp.list.reduce((out, data)=> {
         if ('group'===data.__type) {
             out[0].push({ label: data.label, row_span: 1, col_span: data.list.length});
