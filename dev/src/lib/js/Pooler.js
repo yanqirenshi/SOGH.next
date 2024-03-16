@@ -12,15 +12,18 @@ export default class Pooler extends Loader {
         this.matchmaker = new Matchmaker(this);
 
         this._pools = [
-            'repository',
-            'user',
-            'project-v2',
-            'project-v2-item',
-            'issue',
-            'issue-comment',
-            'pull-request',
-        ].reduce((ht, key)=> {
-            ht[key] = new Pool(this);
+            ['repository',      model.Repository],
+            ['user',            model.User],
+            ['project-v2',      model.ProjectV2],
+            ['project-v2-item', model.ProjectV2Item],
+            ['issue',           model.Issue],
+            ['issue-comment',   model.IssueComment],
+            ['pull-request',    model.PullRequest],
+        ].reduce((ht, data)=> {
+            const key = data[0];
+
+            ht[key] = new Pool(this, data[1]);
+
             return ht;
         }, {});
 
@@ -35,7 +38,17 @@ export default class Pooler extends Loader {
             || this.projectV2(id)
             || this.node2projectV2(id);
     }
-    //
+    /* **************************************************************** *
+     *                                                                  *
+     * **************************************************************** */
+    getPoolAndItemClass (code) {
+        const pool = this.pool(code);
+
+        return {
+            pool: pool,
+            item_class: pool.itemClass(),
+        };
+    }
     /* **************************************************************** *
      *  Viewer                                                          *
      * **************************************************************** */
@@ -81,10 +94,16 @@ export default class Pooler extends Loader {
      *  ProjectV2                                                     *
      * **************************************************************** */
     node2projectV2 (node) {
-        const pool = this.pool('project-v2');
+        const {pool, item_class} = this.getPoolAndItemClass('project-v2');
 
         // this.matchmaker.user(node);
-        return pool.ensure(node, (d)=> new model.ProjectV2(d));
+
+        return pool.ensure(
+            node,
+            (d)=> new item_class(d),
+            (obj, node)=> {
+                obj.core(node);
+            });
     }
     projectsV2 (v) {
         return this.pool('project-v2').list();

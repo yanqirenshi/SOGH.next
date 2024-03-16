@@ -1,9 +1,14 @@
 export default class Pool {
-    constructor (sogh) {
+    constructor (sogh, item_class) {
         this._sogh = sogh;
+
+        this._item_class = item_class;
 
         this._ht = {};
         this._list = [];
+    }
+    itemClass () {
+        return this._item_class;
     }
     ht () {
         return this._ht;
@@ -23,13 +28,14 @@ export default class Pool {
     get (id) {
         return this._ht[id] || null;
     }
-    ensure (node, makeInstance) {
+    ensure (node, makeInstance, updater) {
         let obj = this.get(node.id);
 
         if (obj) {
-            obj.core(node);
+            updater ? updater(obj, node) : obj.core(node);
         } else {
             obj = makeInstance(node);
+
             this.add(obj);
         }
 

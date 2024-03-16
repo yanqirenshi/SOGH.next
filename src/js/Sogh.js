@@ -581,6 +581,52 @@ export default class Sogh extends Pooler {
 
         return out;
     }
+    async asyncFetchProjectsV2WithItemsByTeam (team_id, callbacks={}) {
+        if (callbacks.start) callbacks.start();
+
+        const query = this.query('projectsv2_with_items_by_team')
+              .replace('@team-id', team_id);
+
+        let out = [];
+        let loop = true, cursor = null;
+
+        while (loop) {
+            const query_pageing = this.makeQuery(query, cursor);
+            const post_data = this.postData(query_pageing);
+
+            // fetch
+            const response = await fetch(this.endpoint(), post_data)
+                  .then(res  => this.text2json(res))
+                  .then(res  => this.json2response(res, d=> d.data.node.projectsV2))
+                  .catch(err => this.error2response(err));
+
+            // case of error
+            if ('error'===response.type) {
+                if (callbacks.failed) callbacks.failed(out);
+                return response.data;
+            }
+
+            // nodes 2 objs and pooling
+            const projects
+                  = this.node2objs(
+                      response.data.edges,
+                      data=> this.node2projectV2(data.node));
+
+            // concat out
+            out = out.concat(projects);
+
+            if (callbacks.fetched) callbacks.fetched(projects, out);
+
+            // paging
+            const page_info = response.data.pageInfo;
+            cursor = page_info.endCursor;
+            loop   = page_info.hasNextPage;
+        }
+
+        if (callbacks.successed) callbacks.successed(out);
+
+        return out;
+    }
     async asyncFetchProjectV2ByUserLoginProjectV2Number (login, number, callbacks={}) {
         callback('start', callbacks);
 

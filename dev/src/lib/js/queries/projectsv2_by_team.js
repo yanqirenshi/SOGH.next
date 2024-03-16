@@ -9,7 +9,7 @@ const query = `{
     ... on Team {
       id
       name
-      projectsV2 (${attr.page_nation(10)}, query: "is:open") {
+      projectsV2 (${attr.page_nation(100)}, query: "is:open") {
         edges {
           node {
             ${attr.projectv2()}
@@ -24,11 +24,6 @@ const query = `{
             owner {
               ${attr.projectv2Owner()}
             }
-
-            items (first:50) {
-              ${attr.projectV2Items(MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM)}
-            }
-
           }
         }
         pageInfo {

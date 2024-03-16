@@ -1,6 +1,14 @@
 import GraphQLNode from './GraphQLNode.js';
 import Term from './Term.js';
 
+const priorities = {
+    's': { code: 's', label: '緊急', label_short: '緊', },
+    'h': { code: 'h', label: '高い', label_short: '高', },
+    'n': { code: 'n', label: '普通', label_short: '普', },
+    'l': { code: 'l', label: '低い', label_short: '低', },
+    '?': { code: '?', label: 'なぞ', label_short: '謎', },
+};
+
 export default class ProjectV2 extends GraphQLNode {
     constructor (data) {
         super(data);
@@ -9,6 +17,8 @@ export default class ProjectV2 extends GraphQLNode {
 
         this.initRegexs();
         this.parseReadme();
+
+        this._priorities = priorities;
     }
     initReadmeAttributes () {
         this._priority = '?';
@@ -19,6 +29,11 @@ export default class ProjectV2 extends GraphQLNode {
         this._result = new Term();
         this._action = '';
         this._backlog = '';
+
+        // TODO:
+        this._systems = [];
+        this._customer  = '';
+        this._agency  = '';
     }
     initRegexs () {
         // const value = '(\S)';
@@ -43,6 +58,9 @@ export default class ProjectV2 extends GraphQLNode {
             // estimate_description: /.*\$[E|e]stimate.Description:\s+(\S+).*/,
             // purchase: /.*\$[P|p]urchase:\s+(\S+).*/,
             // phase: /.*\$[P|p]hase:\s+(\S+).*/,
+            customer: /.*\$[C|c]ustomer:\s+(\S+).*/,
+            agency: /.*\$[A|a]gency:\s+(\S+).*/,
+            systems: /.*\$[S|s]ystems:\s+(\S+).*/,
         };
     }
     parseReadmeItem (readme, regex) {
@@ -87,9 +105,12 @@ export default class ProjectV2 extends GraphQLNode {
             case 'result':   this.parseReadmeItemResult(readme, regex);          break;
             case 'action':   this.action(this.parseReadmeItem(readme, regex));   break;
             case 'backlog':  this.backlog(this.parseReadmeItem(readme, regex));  break;
+
+            case 'customer': this.customer(this.parseReadmeItem(readme, regex)); break;
+            case 'agency':   this.agency(this.parseReadmeItem(readme, regex));   break;
+            case 'systems':  this.systems(this.parseReadmeItem(readme, regex));  break;
             default: throw new Error(`Not found key. key=${k}`);
             }
-
         }
     }
     number () {
@@ -149,6 +170,15 @@ export default class ProjectV2 extends GraphQLNode {
 
         return this._priority;
     }
+    priorityData (v) {
+        const table = this._priorities;
+
+        return table[v] || {
+            code: v,
+            label: 'なぞ',
+            label_short: '謎',
+        };
+    }
     maneger (v) {
         if (arguments.length===1)
             this._owner = v;
@@ -190,5 +220,23 @@ export default class ProjectV2 extends GraphQLNode {
             this._backlog = v;
 
         return this._backlog;
+    }
+    systems (v) {
+        if (arguments.length===1)
+            this._systems = v;
+
+        return this._systems;
+    }
+    agency (v) {
+        if (arguments.length===1)
+            this._agency = v;
+
+        return this._agency;
+    }
+    customer (v) {
+        if (arguments.length===1)
+            this._customer = v;
+
+        return this._customer;
     }
 }

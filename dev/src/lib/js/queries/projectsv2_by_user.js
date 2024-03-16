@@ -5,56 +5,16 @@ const query = `{
     projectsV2(${attr.page_nation()}) {
       nodes {
         ${attr.projectv2()}
-        fields(first: 100) {
+        fields(first: 10) {
           nodes {
-            ... on ProjectV2Field {
-              ${attr.projectv2Field()}
-            }
-            ... on ProjectV2SingleSelectField {
-              ${attr.projectv2FieldSelect()}
-              options {
-                id
-                name
-                nameHTML
-              }
-            }
-            ... on ProjectV2IterationField {
-              ${attr.projectv2FieldIteration()}
-              configuration {
-                startDay
-                duration
-                iterations {
-                  duration
-                  id
-                  startDate
-                  title
-                  titleHTML
-                }
-                completedIterations {
-                  duration
-                  id
-                  startDate
-                  title
-                  titleHTML
-                }
-              }
-            }
+            ${attr.projectv2Fields()}
           }
         }
         creator {
-          ${attr.actor()}
-          ... on User { id }
-          ... on Organization { id }
-          ... on Mannequin { id }
-          ... on EnterpriseUserAccount { id }
-          ... on Bot { id }
+          ${attr.projectv2Creator()}
         }
         owner {
-          id
-          ... on Issue { id }
-          ... on User { id }
-          ... on PullRequest { id }
-          ... on Organization { id }
+          ${attr.projectv2Owner()}
         }
       }
       pageInfo {
