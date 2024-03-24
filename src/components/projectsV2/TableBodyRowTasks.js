@@ -12,6 +12,9 @@ export default function TableBodyRowTasks (props) {
 
     const items = project.itemsWith2ProjectV2Item();
 
+    console.log('TableBodyRow --');
+    console.log(TableBodyRowTasks);
+
     return (
         <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
           <Cell colSpan={columns.length} sx={{background: 'rgba(234, 228, 208, 0.3)'}}>

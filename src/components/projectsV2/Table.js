@@ -22,6 +22,9 @@ export default function Table (props) {
     const [open_tasks_projects, setOpenTasksProjects] = React.useState({});
 
     const onChangeOpenTaskProject = (id)=> {
+        console.log();
+        console.log(id);
+
         const new_state = {...open_tasks_projects};
         if (new_state[id]===true)
             new_state[id] = false;
@@ -34,6 +37,9 @@ export default function Table (props) {
     const header_rows = makeHeaderRows(columns);
 
     const now = moment();
+
+    console.log('Table ---');
+    console.log(open_tasks_projects);
 
     return (
         <TableContainer component={Paper}>
