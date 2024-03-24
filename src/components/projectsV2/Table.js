@@ -68,6 +68,11 @@ export default function Table (props) {
                   const project_id = project.id();
                   const is_opened = open_tasks_projects[project_id];
 
+                  console.log('TableBody --');
+                  console.log(open_tasks_projects);
+                  console.log(project_id);
+                  console.log(is_opened);
+
                   return (
                       <TableBodyRow key={project_id}
                                     project={project}
