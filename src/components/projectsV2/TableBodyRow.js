@@ -14,9 +14,6 @@ export default function TableBodyRow (props) {
 
     const project_id = project.id();
 
-    console.log('TableBodyRow --');
-    console.log(is_opened);
-
     return (
         <>
           <TableBodyRowProject project={project}
