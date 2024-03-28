@@ -68,7 +68,7 @@ export default function Table (props) {
                                     columns={columns}
                                     now={now}
                                     actions={actions}
-                                    opened={is_opened}
+                                    is_opened={is_opened}
                                     onChange={onChangeOpenTaskProject}/>
                   );
               })}

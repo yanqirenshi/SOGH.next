@@ -15,7 +15,7 @@ export default function Issue (props) {
     const issue = props.data;
     const actions = props.actions;
 
-    const [is_view_description, setIsViewDescription] = React.useState(false);
+    const [is_view_description, setIsViewDescription] = React.useState(true);
     const [is_view_add_comment, setIsViewAddComment] = React.useState(false);
 
     const clickCreate = (data)=> {
