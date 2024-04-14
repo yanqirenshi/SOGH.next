@@ -26,7 +26,7 @@ export default function IssueComment (props) {
 
     const onChange = actions.issue.comment.change;
 
-    const clickUpdate = ()=> actions.issue.comment.update(comment_id, edit_contents);
+    const clickUpdate = ()=> actions.issue.comment.update(comment_id, value);
 
     const clickDelete = ()=> actions.issue.comment.delete(comment_id);
 
