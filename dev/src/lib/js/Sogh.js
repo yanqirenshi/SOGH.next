@@ -323,7 +323,7 @@ export default class Sogh extends Pooler {
 
         let out = [];
 
-        const query = this.query('create_issue_comment')
+        const query = this.query('delete_issue_comment')
               .replace('@comment-id', id);
 
         const post_data = this.postData(query);
@@ -331,11 +331,7 @@ export default class Sogh extends Pooler {
         fetch(this.endpoint(), post_data)
             .then(response  => this.text2json(response))
             .then(response  => {
-                const r = this.json2response(response, d=> {
-                    console.log(d.data.deleteIssueComment.clientMutationId);
-                    // const issue_comment_node = d.data.deleteIssueComment.clientMutationId;
-                    // return sogh.node2issueComment(issue_comment_node);
-                });
+                const r = this.json2response(response, d=> null);
 
                 // case of error
                 if ('error'===response.type) {
