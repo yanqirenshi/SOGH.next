@@ -45,7 +45,8 @@ function Distance (current, before) {
 
     const distance_day = Math.floor(distance / (60 * 60 * 24));
     const distance_remainder = distance % (60 * 60 * 24);
-    const distance_h = Math.ceil(distance_remainder / (60 * 60));
+    const distance_h = Math.floor(distance_remainder / (60 * 60));
+    const distance_m = Math.floor(distance_remainder % (60 * 60) / 60);
 
     return (
         <Box sx={{mt: 2, mb:3, pl: 11}}>
@@ -56,9 +57,15 @@ function Distance (current, before) {
              <span style={{marginRight:6}}>
                {distance_day}日
              </span>}
+
             {distance_h > 0 &&
              <span>
                {distance_h}時間
+             </span>}
+
+            {distance_m > 0 &&
+             <span>
+               {distance_m} 分
              </span>}
           </S>
         </Box>

@@ -11,6 +11,7 @@ import TabMemo from './CreateComment/TabMemo.js';
 
 export default function CreateComment (props) {
     const onClick = props.onClick;
+    const members = props.members;
 
     const [tabs, setTabs] = React.useState(defaultTabsData());
 
@@ -68,7 +69,8 @@ export default function CreateComment (props) {
 
             {'request'===tabs.selected &&
              <TabRequest data={tabs.list.find(d=>d.code==='request')}
-                         onChange={onChange}/>}
+                         onChange={onChange}
+                         members={members}/>}
 
             {'memo'===tabs.selected &&
              <TabMemo data={tabs.list.find(d=>d.code==='memo')}

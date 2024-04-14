@@ -9,13 +9,12 @@ import Editor from '../Editor.js';
 export default function TabRequest (props) {
     const data = props.data;
     const onChange = props.onChange;
-
-    // console.log(data.parson);
+    const members = props.members;
 
     return (
         <Box>
           <Box sx={{display:'flex'}}>
-            <Parsons/>
+            <Parsons members={members}/>
 
             <TextField type="date"
                        sx={{ml:2}}

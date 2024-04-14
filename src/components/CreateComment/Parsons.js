@@ -6,18 +6,29 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
 export default function Parsons (props) {
+    const members = props.members;
+
     return (
         <FormControl size="small">
-          <InputLabel id="demo-simple-select-label">Age</InputLabel>
+
+          <InputLabel id="demo-simple-select-label">Member</InputLabel>
+
           <Select labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   value={10}
-                  label="Age"
+                  label="Member"
                   onChange={()=>null}>
-            <MenuItem value={10}>Ten</MenuItem>
-            <MenuItem value={20}>Twenty</MenuItem>
-            <MenuItem value={30}>Thirty</MenuItem>
+
+            {members.map(member=> {
+                return (
+                    <MenuItem key={member.code}
+                              value={member.code}>
+                      member.name
+                    </MenuItem>
+                );
+            })}
           </Select>
+
         </FormControl>
     );
 }

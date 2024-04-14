@@ -47,6 +47,11 @@ function Issue (props) {
     const [edit_contents, setEditContents] = React.useState({});
     const [is_view_description, setIsViewDescription] = React.useState(true);
     const [is_view_add_comment, setIsViewAddComment] = React.useState(true);
+    const [add_comment_data, setAddCommentData] = React.useState([
+        { code: '', label: '', contents: '', },
+        { code: '', label: '', contents: '', member: null, next_action_date: '' },
+        { code: '', label: '', contents: '', next_action_date: '' },
+    ]);
 
     const refresh = useRecoilState(REFRESH)[1];
 
@@ -106,7 +111,8 @@ function Issue (props) {
                             actions={actions}
                             view_description={is_view_description}
                             view_add_comment={is_view_add_comment}
-                            edit_contents={edit_contents}/>
+                            edit_contents={edit_contents}
+                            members={sogh.members()}/>
 
                 <Box>
                   <PanelIssueComments comments={comments}

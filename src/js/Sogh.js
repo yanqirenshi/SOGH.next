@@ -14,6 +14,8 @@ export default class Sogh extends Pooler {
             'project-v2-data':  '/scrum/users/:login/projects/:number',
             'project-v2-items': '/scrum/users/:login/projects/:project-number/items/:id',
         };
+
+        this._members = [];
     }
     query (code) {
         return this._queries[code];
@@ -81,6 +83,18 @@ export default class Sogh extends Pooler {
 
                 if (failed) failed(error);
             });
+    }
+    /** **************************************************************** *
+     * Member
+     * **************************************************************** */
+    members (v) {
+        if (arguments.length>0)
+            this._members = v;
+
+        return this._members;
+    }
+    member (code) {
+        return this._members.find(m=> m.code===code) || null;
     }
     /** **************************************************************** *
      * fetch util
@@ -331,14 +345,12 @@ export default class Sogh extends Pooler {
         fetch(this.endpoint(), post_data)
             .then(response  => this.text2json(response))
             .then(response  => {
-                const r = this.json2response(response, d=> null);
-
                 // case of error
                 if ('error'===response.type) {
-                    callback('failed', callbacks, [r.data, id]);
+                    callback('failed', callbacks, [id]);
                 }
 
-                callback('successed', callbacks, [r.data.id(), id]);
+                callback('successed', callbacks, [id]);
             })
             .catch(err => {
                 this.error2response(err);

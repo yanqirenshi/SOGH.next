@@ -16,6 +16,7 @@ export default function Issue (props) {
     const actions = props.actions;
     const is_view_description = props.view_description;
     const is_view_add_comment = props.view_add_comment;
+    const members = props.members;
 
     const clickCreate = (data)=>
           actions.issue.comment.create(issue.id(), data);
@@ -43,9 +44,10 @@ export default function Issue (props) {
                      actions={actions}/>
 
           {is_view_add_comment &&
-           <Card sx={{pb:2}}>
+           <Card sx={{mt:1, pb:2}}>
              <CreateComment actions={actions}
-                            onClick={clickCreate}/>
+                            onClick={clickCreate}
+                            members={members}/>
            </Card>}
 
           {is_view_description &&
