@@ -89,10 +89,10 @@ function Issue (props) {
                 delete: (id,)=> console.log(id),
             },
             description: {
-                swithView : (v)=> setIsViewDescription(v),
+                changeView : (v)=> setIsViewDescription(v),
             },
             add_comment: {
-                swithView : (v)=> setIsViewAddComment(v),
+                changeView : (v)=> setIsViewAddComment(v),
             },
         },
     };

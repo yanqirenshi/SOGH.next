@@ -32,3 +32,7 @@ export { default as search_issues } from './search_issues.js';
 export { default as update_issue_body } from './update_issue_body.js';
 export { default as user_by_id } from './user_by_id.js';
 export { default as viwer } from './viwer.js';
+
+export { default as create_issue_comment } from './create_issue_comment.js';
+export { default as delete_issue_comment } from './delete_issue_comment.js';
+export { default as update_issue_comment } from './update_issue_comment.js';

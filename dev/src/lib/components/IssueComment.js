@@ -30,8 +30,8 @@ export default function IssueComment (props) {
 
     const clickDelete = ()=> actions.issue.comment.delete(comment_id);
 
-    const changeMode = (m)=>
-          onChange(changeEditContentMode(edit_contents, comment_id, value));
+    const changeMode = (new_mode)=>
+          onChange(changeEditContentMode(edit_contents, comment_id, new_mode, value));
 
     const change = (new_value)=>
           onChange(changeEditContentValue (edit_contents, comment_id, new_value));
@@ -77,16 +77,13 @@ export default function IssueComment (props) {
     );
 }
 
-function changeEditContentMode (edit_contents, comment_id, value) {
+function changeEditContentMode (edit_contents, comment_id, mode, value) {
     const new_edit_contents = cp(edit_contents);
 
     if (!new_edit_contents[comment_id])
-        new_edit_contents[comment_id] = makeEditContent(comment_id, value, 'view');
-
-    if ('view'===new_edit_contents[comment_id].mode)
-        new_edit_contents[comment_id].mode = 'edit';
+        new_edit_contents[comment_id] = makeEditContent(comment_id, value, mode);
     else
-        new_edit_contents[comment_id].mode = 'view';
+        new_edit_contents[comment_id].mode = mode;
 
     return new_edit_contents;
 }

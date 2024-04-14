@@ -252,6 +252,105 @@ export default class Sogh extends Pooler {
                                 node=> this.node2issueComment(node));
             });
     }
+    updateIssueComment (id, body, callbacks={}) {
+        callback('start', callbacks, [id, body]);
+
+        let out = [];
+
+        const query = this.query('update_issue_comment')
+              .replace('@id',   id)
+              .replace('@body', body);
+
+        const post_data = this.postData(query);
+
+        fetch(this.endpoint(), post_data)
+            .then(response  => this.text2json(response))
+            .then(response  => {
+                const r = this.json2response(response, d=> {
+                    const issue_comment_node = d.data.updateIssueComment.issueComment;
+                    return this.node2issueComment(issue_comment_node);
+                });
+
+                // case of error
+                if ('error'===response.type) {
+                    callback('failed', callbacks, [r.data, id, body]);
+                }
+
+                callback('successed', callbacks, [r.data.id(), id, body]);
+            })
+            .catch(err => {
+                this.error2response(err);
+                callback('failed', callbacks, [this.error2response(err), id, body]);
+            });
+
+        return out;
+    }
+    createIssueComment (id, body, callbacks={}) {
+        callback('start', callbacks, [id, body]);
+
+        let out = [];
+
+        const query = this.query('create_issue_comment')
+              .replace('@id',   id)
+              .replace('@body', body);
+
+        const post_data = this.postData(query);
+
+        fetch(this.endpoint(), post_data)
+            .then(response  => this.text2json(response))
+            .then(response  => {
+                const r = this.json2response(response, d=> {
+                    const issue_comment_node = d.data.addComment.commentEdge.node;
+                    return this.node2issueComment(issue_comment_node);
+                });
+
+                // case of error
+                if ('error'===response.type) {
+                    callback('failed', callbacks, [r.data, id, body]);
+                }
+
+                callback('successed', callbacks, [r.data.id(), id, body]);
+            })
+            .catch(err => {
+                this.error2response(err);
+                callback('failed', callbacks, [this.error2response(err), id, body]);
+            });
+
+        return out;
+    }
+    deleteIssueComment (id, callbacks={}) {
+        callback('start', callbacks, [id]);
+
+        let out = [];
+
+        const query = this.query('create_issue_comment')
+              .replace('@comment-id', id);
+
+        const post_data = this.postData(query);
+
+        fetch(this.endpoint(), post_data)
+            .then(response  => this.text2json(response))
+            .then(response  => {
+                const r = this.json2response(response, d=> {
+                    console.log(d.data.deleteIssueComment.clientMutationId);
+                    // const issue_comment_node = d.data.deleteIssueComment.clientMutationId;
+                    // return sogh.node2issueComment(issue_comment_node);
+                });
+
+                // case of error
+                if ('error'===response.type) {
+                    callback('failed', callbacks, [r.data, id]);
+                }
+
+                callback('successed', callbacks, [r.data.id(), id]);
+            })
+            .catch(err => {
+                this.error2response(err);
+                callback('failed', callbacks, [this.error2response(err), id]);
+            });
+
+        return out;
+    }
     async asyncFetchViewer () {
         const query = this.query('viwer');
 

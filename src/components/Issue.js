@@ -22,9 +22,9 @@ export default function Issue (props) {
 
     const changeView = (type, v)=> {
         if ('description'===type)
-            actions.issue.description.swithView(v);
+            actions.issue.description.changeView(v);
         else
-            actions.issue.add_comment.swithView(v);
+            actions.issue.add_comment.changeView(v);
     };
 
     return (

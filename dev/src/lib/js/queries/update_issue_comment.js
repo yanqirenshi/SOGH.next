@@ -1,7 +1,7 @@
 import * as attr from './attributes.js';
 
 const query = `mutation {
-  updateIssueComment(input: {id: $id, body: $body}) {
+  updateIssueComment(input: {id: "@id", body: "@body"}) {
     issueComment {
       ${attr.issue_comment()}
       pullRequest {
