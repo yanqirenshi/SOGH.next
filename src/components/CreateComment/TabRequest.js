@@ -14,14 +14,17 @@ export default function TabRequest (props) {
     return (
         <Box>
           <Box sx={{display:'flex'}}>
-            <Parsons members={members}/>
+            <Parsons type="to_parson"
+                     members={members}
+                     value={data.to_parson}
+                     onChange={(e)=> onChange(data.code, 'to_parson', e.target.value)}/>
 
             <TextField type="date"
                        sx={{ml:2}}
                        size="small"
                        label="Next Action Date"
                        value={data.next_action_date}
-                       onChange={onChange}/>
+                       onChange={(e)=> onChange(data.code, 'next_action_date', e.target.value)}/>
           </Box>
 
           <Box sx={{mt:2}}>

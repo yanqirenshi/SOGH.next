@@ -15,12 +15,12 @@ export default function CreateComment (props) {
 
     const [tabs, setTabs] = React.useState(defaultTabsData());
 
-    const onChange = (code, target, contents)=> {
+    const onChange = (code, target, value)=> {
         const new_tabs = JSON.parse(JSON.stringify(tabs));
+
         const tab = new_tabs.list.find(tab=> tab.code===code);
 
-        if ('contents'===target)
-            tab.contents = contents;
+        tab[target] = value;
 
         setTabs(new_tabs);
     };

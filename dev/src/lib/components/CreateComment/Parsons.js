@@ -7,6 +7,9 @@ import Select from '@mui/material/Select';
 
 export default function Parsons (props) {
     const members = props.members;
+    const type = props.type;
+    const value = props.value;
+    const onChange = props.onChange;
 
     return (
         <FormControl size="small">
@@ -15,15 +18,15 @@ export default function Parsons (props) {
 
           <Select labelId="demo-simple-select-label"
                   id="demo-simple-select"
-                  value={10}
+                  value={value}
                   label="Member"
-                  onChange={()=>null}>
+                  onChange={onChange}>
 
             {members.map(member=> {
                 return (
                     <MenuItem key={member.code}
                               value={member.code}>
-                      member.name
+                      {member.name}
                     </MenuItem>
                 );
             })}
