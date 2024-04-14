@@ -10,6 +10,7 @@ import IssueComment from './IssueComment.js';
 export default function IssueComments (props) {
     const comments = props.comments || [];
     const actions = props.actions;
+    const edit_contents = props.edit_contents;
 
     let comment_before = null;
     return (
@@ -24,7 +25,8 @@ export default function IssueComments (props) {
                     {distance}
                     <IssueComment key={comment.id()}
                                   comment={comment}
-                                  actions={actions}/>
+                                  actions={actions}
+                                  edit_contents={edit_contents}/>
                   </Box>
               );
           })}

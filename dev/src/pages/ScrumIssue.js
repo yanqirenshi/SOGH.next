@@ -44,6 +44,8 @@ function Issue (props) {
     const number = props.number;
     const repository = props.repository;
 
+    const [edit_contents, setEditContents] = React.useState({});
+
     const refresh = useRecoilState(REFRESH)[1];
 
     const issue_id = useRecoilValue(fetchIssue({
@@ -79,6 +81,7 @@ function Issue (props) {
                 change: (new_val, project, item, field_item, value)=> console.log([new_val, project, item, field_item, value]),
             },
             comment: {
+                change: (v)=> setEditContents(v),
                 create: (id, data)=> console.log([id, data]),
                 update: (id,contents)=> console.log([id, contents]),
                 delete: (id,)=> console.log(id),
@@ -92,11 +95,13 @@ function Issue (props) {
             <Box sx={{pt:1, pb:33}}>
               <Container>
                 <PanelIssue data={issue}
-                            actions={actions}/>
+                            actions={actions}
+                            edit_contents={edit_contents}/>
 
                 <Box>
                   <PanelIssueComments comments={comments}
-                                      actions={actions}/>
+                                      actions={actions}
+                                      edit_contents={edit_contents}/>
                 </Box>
               </Container>
             </Box>

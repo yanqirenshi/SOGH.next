@@ -14,25 +14,27 @@ import MDEditor from '@uiw/react-md-editor';
 export default function IssueComment (props) {
     const comment = props.comment;
     const actions = props.actions;
+    const edit_contents = props.edit_contents;
 
-    const [mode, setMode] = React.useState('view');
-    const [edit_contents, setEditContents] = React.useState(null);
+    const comment_id = comment.id();
 
-    const changeMode = (m)=> setMode(m);
+    const data = edit_contents[comment_id];
 
-    const click = (type)=> console.log(type);
+    const mode = data ? data.mode : 'view';
 
-    if ('edit'===mode && null===edit_contents)
-        setEditContents(comment.body());
+    const value = edit_contents[comment_id] ? edit_contents[comment_id].value : comment.body();
 
-    const clickUpdate = ()=> {
-        setMode('view');
-        actions.issue.comment.update(comment.id(), edit_contents);
-    };
-    const clickDelete = ()=> {
-        setMode('view');
-        actions.issue.comment.delete(comment.id());
-    };
+    const onChange = actions.issue.comment.change;
+
+    const clickUpdate = ()=> actions.issue.comment.update(comment_id, edit_contents);
+
+    const clickDelete = ()=> actions.issue.comment.delete(comment_id);
+
+    const changeMode = (m)=>
+          onChange(changeEditContentMode(edit_contents, comment_id, value));
+
+    const change = (new_value)=>
+          onChange(changeEditContentValue (edit_contents, comment_id, new_value));
 
     return (
         <Box>
@@ -45,8 +47,8 @@ export default function IssueComment (props) {
 
             {'edit'===mode &&
              <MDEditor height={444}
-                       value={edit_contents || ''}
-                       onChange={(v)=> setEditContents(v)}/>}
+                       value={data.value}
+                       onChange={change}/>}
           </Card>
 
           <Box sx={{
@@ -73,4 +75,37 @@ export default function IssueComment (props) {
 
         </Box>
     );
+}
+
+function changeEditContentMode (edit_contents, comment_id, value) {
+    const new_edit_contents = {...edit_contents};
+
+    if (!new_edit_contents[comment_id])
+        new_edit_contents[comment_id] = makeEditContent(comment_id, value, 'view');
+
+    if ('view'===new_edit_contents[comment_id].mode)
+        new_edit_contents[comment_id].mode = 'edit';
+    else
+        new_edit_contents[comment_id].mode = 'view';
+
+    return new_edit_contents;
+}
+
+function changeEditContentValue (edit_contents, comment_id, value) {
+    const new_edit_contents = {...edit_contents};
+
+    if (!new_edit_contents[comment_id])
+        new_edit_contents[comment_id] = makeEditContent(comment_id, value, 'view');
+    else
+        new_edit_contents[comment_id].value = value;
+
+    return new_edit_contents;
+}
+
+function makeEditContent (comment_id, value, mode) {
+    return {
+        id: comment_id,
+        value: value || '',
+        mode: mode || 'view',
+    };
 }
