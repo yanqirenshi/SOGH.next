@@ -45,6 +45,8 @@ function Issue (props) {
     const repository = props.repository;
 
     const [edit_contents, setEditContents] = React.useState({});
+    const [is_view_description, setIsViewDescription] = React.useState(true);
+    const [is_view_add_comment, setIsViewAddComment] = React.useState(true);
 
     const refresh = useRecoilState(REFRESH)[1];
 
@@ -86,6 +88,12 @@ function Issue (props) {
                 update: (id,contents)=> console.log([id, contents]),
                 delete: (id,)=> console.log(id),
             },
+            description: {
+                swithView : (v)=> setIsViewDescription(v),
+            },
+            add_comment: {
+                swithView : (v)=> setIsViewAddComment(v),
+            },
         },
     };
 
@@ -96,6 +104,8 @@ function Issue (props) {
               <Container>
                 <PanelIssue data={issue}
                             actions={actions}
+                            view_description={is_view_description}
+                            view_add_comment={is_view_add_comment}
                             edit_contents={edit_contents}/>
 
                 <Box>

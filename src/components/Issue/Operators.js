@@ -58,15 +58,15 @@ export default function Operators (props) {
             </Box>
 
             <Box sx={{m:1}}>
-              <Button sx={{mr:1}}
-                      variant={is_view_description ? "outlined" : "contained"}
-                      onClick={()=> onChange('description', !is_view_description)}>
-                Description
-              </Button>
-
               <Button variant={is_view_add_comment ? "outlined" : "contained"}
                       onClick={()=> onChange('add_comment', !is_view_add_comment)}>
                 add Comment
+              </Button>
+
+              <Button sx={{ml:1}}
+                      variant={is_view_description ? "outlined" : "contained"}
+                      onClick={()=> onChange('description', !is_view_description)}>
+                Description
               </Button>
             </Box>
 

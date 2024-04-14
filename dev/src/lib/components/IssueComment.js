@@ -78,7 +78,7 @@ export default function IssueComment (props) {
 }
 
 function changeEditContentMode (edit_contents, comment_id, value) {
-    const new_edit_contents = {...edit_contents};
+    const new_edit_contents = cp(edit_contents);
 
     if (!new_edit_contents[comment_id])
         new_edit_contents[comment_id] = makeEditContent(comment_id, value, 'view');
@@ -92,7 +92,7 @@ function changeEditContentMode (edit_contents, comment_id, value) {
 }
 
 function changeEditContentValue (edit_contents, comment_id, value) {
-    const new_edit_contents = {...edit_contents};
+    const new_edit_contents = cp(edit_contents);
 
     if (!new_edit_contents[comment_id])
         new_edit_contents[comment_id] = makeEditContent(comment_id, value, 'view');
@@ -100,6 +100,10 @@ function changeEditContentValue (edit_contents, comment_id, value) {
         new_edit_contents[comment_id].value = value;
 
     return new_edit_contents;
+}
+
+function cp (v) {
+    return JSON.parse(JSON.stringify(v));
 }
 
 function makeEditContent (comment_id, value, mode) {

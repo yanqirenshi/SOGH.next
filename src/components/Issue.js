@@ -14,19 +14,17 @@ import CreateComment from './CreateComment.js';
 export default function Issue (props) {
     const issue = props.data;
     const actions = props.actions;
+    const is_view_description = props.view_description;
+    const is_view_add_comment = props.view_add_comment;
 
-    const [is_view_description, setIsViewDescription] = React.useState(true);
-    const [is_view_add_comment, setIsViewAddComment] = React.useState(false);
-
-    const clickCreate = (data)=> {
-        actions.issue.comment.create(issue.id(), data);
-    };
+    const clickCreate = (data)=>
+          actions.issue.comment.create(issue.id(), data);
 
     const changeView = (type, v)=> {
         if ('description'===type)
-            setIsViewDescription(v);
+            actions.issue.description.swithView(v);
         else
-            setIsViewAddComment(v);
+            actions.issue.add_comment.swithView(v);
     };
 
     return (
@@ -44,17 +42,17 @@ export default function Issue (props) {
                      onChange={changeView}
                      actions={actions}/>
 
-          {is_view_description &&
-           <Box sx={{mt:2}}>
-             <FirstComment issue={issue}
-                           actions={actions}/>
-           </Box>}
-
           {is_view_add_comment &&
-           <Card sx={{mt:3, pb:2}}>
+           <Card sx={{pb:2}}>
              <CreateComment actions={actions}
                             onClick={clickCreate}/>
            </Card>}
+
+          {is_view_description &&
+           <Box sx={{mt:3, mt:2}}>
+             <FirstComment issue={issue}
+                           actions={actions}/>
+           </Box>}
 
         </Box>
     );

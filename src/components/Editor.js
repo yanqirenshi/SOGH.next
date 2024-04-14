@@ -11,7 +11,7 @@ export default function Editor (props) {
     return (
         <Box sx={{display:'flex'}}>
           <div className="container">
-            <MDEditor height={444}
+            <MDEditor height={222}
                       value={data.contents}
                       onChange={(v)=> onChange(data.code, 'contents', v)}/>
           </div>
