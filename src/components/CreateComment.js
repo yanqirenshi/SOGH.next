@@ -16,6 +16,8 @@ export default function CreateComment (props) {
     const [tabs, setTabs] = React.useState(defaultTabsData());
 
     const onChange = (code, target, value)=> {
+        console.log('---------------------');
+        console.log([code, target, value]);
         const new_tabs = JSON.parse(JSON.stringify(tabs));
 
         const tab = new_tabs.list.find(tab=> tab.code===code);

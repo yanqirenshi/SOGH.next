@@ -14,7 +14,7 @@ export default function TabRequest (props) {
     return (
         <Box>
           <Box sx={{display:'flex'}}>
-            <Parsons type="to_parson"
+            <Parsons type="parson"
                      members={members}
                      value={data.to_parson}
                      onChange={(e)=> onChange(data.code, 'to_parson', e.target.value)}/>
