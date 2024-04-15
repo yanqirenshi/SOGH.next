@@ -1,3 +1,5 @@
+import * as attr from './attributes.js';
+
 const query = `{
   repository(name: "@name", owner: "@owner") {
     issues(after: "", first: 100, states: OPEN) {
@@ -6,64 +8,32 @@ const query = `{
         endCursor
       }
       nodes {
-        id
-        url
-        title
-        createdAt
-        closedAt
-        updatedAt
-        number
-        body
+        ${attr.issue()}
         repository {
-          id
-          name
-          url
+          ${attr.repositories()}
         }
-        projectCards(first: 1) {
+        projectCards(first: 10) {
           nodes {
-            id
-            url
-            note
-            state
+            ${attr.project_card()}
             column {
-              id
-              name
+              ${attr.project_column()}
               project {
-                id
-                number
-                name
-                body
-                createdAt
-                updatedAt
-                closedAt
-                url
+                ${attr.project()}
               }
             }
           }
         }
         milestone {
-          id
-          url
-          title
-          state
-          number
-          dueOn
+          ${attr.milestone()}
         }
         assignees(first: 10) {
           nodes {
-            email
-            id
-            name
-            login
-            url
+            ${attr.user()}
           }
         }
         labels(first: 10) {
           nodes {
-            color
-            id
-            name
-            url
+            ${attr.label()}
           }
         }
       }

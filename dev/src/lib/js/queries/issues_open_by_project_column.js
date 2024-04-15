@@ -1,3 +1,5 @@
+import * as attr from './attributes.js';
+
 const query = `{
   node(id: "@column-id") {
     id
@@ -12,61 +14,32 @@ const query = `{
             isArchived
             content {
               ... on Issue {
-                id
-                url
-                title
-                updatedAt
-                state
-                number
-                createdAt
-                closedAt
-                body
-                labels(first: 10) {
-                  nodes {
-                    color
-                    id
-                    name
-                    url
-                  }
+                ${attr.issue()}
+                repository {
+                  ${attr.repositories()}
                 }
-                projectCards {
+                projectCards(first: 10) {
                   nodes {
-                    id
-                    url
-                    note
-                    state
+                    ${attr.project_card()}
                     column {
-                      id
-                      name
-                      url
-                      purpose
+                      ${attr.project_column()}
                       project {
-                        id
-                        number
-                        name
-                        body
-                        createdAt
-                        updatedAt
-                        closedAt
-                        url
+                        ${attr.project()}
                       }
                     }
                   }
                 }
                 milestone {
-                  id
-                  url
-                  title
-                  state
-                  number
-                  dueOn
+                  ${attr.milestone()}
                 }
                 assignees(first: 10) {
                   nodes {
-                    login
-                    name
-                    id
-                    url
+                    ${attr.user()}
+                  }
+                }
+                labels(first: 10) {
+                  nodes {
+                    ${attr.label()}
                   }
                 }
               }
