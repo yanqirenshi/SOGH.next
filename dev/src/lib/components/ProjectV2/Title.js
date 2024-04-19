@@ -15,23 +15,31 @@ export default function Title (props) {
 
           <Box style={{display:'flex', justifyContent:'center'}}>
             <Box>
-              <S sx={{mr:6}}>
-                {project.type()}
-              </S>
+              <Box sx={{display:'flex', justifyContent: 'space-between'}}>
+                <S sx={{mr:6}}>
+                  {project.type()}
+                </S>
 
-              <S variant="h3">
-                <span style={{marginRight:22}}>
-                  {project.title()}
-                </span>
+                <S>
+                  {project.id()}
+                </S>
+              </Box>
 
-                <span>
-                  (
-                  <Link href={project.url()}>
-                    {project.number()}
-                  </Link>
-                  )
-                </span>
-              </S>
+              <Box sx={{mt:1}}>
+                <S variant="h3">
+                  <span style={{marginRight:22}}>
+                    {project.title()}
+                  </span>
+
+                  <span>
+                    (
+                    <Link href={project.url()}>
+                      {project.number()}
+                    </Link>
+                    )
+                  </span>
+                </S>
+              </Box>
             </Box>
           </Box>
 
