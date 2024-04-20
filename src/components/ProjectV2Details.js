@@ -14,7 +14,7 @@ import Metrix from './ProjectV2/Metrix.js';
 import Part from './ProjectV2/Part.js';
 import Points from './ProjectV2/Points.js';
 
-export default function ProjectV2 (props) {
+export default function ProjectV2Details (props) {
     const project = props.project;
     const items = props.items;
     const actions = ensureActions(props.actions);
@@ -40,7 +40,7 @@ export default function ProjectV2 (props) {
 
           <Container maxWidth="lg">
 
-            <Box sx={{mt:6}}>
+            <Box>
               <Tabs data={tabs} onChange={new_tabs=>setTabs(new_tabs)}/>
             </Box>
 

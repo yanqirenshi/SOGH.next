@@ -77,14 +77,7 @@ function Project () {
     return (
         <Frame>
           <Box sx={{width:'100%', height:'100%', overflow: 'auto'}}>
-            <ProjectV2Contents project={sogh.projectV2(project)}
-                               actions={actions}
-                               values={{
-                                   priority: priority,
-                                   plan: plan,
-                                   result: result,
-                               }}
-                               onChange={change}/>
+            <ProjectV2Contents project={sogh.projectV2(project)}/>
 
             <ProjectV2Details project={sogh.projectV2(project)}
                               items={project_items.map(id=> sogh.projectV2Item(id))}
