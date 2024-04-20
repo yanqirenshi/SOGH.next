@@ -10,7 +10,7 @@ import * as atoms from '../recoil/PAGE_SCRUM_PROJECT.js';
 import Loading from '../panels/Loading.js';
 import Frame from '../assemblies/frames/Frame.js';
 
-import { ProjectV2 } from '../lib/index.js';
+import { ProjectV2Contents, ProjectV2Details } from '../lib/index.js';
 
 import sogh from '../manegers/sogh.js';
 
@@ -77,15 +77,18 @@ function Project () {
     return (
         <Frame>
           <Box sx={{width:'100%', height:'100%', overflow: 'auto'}}>
-            <ProjectV2 project={sogh.projectV2(project)}
-                       items={project_items.map(id=> sogh.projectV2Item(id))}
-                       actions={actions}
-                       values={{
-                           priority: priority,
-                           plan: plan,
-                           result: result,
-                       }}
-                       onChange={change}/>
+            <ProjectV2Contents project={sogh.projectV2(project)}
+                               actions={actions}
+                               values={{
+                                   priority: priority,
+                                   plan: plan,
+                                   result: result,
+                               }}
+                               onChange={change}/>
+
+            <ProjectV2Details project={sogh.projectV2(project)}
+                              items={project_items.map(id=> sogh.projectV2Item(id))}
+                              actions={actions}/>
           </Box>
         </Frame>
     );

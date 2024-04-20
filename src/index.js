@@ -2,7 +2,8 @@ import ProjectV2Item from './components/ProjectV2Item.js';
 import ProjectV2Items from './components/ProjectV2Items.js';
 import ProjectsV2 from './components/ProjectsV2.js';
 import Repositories from './components/Repositories.js';
-import ProjectV2 from './components/ProjectV2.js';
+import ProjectV2Contents from './components/ProjectV2Contents.js';
+import ProjectV2Details from './components/ProjectV2Details.js';
 import PanelIssue from './components/Issue.js';
 import PanelIssueComments from './components/IssueComments.js';
 import TableProjectV2Items from './components/common/TableProjectV2Items.js';
@@ -25,7 +26,8 @@ export {
     ProjectV2Item,
     ProjectV2Items,
     ProjectsV2,
-    ProjectV2,
+    ProjectV2Contents,
+    ProjectV2Details,
     Repositories,
     PanelIssue,
     PanelIssueComments,

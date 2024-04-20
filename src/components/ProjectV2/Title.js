@@ -44,13 +44,12 @@ export default function Title (props) {
           </Box>
 
           <Box sx={{display:'flex', justifyContent:'center'}}>
-            <Chip label={project.creator().login}
+            <Chip title="Created At"
+                  label={project.creator().login}
                   sx={{m:1}}/>
 
-            <Chip label={project.release()}
-                  sx={{m:1}}/>
-
-            <Chip label={project.public() ? "public" : "private"}
+            <Chip title="Scope"
+                  label={project.public() ? "public" : "private"}
                   sx={{m:1}}/>
           </Box>
 

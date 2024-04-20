@@ -16,7 +16,7 @@ export default function ReadmeAttributes (props) {
     const changeResult   = (term)=> onChange('result', term);
 
     return (
-        <Box sx={{display:'flex', flexWrap: 'wrap', justifyContent:'center'}}>
+        <Box sx={{display:'flex', flexWrap: 'wrap', justifyContent:'flex-start'}}>
 
           <Box>
             <Priority project={project}
