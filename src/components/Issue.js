@@ -45,7 +45,8 @@ export default function Issue (props) {
 
           {is_view_add_comment &&
            <Card sx={{mt:1, pb:2}}>
-             <CreateComment actions={actions}
+             <CreateComment issue={issue}
+                            actions={actions}
                             onClick={clickCreate}
                             members={members}/>
            </Card>}

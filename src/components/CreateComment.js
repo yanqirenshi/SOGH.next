@@ -10,14 +10,13 @@ import TabRequest from './CreateComment/TabRequest.js';
 import TabMemo from './CreateComment/TabMemo.js';
 
 export default function CreateComment (props) {
+    const issue = props.issue;
     const onClick = props.onClick;
     const members = props.members;
 
     const [tabs, setTabs] = React.useState(defaultTabsData());
 
     const onChange = (code, target, value)=> {
-        console.log('---------------------');
-        console.log([code, target, value]);
         const new_tabs = JSON.parse(JSON.stringify(tabs));
 
         const tab = new_tabs.list.find(tab=> tab.code===code);
@@ -28,6 +27,8 @@ export default function CreateComment (props) {
     };
 
     const click = ()=> {
+        const field = issue.fieldValueContents('NextAction.Date');
+
         const tab = tabs.list.find(tab=> {
             return tab.code===tabs.selected;
         });
@@ -40,19 +41,27 @@ export default function CreateComment (props) {
         }
 
         if ('request'===tab.code) {
+
+
             onClick({
                 type: tab.code,
                 to_parson: tab.parson,
-                next_action_date: tab.next_action_date,
                 contents: tab.contents,
+                project: field.project,
+                item: field.item,
+                field_item: field.field_item,
+                next_action_date: tab.next_action_date,
             });
         }
 
         if ('finish today'===tab.code) {
             onClick({
                 type: tab.code,
-                next_action_date: tab.next_action_date,
                 contents: tab.contents,
+                project: field.project,
+                item: field.item,
+                field_item: field.field_item,
+                next_action_date: tab.next_action_date,
             });
         }
     };
