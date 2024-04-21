@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import { useParams } from 'react-router-dom';
+import moment from 'moment';
 
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -32,26 +33,23 @@ export default function ScrumIssue (props) {
 
     return (
         <Suspense fallback={<Loading/>}>
-          <Issue login={params.login}
-                 number={params.number}
-                 repository={params.repository}/>
+          <Contents login={params.login}
+                    number={params.number}
+                    repository={params.repository}/>
         </Suspense>
     );
 }
 
-function Issue (props) {
+function Contents (props) {
     const login = props.login;
     const number = props.number;
     const repository = props.repository;
 
+    const [tabs, setTabs] = React.useState(defaultTabsData());
+
     const [edit_contents, setEditContents] = React.useState({});
     const [is_view_description, setIsViewDescription] = React.useState(true);
     const [is_view_add_comment, setIsViewAddComment] = React.useState(true);
-    const [add_comment_data, setAddCommentData] = React.useState([
-        { code: '', label: '', contents: '', },
-        { code: '', label: '', contents: '', member: null, next_action_date: '' },
-        { code: '', label: '', contents: '', next_action_date: '' },
-    ]);
 
     const refresh = useRecoilState(REFRESH)[1];
 
@@ -91,7 +89,8 @@ function Issue (props) {
                 change: (v)=> setEditContents(v),
                 create: (id, data)=> console.log([id, data]),
                 update: (id,contents)=> console.log([id, contents]),
-                delete: (id,)=> console.log(id),
+                delete: (id)=> console.log(id),
+                changeTabs: (new_tabs)=> setTabs(new_tabs),
             },
             description: {
                 changeView : (v)=> setIsViewDescription(v),
@@ -111,8 +110,8 @@ function Issue (props) {
                             actions={actions}
                             view_description={is_view_description}
                             view_add_comment={is_view_add_comment}
-                            edit_contents={edit_contents}
-                            members={sogh.members()}/>
+                            members={sogh.members()}
+                            tabs={tabs}/>
 
                 <Box>
                   <PanelIssueComments comments={comments}
@@ -124,4 +123,45 @@ function Issue (props) {
           </Box>
         </Frame>
     );
+}
+
+function defaultTabsData () {
+    return {
+        selected: 'memo',
+        list: [
+            {
+                code: 'memo',
+                label: 'Memo',
+                contents: [
+                    '## Memo',
+                    '',
+                    '',
+                ].join('\n'),
+            },
+            {
+                code: 'request',
+                label: 'Request',
+                parson: '',
+                next_action_date: moment().add(1, 'd').format('YYYY-MM-DD'),
+                contents: [
+                    '作業を依頼する時は 1、2行で良いので「依頼文章」を記載してください。',
+                    'イシューこコメントのメンションは自動で付与されます。',
+                    '',
+                ].join('\n'),
+            },
+            {
+                code: 'finish today',
+                label: 'Finish Today',
+                next_action_date: moment().add(1, 'd').format('YYYY-MM-DD'),
+                contents: [
+                    '## Memo',
+                    '',
+                    '明日の自分にメモを残すとよいです。',
+                    '1. 本日の対応内容、出来た物',
+                    '2. 明日やること、作る物',
+                    '',
+                ].join('\n'),
+            },
+        ],
+    };
 }

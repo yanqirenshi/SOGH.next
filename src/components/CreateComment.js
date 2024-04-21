@@ -1,5 +1,4 @@
 import React from 'react';
-import moment from 'moment';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -13,17 +12,19 @@ export default function CreateComment (props) {
     const issue = props.issue;
     const onClick = props.onClick;
     const members = props.members;
+    const tabs = props.tabs;
+    const onChange = props.onChange;
 
-    const [tabs, setTabs] = React.useState(defaultTabsData());
+    const onChangeTab = (new_tabs)=> onChange(new_tabs);
 
-    const onChange = (code, target, value)=> {
+    const onChangeValue = (code, target, value)=> {
         const new_tabs = JSON.parse(JSON.stringify(tabs));
 
         const tab = new_tabs.list.find(tab=> tab.code===code);
 
         tab[target] = value;
 
-        setTabs(new_tabs);
+        onChange(new_tabs);
     };
 
     const click = ()=> {
@@ -68,22 +69,22 @@ export default function CreateComment (props) {
         <Box>
 
           <Box sx={{mb:2, pl:2, background:'#f8f8f8'}}>
-            <Tabs tabs={tabs} onChange={v=>setTabs(v)}/>
+            <Tabs tabs={tabs} onChange={onChangeTab}/>
           </Box>
 
           <Box sx={{pl:2, pr:2}}>
             {'finish today'===tabs.selected &&
              <TabFinishToday data={tabs.list.find(d=>d.code==='finish today')}
-                             onChange={onChange}/>}
+                             onChange={onChangeValue}/>}
 
             {'request'===tabs.selected &&
              <TabRequest data={tabs.list.find(d=>d.code==='request')}
-                         onChange={onChange}
+                         onChange={onChangeValue}
                          members={members}/>}
 
             {'memo'===tabs.selected &&
              <TabMemo data={tabs.list.find(d=>d.code==='memo')}
-                      onChange={onChange}/>}
+                      onChange={onChangeValue}/>}
 
             <Box sx={{mt:1}}>
               <Button variant="contained"
@@ -94,46 +95,4 @@ export default function CreateComment (props) {
           </Box>
         </Box>
     );
-}
-
-function defaultTabsData () {
-    return {
-        selected: 'memo',
-        list: [
-            {
-                code: 'memo',
-                label: 'Memo',
-                contents: [
-                    '## Memo',
-                    '',
-                    '',
-                    '',
-                ].join('\n'),
-            },
-            {
-                code: 'request',
-                label: 'Request',
-                parson: '',
-                next_action_date: moment().add(1, 'd').format('YYYY-MM-DD'),
-                contents: [
-                    '作業を依頼する時は 1、2行で良いので「依頼文章」を記載してください。',
-                    'イシューこコメントのメンションは自動で付与されます。',
-                    '',
-                ].join('\n'),
-            },
-            {
-                code: 'finish today',
-                label: 'Finish Today',
-                next_action_date: moment().add(1, 'd').format('YYYY-MM-DD'),
-                contents: [
-                    '## Memo',
-                    '',
-                    '明日の自分にメモを残すとよいです。',
-                    '1. 本日の対応内容、出来た物',
-                    '2. 明日やること、作る物',
-                    '',
-                ].join('\n'),
-            },
-        ],
-    };
 }

@@ -67,7 +67,7 @@ function View (props) {
     const html = issue.bodyHTML();
 
     return (
-        <Box sx={{background:'rgba(255,255,255,0.3)',
+        <Box sx={{background:'rgba(255,255,255,0.6)',
                   pt:0.5, pb:1, pl:2, pr:2,
                   borderRadius: 2}}>
           {html.trim().length > 0 &&

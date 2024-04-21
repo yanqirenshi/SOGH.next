@@ -17,6 +17,7 @@ export default function Issue (props) {
     const is_view_description = props.view_description;
     const is_view_add_comment = props.view_add_comment;
     const members = props.members;
+    const tabs = props.tabs;
 
     const clickCreate = (data)=>
           actions.issue.comment.create(issue.id(), data);
@@ -27,6 +28,8 @@ export default function Issue (props) {
         else
             actions.issue.add_comment.changeView(v);
     };
+
+    const onChange = (new_tabs)=> actions.issue.comment.changeTabs(new_tabs);
 
     return (
         <Box>
@@ -48,11 +51,13 @@ export default function Issue (props) {
              <CreateComment issue={issue}
                             actions={actions}
                             onClick={clickCreate}
-                            members={members}/>
+                            onChange={onChange}
+                            members={members}
+                            tabs={tabs}/>
            </Card>}
 
           {is_view_description &&
-           <Box sx={{mt:3, mt:2}}>
+           <Box sx={{mt:3}}>
              <FirstComment issue={issue}
                            actions={actions}/>
            </Box>}
