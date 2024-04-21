@@ -41,8 +41,6 @@ export default function CreateComment (props) {
         }
 
         if ('request'===tab.code) {
-
-
             onClick({
                 type: tab.code,
                 to_parson: tab.parson,
@@ -106,7 +104,10 @@ function defaultTabsData () {
                 code: 'memo',
                 label: 'Memo',
                 contents: [
-                    '## Memo'
+                    '## Memo',
+                    '',
+                    '',
+                    '',
                 ].join('\n'),
             },
             {
@@ -115,7 +116,9 @@ function defaultTabsData () {
                 parson: '',
                 next_action_date: moment().add(1, 'd').format('YYYY-MM-DD'),
                 contents: [
-                    ''
+                    '作業を依頼する時は 1、2行で良いので「依頼文章」を記載してください。',
+                    'イシューこコメントのメンションは自動で付与されます。',
+                    '',
                 ].join('\n'),
             },
             {
@@ -123,7 +126,12 @@ function defaultTabsData () {
                 label: 'Finish Today',
                 next_action_date: moment().add(1, 'd').format('YYYY-MM-DD'),
                 contents: [
-                    ''
+                    '## Memo',
+                    '',
+                    '明日の自分にメモを残すとよいです。',
+                    '1. 本日の対応内容、出来た物',
+                    '2. 明日やること、作る物',
+                    '',
                 ].join('\n'),
             },
         ],
