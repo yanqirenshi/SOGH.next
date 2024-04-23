@@ -86,6 +86,10 @@ export default function CreateComment (props) {
              <TabMemo data={tabs.list.find(d=>d.code==='memo')}
                       onChange={onChangeValue}/>}
 
+            {'meeting-comment'===tabs.selected &&
+             <TabMemo data={tabs.list.find(d=>d.code==='meeting-comment')}
+                      onChange={onChangeValue}/>}
+
             <Box sx={{mt:1}}>
               <Button variant="contained"
                       onClick={click}>
