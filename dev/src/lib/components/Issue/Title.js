@@ -8,12 +8,12 @@ import Link from '../common/Link.js';
 export default function Title (props) {
     const issue = props.issue;
 
-    // console.log(issue.projects());
-
     const repository = issue.repository();
 
+    const color = issue.closedAt() ? '#aaa' : null;
+
     return (
-        <Box sx={{mt: 3}}>
+        <Box sx={{mt: 3, color: color}}>
           <S>
             <Link href={repository.url}>
               {repository.name}
@@ -26,7 +26,7 @@ export default function Title (props) {
 
             <span style={{marginLeft:11}}>
               (
-              <Link href={issue.url()}>
+              <Link href={issue.url()} style={color ? {color: color} : null}>
                 {issue.number()}
               </Link>
               )

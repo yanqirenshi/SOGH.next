@@ -162,6 +162,15 @@ function defaultTabsData () {
                     '',
                 ].join('\n'),
             },
+            {
+                code: 'meeting-comment',
+                label: '会議コメント',
+                contents: [
+                    '## ' + moment().format('YYYY-MM-DD'),
+                    '',
+                    '',
+                ].join('\n'),
+            },
         ],
     };
 }
