@@ -34,14 +34,16 @@ export default function CreateComment (props) {
             return tab.code===tabs.selected;
         });
 
-        if ('memo'===tab.code) {
+        const editor_type = tab.editor.type;
+
+        if ('Md'===editor_type) {
             onClick({
                 type: tab.code,
                 contents: tab.contents,
             });
         }
 
-        if ('request'===tab.code) {
+        if ('MdNadAss'===editor_type) {
             onClick({
                 type: tab.code,
                 to_parson: tab.parson,
@@ -53,7 +55,7 @@ export default function CreateComment (props) {
             });
         }
 
-        if ('finish today'===tab.code) {
+        if ('MdNad'===editor_type) {
             onClick({
                 type: tab.code,
                 contents: tab.contents,
@@ -65,6 +67,10 @@ export default function CreateComment (props) {
         }
     };
 
+    const tab = tabs.list.find(d=> d.code===tabs.selected);
+    const tab_code = tab.code;
+    const editor_type = tab.editor.type;
+
     return (
         <Box>
 
@@ -73,30 +79,23 @@ export default function CreateComment (props) {
           </Box>
 
           <Box sx={{pl:2, pr:2}}>
-            {'finish today'===tabs.selected &&
-             <TabFinishToday data={tabs.list.find(d=>d.code==='finish today')}
-                             onChange={onChangeValue}/>}
+            {'Md'===editor_type &&
+             <TabMemo value={tab}
+                      onChange={onChangeValue}
+                      onClick={click}/>}
 
-            {'request'===tabs.selected &&
-             <TabRequest data={tabs.list.find(d=>d.code==='request')}
+            {'MdNad'===editor_type &&
+             <TabFinishToday value={tab}
+                             onChange={onChangeValue}
+                             onClick={click}/>}
+
+            {'MdNadAss'===editor_type &&
+             <TabRequest members={members}
+                         value={tab}
                          onChange={onChangeValue}
-                         members={members}/>}
-
-            {'memo'===tabs.selected &&
-             <TabMemo data={tabs.list.find(d=>d.code==='memo')}
-                      onChange={onChangeValue}/>}
-
-            {'meeting-comment'===tabs.selected &&
-             <TabMemo data={tabs.list.find(d=>d.code==='meeting-comment')}
-                      onChange={onChangeValue}/>}
-
-            <Box sx={{mt:1}}>
-              <Button variant="contained"
-                      onClick={click}>
-                Commit
-              </Button>
-            </Box>
+                         onClick={click}/>}
           </Box>
+
         </Box>
     );
 }

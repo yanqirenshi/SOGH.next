@@ -132,6 +132,7 @@ function defaultTabsData () {
             {
                 code: 'memo',
                 label: 'Memo',
+                editor: { type: 'Md', button_label: 'add Memo' },
                 contents: [
                     '## Memo',
                     '',
@@ -141,6 +142,7 @@ function defaultTabsData () {
             {
                 code: 'request',
                 label: 'Request',
+                editor: { type: 'MdNadAss', button_label: 'Request' },
                 parson: '',
                 next_action_date: moment().add(1, 'd').format('YYYY-MM-DD'),
                 contents: [
@@ -152,6 +154,7 @@ function defaultTabsData () {
             {
                 code: 'finish today',
                 label: 'Finish Today',
+                editor: { type: 'MdNad', button_label: 'Finish today' },
                 next_action_date: moment().add(1, 'd').format('YYYY-MM-DD'),
                 contents: [
                     '## Memo',
@@ -165,6 +168,7 @@ function defaultTabsData () {
             {
                 code: 'meeting-comment',
                 label: '会議コメント',
+                editor: { type: 'Md', button_label: 'add 会議 コメント' },
                 contents: [
                     '## ' + moment().format('YYYY-MM-DD'),
                     '',

@@ -2,14 +2,16 @@ import React from 'react';
 
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 
 import Parsons from './Parsons.js';
 import Editor from '../Editor.js';
 
 export default function TabRequest (props) {
-    const data = props.data;
-    const onChange = props.onChange;
     const members = props.members;
+    const data = props.value;
+    const onChange = props.onChange;
+    const onClick = props.onClick;
 
     return (
         <Box>
@@ -28,6 +30,13 @@ export default function TabRequest (props) {
 
           <Box sx={{mt:2}}>
             <Editor data={data} onChange={onChange}/>
+          </Box>
+
+          <Box sx={{mt:1}}>
+            <Button variant="contained"
+                    onClick={onClick}>
+              {data.editor.button_label}
+            </Button>
           </Box>
         </Box>
     );
