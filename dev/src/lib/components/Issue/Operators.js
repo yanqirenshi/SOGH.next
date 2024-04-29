@@ -104,6 +104,16 @@ export default function Operators (props) {
                          onChange={changeDueDate} />
             </Box>
 
+            {issue.closedAt() &&
+             <Box sx={{m:1}}>
+               <Button sx={{ml:1}}
+                       color="error"
+                       variant={is_view_description ? "outlined" : "contained"}
+                       onClick={()=> actions.issue.reopen(issue.id())}>
+                 Re Open
+               </Button>
+             </Box>}
+
           </Box>
 
         </Box>

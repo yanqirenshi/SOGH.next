@@ -98,6 +98,7 @@ function Contents (props) {
             add_comment: {
                 changeView : (v)=> setIsViewAddComment(v),
             },
+            reopen: (id)=> console.log(id),
         },
     };
 
@@ -171,6 +172,16 @@ function defaultTabsData () {
                 editor: { type: 'Md', button_label: 'add 会議 コメント' },
                 contents: [
                     '## ' + moment().format('YYYY-MM-DD'),
+                    '',
+                    '',
+                ].join('\n'),
+            },
+            {
+                code: 'close-issue',
+                label: 'イシューの対応完了',
+                editor: { type: 'Md', button_label: '対応完了(クローズ)' },
+                contents: [
+                    '## イシュー・クローズ!!',
                     '',
                     '',
                 ].join('\n'),
