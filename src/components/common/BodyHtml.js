@@ -6,7 +6,8 @@ export default function BodyHtml (props) {
     const html =  {__html: comment};
 
     return (
-        <div dangerouslySetInnerHTML={html} >
+        <div dangerouslySetInnerHTML={html}
+             className="sogh-markdown-body-html">
         </div>
     );
 }
