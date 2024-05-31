@@ -94,6 +94,7 @@ export default class ProjectV2 extends GraphQLNode {
         const readme = this.readme();
 
         for (const k in regexs) {
+
             const regex = regexs[k];
 
             if (!regex) continue;
@@ -111,7 +112,7 @@ export default class ProjectV2 extends GraphQLNode {
             case 'customer': this.customer(this.parseReadmeItem(readme, regex)); break;
             case 'agency':   this.agency(this.parseReadmeItem(readme, regex));   break;
             case 'systems':  this.systems(this.parseReadmeItem(readme, regex));  break;
-            case 'scenario': this.backlog(this.parseReadmeItem(readme, regex));  break;
+            case 'scenario': this.scenario(this.parseReadmeItem(readme, regex));  break;
 
             default: throw new Error(`Not found key. key=${k}`);
             }
