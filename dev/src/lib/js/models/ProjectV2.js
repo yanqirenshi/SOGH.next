@@ -34,6 +34,7 @@ export default class ProjectV2 extends GraphQLNode {
         this._systems = [];
         this._customer  = '';
         this._agency  = '';
+        this._scenario = '';
     }
     initRegexs () {
         // const value = '(\S)';
@@ -61,6 +62,7 @@ export default class ProjectV2 extends GraphQLNode {
             customer: /.*\$[C|c]ustomer:\s+(\S+).*/,
             agency: /.*\$[A|a]gency:\s+(\S+).*/,
             systems: /.*\$[S|s]ystems:\s+(\S+).*/,
+            scenario: /.*\$[S|s]cenario:\s+(\S+).*/,
         };
     }
     parseReadmeItem (readme, regex) {
@@ -109,6 +111,8 @@ export default class ProjectV2 extends GraphQLNode {
             case 'customer': this.customer(this.parseReadmeItem(readme, regex)); break;
             case 'agency':   this.agency(this.parseReadmeItem(readme, regex));   break;
             case 'systems':  this.systems(this.parseReadmeItem(readme, regex));  break;
+            case 'scenario': this.backlog(this.parseReadmeItem(readme, regex));  break;
+
             default: throw new Error(`Not found key. key=${k}`);
             }
         }
@@ -240,5 +244,11 @@ export default class ProjectV2 extends GraphQLNode {
             this._customer = v;
 
         return this._customer;
+    }
+    scenario (v) {
+        if (arguments.length===1)
+            this._scenario = v;
+
+        return this._scenario;
     }
 }
