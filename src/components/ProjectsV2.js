@@ -156,6 +156,14 @@ const COLUMNS = [
         },
     },
     {
+        code: 'progress',
+        label: 'Progress',
+        sx: null,
+        val: (column, project, actions)=> {
+            return project.progress();
+        },
+    },
+    {
         code: 'action',
         label: 'Action',
         sx: {whiteSpace: 'nowrap'},

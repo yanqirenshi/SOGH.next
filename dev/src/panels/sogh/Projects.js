@@ -203,6 +203,16 @@ const columns = [
         },
     },
     {
+        code: 'progress',
+        label: 'Progress',
+        sx: null,
+        val: (column, data)=> {
+            const project = data.project;
+
+            return project.progress();
+        },
+    },
+    {
         code: 'action',
         label: 'Action',
         sx: {whiteSpace: 'nowrap'},
