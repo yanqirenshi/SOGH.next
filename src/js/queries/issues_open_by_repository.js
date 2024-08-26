@@ -9,6 +9,9 @@ const query = `{
       }
       nodes {
         ${attr.issue()}
+        author {
+          ${attr.actor()}
+        }
         repository {
           ${attr.repositories()}
         }

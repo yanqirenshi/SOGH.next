@@ -4,6 +4,9 @@ const query = `{
   node(id: "@id") {
     ... on Issue {
       ${attr.issue()}
+      author {
+        ${attr.actor()}
+      }
       repository {
         ${attr.repositories()}
       }

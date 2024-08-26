@@ -6,6 +6,9 @@ const query = `{
       issues(after: "", first: 100, states: OPEN) {
         nodes {
           ${attr.issue()}
+          author {
+            ${attr.actor()}
+          }
           repository {
             ${attr.repositories()}
           }

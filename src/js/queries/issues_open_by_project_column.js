@@ -15,6 +15,9 @@ const query = `{
             content {
               ... on Issue {
                 ${attr.issue()}
+                author {
+                  ${attr.actor()}
+                }
                 repository {
                   ${attr.repositories()}
                 }

@@ -5,6 +5,9 @@ const query = `{
     repository (name:"@name") {
       issue (number:@number){
         ${attr.issue()}
+        author {
+          ${attr.actor()}
+        }
         repository {
           ${attr.repositories()}
         }

@@ -19,11 +19,25 @@ export default function SubTitle (props) {
         actions.project.click(project.owner.login, project.number);
     };
 
+    const repository = issue.repository();
+
+    const author = issue.author();
+
     return (
         <Box sx={{mt:0.5}}>
 
-          <Box>
-            <>
+          <Box sx={{
+              display:'flex',
+              alignItems: 'center',
+          }}>
+
+            <Box sx={{mr:2}}>
+              <Link href={repository.url}>
+                {repository.name}
+              </Link>
+            </Box>
+
+            <Box>
               <span onClick={clickProject}>
                 {project.title}
               </span>
@@ -34,7 +48,8 @@ export default function SubTitle (props) {
                 </Link>
                 )
               </span>
-            </>
+            </Box>
+
           </Box>
 
           <Box sx={{display: 'flex'}}>
@@ -69,18 +84,40 @@ export default function SubTitle (props) {
               })}
             </Box>
 
-            <Box sx={{m:1, display: 'flex'}}>
-              {issue.assignees().map(assignee=> {
-                  return (
-                      <Link key={assignee.id}
-                            href={assignee.url}>
-                        <Chip sx={{background:'#fff'}}
-                              avatar={<Avatar alt={assignee.login}
-                        src={assignee.avatarUrl} />}
-                              label={assignee.name || assignee.login}/>
-                      </Link>
-                  );
-              })}
+            <Box sx={{
+                mt:1, mb:1,
+                display: 'flex',
+            }}>
+
+              <Box sx={{display: 'flex', alignItems: 'center', mr:3}}>
+                <span style={{marginRight:6}}>
+                  Owners:
+                </span>
+
+                {issue.assignees().map(assignee=> {
+                    return (
+                        <Link key={assignee.id}
+                              href={assignee.url}>
+                          <Chip sx={{background:'#fff'}}
+                                avatar={<Avatar alt={assignee.login}
+                                   src={assignee.avatarUrl} />}
+                                label={assignee.name || assignee.login}/>
+                        </Link>
+                    );
+                })}
+              </Box>
+
+              <Box sx={{display: 'flex', alignItems: 'center'}}>
+                <span style={{marginRight:6}}>
+                  Create:
+                </span>
+                <Link href={author.url}>
+                  <Avatar alt={author.login}
+                          src={author.avatarUrl}
+                          sx={{width:22,height:22}} />
+                </Link>
+              </Box>
+
             </Box>
           </Box>
 

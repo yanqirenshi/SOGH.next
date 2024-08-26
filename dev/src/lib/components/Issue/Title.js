@@ -14,14 +14,8 @@ export default function Title (props) {
 
     return (
         <Box sx={{mt: 3, color: color}}>
-          <S>
-            <Link href={repository.url}>
-              {repository.name}
-            </Link>
-          </S>
 
           <S variant="h3">
-
             <span>{issue.title()}</span>
 
             <span style={{marginLeft:11}}>
@@ -31,8 +25,8 @@ export default function Title (props) {
               </Link>
               )
             </span>
-
           </S>
+
         </Box>
     );
 }
