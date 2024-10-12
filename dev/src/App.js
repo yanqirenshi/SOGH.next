@@ -35,6 +35,8 @@ export default function App () {
         window.addEventListener("resize", handleResize);
     }, [setWindowSize]); // TODO: これなぁ。。。
 
+    if (!window_size) return null;
+
     return (
         <Box className="theme-color5" sx={{height: window_size.h}}>
 
