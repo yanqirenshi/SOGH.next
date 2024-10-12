@@ -5,6 +5,7 @@ import Issue from './Issue.js';
 import IssueComment from './IssueComment.js';
 import Label from './Label.js';
 import Milestone from './Milestone.js';
+import Organization from './Organization.js';
 import Project from './Project.js';
 import ProjectV2 from './ProjectV2.js';
 import ProjectV2Item from './ProjectV2Item.js';
@@ -21,6 +22,7 @@ export {
     IssueComment,
     Label,
     Milestone,
+    Organization,
     Project,
     ProjectV2,
     ProjectV2Item,

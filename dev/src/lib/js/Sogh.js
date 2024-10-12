@@ -74,6 +74,9 @@ export default class Sogh extends Pooler {
             (results) => {
                 const viewer = results.data;
 
+                for (const org of viewer.core().organizations.edges)
+                    this.node2organization(org.node);
+
                 this.viewer(viewer);
 
                 if (successed) successed(viewer);
@@ -359,6 +362,9 @@ export default class Sogh extends Pooler {
 
         return out;
     }
+    /////
+    ///// Viewer
+    /////
     async asyncFetchViewer () {
         const query = this.query('viwer');
 
@@ -378,6 +384,33 @@ export default class Sogh extends Pooler {
 
         // nodes 2 objs and pooling
         return this.node2viewer(response.data);
+    }
+    /////
+    ///// organization
+    /////
+    async asyncFetchOrganaizationByLogin (login) {
+        const query = this.query('organization_by_login')
+              .replace('@login', login);
+
+        const post_data = this.postData(query);
+
+        // fetch
+        const response = await fetch(this.endpoint(), post_data)
+              .then(res  => this.text2json(res))
+              .then(res  => this.json2response(res, d=> {
+                  return d.data.organization;
+              }))
+              .catch(err => this.error2response(err));
+
+        // case of error
+        if ('error'===response.type)
+            return response.data;
+
+        // create object
+        const obj = this.node2organization(response.data);
+
+        // nodes 2 objs and pooling
+        return obj.id();
     }
     /////
     ///// Repository

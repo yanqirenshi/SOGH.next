@@ -33,6 +33,9 @@ export default class Loader {
     isConnected () {
         return this.viewer() !== null;
     }
+    isAuthed () {
+        return this.viewer() !== null;
+    }
     /** *************************************************************** *
      *  Query
      * **************************************************************** */

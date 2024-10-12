@@ -9,6 +9,26 @@ hasPreviousPage
 startCursor`;
 }
 
+export function organization () {
+    return `id
+name
+avatarUrl
+description
+descriptionHTML
+url
+createdAt
+updatedAt`;
+}
+
+export function team () {
+    return `id
+name
+avatarUrl
+url
+description
+`;
+}
+
 export function user () {
     return `id
 login

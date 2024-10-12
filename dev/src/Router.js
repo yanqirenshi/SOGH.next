@@ -5,9 +5,18 @@ import * as page from './pages/index.js';
 import * as page_docs from './pages/docs/index.js';
 import Loading from './panels/Loading.js';
 
+import Home from './pages2/Home.js';
+import Organaization from './pages2/Organaization.js';
+
+
 export default function Router () {
     return (
         <Routes>
+
+          <Route path='/next' element={<Home/>} />
+          <Route path='/next/organaizations/:login' element={<Organaization/>} />
+          <Route path='/next/organaizations/:login/teams/:name' element={<Home/>} />
+
           {/* /scrum root. viewer の画面 */}
           <Route path='/' element={<page.Scrum/>} />
 

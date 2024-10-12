@@ -1,11 +1,14 @@
 import React from 'react';
-import { useRecoilState } from "recoil";
 
 import Box from '@mui/material/Box';
+import SideMenu from './assemblies/SideMenu.js';
 
 import Account from './assemblies/Account.js';
 import Operators from './assemblies/Operators.js';
+
+import { useRecoilState, useRecoilValue } from "recoil";
 import * as atoms from './recoil/ATOMS.js';
+import { GITHUB_AUTH } from './recoil/GITHUB.js';
 
 import Router from './Router.js';
 import Github from './Github.js';
@@ -14,6 +17,7 @@ export default function App () {
     const [window_size, setWindowSize] = useRecoilState(atoms.WINDOW);
     const [account_menu, setAccountMenu] = useRecoilState(atoms.ACCOUNT_MENU);
     const [operators, setOperators] = useRecoilState(atoms.OPERATORS);
+    const github_auth = useRecoilValue(GITHUB_AUTH);
 
     const actions = {
         menu: {
@@ -32,22 +36,22 @@ export default function App () {
     }, [setWindowSize]); // TODO: これなぁ。。。
 
     return (
-        <Box className="theme-color5">
+        <Box className="theme-color5" sx={{height: window_size.h}}>
 
           <Github/>
 
-          <Account menu={account_menu}
-                   actions={actions}/>
+          {/* <Account menu={account_menu} */}
+          {/*          actions={actions}/> */}
 
-          <Operators operators={operators}
-                     window_size={window_size}
-                     actions={actions}>
-            {'a'===operators.active && <div/>}
-            {'b'===operators.active && <div/>}
-            {'c'===operators.active && <div/>}
-          </Operators>
+          {github_auth &&
+           <>
+             <SideMenu />
 
-          <Router/>
+             <Box sx={{pl:'68px', height:'100%'}}>
+               <Router/>
+             </Box>
+           </>
+          }
         </Box>
     );
 }

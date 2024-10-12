@@ -19,6 +19,7 @@ export default class Pooler extends Loader {
             ['issue',           model.Issue],
             ['issue-comment',   model.IssueComment],
             ['pull-request',    model.PullRequest],
+            ['organization',    model.Organization],
         ].reduce((ht, data)=> {
             const key = data[0];
 
@@ -184,6 +185,24 @@ export default class Pooler extends Loader {
     }
     pullRequest (v) {
         const pool = this.pool('pull-request');
+
+        return pool.get(v);
+    }
+    /* **************************************************************** *
+     *  Organization                                                    *
+     * **************************************************************** */
+    node2organization (node) {
+        const pool = this.pool('organization');
+
+        // this.matchmaker.user(node);
+
+        return pool.ensure(node, (d)=> new model.Organization(d));
+    }
+    organizations (v) {
+        return this.pool('organization').list();
+    }
+    organization (v) {
+        const pool = this.pool('organization');
 
         return pool.get(v);
     }
