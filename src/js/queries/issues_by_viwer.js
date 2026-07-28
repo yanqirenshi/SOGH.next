@@ -11,17 +11,6 @@ const query = `{
         repository {
           ${attr.repositories()}
         }
-        projectCards(first: 10) {
-          nodes {
-            ${attr.project_card()}
-            column {
-              ${attr.project_column()}
-              project {
-                ${attr.project()}
-              }
-            }
-          }
-        }
         milestone {
           ${attr.milestone()}
         }
