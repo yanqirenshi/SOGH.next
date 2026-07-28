@@ -20,19 +20,10 @@ export default function TableBodyRowProject (props) {
     return (
         <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
           {columns.map(column=> {
-              const data = {
-                  project: project,
-                  actions: actions,
-                  is_opened: is_opened,
-                  is_in_term: is_in_term,
-                  is_passed: is_passed,
-                  onChange: onChange,
-              };
-
               return (
                   <Cell key={column.code}
                         sx={column.sx}>
-                    {column.val(column, data)}
+                    {column.val(column, project, actions, is_opened, onChange)}
                   </Cell>
               );
           })}
