@@ -400,7 +400,7 @@ export default class Sogh extends Pooler {
 
             // case of error
             if ('error'===response.type)
-                return response.data;
+                return out;
 
             // nodes 2 objs and pooling
             const repositories
@@ -464,7 +464,7 @@ export default class Sogh extends Pooler {
 
             // case of error
             if ('error'===response.type)
-                return response.data;
+                return out;
 
             // nodes 2 objs and pooling
             const projects
@@ -623,7 +623,7 @@ export default class Sogh extends Pooler {
 
             // case of error
             if ('error'===response.type)
-                return response.data;
+                return out;
 
             // nodes 2 objs and pooling
             const projects
