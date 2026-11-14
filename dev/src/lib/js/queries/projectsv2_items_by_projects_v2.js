@@ -24,15 +24,9 @@ const query = `{
           ${attr.projectV2ItemFieldValues(MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM)}
           creator ${attr.projectV2FieldValue_Creator()}
           content {
-            ... on DraftIssue  {
-              ${attr.projectV2ItemContentDraftIssue()}
-            }
-            ... on Issue       {
-              ${attr.projectV2ItemContentIssue()}
-            }
-            ... on PullRequest {
-              ${attr.projectV2ItemContentPullRequest()}
-            }
+            ... on DraftIssue  ${attr.projectV2ItemContentDraftIssue()}
+            ... on Issue       ${attr.projectV2ItemContentIssue()}
+            ... on PullRequest ${attr.projectV2ItemContentPullRequest()}
           }
         }
       }

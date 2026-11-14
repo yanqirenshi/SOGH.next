@@ -66,12 +66,12 @@ export default class ProjectV2Item extends GraphQLNode {
     linkedPullRequests () {
         const field_value = this.getFieldValueByName('Linked pull requests');
 
-        return field_value ? field_value.date : null;
+        return field_value ? field_value.pullRequests.nodes : [];
     }
     reviewers () {
         const field_value = this.getFieldValueByName('Reviewers');
 
-        return field_value ? field_value.date : null;
+        return field_value ? field_value.reviewers.nodes : [];
     }
     repository () {
         const field_value = this.getFieldValueByName('Repository');
@@ -80,7 +80,7 @@ export default class ProjectV2Item extends GraphQLNode {
     }
     milestone () {
         const field_value = this.getFieldValueByName('Milestone');
-        return field_value ? field_value.date : null;
+        return field_value ? field_value.milestone : null;
     }
     content () {
         return this.core().content;

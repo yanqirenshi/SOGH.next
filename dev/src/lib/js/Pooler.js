@@ -33,11 +33,14 @@ export default class Pooler extends Loader {
         return this._pools[v] || null;
     }
     get (id) {
-        return this.issue(id)
-            || this.repository(id)
-            || this.user(id)
-            || this.projectV2(id)
-            || this.node2projectV2(id);
+        // GitHub の node id は種類をまたいで一意なので、全 pool から探す。
+        for (const pool of Object.values(this._pools)) {
+            const obj = pool.get(id);
+
+            if (obj) return obj;
+        }
+
+        return null;
     }
     /* **************************************************************** *
      *                                                                  *
@@ -99,16 +102,7 @@ export default class Pooler extends Loader {
 
         // this.matchmaker.user(node);
 
-        return pool.ensure(
-            node,
-            (d)=> new item_class(d),
-            (obj, node)=> {
-                obj.core('----------');
-                obj.core(obj.core());
-                obj.core(node);
-
-                obj.core(node);
-            });
+        return pool.ensure(node, (d)=> new item_class(d));
     }
     projectsV2 (v) {
         return this.pool('project-v2').list();

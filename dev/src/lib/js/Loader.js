@@ -67,11 +67,10 @@ export default class Loader {
         };
     }
     fetch (query, success, error) {
-        const endpoint = 'https://api.github.com/graphql';
-        const post_data = this.postData(this._token, query);
+        const post_data = this.postData(query);
 
         // Promis を返す
-        return fetch(endpoint, post_data)
+        return fetch(this.endpoint(), post_data)
             .then(r => r.ok ? r.json() : Promise.reject(r))
             .then(r => {
                 const out = { status: 'success', data: r.data };
@@ -83,7 +82,7 @@ export default class Loader {
                 return out;
             })
             .catch(err => {
-                const out = { status: 'error', error };
+                const out = { status: 'error', error: err };
 
                 // コールバック関数に結果を返す。
                 // SOGH の処理用。
@@ -148,8 +147,15 @@ export default class Loader {
         return r.ok ? r.json() : Promise.reject(r);
     }
     json2response (r, getData) {
-        if (r.errors)
-            throw new Error(r.errors);
+        if (r.errors) {
+            // GraphQL の errors は配列なので、message を連結して読める形にする。
+            const messages = r.errors.map(e=> (e && e.message) || JSON.stringify(e));
+            const error = new Error(messages.join('\n'));
+
+            error.errors = r.errors;
+
+            throw error;
+        }
 
         return {
             type: 'success',

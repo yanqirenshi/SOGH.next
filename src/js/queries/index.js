@@ -12,7 +12,7 @@ export { default as issues_open_by_label } from './issues_open_by_label.js';
 export { default as issues_open_by_project_column } from './issues_open_by_project_column.js';
 export { default as issues_open_by_repository } from './issues_open_by_repository.js';
 export { default as labels_by_repository } from './labels_by_repository.js';
-export { default as milestone_by_reposigory } from './milestones_by_repository.js';
+export { default as milestones_by_repository } from './milestones_by_repository.js';
 export { default as project_by_id } from './project_by_id.js';
 export { default as projects_by_repository } from './projects_by_repository.js';
 export { default as projects_next_by_id } from './projects_next_by_id.js';
