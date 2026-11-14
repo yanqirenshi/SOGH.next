@@ -1,0 +1,2457 @@
+[
+    {
+        "id": "Loader",
+        "name": "Loader",
+        "layer": "infra",
+        "filePath": "src/js/Loader.js",
+        "description": [
+            "src/js/Loader.js"
+        ],
+        "attributes": [
+            {
+                "name": "_token",
+                "visibility": "private",
+                "type": "string"
+            },
+            {
+                "name": "_viewer",
+                "visibility": "private",
+                "type": "User"
+            },
+            {
+                "name": "_endpoint",
+                "visibility": "private",
+                "type": "string"
+            },
+            {
+                "name": "_api",
+                "visibility": "private"
+            }
+        ],
+        "methods": [
+            {
+                "name": "endpoint",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "token",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "viewer",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "isConnected",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "makeQuery",
+                "parameters": [
+                    "query",
+                    "endCursor"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "ensureEndCursor",
+                "parameters": [
+                    "query",
+                    "endCursor"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "makeHeader",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "postData",
+                "parameters": [
+                    "query",
+                    "variables"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fetch",
+                "parameters": [
+                    "query",
+                    "success",
+                    "error"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fetchX",
+                "parameters": [
+                    "query",
+                    "response2data",
+                    "success",
+                    "error"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "makeGraphQLDataItem",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "makeGraphQLData",
+                "parameters": [
+                    "data"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "text2json",
+                "parameters": [
+                    "r"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "json2response",
+                "parameters": [
+                    "r",
+                    "getData"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "error2response",
+                "parameters": [
+                    "error"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 1220,
+            "y": 0
+        },
+        "size": {
+            "w": 390
+        }
+    },
+    {
+        "id": "Pooler",
+        "name": "Pooler",
+        "layer": "infra",
+        "filePath": "src/js/Pooler.js",
+        "description": [
+            "src/js/Pooler.js",
+            "extends Loader"
+        ],
+        "attributes": [
+            {
+                "name": "matchmaker",
+                "visibility": "public",
+                "type": "Matchmaker"
+            },
+            {
+                "name": "_pools",
+                "visibility": "private",
+                "type": "{ [code]: Pool }"
+            }
+        ],
+        "methods": [
+            {
+                "name": "pool",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "get",
+                "parameters": [
+                    "id"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "getPoolAndItemClass",
+                "parameters": [
+                    "code"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "node2viewer",
+                "parameters": [
+                    "d"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "node2repository",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "repositories",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "repository",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "node2user",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "user",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "node2projectV2",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "projectsV2",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "projectV2",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "node2projectV2Item",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "projectV2Item",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "node2issue",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "issues",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "issue",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "node2issueComment",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "issueComment",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "node2pullRequest",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "pullRequests",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "pullRequest",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 1730,
+            "y": 0
+        },
+        "size": {
+            "w": 260
+        }
+    },
+    {
+        "id": "Sogh",
+        "name": "Sogh",
+        "layer": "infra",
+        "filePath": "src/js/Sogh.js",
+        "description": [
+            "src/js/Sogh.js",
+            "extends Pooler"
+        ],
+        "attributes": [
+            {
+                "name": "_queries",
+                "visibility": "private",
+                "type": "{ [code]: string }"
+            },
+            {
+                "name": "_routes",
+                "visibility": "private",
+                "type": "{ [code]: string }"
+            },
+            {
+                "name": "_members",
+                "visibility": "private"
+            }
+        ],
+        "methods": [
+            {
+                "name": "query",
+                "parameters": [
+                    "code"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "routes",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "href",
+                "parameters": [
+                    "to",
+                    "data"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "connect",
+                "parameters": [
+                    "token",
+                    "successed",
+                    "failed"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "members",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "member",
+                "parameters": [
+                    "code"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "node2objs",
+                "parameters": [
+                    "node_or_nodes",
+                    "make"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "data2data",
+                "parameters": [
+                    "data",
+                    "make",
+                    "appender"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "zzz",
+                "parameters": [
+                    "data",
+                    "make"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fetchRepositoriesByViewer",
+                "parameters": [
+                    "success",
+                    "fail"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fetchUserByID",
+                "parameters": [
+                    "id",
+                    "success",
+                    "fail"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fetchProjectsV2ByUser",
+                "parameters": [
+                    "user",
+                    "success",
+                    "fail"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fetchProjectsV2ByID",
+                "parameters": [
+                    "id",
+                    "success",
+                    "fail"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fetchProjectV2ItemsByProjectNext",
+                "parameters": [
+                    "project_next",
+                    "success",
+                    "fail"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fetchProjectNextItemByID",
+                "parameters": [
+                    "id"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fetchIssueByID",
+                "parameters": [
+                    "id"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fetchIssueCommentsByIssueID",
+                "parameters": [
+                    "id"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "updateIssueComment",
+                "parameters": [
+                    "id",
+                    "body",
+                    "callbacks={}"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "createIssueComment",
+                "parameters": [
+                    "id",
+                    "body",
+                    "callbacks={}"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "deleteIssueComment",
+                "parameters": [
+                    "id",
+                    "callbacks={}"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchViewer",
+                "parameters": [],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchRepositoriesByViewer",
+                "parameters": [],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchIssueByID",
+                "parameters": [
+                    "id"
+                ],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchIssueByViewer",
+                "parameters": [],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchIssueByOrgRepoIssueNumber",
+                "parameters": [
+                    "org_login",
+                    "repo_name",
+                    "issue_number"
+                ],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchIssueCommentsByID",
+                "parameters": [
+                    "id"
+                ],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchIssueCommentsByOrgRepoIssueNumber",
+                "parameters": [
+                    "org_login",
+                    "repo_name",
+                    "issue_number"
+                ],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchProjectsV2ByViewer",
+                "parameters": [],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchProjectsV2ByTeam",
+                "parameters": [
+                    "team_id",
+                    "callbacks={}"
+                ],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchProjectsV2WithItemsByTeam",
+                "parameters": [
+                    "team_id",
+                    "callbacks={}"
+                ],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchProjectV2ByUserLoginProjectV2Number",
+                "parameters": [
+                    "login",
+                    "number",
+                    "callbacks={}"
+                ],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchProjectV2ByOrgLoginProjectV2Number",
+                "parameters": [
+                    "login",
+                    "number",
+                    "callbacks={}"
+                ],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchProjectV2ItemsByUserLoginProjectV2Number",
+                "parameters": [
+                    "login",
+                    "number"
+                ],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchProjectV2ItemsByOrgLoginProjectV2Number",
+                "parameters": [
+                    "login",
+                    "number"
+                ],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchProjectV2ItemByID",
+                "parameters": [
+                    "id"
+                ],
+                "returnType": "Promise",
+                "visibility": "public"
+            },
+            {
+                "name": "asyncFetchItemByID",
+                "parameters": [
+                    "id"
+                ],
+                "returnType": "Promise",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 2110,
+            "y": 0
+        },
+        "size": {
+            "w": 660
+        }
+    },
+    {
+        "id": "Pool",
+        "name": "Pool",
+        "layer": "infra",
+        "filePath": "src/js/Pool.js",
+        "description": [
+            "src/js/Pool.js"
+        ],
+        "attributes": [
+            {
+                "name": "_sogh",
+                "visibility": "private",
+                "type": "Sogh"
+            },
+            {
+                "name": "_item_class",
+                "visibility": "private",
+                "type": "class"
+            },
+            {
+                "name": "_ht",
+                "visibility": "private",
+                "type": "{ [id]: GraphQLNode }"
+            },
+            {
+                "name": "_list",
+                "visibility": "private",
+                "type": "GraphQLNode[]"
+            }
+        ],
+        "methods": [
+            {
+                "name": "itemClass",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "ht",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "list",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "add",
+                "parameters": [
+                    "data"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "get",
+                "parameters": [
+                    "id"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "ensure",
+                "parameters": [
+                    "node",
+                    "makeInstance",
+                    "updater"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 1695,
+            "y": 980
+        },
+        "size": {
+            "w": 330
+        }
+    },
+    {
+        "id": "Matchmaker",
+        "name": "Matchmaker",
+        "layer": "infra",
+        "filePath": "src/js/Matchmaker.js",
+        "description": [
+            "src/js/Matchmaker.js"
+        ],
+        "attributes": [
+            {
+                "name": "sogh",
+                "visibility": "public",
+                "type": "Sogh"
+            }
+        ],
+        "methods": [
+            {
+                "name": "repository",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "user",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 1355,
+            "y": 980
+        },
+        "size": {
+            "w": 190
+        }
+    },
+    {
+        "id": "Assignee",
+        "name": "Assignee",
+        "layer": "model",
+        "filePath": "src/js/models/Assignee.js",
+        "description": [
+            "src/js/models/Assignee.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "login",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "name",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "email",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "company",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 420,
+            "y": 1720
+        },
+        "size": {
+            "w": 160
+        }
+    },
+    {
+        "id": "Card",
+        "name": "Card",
+        "layer": "deprecated",
+        "filePath": "src/js/models/Card.js",
+        "description": [
+            "src/js/models/Card.js",
+            "Projects (classic) 用のクラス。GitHub では廃止。"
+        ],
+        "attributes": [],
+        "methods": [],
+        "position": {
+            "x": 3820,
+            "y": 1720
+        },
+        "size": {
+            "w": 160
+        },
+        "stereotype": "classic・廃止予定"
+    },
+    {
+        "id": "Column",
+        "name": "Column",
+        "layer": "deprecated",
+        "filePath": "src/js/models/Column.js",
+        "description": [
+            "src/js/models/Column.js",
+            "Projects (classic) 用のクラス。GitHub では廃止。"
+        ],
+        "attributes": [],
+        "methods": [],
+        "position": {
+            "x": 4030,
+            "y": 1720
+        },
+        "size": {
+            "w": 160
+        },
+        "stereotype": "classic・廃止予定"
+    },
+    {
+        "id": "GraphQLNode",
+        "name": "GraphQLNode",
+        "layer": "model",
+        "filePath": "src/js/models/GraphQLNode.js",
+        "description": [
+            "src/js/models/GraphQLNode.js"
+        ],
+        "attributes": [
+            {
+                "name": "_core",
+                "visibility": "private",
+                "type": "object"
+            },
+            {
+                "name": "_sogh",
+                "visibility": "private",
+                "type": "Sogh"
+            }
+        ],
+        "methods": [
+            {
+                "name": "sogh",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "core",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "id",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "createdAt",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "updatedAt",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 1780,
+            "y": 1380
+        },
+        "size": {
+            "w": 160
+        }
+    },
+    {
+        "id": "Issue",
+        "name": "Issue",
+        "layer": "model",
+        "filePath": "src/js/models/Issue.js",
+        "description": [
+            "src/js/models/Issue.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [
+            {
+                "name": "_owner",
+                "visibility": "private"
+            },
+            {
+                "name": "_date_next_action",
+                "visibility": "private"
+            },
+            {
+                "name": "_due_date",
+                "visibility": "private"
+            },
+            {
+                "name": "_points",
+                "visibility": "private"
+            },
+            {
+                "name": "regex",
+                "visibility": "public"
+            }
+        ],
+        "methods": [
+            {
+                "name": "core",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "number",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "title",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "milestone",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "assignees",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "labels",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "owner",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "getOwnerFromBody",
+                "parameters": [
+                    "body"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "author",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "closedAt",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "project",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "repository",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "points",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "pointPlansTotal",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "pointResultTotal",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "getPointResultsFromBody",
+                "parameters": [
+                    "body"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "getPointPlansFromBody",
+                "parameters": [
+                    "body"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "getPointFromBody",
+                "parameters": [
+                    "body"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "body",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "bodyHTML",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fieldItem",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fieldValueContents",
+                "parameters": [
+                    "name"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fieldValues",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "getFieldValueByName",
+                "parameters": [
+                    "name"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "dueDate",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "nextActionDate",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "getDueDateFromBody",
+                "parameters": [
+                    "body"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "getNextActionFromBody",
+                "parameters": [
+                    "body"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "addAnotetionValue",
+                "parameters": [
+                    "issue"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "addAnotetionValueNew",
+                "parameters": [
+                    "issue"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "makeIssueData",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "issueData2requestDataDescription",
+                "parameters": [
+                    "data"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "issueData2requestData",
+                "parameters": [
+                    "data"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "projectV2Items",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "projectV2Item",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "projectsV2",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "projectV2",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "projectCards",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "getColumnFirst",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "getFirstColumnProject",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "getFirstColumnProjectID",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "milestoneId",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "projects",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "projectIds",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 1360,
+            "y": 1720
+        },
+        "size": {
+            "w": 350
+        }
+    },
+    {
+        "id": "IssueComment",
+        "name": "IssueComment",
+        "layer": "model",
+        "filePath": "src/js/models/IssueComment.js",
+        "description": [
+            "src/js/models/IssueComment.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "body",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "bodyHTML",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "publishedAt",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "author",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 1760,
+            "y": 1720
+        },
+        "size": {
+            "w": 170
+        }
+    },
+    {
+        "id": "Label",
+        "name": "Label",
+        "layer": "model",
+        "filePath": "src/js/models/Label.js",
+        "description": [
+            "src/js/models/Label.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "color",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "name",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "description",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fontColor",
+                "parameters": [
+                    "hexcolor"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 880,
+            "y": 1720
+        },
+        "size": {
+            "w": 210
+        }
+    },
+    {
+        "id": "Milestone",
+        "name": "Milestone",
+        "layer": "model",
+        "filePath": "src/js/models/Milestone.js",
+        "description": [
+            "src/js/models/Milestone.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "title",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "number",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "state",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "description",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "closedAt",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "dueOn",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 1140,
+            "y": 1720
+        },
+        "size": {
+            "w": 170
+        }
+    },
+    {
+        "id": "Project",
+        "name": "Project",
+        "layer": "deprecated",
+        "filePath": "src/js/models/Project.js",
+        "description": [
+            "src/js/models/Project.js",
+            "extends GraphQLNode",
+            "Projects (classic) 用のクラス。GitHub では廃止。"
+        ],
+        "attributes": [
+            {
+                "name": "_type",
+                "visibility": "private"
+            },
+            {
+                "name": "_priority",
+                "visibility": "private"
+            },
+            {
+                "name": "_assignee",
+                "visibility": "private"
+            },
+            {
+                "name": "_plan",
+                "visibility": "private"
+            },
+            {
+                "name": "_result",
+                "visibility": "private"
+            },
+            {
+                "name": "_issues",
+                "visibility": "private"
+            }
+        ],
+        "methods": [
+            {
+                "name": "number",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "name",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "state",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "closedAt",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "closed",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "body",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "progress",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "type",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "priority",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "assignee",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "plan",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "result",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "issues",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "columns",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "addAnotetionValue",
+                "parameters": [
+                    "project"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "colorByPriority",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "priorityLabel",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 3510,
+            "y": 1720
+        },
+        "size": {
+            "w": 260
+        },
+        "stereotype": "classic・廃止予定"
+    },
+    {
+        "id": "ProjectV2",
+        "name": "ProjectV2",
+        "layer": "model",
+        "filePath": "src/js/models/ProjectV2.js",
+        "description": [
+            "src/js/models/ProjectV2.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [
+            {
+                "name": "_priorities",
+                "visibility": "private"
+            },
+            {
+                "name": "_priority",
+                "visibility": "private"
+            },
+            {
+                "name": "_owner",
+                "visibility": "private"
+            },
+            {
+                "name": "_type",
+                "visibility": "private"
+            },
+            {
+                "name": "_release",
+                "visibility": "private"
+            },
+            {
+                "name": "_plan",
+                "visibility": "private",
+                "type": "Term"
+            },
+            {
+                "name": "_result",
+                "visibility": "private",
+                "type": "Term"
+            },
+            {
+                "name": "_action",
+                "visibility": "private"
+            },
+            {
+                "name": "_backlog",
+                "visibility": "private"
+            },
+            {
+                "name": "_systems",
+                "visibility": "private"
+            },
+            {
+                "name": "_customer",
+                "visibility": "private"
+            },
+            {
+                "name": "_agency",
+                "visibility": "private"
+            },
+            {
+                "name": "_scenario",
+                "visibility": "private"
+            },
+            {
+                "name": "_progress",
+                "visibility": "private"
+            },
+            {
+                "name": "_regexs",
+                "visibility": "private"
+            }
+        ],
+        "methods": [
+            {
+                "name": "core",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "initReadmeAttributes",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "initRegexs",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "parseReadmeItem",
+                "parameters": [
+                    "readme",
+                    "regex"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "parseReadmeItemPlan",
+                "parameters": [
+                    "readme",
+                    "regex"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "parseReadmeItemResult",
+                "parameters": [
+                    "readme",
+                    "regexs"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "parseReadme",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "number",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "title",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fields",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "shortDescription",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "readme",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "public",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "owner",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "creator",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "items",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "itemsWith2ProjectV2Item",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "priority",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "priorityData",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "maneger",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "type",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "release",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "plan",
+                "parameters": [
+                    "start",
+                    "end"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "result",
+                "parameters": [
+                    "start",
+                    "end"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "action",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "backlog",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "systems",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "agency",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "customer",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "scenario",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "progress",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 2810,
+            "y": 1720
+        },
+        "size": {
+            "w": 340
+        }
+    },
+    {
+        "id": "ProjectV2Item",
+        "name": "ProjectV2Item",
+        "layer": "model",
+        "filePath": "src/js/models/ProjectV2Item.js",
+        "description": [
+            "src/js/models/ProjectV2Item.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "creator",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "path",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "fieldValues",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "getFieldValueByName",
+                "parameters": [
+                    "name"
+                ],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "project",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "projectNumber",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "projectOwnerLogin",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "projectPath",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "type",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "isArchived",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "archived",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "title",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "status",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "assignees",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "labels",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "linkedPullRequests",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "reviewers",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "repository",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "milestone",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "content",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "contentTypename",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "planStart",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "planEnd",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "planTerm",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "planPoints",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "planPointsSummary",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "resultPoints",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "resultPointsSummary",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "nextActionDate",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "dueDate",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 2400,
+            "y": 1720
+        },
+        "size": {
+            "w": 260
+        }
+    },
+    {
+        "id": "PullRequest",
+        "name": "PullRequest",
+        "layer": "model",
+        "filePath": "src/js/models/PullRequest.js",
+        "description": [
+            "src/js/models/PullRequest.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "title",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "number",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "body",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "bodyHTML",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "repository",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "author",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "assignees",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 1980,
+            "y": 1720
+        },
+        "size": {
+            "w": 160
+        }
+    },
+    {
+        "id": "Relationship",
+        "name": "Relationship",
+        "layer": "model",
+        "filePath": "src/js/models/Relationship.js",
+        "description": [
+            "src/js/models/Relationship.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "a",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "b",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 2190,
+            "y": 1720
+        },
+        "size": {
+            "w": 160
+        }
+    },
+    {
+        "id": "Repository",
+        "name": "Repository",
+        "layer": "model",
+        "filePath": "src/js/models/Repository.js",
+        "description": [
+            "src/js/models/Repository.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "name",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "description",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "descriptionHTML",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "owner",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "pushedAt",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 630,
+            "y": 1720
+        },
+        "size": {
+            "w": 200
+        }
+    },
+    {
+        "id": "Term",
+        "name": "Term",
+        "layer": "model",
+        "filePath": "src/js/models/Term.js",
+        "description": [
+            "src/js/models/Term.js"
+        ],
+        "attributes": [
+            {
+                "name": "start",
+                "visibility": "public"
+            },
+            {
+                "name": "end",
+                "visibility": "public"
+            }
+        ],
+        "methods": [],
+        "position": {
+            "x": 3300,
+            "y": 1720
+        },
+        "size": {
+            "w": 160
+        }
+    },
+    {
+        "id": "User",
+        "name": "User",
+        "layer": "model",
+        "filePath": "src/js/models/User.js",
+        "description": [
+            "src/js/models/User.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "login",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "name",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "email",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "company",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "avatarUrl",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 0,
+            "y": 1720
+        },
+        "size": {
+            "w": 160
+        }
+    },
+    {
+        "id": "Viewer",
+        "name": "Viewer",
+        "layer": "model",
+        "filePath": "src/js/models/Viewer.js",
+        "description": [
+            "src/js/models/Viewer.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "login",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "name",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public"
+            }
+        ],
+        "position": {
+            "x": 210,
+            "y": 1720
+        },
+        "size": {
+            "w": 160
+        }
+    }
+]
