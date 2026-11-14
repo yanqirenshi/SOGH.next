@@ -33,7 +33,10 @@
                 "name": "endpoint",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "endpoint"
+                }
             },
             {
                 "name": "token",
@@ -41,7 +44,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "token"
+                }
             },
             {
                 "name": "viewer",
@@ -49,13 +55,19 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "viewer"
+                }
             },
             {
                 "name": "isConnected",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "connected"
+                }
             },
             {
                 "name": "makeQuery",
@@ -64,7 +76,10 @@
                     "endCursor"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "query"
+                }
             },
             {
                 "name": "ensureEndCursor",
@@ -73,13 +88,19 @@
                     "endCursor"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "query"
+                }
             },
             {
                 "name": "makeHeader",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "headers"
+                }
             },
             {
                 "name": "postData",
@@ -88,7 +109,10 @@
                     "variables"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "postData"
+                }
             },
             {
                 "name": "fetch",
@@ -98,7 +122,10 @@
                     "error"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "promise"
+                }
             },
             {
                 "name": "fetchX",
@@ -109,7 +136,10 @@
                     "error"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "promise"
+                }
             },
             {
                 "name": "makeGraphQLDataItem",
@@ -117,7 +147,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "literal"
+                }
             },
             {
                 "name": "makeGraphQLData",
@@ -125,7 +158,10 @@
                     "data"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "data"
+                }
             },
             {
                 "name": "text2json",
@@ -133,7 +169,10 @@
                     "r"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "promise"
+                }
             },
             {
                 "name": "json2response",
@@ -142,7 +181,10 @@
                     "getData"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "response"
+                }
             },
             {
                 "name": "error2response",
@@ -150,7 +192,10 @@
                     "error"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "response"
+                }
             }
         ],
         "position": {
@@ -189,7 +234,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "pool"
+                }
             },
             {
                 "name": "get",
@@ -197,7 +245,10 @@
                     "id"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "object"
+                }
             },
             {
                 "name": "getPoolAndItemClass",
@@ -205,7 +256,10 @@
                     "code"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "poolAndItemClass"
+                }
             },
             {
                 "name": "node2viewer",
@@ -213,7 +267,10 @@
                     "d"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "viewer"
+                }
             },
             {
                 "name": "node2repository",
@@ -221,7 +278,10 @@
                     "node"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "repository"
+                }
             },
             {
                 "name": "repositories",
@@ -229,7 +289,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "repositories"
+                }
             },
             {
                 "name": "repository",
@@ -237,7 +300,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "repository"
+                }
             },
             {
                 "name": "node2user",
@@ -245,7 +311,10 @@
                     "node"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "user"
+                }
             },
             {
                 "name": "user",
@@ -253,7 +322,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "user"
+                }
             },
             {
                 "name": "node2projectV2",
@@ -261,7 +333,10 @@
                     "node"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2"
+                }
             },
             {
                 "name": "projectsV2",
@@ -269,7 +344,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectsV2"
+                }
             },
             {
                 "name": "projectV2",
@@ -277,7 +355,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2"
+                }
             },
             {
                 "name": "node2projectV2Item",
@@ -285,7 +366,10 @@
                     "node"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2Item"
+                }
             },
             {
                 "name": "projectV2Item",
@@ -293,7 +377,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2Item"
+                }
             },
             {
                 "name": "node2issue",
@@ -301,7 +388,10 @@
                     "node"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issue"
+                }
             },
             {
                 "name": "issues",
@@ -309,7 +399,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issues"
+                }
             },
             {
                 "name": "issue",
@@ -317,7 +410,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issue"
+                }
             },
             {
                 "name": "node2issueComment",
@@ -325,7 +421,10 @@
                     "node"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issueComment"
+                }
             },
             {
                 "name": "issueComment",
@@ -333,7 +432,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issueComment"
+                }
             },
             {
                 "name": "node2pullRequest",
@@ -341,7 +443,10 @@
                     "node"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "pullRequest"
+                }
             },
             {
                 "name": "pullRequests",
@@ -349,7 +454,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "pullRequests"
+                }
             },
             {
                 "name": "pullRequest",
@@ -357,7 +465,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "pullRequest"
+                }
             }
         ],
         "position": {
@@ -400,7 +511,10 @@
                     "code"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "query"
+                }
             },
             {
                 "name": "routes",
@@ -408,7 +522,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "routes"
+                }
             },
             {
                 "name": "href",
@@ -417,7 +534,10 @@
                     "data"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "path"
+                }
             },
             {
                 "name": "connect",
@@ -427,7 +547,10 @@
                     "failed"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "promise"
+                }
             },
             {
                 "name": "members",
@@ -435,7 +558,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "members"
+                }
             },
             {
                 "name": "member",
@@ -443,7 +569,10 @@
                     "code"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "member"
+                }
             },
             {
                 "name": "node2objs",
@@ -452,7 +581,10 @@
                     "make"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "ids"
+                }
             },
             {
                 "name": "data2data",
@@ -462,7 +594,10 @@
                     "appender"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "page"
+                }
             },
             {
                 "name": "zzz",
@@ -471,7 +606,10 @@
                     "make"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "page"
+                }
             },
             {
                 "name": "fetchRepositoriesByViewer",
@@ -480,7 +618,8 @@
                     "fail"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": null
             },
             {
                 "name": "fetchUserByID",
@@ -490,7 +629,10 @@
                     "fail"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "promise"
+                }
             },
             {
                 "name": "fetchProjectsV2ByUser",
@@ -500,7 +642,10 @@
                     "fail"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "promise"
+                }
             },
             {
                 "name": "fetchProjectsV2ByID",
@@ -510,7 +655,10 @@
                     "fail"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "promise"
+                }
             },
             {
                 "name": "fetchProjectV2ItemsByProjectNext",
@@ -520,7 +668,10 @@
                     "fail"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "promise"
+                }
             },
             {
                 "name": "fetchProjectNextItemByID",
@@ -528,7 +679,10 @@
                     "id"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "promise"
+                }
             },
             {
                 "name": "fetchIssueByID",
@@ -536,7 +690,10 @@
                     "id"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "promise"
+                }
             },
             {
                 "name": "fetchIssueCommentsByIssueID",
@@ -544,7 +701,10 @@
                     "id"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "promise"
+                }
             },
             {
                 "name": "updateIssueComment",
@@ -554,7 +714,10 @@
                     "callbacks={}"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "emptyArray"
+                }
             },
             {
                 "name": "createIssueComment",
@@ -564,7 +727,10 @@
                     "callbacks={}"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "emptyArray"
+                }
             },
             {
                 "name": "deleteIssueComment",
@@ -573,19 +739,28 @@
                     "callbacks={}"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "emptyArray"
+                }
             },
             {
                 "name": "asyncFetchViewer",
                 "parameters": [],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "viewer"
+                }
             },
             {
                 "name": "asyncFetchRepositoriesByViewer",
                 "parameters": [],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "repositoryIds"
+                }
             },
             {
                 "name": "asyncFetchIssueByID",
@@ -593,13 +768,19 @@
                     "id"
                 ],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issueId"
+                }
             },
             {
                 "name": "asyncFetchIssueByViewer",
                 "parameters": [],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issueIds"
+                }
             },
             {
                 "name": "asyncFetchIssueByOrgRepoIssueNumber",
@@ -609,7 +790,10 @@
                     "issue_number"
                 ],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issueId"
+                }
             },
             {
                 "name": "asyncFetchIssueCommentsByID",
@@ -617,7 +801,10 @@
                     "id"
                 ],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issueCommentIds"
+                }
             },
             {
                 "name": "asyncFetchIssueCommentsByOrgRepoIssueNumber",
@@ -627,13 +814,19 @@
                     "issue_number"
                 ],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issueCommentIds"
+                }
             },
             {
                 "name": "asyncFetchProjectsV2ByViewer",
                 "parameters": [],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2Ids"
+                }
             },
             {
                 "name": "asyncFetchProjectsV2ByTeam",
@@ -642,7 +835,10 @@
                     "callbacks={}"
                 ],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2Ids"
+                }
             },
             {
                 "name": "asyncFetchProjectsV2WithItemsByTeam",
@@ -651,7 +847,10 @@
                     "callbacks={}"
                 ],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2Ids"
+                }
             },
             {
                 "name": "asyncFetchProjectV2ByUserLoginProjectV2Number",
@@ -661,7 +860,10 @@
                     "callbacks={}"
                 ],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2Id"
+                }
             },
             {
                 "name": "asyncFetchProjectV2ByOrgLoginProjectV2Number",
@@ -671,7 +873,10 @@
                     "callbacks={}"
                 ],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2Id"
+                }
             },
             {
                 "name": "asyncFetchProjectV2ItemsByUserLoginProjectV2Number",
@@ -680,7 +885,10 @@
                     "number"
                 ],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2ItemIds"
+                }
             },
             {
                 "name": "asyncFetchProjectV2ItemsByOrgLoginProjectV2Number",
@@ -689,7 +897,10 @@
                     "number"
                 ],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2ItemIds"
+                }
             },
             {
                 "name": "asyncFetchProjectV2ItemByID",
@@ -697,7 +908,10 @@
                     "id"
                 ],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2ItemId"
+                }
             },
             {
                 "name": "asyncFetchItemByID",
@@ -705,7 +919,10 @@
                     "id"
                 ],
                 "returnType": "Promise",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issueId"
+                }
             }
         ],
         "position": {
@@ -751,19 +968,28 @@
                 "name": "itemClass",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "itemClass"
+                }
             },
             {
                 "name": "ht",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "ht"
+                }
             },
             {
                 "name": "list",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "list"
+                }
             },
             {
                 "name": "add",
@@ -771,7 +997,8 @@
                     "data"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": null
             },
             {
                 "name": "get",
@@ -779,7 +1006,10 @@
                     "id"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "object"
+                }
             },
             {
                 "name": "ensure",
@@ -789,7 +1019,10 @@
                     "updater"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "object"
+                }
             }
         ],
         "position": {
@@ -822,7 +1055,8 @@
                     "node"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": null
             },
             {
                 "name": "user",
@@ -830,7 +1064,8 @@
                     "node"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": null
             }
         ],
         "position": {
@@ -856,31 +1091,46 @@
                 "name": "login",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "login"
+                }
             },
             {
                 "name": "name",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "name"
+                }
             },
             {
                 "name": "email",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "email"
+                }
             },
             {
                 "name": "url",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "url"
+                }
             },
             {
                 "name": "company",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "company"
+                }
             }
         ],
         "position": {
@@ -958,7 +1208,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "sogh"
+                }
             },
             {
                 "name": "core",
@@ -966,25 +1219,37 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "core"
+                }
             },
             {
                 "name": "id",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "id"
+                }
             },
             {
                 "name": "createdAt",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "createdAt"
+                }
             },
             {
                 "name": "updatedAt",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "updatedAt"
+                }
             }
         ],
         "position": {
@@ -1033,49 +1298,73 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "core"
+                }
             },
             {
                 "name": "number",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "number"
+                }
             },
             {
                 "name": "title",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "title"
+                }
             },
             {
                 "name": "url",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "url"
+                }
             },
             {
                 "name": "milestone",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "milestone"
+                }
             },
             {
                 "name": "assignees",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "assignees"
+                }
             },
             {
                 "name": "labels",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "labels"
+                }
             },
             {
                 "name": "owner",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "owner"
+                }
             },
             {
                 "name": "getOwnerFromBody",
@@ -1083,49 +1372,73 @@
                     "body"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "owner"
+                }
             },
             {
                 "name": "author",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "author"
+                }
             },
             {
                 "name": "closedAt",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "closedAt"
+                }
             },
             {
                 "name": "project",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "project"
+                }
             },
             {
                 "name": "repository",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "repository"
+                }
             },
             {
                 "name": "points",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "points"
+                }
             },
             {
                 "name": "pointPlansTotal",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "total"
+                }
             },
             {
                 "name": "pointResultTotal",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "total"
+                }
             },
             {
                 "name": "getPointResultsFromBody",
@@ -1133,7 +1446,10 @@
                     "body"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "pointResults"
+                }
             },
             {
                 "name": "getPointPlansFromBody",
@@ -1141,7 +1457,10 @@
                     "body"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "pointPlans"
+                }
             },
             {
                 "name": "getPointFromBody",
@@ -1149,7 +1468,10 @@
                     "body"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "points"
+                }
             },
             {
                 "name": "body",
@@ -1157,19 +1479,28 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "body"
+                }
             },
             {
                 "name": "bodyHTML",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "bodyHTML"
+                }
             },
             {
                 "name": "fieldItem",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "fieldItem"
+                }
             },
             {
                 "name": "fieldValueContents",
@@ -1177,13 +1508,19 @@
                     "name"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "contents"
+                }
             },
             {
                 "name": "fieldValues",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "fieldValues"
+                }
             },
             {
                 "name": "getFieldValueByName",
@@ -1191,7 +1528,10 @@
                     "name"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "fieldValue"
+                }
             },
             {
                 "name": "dueDate",
@@ -1199,7 +1539,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "dueDate"
+                }
             },
             {
                 "name": "nextActionDate",
@@ -1207,7 +1550,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "nextActionDate"
+                }
             },
             {
                 "name": "getDueDateFromBody",
@@ -1215,7 +1561,10 @@
                     "body"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "dueDate"
+                }
             },
             {
                 "name": "getNextActionFromBody",
@@ -1223,7 +1572,10 @@
                     "body"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "nextActionDate"
+                }
             },
             {
                 "name": "addAnotetionValue",
@@ -1231,7 +1583,10 @@
                     "issue"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issue"
+                }
             },
             {
                 "name": "addAnotetionValueNew",
@@ -1239,13 +1594,19 @@
                     "issue"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issue"
+                }
             },
             {
                 "name": "makeIssueData",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issueData"
+                }
             },
             {
                 "name": "issueData2requestDataDescription",
@@ -1253,7 +1614,10 @@
                     "data"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "description"
+                }
             },
             {
                 "name": "issueData2requestData",
@@ -1261,73 +1625,109 @@
                     "data"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "requestData"
+                }
             },
             {
                 "name": "projectV2Items",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2Items"
+                }
             },
             {
                 "name": "projectV2Item",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2Item"
+                }
             },
             {
                 "name": "projectsV2",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectsV2"
+                }
             },
             {
                 "name": "projectV2",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2"
+                }
             },
             {
                 "name": "projectCards",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectCards"
+                }
             },
             {
                 "name": "getColumnFirst",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "column"
+                }
             },
             {
                 "name": "getFirstColumnProject",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "project"
+                }
             },
             {
                 "name": "getFirstColumnProjectID",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectId"
+                }
             },
             {
                 "name": "milestoneId",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "milestoneId"
+                }
             },
             {
                 "name": "projects",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projects"
+                }
             },
             {
                 "name": "projectIds",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectIds"
+                }
             }
         ],
         "position": {
@@ -1353,31 +1753,46 @@
                 "name": "body",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "body"
+                }
             },
             {
                 "name": "bodyHTML",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "bodyHTML"
+                }
             },
             {
                 "name": "url",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "url"
+                }
             },
             {
                 "name": "publishedAt",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "publishedAt"
+                }
             },
             {
                 "name": "author",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "author"
+                }
             }
         ],
         "position": {
@@ -1403,25 +1818,37 @@
                 "name": "color",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "color"
+                }
             },
             {
                 "name": "name",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "name"
+                }
             },
             {
                 "name": "url",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "url"
+                }
             },
             {
                 "name": "description",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "description"
+                }
             },
             {
                 "name": "fontColor",
@@ -1429,7 +1856,10 @@
                     "hexcolor"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "color"
+                }
             }
         ],
         "position": {
@@ -1455,43 +1885,64 @@
                 "name": "title",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "title"
+                }
             },
             {
                 "name": "url",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "url"
+                }
             },
             {
                 "name": "number",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "number"
+                }
             },
             {
                 "name": "state",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "state"
+                }
             },
             {
                 "name": "description",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "description"
+                }
             },
             {
                 "name": "closedAt",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "closedAt"
+                }
             },
             {
                 "name": "dueOn",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "dueOn"
+                }
             }
         ],
         "position": {
@@ -1543,91 +1994,136 @@
                 "name": "number",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "number"
+                }
             },
             {
                 "name": "name",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "name"
+                }
             },
             {
                 "name": "url",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "url"
+                }
             },
             {
                 "name": "state",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "state"
+                }
             },
             {
                 "name": "closedAt",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "closedAt"
+                }
             },
             {
                 "name": "closed",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "closed"
+                }
             },
             {
                 "name": "body",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "body"
+                }
             },
             {
                 "name": "progress",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "progress"
+                }
             },
             {
                 "name": "type",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "type"
+                }
             },
             {
                 "name": "priority",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "priority"
+                }
             },
             {
                 "name": "assignee",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "assignee"
+                }
             },
             {
                 "name": "plan",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "plan"
+                }
             },
             {
                 "name": "result",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "result"
+                }
             },
             {
                 "name": "issues",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "issues"
+                }
             },
             {
                 "name": "columns",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "columns"
+                }
             },
             {
                 "name": "addAnotetionValue",
@@ -1635,19 +2131,28 @@
                     "project"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "project"
+                }
             },
             {
                 "name": "colorByPriority",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "style"
+                }
             },
             {
                 "name": "priorityLabel",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "label"
+                }
             }
         ],
         "position": {
@@ -1739,19 +2244,24 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "core"
+                }
             },
             {
                 "name": "initReadmeAttributes",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": null
             },
             {
                 "name": "initRegexs",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": null
             },
             {
                 "name": "parseReadmeItem",
@@ -1760,7 +2270,10 @@
                     "regex"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "value"
+                }
             },
             {
                 "name": "parseReadmeItemPlan",
@@ -1769,7 +2282,8 @@
                     "regex"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": null
             },
             {
                 "name": "parseReadmeItemResult",
@@ -1778,55 +2292,80 @@
                     "regexs"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "result"
+                }
             },
             {
                 "name": "parseReadme",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": null
             },
             {
                 "name": "number",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "number"
+                }
             },
             {
                 "name": "title",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "title"
+                }
             },
             {
                 "name": "url",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "url"
+                }
             },
             {
                 "name": "fields",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "fields"
+                }
             },
             {
                 "name": "shortDescription",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "shortDescription"
+                }
             },
             {
                 "name": "readme",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "readme"
+                }
             },
             {
                 "name": "public",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "public"
+                }
             },
             {
                 "name": "owner",
@@ -1834,25 +2373,37 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "owner"
+                }
             },
             {
                 "name": "creator",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "creator"
+                }
             },
             {
                 "name": "items",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "items"
+                }
             },
             {
                 "name": "itemsWith2ProjectV2Item",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2Items"
+                }
             },
             {
                 "name": "priority",
@@ -1860,13 +2411,19 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "priority"
+                }
             },
             {
                 "name": "priorityData",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "priorityData"
+                }
             },
             {
                 "name": "maneger",
@@ -1874,7 +2431,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "owner"
+                }
             },
             {
                 "name": "type",
@@ -1882,7 +2442,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "type"
+                }
             },
             {
                 "name": "release",
@@ -1890,7 +2453,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "release"
+                }
             },
             {
                 "name": "plan",
@@ -1899,7 +2465,10 @@
                     "end"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "plan"
+                }
             },
             {
                 "name": "result",
@@ -1908,7 +2477,10 @@
                     "end"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "result"
+                }
             },
             {
                 "name": "action",
@@ -1916,7 +2488,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "action"
+                }
             },
             {
                 "name": "backlog",
@@ -1924,7 +2499,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "backlog"
+                }
             },
             {
                 "name": "systems",
@@ -1932,7 +2510,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "systems"
+                }
             },
             {
                 "name": "agency",
@@ -1940,7 +2521,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "agency"
+                }
             },
             {
                 "name": "customer",
@@ -1948,7 +2532,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "customer"
+                }
             },
             {
                 "name": "scenario",
@@ -1956,7 +2543,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "scenario"
+                }
             },
             {
                 "name": "progress",
@@ -1964,7 +2554,10 @@
                     "v"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "progress"
+                }
             }
         ],
         "position": {
@@ -1990,19 +2583,28 @@
                 "name": "creator",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "creator"
+                }
             },
             {
                 "name": "path",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "path"
+                }
             },
             {
                 "name": "fieldValues",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "fieldValues"
+                }
             },
             {
                 "name": "getFieldValueByName",
@@ -2010,163 +2612,244 @@
                     "name"
                 ],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "fieldValue"
+                }
             },
             {
                 "name": "project",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "project"
+                }
             },
             {
                 "name": "projectNumber",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectNumber"
+                }
             },
             {
                 "name": "projectOwnerLogin",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "projectOwnerLogin"
+                }
             },
             {
                 "name": "projectPath",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "path"
+                }
             },
             {
                 "name": "type",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "type"
+                }
             },
             {
                 "name": "isArchived",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "archived"
+                }
             },
             {
                 "name": "archived",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "archivedDate"
+                }
             },
             {
                 "name": "title",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "title"
+                }
             },
             {
                 "name": "status",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "status"
+                }
             },
             {
                 "name": "assignees",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "assignees"
+                }
             },
             {
                 "name": "labels",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "labels"
+                }
             },
             {
                 "name": "linkedPullRequests",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "linkedPullRequests"
+                }
             },
             {
                 "name": "reviewers",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "reviewers"
+                }
             },
             {
                 "name": "repository",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "repository"
+                }
             },
             {
                 "name": "milestone",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "milestone"
+                }
             },
             {
                 "name": "content",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "content"
+                }
             },
             {
                 "name": "contentTypename",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "typename"
+                }
             },
             {
                 "name": "planStart",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "planStart"
+                }
             },
             {
                 "name": "planEnd",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "planEnd"
+                }
             },
             {
                 "name": "planTerm",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "term"
+                }
             },
             {
                 "name": "planPoints",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "planPoints"
+                }
             },
             {
                 "name": "planPointsSummary",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "total"
+                }
             },
             {
                 "name": "resultPoints",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "resultPoints"
+                }
             },
             {
                 "name": "resultPointsSummary",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "summary"
+                }
             },
             {
                 "name": "nextActionDate",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "nextActionDate"
+                }
             },
             {
                 "name": "dueDate",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "dueDate"
+                }
             }
         ],
         "position": {
@@ -2192,49 +2875,73 @@
                 "name": "title",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "title"
+                }
             },
             {
                 "name": "number",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "number"
+                }
             },
             {
                 "name": "url",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "url"
+                }
             },
             {
                 "name": "body",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "body"
+                }
             },
             {
                 "name": "bodyHTML",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "bodyHTML"
+                }
             },
             {
                 "name": "repository",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "repository"
+                }
             },
             {
                 "name": "author",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "author"
+                }
             },
             {
                 "name": "assignees",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "assignees"
+                }
             }
         ],
         "position": {
@@ -2260,13 +2967,15 @@
                 "name": "a",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": null
             },
             {
                 "name": "b",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": null
             }
         ],
         "position": {
@@ -2292,37 +3001,55 @@
                 "name": "name",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "name"
+                }
             },
             {
                 "name": "url",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "url"
+                }
             },
             {
                 "name": "description",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "description"
+                }
             },
             {
                 "name": "descriptionHTML",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "descriptionHTML"
+                }
             },
             {
                 "name": "owner",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "owner"
+                }
             },
             {
                 "name": "pushedAt",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "pushedAt"
+                }
             }
         ],
         "position": {
@@ -2375,37 +3102,55 @@
                 "name": "login",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "login"
+                }
             },
             {
                 "name": "name",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "name"
+                }
             },
             {
                 "name": "email",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "email"
+                }
             },
             {
                 "name": "url",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "url"
+                }
             },
             {
                 "name": "company",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "company"
+                }
             },
             {
                 "name": "avatarUrl",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "avatarUrl"
+                }
             }
         ],
         "position": {
@@ -2431,19 +3176,28 @@
                 "name": "login",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "login"
+                }
             },
             {
                 "name": "name",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "name"
+                }
             },
             {
                 "name": "url",
                 "parameters": [],
                 "returnType": "any",
-                "visibility": "public"
+                "visibility": "public",
+                "returns": {
+                    "name": "url"
+                }
             }
         ],
         "position": {
