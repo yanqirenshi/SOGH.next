@@ -1,1 +1,156 @@
-[]
+[
+    {
+        "id": 1000000,
+        "parent": 1004,
+        "name": "Loader",
+        "description": "src/js/Loader.js",
+        "type": "classes"
+    },
+    {
+        "id": 1000001,
+        "parent": 1004,
+        "name": "Pooler",
+        "description": "src/js/Pooler.js (extends Loader)",
+        "type": "classes"
+    },
+    {
+        "id": 1000002,
+        "parent": 1004,
+        "name": "Sogh",
+        "description": "src/js/Sogh.js (extends Pooler)",
+        "type": "classes"
+    },
+    {
+        "id": 1000003,
+        "parent": 1004,
+        "name": "Pool",
+        "description": "src/js/Pool.js",
+        "type": "classes"
+    },
+    {
+        "id": 1000004,
+        "parent": 1004,
+        "name": "Matchmaker",
+        "description": "src/js/Matchmaker.js",
+        "type": "classes"
+    },
+    {
+        "id": 1000005,
+        "parent": 1030,
+        "name": "Assignee",
+        "description": "src/js/models/Assignee.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000006,
+        "parent": 1031,
+        "name": "Card",
+        "description": "src/js/models/Card.js　Projects (classic) 用のクラス。GitHub では廃止。",
+        "type": "classes"
+    },
+    {
+        "id": 1000007,
+        "parent": 1031,
+        "name": "Column",
+        "description": "src/js/models/Column.js　Projects (classic) 用のクラス。GitHub では廃止。",
+        "type": "classes"
+    },
+    {
+        "id": 1000008,
+        "parent": 1030,
+        "name": "GraphQLNode",
+        "description": "src/js/models/GraphQLNode.js",
+        "type": "classes"
+    },
+    {
+        "id": 1000009,
+        "parent": 1030,
+        "name": "Issue",
+        "description": "src/js/models/Issue.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000010,
+        "parent": 1030,
+        "name": "IssueComment",
+        "description": "src/js/models/IssueComment.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000011,
+        "parent": 1030,
+        "name": "Label",
+        "description": "src/js/models/Label.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000012,
+        "parent": 1030,
+        "name": "Milestone",
+        "description": "src/js/models/Milestone.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000013,
+        "parent": 1031,
+        "name": "Project",
+        "description": "src/js/models/Project.js (extends GraphQLNode)　Projects (classic) 用のクラス。GitHub では廃止。",
+        "type": "classes"
+    },
+    {
+        "id": 1000014,
+        "parent": 1030,
+        "name": "ProjectV2",
+        "description": "src/js/models/ProjectV2.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000015,
+        "parent": 1030,
+        "name": "ProjectV2Item",
+        "description": "src/js/models/ProjectV2Item.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000016,
+        "parent": 1030,
+        "name": "PullRequest",
+        "description": "src/js/models/PullRequest.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000017,
+        "parent": 1030,
+        "name": "Relationship",
+        "description": "src/js/models/Relationship.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000018,
+        "parent": 1030,
+        "name": "Repository",
+        "description": "src/js/models/Repository.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000019,
+        "parent": 1030,
+        "name": "Term",
+        "description": "src/js/models/Term.js",
+        "type": "classes"
+    },
+    {
+        "id": 1000020,
+        "parent": 1030,
+        "name": "User",
+        "description": "src/js/models/User.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000021,
+        "parent": 1030,
+        "name": "Viewer",
+        "description": "src/js/models/Viewer.js (extends GraphQLNode)",
+        "type": "classes"
+    }
+]
