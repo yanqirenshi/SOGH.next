@@ -14,7 +14,6 @@ import COLORS from './config/COLORS.js';
 import OPERATOR_ITEMS from './config/OPERATOR_ITEMS.js';
 import Operators from './operators/Operators.js';
 import { withIcons, withoutIcons } from './operators/labels.js';
-import ClassDiagram from './panels/ClassDiagram.js';
 import NotFoundWbsNodeData from './wbs/NotFoundWbsNodeData.js';
 import NotFoundWbsNodeComponent from './wbs/NotFoundWbsNodeComponent.js';
 import * as serviceWorkerRegistration from './js/serviceWorkerRegistration';
@@ -37,10 +36,20 @@ const config = {
     // ドック
     operators: { items: OPERATOR_ITEMS, Leafs: Operators, labels: { withIcons, withoutIcons } },
 
-    // タブのパネル (タブの code → パネルの部品)。コアの既定に重ねる。
-    panels: {
-        // クラスのページの「クラス図」タブ。SOGH のデータモデルのクラスを描く。
-        PAGE_CLASSES: { 'class-diagram': ClassDiagram },
+    // 図の設定
+    diagrams: {
+        // クラス図 (クラスのページの「クラス図」タブ。データは data/classes/)
+        // 箱の見出しの色を、クラスの layer (infra / model / deprecated) で分ける。
+        classes: {
+            header: {
+                by: 'layer',
+                colors: {
+                    infra:      '#E4E3EF',  // js/ (取得・キャッシュ)。藤鼠を薄く
+                    model:      '#F3E9F1',  // js/models/ (データモデル)。梅紫を薄く
+                    deprecated: '#EEEEEE',  // Projects (classic)。廃止予定
+                },
+            },
+        },
     },
 
     // WBS のノードのページ (src/wbs/)

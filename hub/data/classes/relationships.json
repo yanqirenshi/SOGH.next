@@ -1,0 +1,263 @@
+[
+    {
+        "id": "Pooler->Loader",
+        "type": "inheritance",
+        "from": {
+            "classId": "Pooler",
+            "point": "left"
+        },
+        "to": {
+            "classId": "Loader",
+            "point": "right"
+        }
+    },
+    {
+        "id": "Sogh->Pooler",
+        "type": "inheritance",
+        "from": {
+            "classId": "Sogh",
+            "point": "left"
+        },
+        "to": {
+            "classId": "Pooler",
+            "point": "right"
+        }
+    },
+    {
+        "id": "Pool->Pooler",
+        "type": "composition",
+        "from": {
+            "classId": "Pool",
+            "point": "top"
+        },
+        "to": {
+            "classId": "Pooler",
+            "point": "bottom"
+        },
+        "label": "_pools",
+        "fromMultiplicity": "1..*",
+        "description": [
+            "Pooler は、モデルの種類ごとの Pool を持つ。"
+        ]
+    },
+    {
+        "id": "Matchmaker->Pooler",
+        "type": "composition",
+        "from": {
+            "classId": "Matchmaker",
+            "point": "top"
+        },
+        "to": {
+            "classId": "Pooler",
+            "point": 40
+        },
+        "label": "matchmaker",
+        "fromMultiplicity": "1"
+    },
+    {
+        "id": "GraphQLNode->Pool",
+        "type": "aggregation",
+        "from": {
+            "classId": "GraphQLNode",
+            "point": "top"
+        },
+        "to": {
+            "classId": "Pool",
+            "point": "bottom"
+        },
+        "label": "_list / _ht",
+        "fromMultiplicity": "0..*",
+        "description": [
+            "Pool は、取得したモデルを id で引けるように持つ (キャッシュ)。"
+        ]
+    },
+    {
+        "id": "User->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "User",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "Viewer->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "Viewer",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "Assignee->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "Assignee",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "Repository->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "Repository",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "Label->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "Label",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "Milestone->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "Milestone",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "Issue->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "Issue",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "IssueComment->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "IssueComment",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "PullRequest->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "PullRequest",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "Relationship->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "Relationship",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "ProjectV2Item->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "ProjectV2Item",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "ProjectV2->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "ProjectV2",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "Project->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "Project",
+            "point": 200
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "ProjectV2->ProjectV2Item",
+        "type": "association",
+        "from": {
+            "classId": "ProjectV2",
+            "point": "left"
+        },
+        "to": {
+            "classId": "ProjectV2Item",
+            "point": "right"
+        },
+        "label": "items",
+        "toMultiplicity": "0..*",
+        "description": [
+            "ProjectV2.itemsWith2ProjectV2Item() で、core の items を ProjectV2Item にする。"
+        ]
+    },
+    {
+        "id": "Term->ProjectV2",
+        "type": "composition",
+        "from": {
+            "classId": "Term",
+            "point": "left"
+        },
+        "to": {
+            "classId": "ProjectV2",
+            "point": "right"
+        },
+        "label": "_plan, _result",
+        "description": [
+            "README の $Plan / $Result から作る期間。"
+        ]
+    }
+]
