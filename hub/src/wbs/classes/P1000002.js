@@ -1,28 +1,28 @@
 import React from 'react';
 
-import Container from '@mui/material/Container';
-
-import { FrameWbsNodeTabs as Frame, WBSTable } from '@yanqirenshi/ihub.core';
-
-import TABS from './TABS.js';
-import Behaviors from './P1000002/Behaviors.js';
+import FrameClass from '../../components/assemblies/frames/FrameClass.js';
+import useClassData from '../../hooks/useClassData.js';
 
 // クラス Sogh のページ
 //   src/js/Sogh.js
 //   extends Pooler
+const CLASS = 'Sogh';
+
 export default function P1000002 (props) {
-    // 選んでいるタブの code。null のときは、URL の ?tab= (無ければ先頭のタブ) になる。
-    const [tab, setTab] = React.useState(null);
+    // 属性・振舞のデータ。(data/classes/classes.json の Sogh)
+    const data = useClassData(CLASS);
 
     return (
-        <Frame tabs={TABS} tab={tab} onChangeTab={setTab} wbs_node={props.wbs_node} centered>
-          {/* 概要 (overview)・属性 (attributes) の中身は、まだ空。 */}
-          { tab==='behaviors' && <Behaviors/> }
-
-          { tab==='wbs' &&
-            <Container maxWidth="lg" sx={{ pt: 3 }}>
-              <WBSTable start_id={String(props.wbs_node.id)}/>
-            </Container> }
-        </Frame>
+        <FrameClass wbs_node={props.wbs_node}
+                    wbs_id={props.wbs_node.id}
+                    name={CLASS}
+                    overview={<Overview/>}
+                    attributes={data.attributes}
+                    behaviors={data.methods}/>
     );
+}
+
+// 概要タブの中身。(まだ空)
+function Overview () {
+    return null;
 }
