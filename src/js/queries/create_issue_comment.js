@@ -1,7 +1,8 @@
 import * as attr from './attributes.js';
 
-const query = `mutation {
-  addComment(input:{subjectId:"@id", body:"@body"}) {
+// variables: { id: ID!, body: String! }
+const query = `mutation ($id: ID!, $body: String!) {
+  addComment(input:{subjectId: $id, body: $body}) {
     commentEdge {
       node {
           ${attr.issue_comment()}

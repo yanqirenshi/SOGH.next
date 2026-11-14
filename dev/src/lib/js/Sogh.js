@@ -274,29 +274,22 @@ export default class Sogh extends Pooler {
 
         let out = [];
 
-        const query = this.query('update_issue_comment')
-              .replace('@id',   id)
-              .replace('@body', body);
+        const query = this.query('update_issue_comment');
 
-        const post_data = this.postData(query);
+        const post_data = this.postData(query, { id: id, body: body });
 
         fetch(this.endpoint(), post_data)
             .then(response  => this.text2json(response))
             .then(response  => {
+                // GraphQL のエラーは json2response が throw して catch に回る。
                 const r = this.json2response(response, d=> {
                     const issue_comment_node = d.data.updateIssueComment.issueComment;
                     return this.node2issueComment(issue_comment_node);
                 });
 
-                // case of error
-                if ('error'===response.type) {
-                    callback('failed', callbacks, [r.data, id, body]);
-                }
-
                 callback('successed', callbacks, [r.data.id(), id, body]);
             })
             .catch(err => {
-                this.error2response(err);
                 callback('failed', callbacks, [this.error2response(err), id, body]);
             });
 
@@ -307,29 +300,22 @@ export default class Sogh extends Pooler {
 
         let out = [];
 
-        const query = this.query('create_issue_comment')
-              .replace('@id',   id)
-              .replace('@body', body);
+        const query = this.query('create_issue_comment');
 
-        const post_data = this.postData(query);
+        const post_data = this.postData(query, { id: id, body: body });
 
         fetch(this.endpoint(), post_data)
             .then(response  => this.text2json(response))
             .then(response  => {
+                // GraphQL のエラーは json2response が throw して catch に回る。
                 const r = this.json2response(response, d=> {
                     const issue_comment_node = d.data.addComment.commentEdge.node;
                     return this.node2issueComment(issue_comment_node);
                 });
 
-                // case of error
-                if ('error'===response.type) {
-                    callback('failed', callbacks, [r.data, id, body]);
-                }
-
                 callback('successed', callbacks, [r.data.id(), id, body]);
             })
             .catch(err => {
-                this.error2response(err);
                 callback('failed', callbacks, [this.error2response(err), id, body]);
             });
 
@@ -340,23 +326,20 @@ export default class Sogh extends Pooler {
 
         let out = [];
 
-        const query = this.query('delete_issue_comment')
-              .replace('@comment-id', id);
+        const query = this.query('delete_issue_comment');
 
-        const post_data = this.postData(query);
+        const post_data = this.postData(query, { id: id });
 
         fetch(this.endpoint(), post_data)
             .then(response  => this.text2json(response))
             .then(response  => {
-                // case of error
-                if ('error'===response.type) {
-                    callback('failed', callbacks, [id]);
-                }
+                // HTTP 200 でも GraphQL の errors が返ることがある。
+                // json2response が throw して catch (failed) に回る。
+                this.json2response(response, d=> d.data.deleteIssueComment);
 
                 callback('successed', callbacks, [id]);
             })
             .catch(err => {
-                this.error2response(err);
                 callback('failed', callbacks, [this.error2response(err), id]);
             });
 

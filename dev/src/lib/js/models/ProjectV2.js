@@ -20,6 +20,19 @@ export default class ProjectV2 extends GraphQLNode {
 
         this._priorities = priorities;
     }
+    core (v) {
+        if (arguments.length===1) {
+            super.core(v);
+
+            // 再取得などで core が差し替わったら、README の属性を解析し直す。
+            if (this._core) {
+                this.initReadmeAttributes();
+                this.parseReadme();
+            }
+        }
+
+        return super.core();
+    }
     initReadmeAttributes () {
         this._priority = '?';
         this._owner = '?';

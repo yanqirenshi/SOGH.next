@@ -27,6 +27,17 @@ export default class Issue extends GraphQLNode {
             owner:       /.*\$[O|o]wner:*\s+(\S+).*/,
         };
     }
+    core (v) {
+        if (arguments.length===1) {
+            super.core(v);
+
+            // 再取得などで core が差し替わったら、本文の注釈 ($Point など) を解析し直す。
+            if (this._core)
+                this.addAnotetionValueNew(this._core);
+        }
+
+        return super.core();
+    }
     number () {
         return this._core.number || null;
     }
@@ -168,6 +179,9 @@ export default class Issue extends GraphQLNode {
 
         core.body = v || '';
 
+        // 本文が変わったので注釈 ($Point など) を解析し直す。
+        this.addAnotetionValueNew(core);
+
         return core.body;
     }
     bodyHTML () {
@@ -279,7 +293,8 @@ export default class Issue extends GraphQLNode {
         return issue;
     }
     addAnotetionValueNew (issue) {
-        const body = issue.body;
+        // body を取得していないノード (ProjectV2Item の content など) もあるので空文字で扱う。
+        const body = issue.body || '';
 
         this._points = this.getPointFromBody(body);
         this._due_date = this.getDueDateFromBody(body);

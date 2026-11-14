@@ -1,7 +1,8 @@
 import * as attr from './attributes.js';
 
-const query = `mutation {
-  deleteIssueComment(input: {id: "@comment-id"}) {
+// variables: { id: ID! }
+const query = `mutation ($id: ID!) {
+  deleteIssueComment(input: {id: $id}) {
     clientMutationId
   }
 }`;

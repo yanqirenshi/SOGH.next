@@ -59,11 +59,18 @@ export default class Loader {
             'Accept': 'application/json',
         };
     }
-    postData (query) {
+    postData (query, variables) {
+        const body = { query: query };
+
+        // 値はクエリ文字列に埋め込まず、GraphQL の variables で渡す。
+        // (改行や " を含む値でもクエリが壊れない)
+        if (variables)
+            body.variables = variables;
+
         return {
             method: 'POST',
             headers: this.makeHeader(),
-            body: JSON.stringify({query: query})
+            body: JSON.stringify(body)
         };
     }
     fetch (query, success, error) {

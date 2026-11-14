@@ -39,7 +39,13 @@ export default class ProjectV2Item extends GraphQLNode {
     type () {
         return this._core.type || null;
     }
+    isArchived () {
+        // GitHub 標準のアーカイブ状態 (ProjectV2Item.isArchived)
+        return this._core.isArchived===true;
+    }
     archived () {
+        // 'Archived' という名前の日付フィールド (ユーザー定義) の値。
+        // GitHub 標準のアーカイブ状態は isArchived() を使う。
         const field_value = this.getFieldValueByName('Archived');
         return field_value ? field_value.date : null;
     }
