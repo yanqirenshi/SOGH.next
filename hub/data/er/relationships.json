@@ -1,0 +1,28 @@
+[
+    {
+        "id": 10000000,
+        "type": "FK",
+        "from": {
+            "entity": 2,
+            "cardinality": 3,
+            "optionality": 1,
+            "position": 270
+        },
+        "to": {
+            "entity": 3,
+            "cardinality": 1,
+            "optionality": 0,
+            "position": 90
+        },
+        "details": [
+            {
+                "from": {
+                    "id": 10
+                },
+                "to": {
+                    "id": 28
+                }
+            }
+        ]
+    }
+]

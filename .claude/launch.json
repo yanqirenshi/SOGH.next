@@ -1,0 +1,16 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "hub",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "hub", "start"],
+      "env": {
+        "PORT": "3001",
+        "BROWSER": "none",
+        "IHUB_API_PORT": "4001"
+      },
+      "port": 3001
+    }
+  ]
+}
