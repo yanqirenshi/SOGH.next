@@ -14,6 +14,7 @@ import COLORS from './config/COLORS.js';
 import OPERATOR_ITEMS from './config/OPERATOR_ITEMS.js';
 import Operators from './operators/Operators.js';
 import { withIcons, withoutIcons } from './operators/labels.js';
+import ClassDiagram from './panels/ClassDiagram.js';
 import NotFoundWbsNodeData from './wbs/NotFoundWbsNodeData.js';
 import NotFoundWbsNodeComponent from './wbs/NotFoundWbsNodeComponent.js';
 import * as serviceWorkerRegistration from './js/serviceWorkerRegistration';
@@ -35,6 +36,12 @@ const config = {
 
     // ドック
     operators: { items: OPERATOR_ITEMS, Leafs: Operators, labels: { withIcons, withoutIcons } },
+
+    // タブのパネル (タブの code → パネルの部品)。コアの既定に重ねる。
+    panels: {
+        // クラスのページの「クラス図」タブ。SOGH のデータモデルのクラスを描く。
+        PAGE_CLASSES: { 'class-diagram': ClassDiagram },
+    },
 
     // WBS のノードのページ (src/wbs/)
     // 動的 import は、webpack がこのアプリのフォルダを束ねられるように、アプリ側に置く。
