@@ -39,8 +39,8 @@ function Overview ({ data }) {
             <P>{"Pooler の node2repository(node) が repository(node) を、node2user(node) が user(node) を呼ぶ。"}</P>
             <P>{"repository(node) は、リポジトリの owner を User の Pool に入れる。"}</P>
             <P>{"user(node) は、今は何もしない。"}</P>
-            <P>{"owner は組織 (Organization) のときも User として入り、同じ id の User があるときはその core を owner のノードに差し替える。"}</P>
-            <P>{"そのため、Sogh の connect(token, successed, failed) で viewer にした User も、自分のリポジトリを取得すると name()・email() などが null になる。"}</P>
+            <P>{"owner は組織 (Organization) のときも User として入り、同じ id の User があるときはその core に owner のノードを重ねる。"}</P>
+            <P>{"重ねるだけなので、Sogh の connect(token, successed, failed) で viewer にした User の name()・email() などは、自分のリポジトリを取得しても残る。"}</P>
             <Plane>{CODE}</Plane>
           </Section>
 

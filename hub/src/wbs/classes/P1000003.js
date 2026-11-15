@@ -38,7 +38,8 @@ function Overview ({ data }) {
             <P>{"Pooler の constructor が、種類ごとに new Pool(sogh, item_class) で 1 つずつ作り、Sogh からは pool(v) で取り出す。"}</P>
             <P>{"id → オブジェクト の表 (_ht) と、入れた順の配列 (_list) の 2 つで持つ。"}</P>
             <P>{"ensure(node, makeInstance, updater) は、同じ id のオブジェクトがあればそれを更新し、無ければ作って入れるので、同じ id のオブジェクトは 1 つだけになる。"}</P>
-            <P>{"既にあるときは、updater が無ければ core(v) でノードをまるごと差し替える。(マージしない)"}</P>
+            <P>{"既にあるときは、updater が無ければ merge(node) で、core にノードを重ねる。(まるごと差し替えない)"}</P>
+            <P>{"重ねるかどうかは、最終更新日時 (updatedAt) を比べて決める。(GraphQLNode の merge(node) を見る)"}</P>
             <P>{"ensure で返すオブジェクトには、sogh(v) で Sogh を入れる。"}</P>
             <P>{"オブジェクトを消すメソッドは無い。"}</P>
             <Plane>{CODE}</Plane>

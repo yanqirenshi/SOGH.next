@@ -46,7 +46,7 @@
                     "Pooler の node2viewer(d) は、Pool に入れない Viewer を作って入れる。(Sogh の asyncFetchViewer() が使う)",
                     "そのため、どちらで入れたかで、クラス (User か Viewer か) が違う。",
                     "isConnected() は、これが null かどうかを見る。",
-                    "connect で入れた User は Pool の User と同じオブジェクトなので、あとで Matchmaker が同じ id のリポジトリの owner を User の Pool に入れると、その core が owner のノードに差し替わり、name()・email() などが null になる。"
+                    "connect で入れた User は Pool の User と同じオブジェクトなので、あとで Matchmaker が同じ id のリポジトリの owner を User の Pool に入れると、その core に owner のノードが重なる。(重ねるだけなので、name()・email() などは残る)"
                 ],
                 "examples": [
                     "await sogh.connect('ghp_xxxxxxxx');",
@@ -977,7 +977,7 @@
                 "description": [
                     "リポジトリのノードを、Repository にして Pool に入れて返す。",
                     "先に matchmaker.repository(node) で、owner を User の Pool に入れる。(組織のときも User になる)",
-                    "同じ id の Repository があるときは、新しく作らず、その core をノードに差し替える。",
+                    "同じ id の Repository があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
                     "Sogh の fetchRepositoriesByViewer(success, fail)・asyncFetchRepositoriesByViewer() が使う。"
                 ],
                 "examples": [
@@ -1085,7 +1085,7 @@
                 "description": [
                     "ユーザーのノードを、User にして Pool に入れて返す。",
                     "先に matchmaker.user(node) を呼ぶ。(今は何もしない)",
-                    "同じ id の User があるときは、新しく作らず、その core をノードに差し替える。(マージしないので、ノードに無い項目はなくなる)",
+                    "同じ id の User があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node)。ノードに無い項目は、残る)",
                     "Sogh の connect(token, successed, failed)・fetchUserByID(id, success, fail) と、Matchmaker の repository(node) が使う。"
                 ],
                 "examples": [
@@ -1157,7 +1157,7 @@
                 "description": [
                     "ProjectV2 のノードを、ProjectV2 にして Pool に入れて返す。",
                     "クラスは getPoolAndItemClass(code) で引く。",
-                    "同じ id の ProjectV2 があるときは、新しく作らず、その core をノードに差し替える。(README の属性も読み直す)",
+                    "同じ id の ProjectV2 があるときは、新しく作らず、その core にノードを重ねる。(core が変わったときは、README の属性も読み直す)",
                     "Sogh の asyncFetchProjectsV2ByTeam(team_id, callbacks) などが使う。"
                 ],
                 "examples": [
@@ -1259,7 +1259,7 @@
                 ],
                 "description": [
                     "ProjectV2 のアイテムのノードを、ProjectV2Item にして Pool に入れて返す。",
-                    "同じ id の ProjectV2Item があるときは、新しく作らず、その core をノードに差し替える。",
+                    "同じ id の ProjectV2Item があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
                     "Pool に入れたあとで、もう一度 sogh(v) に自分を入れる。(Pool も入れるので、結果は同じ)",
                     "Sogh の asyncFetchProjectV2ItemByID(id) や、ProjectV2 の itemsWith2ProjectV2Item() などが使う。"
                 ],
@@ -1328,7 +1328,7 @@
                 ],
                 "description": [
                     "Issue のノードを、Issue にして Pool に入れて返す。",
-                    "同じ id の Issue があるときは、新しく作らず、その core をノードに差し替える。(本文の注釈 ($Point など) も読み直す)",
+                    "同じ id の Issue があるときは、新しく作らず、その core にノードを重ねる。(core が変わったときは、本文の注釈 ($Point など) も読み直す)",
                     "Sogh の asyncFetchIssueByID(id) などが使う。"
                 ],
                 "examples": [
@@ -1430,7 +1430,7 @@
                 ],
                 "description": [
                     "Issue のコメントのノードを、IssueComment にして Pool に入れて返す。",
-                    "同じ id の IssueComment があるときは、新しく作らず、その core をノードに差し替える。",
+                    "同じ id の IssueComment があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
                     "Sogh の asyncFetchIssueCommentsByID(id) や updateIssueComment(id, body, callbacks) などが使う。"
                 ],
                 "examples": [
@@ -1498,7 +1498,7 @@
                 ],
                 "description": [
                     "Pull request のノードを、PullRequest にして Pool に入れて返す。",
-                    "同じ id の PullRequest があるときは、新しく作らず、その core をノードに差し替える。",
+                    "同じ id の PullRequest があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
                     "SOGH の中では、呼ぶところが無い。"
                 ],
                 "examples": [
@@ -2110,7 +2110,7 @@
                 "description": [
                     "viewer のリポジトリを取得し、Repository にして Pool に入れる。",
                     "ページ送りはせず、先頭の 100 件だけを取得する。",
-                    "リポジトリの owner も User にして、user の Pool に入れる。(同じ id の User があるときは、owner の少ない項目で core が差し替わる)",
+                    "リポジトリの owner も User にして、user の Pool に入れる。(同じ id の User があるときは、その core に owner のノードを重ねる)",
                     "取得できたときは、success({ contents: Repository の id の配列, pageInfo }) を呼ぶ。",
                     "fail は、取得できたときに、success のあとで { status: 'success', data: undefined } を引数にして呼ばれる。(fetchX の success の位置に渡しているため)",
                     "取得に失敗したときは、success も fail も呼ばれない。",
@@ -2496,7 +2496,7 @@
                 "description": [
                     "id のコメントの本文を、body に書き換える。(GraphQL の updateIssueComment)",
                     "id と body は、クエリに埋め込まず、GraphQL の variables で送る。",
-                    "書き換えたコメントは、IssueComment にして Pool に入れる。(同じ id があるときは core を差し替える)",
+                    "書き換えたコメントは、IssueComment にして Pool に入れる。(同じ id があるときは、core にノードを重ねる)",
                     "始めに、callbacks の start(id, body) を呼ぶ。",
                     "成功したときは、successed(コメントの id, id, body) を呼ぶ。",
                     "失敗したときは、failed({ type: 'error', data: error }, id, body) を呼ぶ。",
@@ -2665,7 +2665,7 @@
                 "description": [
                     "viewer のリポジトリを、ページ送りをしながらすべて取得し、Repository にして Pool に入れる。",
                     "1 回に 100 件ずつ取得する。",
-                    "リポジトリの owner も User にして、user の Pool に入れる。(同じ id の User があるときは、owner の少ない項目で core が差し替わる)",
+                    "リポジトリの owner も User にして、user の Pool に入れる。(同じ id の User があるときは、その core に owner のノードを重ねる)",
                     "そのため、connect(token, successed, failed) で入れた viewer (User) の name() などが null になる。",
                     "途中で失敗したときは、それまでに取得した id の配列を返す。(エラーは返さない)"
                 ],
@@ -3562,7 +3562,7 @@
                         "description": [
                             "同じ id のオブジェクトがあるときに、オブジェクトを更新する関数。",
                             "(obj, node) を受け取る。(戻り値は使わない)",
-                            "無いときは、obj.core(node) で差し替える。"
+                            "無いときは、obj.merge(node) で重ねる。"
                         ],
                         "optional": true
                     }
@@ -3570,8 +3570,9 @@
                 "description": [
                     "ノードから、Pool のオブジェクトを返す。(無ければ作って入れ、あれば更新する)",
                     "node.id のオブジェクトが無いときは、makeInstance(node) で作って、add(data) で入れる。",
-                    "あるときは、updater があれば updater(obj, node) を呼び、無ければ obj.core(node) で core をまるごとノードに差し替える。(マージしない)",
-                    "そのため、項目の少ないノードで差し替えると、前のノードにあった項目はなくなる。",
+                    "あるときは、updater があれば updater(obj, node) を呼び、無ければ obj.merge(node) で、core にノードを重ねる。(core をまるごと差し替えない)",
+                    "重ねるかどうかは、最終更新日時 (updatedAt) を比べて決める。(GraphQLNode の merge(node) を見る)",
+                    "そのため、項目の少ないノードを入れても、前のノードにあった項目は残る。",
                     "どちらのときも、最後にオブジェクトの sogh(v) に、この Pool の Sogh を入れる。",
                     "Pooler の node2〜(node) が使う。(updater は渡していない)"
                 ],
@@ -3582,7 +3583,7 @@
                     "const user = pool.ensure({ id: 'U_kgDOAB', login: 'octocat' }, d=> new User(d));",
                     "",
                     "user.name();",
-                    "// => null"
+                    "// => \"The Octocat\""
                 ]
             }
         ],
@@ -3648,8 +3649,8 @@
                     "リポジトリのノードの owner を、sogh の node2user(node) で User の Pool に入れる。",
                     "owner が無いときは、何もしない。",
                     "owner が組織 (Organization) のときも、User として入れる。",
-                    "owner のノードは、リポジトリと一緒に取得した一部の項目だけ。(Sogh の repositories_by_viewer のクエリでは、id・login・resourcePath・avatarUrl・url)",
-                    "同じ id の User が既にあるときは、その core を owner のノードに差し替える。(Sogh の connect(token, successed, failed) で viewer にした User も、name()・email() などが null になる)",
+                    "owner のノードは、リポジトリと一緒に取得した一部の項目だけ。(email・company などは無い)",
+                    "同じ id の User が既にあるときは、その core に owner のノードを重ねる。(Sogh の connect(token, successed, failed) で viewer にした User の name()・email() などは、残る)",
                     "リポジトリは Pool に入れない。(入れるのは Pooler の node2repository(node))"
                 ],
                 "examples": [
@@ -3881,7 +3882,7 @@
                     "GraphQL で取得したノード。",
                     "constructor が、引数 data をそのまま入れる。",
                     "core(v) で差し替える。(null や '' などの falsy な値を渡すと null になる)",
-                    "Pool は、同じ id のノードを取得し直したとき、core(v) でまるごと差し替える。",
+                    "Pool は、同じ id のノードを取得し直したとき、merge(node) でノードを重ねる。(merge(node) は、core を変えるときに core(v) を通す)",
                     "id() などの値を読むメソッドは、ここから読む。"
                 ],
                 "examples": [
@@ -3892,10 +3893,12 @@
                 "affectedBy": [
                     "constructor",
                     "core(v)",
+                    "merge(node)",
                     "Pool"
                 ],
                 "seeAlso": [
                     "core(v)",
+                    "merge(node)",
                     "id()",
                     "createdAt()",
                     "updatedAt()"
@@ -3926,6 +3929,40 @@
                 "seeAlso": [
                     "sogh(v)",
                     "Sogh"
+                ]
+            },
+            {
+                "name": "_reload",
+                "visibility": "private",
+                "type": "String | null",
+                "initialValue": "null",
+                "description": [
+                    "GitHub 側の変更を重ねた日時。(ISO 8601 の文字列)",
+                    "constructor が null にする。",
+                    "merge(node) が、今の core より新しいノード (updatedAt が新しいノード) を重ねたときに、そのときの日時を入れる。",
+                    "手元に無い項目を足しただけのときと、updatedAt が無くて毎回重ねたときは、入れない。",
+                    "reload(v) で読み書きする。",
+                    "使い道は、まだ決めていない。"
+                ],
+                "examples": [
+                    "const graphQLNode = sogh.user('U_kgDOAB');",
+                    "graphQLNode._reload;",
+                    "// => null",
+                    "",
+                    "// GitHub で変更があったあとに、取得し直す",
+                    "await sogh.fetchUserByID('U_kgDOAB');",
+                    "graphQLNode._reload;",
+                    "// => \"2026-11-15T05:40:00.000Z\""
+                ],
+                "affectedBy": [
+                    "constructor",
+                    "merge(node)",
+                    "reload(v)"
+                ],
+                "seeAlso": [
+                    "reload(v)",
+                    "merge(node)",
+                    "updatedAt()"
                 ]
             }
         ],
@@ -3998,7 +4035,7 @@
                     "GraphQL から取得したノード (core) を読み書きする。",
                     "引数を 1 つ渡したときだけ、そのノードに差し替える。(falsy な値は null にする)",
                     "core が null のときは、id() などの値を読むメソッドがエラーになる。",
-                    "Pool が同じ id のノードを取得し直したときも、ここで差し替わる。"
+                    "Pool が同じ id のノードを取得し直したときは、merge(node) が、重ねたあとの core を、ここで入れる。"
                 ],
                 "examples": [
                     "graphQLNode.core().login;",
@@ -4076,6 +4113,107 @@
                 "examples": [
                     "graphQLNode.updatedAt();",
                     "// => \"2026-11-02T18:30:00Z\""
+                ]
+            },
+            {
+                "name": "reload",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "reload",
+                    "type": "String | null",
+                    "description": [
+                        "GitHub 側の変更を重ねた日時。",
+                        "重ねたことが無いときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String | null",
+                        "description": [
+                            "新しい日時。"
+                        ],
+                        "optional": true
+                    }
+                ],
+                "description": [
+                    "GitHub 側の変更を重ねた日時 (_reload) を読み書きする。",
+                    "引数を 1 つ渡したときだけ、その値にする。(falsy な値は null にする)",
+                    "merge(node) が、今の core より新しいノードを重ねたときに、そのときの日時 (ISO 8601 の文字列) を入れる。",
+                    "使い道は、まだ決めていない。"
+                ],
+                "examples": [
+                    "graphQLNode.reload();",
+                    "// => null",
+                    "",
+                    "graphQLNode.merge({ id: 'MDQ6VXNlcjU4MzIzMQ==', name: 'The Octocat', updatedAt: '2026-11-03T10:00:00Z' });",
+                    "graphQLNode.reload();",
+                    "// => \"2026-11-15T05:40:00.000Z\""
+                ]
+            },
+            {
+                "name": "merge",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "result",
+                    "type": "String",
+                    "description": [
+                        "何をしたか。",
+                        "'newer' … 来たノードのほうが新しく、来た項目を重ねた。",
+                        "'filled' … 手元に無い項目を足した。",
+                        "'kept' … 何もしなかった。",
+                        "'always' … updatedAt を比べられず、来た項目を重ねた。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "重ねるノード。(今の core と同じ id のノード)",
+                            "falsy な値のときは、何もしない。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "同じ id のノードを、今の core に重ねる。",
+                    "core をまるごと差し替えずに、来た項目だけを重ねる。(入れ子で取得したノードは項目が少ないので、差し替えると、今ある値が消えるため)",
+                    "重ねるかどうかは、最終更新日時 (updatedAt) を、今の core とノードで比べて決める。",
+                    "来たノードのほうが新しいときは、来た項目を重ね、_reload にそのときの日時を入れる。",
+                    "日時が同じとき、来たノードのほうが古いときは、手元に無い項目だけを足す。(手元の値は上書きしない)",
+                    "今の core とノードのどちらかに updatedAt が無いとき (null のときも) は、毎回、来た項目を重ねる。(_reload は入れない)",
+                    "重ねる単位は、一番上の項目。(入れ子の中身までは重ねない)",
+                    "来た値が null の項目は、null で重ねる。来ていない項目 (undefined) は、触らない。",
+                    "core を変えるときは、core(v) を通す。(Issue・ProjectV2 は、core(v) で注釈を読み直す)",
+                    "何も重ねなかったときは、core を作り直さない。",
+                    "core が無いときは、ノードをそのまま core にする。",
+                    "Pool の ensure(node, makeInstance, updater) が使う。",
+                    "この重ね方では、項目の少ない新しいノードを重ねたあとに、古い項目が残ることがある。(あとで、_reload を使って解く)"
+                ],
+                "examples": [
+                    "const graphQLNode = new GraphQLNode({ id: 'U_kgDOAB', name: 'The Octocat', updatedAt: '2026-11-01T09:00:00Z' });",
+                    "",
+                    "// 日時が同じ: 手元に無い項目だけ足す",
+                    "graphQLNode.merge({ id: 'U_kgDOAB', name: 'Octo', email: 'octo@example.com', updatedAt: '2026-11-01T09:00:00Z' });",
+                    "// => \"filled\"",
+                    "graphQLNode.core().name;",
+                    "// => \"The Octocat\"",
+                    "",
+                    "// 来たほうが新しい: 来た項目を重ねる",
+                    "graphQLNode.merge({ id: 'U_kgDOAB', name: 'Octo', updatedAt: '2026-11-02T09:00:00Z' });",
+                    "// => \"newer\"",
+                    "graphQLNode.core().name;",
+                    "// => \"Octo\"",
+                    "graphQLNode.core().email;",
+                    "// => \"octo@example.com\""
                 ]
             }
         ],
@@ -4264,7 +4402,7 @@
                     "GraphQL から取得した Issue のノード (core) を読み書きする。",
                     "引数を渡したときは core を差し替え、addAnotetionValueNew(issue) で本文の注釈を読み直す。",
                     "null などを渡したときは core が null になり、注釈は読み直さない。(前の値のまま)",
-                    "Pool が同じ id のノードを取得し直したときも、ここで差し替わる。"
+                    "Pool が同じ id のノードを取得し直したときは、merge(node) が、重ねたあとの core を、ここで入れる。"
                 ],
                 "examples": [
                     "issue.core().title;",
@@ -6949,7 +7087,7 @@
                 "description": [
                     "GraphQL から取得した ProjectV2 のノード (core) を読み書きする。",
                     "引数を渡したときは core を差し替え、initReadmeAttributes() と parseReadme() で README の属性を読み直す。",
-                    "Pool が同じ id のノードを取得し直したときも、ここで差し替わる。"
+                    "Pool が同じ id のノードを取得し直したときは、merge(node) が、重ねたあとの core を、ここで入れる。"
                 ],
                 "examples": [
                     "const projectV2 = sogh.projectV2(id);",
@@ -9128,7 +9266,7 @@
                 },
                 "description": [
                     "ユーザーの名前 (プロフィールの Name) を返す。",
-                    "リポジトリの owner のノードに差し替わったあとは、null になる。"
+                    "リポジトリの owner のノードが重なっても、値は残る。"
                 ],
                 "examples": [
                     "user.name();",

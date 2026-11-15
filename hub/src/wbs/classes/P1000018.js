@@ -38,7 +38,7 @@ function Overview ({ data }) {
             <P>{"Sogh の node2repository(node) が作り、Pool に入れる。(asyncFetchRepositoriesByViewer() などで取得したとき)"}</P>
             <P>{"node2repository(node) は、Matchmaker を通して、持ち主 (owner) のノードも node2user(node) で User の Pool に入れる。"}</P>
             <P>{"持ち主が組織のときも、User として入る。"}</P>
-            <P>{"同じ id の User が既にあると、その core が owner のノードに差し替わるので、owner のノードに無い name・email・company は null になる。"}</P>
+            <P>{"同じ id の User が既にあると、その core に owner のノードが重なる。(重ねるだけなので、owner のノードに無い email・company などは残る)"}</P>
           </Section>
 
           <Section title="属性" lev="4" sx={SX_MEMBER_TITLE}>

@@ -159,7 +159,7 @@ const NESTED_COLUMNS = [
 
 const NESTED = [
     { type: 'Repository',    nested: 'owner',                                                      some: '-' },
-    { type: 'Issue',         nested: 'author, repository, milestone, assignees (10 件まで), labels (10 件まで)', some: 'projectItems (1 件), comments (100 件まで), projectCards' },
+    { type: 'Issue',         nested: 'author, repository, milestone, assignees (10 件まで), labels (10 件まで)', some: 'projectItems (1 件), comments (100 件まで)' },
     { type: 'IssueComment',  nested: 'author, editor, pullRequest',                                some: '-' },
     { type: 'ProjectV2',     nested: 'fields, creator, owner',                                     some: 'items' },
     { type: 'ProjectV2Item', nested: 'fieldValues, creator, content',                              some: 'project' },
@@ -184,9 +184,14 @@ export default function DataModel () {
               <P>Pool は、種類ごとに 1 つあります。キーは、GitHub の node id です。</P>
               <Table columns={POOL_COLUMNS} rows={POOLS} ids={TABLE_IDS}/>
               <OL sx={SX_AFTER_TABLE}>
-                <LI>同じ id の node を入れ直すと、いまあるモデルの core を差し替える。(モデルは同じものが残る)</LI>
+                <LI>同じ id の node を入れ直すと、いまあるモデルの core に、node を重ねる。(モデルは同じものが残る)
+                  <UL>
+                    <LI>core を丸ごと差し替えずに、最終更新日時 (updatedAt) を比べて、重ねる項目を決める。</LI>
+                    <LI>重ね方は、「7.4 (1) node の重ね方」を見る。</LI>
+                  </UL>
+                </LI>
                 <LI>無ければ、モデルを作って入れる。</LI>
-                <LI><C>Issue</C> と <C>ProjectV2</C> は、core を差し替えると、注釈を読み取り直す。</LI>
+                <LI><C>Issue</C> と <C>ProjectV2</C> は、core が変わると、注釈を読み取り直す。</LI>
                 <LI><C>sogh.get(id)</C> は、すべての Pool を順に探す。(node id は、種類をまたいで重ならない)</LI>
                 <LI>Pool から消す操作は無い。ページを開いている間は、貯まり続ける。</LI>
                 <LI>Label・Milestone・Assignee・Project・Card・Column は、Pool を持たない。Issue や ProjectV2Item の core の中に、JSON のまま残る。</LI>
