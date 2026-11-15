@@ -36,9 +36,11 @@ function Overview ({ data }) {
             <P>{"GraphQL で取得した PullRequest のノード (core) を包み、タイトル・番号・本文・リポジトリ・作者・担当者を読む。"}</P>
             <P>{"GraphQLNode を継承する。"}</P>
             <P>{"Pooler の node2pullRequest(node) が作り、Pool に入れる。"}</P>
-            <P>{"今の Sogh の取得メソッドには、node2pullRequest(node) を呼ぶものは無い。"}</P>
+            <P>{"今の Sogh の取得メソッドには、node2pullRequest(node) を直に呼ぶものは無い。(Matchmaker が、IssueComment の pullRequest や ProjectV2Item の content・Linked pull requests を Pool に入れるときに呼ぶ)"}</P>
             <P>{"body()・bodyHTML() は、ほかのモデルと違い、無いときに null ではなく '' を返す。"}</P>
-            <P>{"assignees() は core の assignees.edges を読むので、取得していないときはエラーになる。"}</P>
+            <P>{"assignees() は、core の assignees の id で Pool から User を引いて、配列で返す。(取得していないときは [])"}</P>
+            <P>{"いまは、どのクエリも PullRequest の assignees を取得しないので、assignees() は [] になる。"}</P>
+            <P>{"repository()・author() は、モデルにする範囲に入っていないので、JSON (ノード) のまま返す。"}</P>
           </Section>
 
           <Section title="属性" lev="4" sx={SX_MEMBER_TITLE}>

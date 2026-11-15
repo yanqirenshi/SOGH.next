@@ -49,7 +49,10 @@ function Overview ({ data }) {
             <P>README に書いた「$名前: 値」の行から、プロジェクトを管理するための属性 (優先度・担当者・予定と実績の期間など) を読み出して持つ。</P>
             <P>core を差し替えると、README の属性を読み直す。</P>
             <Plane>{README_EXAMPLE}</Plane>
-            <P>アイテムは、items() でノードを、itemsWith2ProjectV2Item() で ProjectV2Item を得る。</P>
+            <P>node2projectV2(node) は、Pool に入れる前に、Matchmaker の projectV2(node) で、入れ子で来た creator・owner・items もモデルにして Pool に入れる。</P>
+            <P>アイテムは、items() で ProjectV2Item のモデルの配列を得る。(itemsWith2ProjectV2Item() は、items() と同じものを返す古い名前)</P>
+            <P>creator() は、作った人を、__typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) で返す。</P>
+            <P>owner(v) は README の $Owner の値 (文字列) を読み書きする。GitHub の owner (持ち主) は、ownerNode() で、User・Organization・Issue・PullRequest のどれかのモデルを得る。</P>
           </Section>
 
           <Section title="属性" lev="4" sx={SX_MEMBER_TITLE}>

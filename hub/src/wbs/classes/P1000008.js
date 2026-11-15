@@ -37,7 +37,10 @@ function Overview ({ data }) {
             <P>{"GraphQL で取得したノードを包む、モデルの基底クラス。"}</P>
             <P>{"ノード (core) を _core に、モデルを持っている Sogh を _sogh に持つ。"}</P>
             <P>{"id()・createdAt()・updatedAt() で、どのノードにもある値を読む。"}</P>
-            <P>{"Repository・User・Viewer・ProjectV2・ProjectV2Item・Issue・IssueComment・PullRequest・Label・Milestone・Assignee などが継承する。"}</P>
+            <P>{"Repository・User・Organization・Bot・Mannequin・EnterpriseUserAccount・Team・ProjectV2・ProjectV2Item・DraftIssue・Issue・IssueComment・PullRequest・Label・Milestone などが継承する。"}</P>
+            <P>{"relation(node)・relations(connection) は、core に入れ子で残っている関連の JSON の id で、Pool からモデルを引く。(Pool に無いとき・JSON が無いときは、null か空の配列)"}</P>
+            <P>{"関連を返すメソッド (Issue の assignees()・Repository の owner() など) は、これを使う。"}</P>
+            <P>{"同じファイルの nodesOf(connection) は、関連の JSON ({ nodes: [...] } か { edges: [{ node }] }) から node の配列を取り出す関数で、Matchmaker も使う。"}</P>
             <P>{"Pool は、モデルを Pool に入れるときに sogh(v) で Sogh を入れ、同じ id のノードを取得し直したときに merge(node) でノードを重ねる。"}</P>
             <P>{"merge(node) は、core をまるごと差し替えずに、最終更新日時 (updatedAt) を比べて、来た項目を重ねる。(来たノードのほうが新しいときは来た項目を重ね、そうでないときは手元に無い項目だけを足す)"}</P>
             <P>{"来たノードのほうが新しくて重ねたときは、そのときの日時を _reload に入れる。(reload(v) で読む)"}</P>

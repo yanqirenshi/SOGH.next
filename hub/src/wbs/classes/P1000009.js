@@ -39,9 +39,12 @@ function Overview ({ data }) {
             <P>{"GraphQL で取得した Issue のノード (core) を包み、番号・タイトル・URL・本文・担当者・ラベルなどを読む。"}</P>
             <P>{"GraphQLNode を継承する。"}</P>
             <P>{"Sogh の node2issue(node) が作り、Pool に入れる。(asyncFetchIssueByID() や asyncFetchIssueByOrgRepoIssueNumber() などで取得したとき)"}</P>
+            <P>{"node2issue(node) は、Pool に入れる前に、Matchmaker の issue(node) で、入れ子で来た関連 (assignees・author・labels・milestone・repository・projectItems・comments) もモデルにして Pool に入れる。"}</P>
+            <P>{"関連を返すメソッド (assignees()・author()・labels()・milestone()・repository()・comments()・projectV2Items()・projectsV2() など) は、core の JSON の id で Pool からモデルを引いて返す。(無いときは null か [])"}</P>
+            <P>{"ProjectV2 のフィールドの値を読むメソッド (fieldItem()・fieldValueContents(name)・fieldValues()・getFieldValueByName(name)) は、モデルにせず、JSON のまま返す。"}</P>
             <P>{"本文に書いた注釈 ($Owner・$Point.Plan・$Point.Result・$Date.Due・$Date.Next) を読み出して持ち、core や本文を差し替えると読み直す。"}</P>
             <P>{"期日 (dueDate(v)) と次のアクションの日 (nextActionDate(v)) は、本文の注釈ではなく、ProjectV2 のフィールド (Due.Date・NextAction.Date) から読む。"}</P>
-            <P>{"ProjectV2 のアイテム (projectItems) を取得していないとき (asyncFetchIssueByID() で取得したときなど) は、fieldItem() などのメソッドがエラーになる。"}</P>
+            <P>{"ProjectV2 のアイテム (projectItems) を取得していないとき (asyncFetchIssueByID() で取得したときなど) は、fieldValues() などのメソッドがエラーになる。(fieldItem() と fieldValueContents(name) は null を返す)"}</P>
             <P>{"Projects (classic) 用のメソッド (projectCards() など) も残っているが、Projects (classic) は GitHub で廃止された。"}</P>
             <Plane>{CODE}</Plane>
           </Section>

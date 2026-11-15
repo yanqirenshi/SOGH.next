@@ -38,9 +38,14 @@ function Overview ({ data }) {
             <P>{"GitHub の Projects (ProjectV2) の、1 つのアイテム (Issue・Pull request・Draft issue) を表すモデル。"}</P>
             <P>{"GraphQL で取得した ProjectV2Item のノード (core) を包み、フィールドの値・入っているプロジェクト・中身 (content) などを読む。"}</P>
             <P>{"GraphQLNode を継承する。"}</P>
-            <P>{"Sogh の node2projectV2Item(node) が作り、Pool に入れる。(asyncFetchProjectV2ItemByID(id) や、ProjectV2 の itemsWith2ProjectV2Item() など)"}</P>
+            <P>{"Sogh の node2projectV2Item(node) が作り、Pool に入れる。(asyncFetchProjectV2ItemByID(id) や、Matchmaker が ProjectV2 の items・Issue の projectItems を Pool に入れるときなど)"}</P>
+            <P>{"node2projectV2Item(node) は、Pool に入れる前に、Matchmaker の projectV2Item(node) で、入れ子で来た project・content・creator と、フィールドの値の中の関連 (担当者・ラベル・マイルストーン・リポジトリ・Pull request・レビューする人) もモデルにして Pool に入れる。"}</P>
+            <P>{"project()・content()・creator() と、関連のフィールドを読むメソッド (assignees()・labels()・milestone()・repository()・linkedPullRequests()・reviewers()) は、JSON の id で Pool からモデルを引いて返す。"}</P>
+            <P>{"content() は Issue・PullRequest・DraftIssue のどれか、creator() は User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか、reviewers() の要素は User・Team・Mannequin・Bot のどれかのモデルになる。"}</P>
             <P>{"フィールドの値は、フィールドの名前で fieldValues() から探して読む。(getFieldValueByName(name))"}</P>
-            <P>{"値が無いときは null (配列を返すメソッドは []) を返すが、同じ名前で種類の違うフィールド (例: テキストの Archived) のときは undefined を返す。"}</P>
+            <P>{"フィールドの値 (fieldValues() の箱) と、箱に付いている creator は、モデルにせず、JSON のまま返す。"}</P>
+            <P>{"contentTypename()・projectNumber()・projectOwnerLogin()・projectPath() は、モデルではなく、core の JSON を読む。"}</P>
+            <P>{"値が無いときは null (配列を返すメソッドは []) を返すが、同じ名前で種類の違うフィールド (例: テキストの Archived) のときは undefined を返す。(関連を返すメソッドは、そのときも null か [] を返す)"}</P>
             <P>{"path() と projectPath() は Sogh の href(to, data) を使うので、Sogh を持っていないとき (Pool を通さずに作ったとき) はエラーになる。"}</P>
             <P>{"読むフィールドの名前と、メソッドは次のとおり。"}</P>
             <Plane>{CODE}</Plane>

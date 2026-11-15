@@ -35,8 +35,8 @@ function Overview ({ data }) {
             <P>{"リポジトリのマイルストーンを 1 つ表すモデル。"}</P>
             <P>{"GraphQL で取得した Milestone のノード (core) を包み、タイトル・番号・状態・説明・期限などを読む。"}</P>
             <P>{"GraphQLNode を継承する。"}</P>
-            <P>{"Pooler には Milestone を作るメソッドも Pool も無いので、使うときは new Milestone(node) で作る。"}</P>
-            <P>{"Issue の milestone() や ProjectV2Item の milestone() は、Milestone ではなく、ノードのまま返す。"}</P>
+            <P>{"Pooler の node2milestone(node) が作り、milestone の Pool に入れる。(Matchmaker が、Issue の milestone や ProjectV2Item の Milestone フィールドの値を Pool に入れるとき)"}</P>
+            <P>{"Issue の milestone() や ProjectV2Item の milestone() は、Pool の Milestone を返す。"}</P>
             <P>{"ProjectV2Item のクエリが使う attributes.js の milestone() は description・closedAt を取得しないので、そのノードで作った Milestone では description()・closedAt() が null になる。"}</P>
           </Section>
 
