@@ -92,6 +92,52 @@ const ATTRIBUTES = [
       nested: 'fieldValues (30 件まで), creator, content (Issue・PullRequest・DraftIssue)' },
 ];
 
+// 型ごとの、項目の組。(同じ型を、何通りの項目の組で取っているか)
+const FIELD_SET_COLUMNS = [
+    { code: 'type',  label: '型',         key: 'type' },
+    { code: 'count', label: '通り',       val: (r)=> r.sets.length },
+    { code: 'sets',  label: '項目の組',   val: (r)=> r.sets.map(s=> <div key={s}>{s}</div>) },
+];
+
+const FIELD_SETS = [
+    { type: 'User など (人)',
+      sets: [
+          'user()',
+          'owner()',
+          'actor()',
+          'projectv2Creator()',
+          'projectV2FieldValue_Creator()',
+          'リポジトリの owner の直書き (repositories() の中)',
+          'reviewers の直書き (id だけ)',
+      ] },
+    { type: 'PullRequest',
+      sets: [
+          'pull_request()',
+          'projectV2ItemContentPullRequest()',
+          'コメントの pullRequest の直書き (id・number・title・url)',
+          'フィールドの値の pullRequests の直書き (id・url・title)',
+      ] },
+    { type: 'Repository',
+      sets: [
+          'repositories()',
+          'フィールドの値の repository の直書き (name・id・url)',
+          'repository クエリの直書き',
+      ] },
+    { type: 'Issue',
+      sets: [
+          'issue()',
+          'projectV2ItemContentIssue()',
+          'create_issue クエリの直書き',
+      ] },
+    { type: 'ProjectV2',
+      sets: [
+          'projectv2()',
+          'Item の project の直書き (id・number・title・url・owner)',
+      ] },
+    { type: 'Label',     sets: ['label()'] },
+    { type: 'Milestone', sets: ['milestone()'] },
+];
+
 export default function DataModel () {
     return (
         <>
@@ -127,6 +173,7 @@ export default function DataModel () {
                 <LI>ProjectV2Item の content (Issue・PullRequest・DraftIssue) も、JSON のまま返す。</LI>
               </OL>
               <P>id でたどってモデルを得られるつながりは、Repository から User だけです。</P>
+              <P>すべての関連をモデルにする仕様は、「7. 関連をモデルにする」に書いています。</P>
             </Section>
 
             <Section title="注釈" num="4.4" lev="5">
@@ -137,20 +184,36 @@ export default function DataModel () {
           </Section>
 
           <Section title="取得する項目" num="5." lev="4" sx={SX_MEMBER_TITLE}>
-            <Table columns={ATTRIBUTE_COLUMNS} rows={ATTRIBUTES} ids={TABLE_IDS}/>
 
-            <P sx={SX_AFTER_TABLE}>件数の上限は、次のとおりです。</P>
-            <OL>
-              <LI>一覧は、1 回に 100 件。(<C>attributes.page_nation()</C>)</LI>
-              <LI>Issue の assignees と labels は、10 件まで。</LI>
-              <LI>ProjectV2 の fields は、一覧のクエリで 10 件まで、Item のクエリで 30 件まで。</LI>
-              <LI>ProjectV2Item の fieldValues は、30 件まで。その中のラベルとプルリクエストも、30 件まで。</LI>
-              <LI>入れ子の上限は、ページングしていない。
-                <UL>
-                  <LI>上限を超えた分は、取れない。</LI>
-                </UL>
-              </LI>
-            </OL>
+            <Section title="取る属性" num="5.1" lev="5">
+              <P>それぞれの種類を、主に取るときの属性です。</P>
+              <Table columns={ATTRIBUTE_COLUMNS} rows={ATTRIBUTES} ids={TABLE_IDS}/>
+            </Section>
+
+            <Section title="件数の上限" num="5.2" lev="5">
+              <OL>
+                <LI>一覧は、1 回に 100 件。(<C>attributes.page_nation()</C>)</LI>
+                <LI>Issue の assignees と labels は、10 件まで。</LI>
+                <LI>ProjectV2 の fields は、一覧のクエリで 10 件まで、Item のクエリで 30 件まで。</LI>
+                <LI>ProjectV2Item の fieldValues は、クエリによって 20 件まで、または 30 件まで。その中のラベルとプルリクエストも同じ。</LI>
+                <LI>入れ子の上限は、ページングしていない。
+                  <UL>
+                    <LI>上限を超えた分は、取れない。</LI>
+                  </UL>
+                </LI>
+              </OL>
+            </Section>
+
+            <Section title="型ごとの、項目の組" num="5.3" lev="5">
+              <P>同じ型でも、取る場所によって、取る項目の組が違います。</P>
+              <Table columns={FIELD_SET_COLUMNS} rows={FIELD_SETS} ids={TABLE_IDS}/>
+              <OL sx={SX_AFTER_TABLE}>
+                <LI>人の 7 通りのうち、<C>actor()</C> は id を取っていない。</LI>
+                <LI>人の 7 通りのうち、updatedAt を取っているのは、<C>user()</C> だけ。</LI>
+                <LI>名前に () が付いているものは、<C>queries/attributes.js</C> の項目の部品。「直書き」は、クエリに直に書いているもの。</LI>
+              </OL>
+            </Section>
+
           </Section>
         </>
     );
