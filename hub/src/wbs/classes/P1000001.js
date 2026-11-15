@@ -1,6 +1,11 @@
 import React from 'react';
 
+import { Section, P, Plane } from 'tion';
+
 import FrameClass from '../../components/assemblies/frames/FrameClass.js';
+import AttributesTable from '../../components/panels/FrameClass/AttributesTable.js';
+import BehaviorsTable from '../../components/panels/FrameClass/BehaviorsTable.js';
+import { SX_MEMBER_TITLE } from '../../components/panels/FrameClass/utils.js';
 import useClassData from '../../hooks/useClassData.js';
 
 // クラス Pooler のページ
@@ -16,13 +21,37 @@ export default function P1000001 (props) {
         <FrameClass wbs_node={props.wbs_node}
                     wbs_id={props.wbs_node.id}
                     name={CLASS}
-                    overview={<Overview/>}
+                    overview={<Overview data={data}/>}
                     attributes={data.attributes}
                     behaviors={data.methods}/>
     );
 }
 
-// 概要タブの中身。(まだ空)
-function Overview () {
-    return null;
+// 概要に出すコードの例。
+const CODE = "const sogh = new Sogh();\n\nconst issue = sogh.node2issue({ id: 'I_kwDOAB', number: 1, title: 'Found a bug' });\n\nsogh.issue('I_kwDOAB') === issue;\n// => true\nsogh.get('I_kwDOAB') === issue;\n// => true\nsogh.pool('issue').list().length;\n// => 1";
+
+// 概要タブの中身。(概要・属性の一覧・振舞の一覧)
+function Overview ({ data }) {
+    return (
+        <>
+          <Section title="概要" lev="4" sx={SX_MEMBER_TITLE}>
+            <P>{"GraphQL で取得したノードを、モデル (Repository・User・Issue など) のオブジェクトにして、種類ごとの Pool に入れて持つクラス。"}</P>
+            <P>{"Loader を継承し、Sogh が Pooler を継承する。(Loader → Pooler → Sogh)"}</P>
+            <P>{"constructor が、種類のコード (repository・user・project-v2・project-v2-item・issue・issue-comment・pull-request) ごとに Pool を 1 つずつ作り、_pools に入れる。"}</P>
+            <P>{"node2〜(node) は、ノードをオブジェクトにして Pool に入れて返す。(同じ id のものがあるときは、新しく作らず、その core をノードに差し替える)"}</P>
+            <P>{"repository(v)・issue(v) などは id で 1 つを、repositories(v)・issues(v) などは Pool のすべてを返し、get(id) はすべての Pool から id で探す。"}</P>
+            <P>{"Matchmaker (matchmaker) を持ち、node2repository(node) のときに、リポジトリの owner も User の Pool に入れる。"}</P>
+            <P>{"Sogh の fetch〜・asyncFetch〜 が、取得したノードを node2〜(node) に渡す。"}</P>
+            <Plane>{CODE}</Plane>
+          </Section>
+
+          <Section title="属性" lev="4" sx={SX_MEMBER_TITLE}>
+            <AttributesTable data={data.attributes}/>
+          </Section>
+
+          <Section title="振舞" lev="4" sx={SX_MEMBER_TITLE}>
+            <BehaviorsTable data={data.methods}/>
+          </Section>
+        </>
+    );
 }
