@@ -109,7 +109,7 @@ const CHECKS = [
           'projectv2items_by_user_login_projectv2_number',
           'search_issues',
       ],
-      note: 'ProjectV2Item の content で、Issue の state と PullRequest の state を取っている。型が違う (IssueState と PullRequestState) ので、GraphQL の決まりでは正しくない' },
+      note: 'ProjectV2Item の content で、Issue の state と PullRequest の state を取っている。型が違う (IssueState と PullRequestState) ので、GraphQL の決まりでは正しくない。GitHub は受け付ける (「3.8 GitHub につないで確かめる」を見る)' },
     { kind: 'キー (使用中)',
       count: 0,
       queries: [],
@@ -118,6 +118,67 @@ const CHECKS = [
       count: 2,
       queries: ['issues_by_milestone', 'issues_by_report_label'],
       note: '項目を直に書いていて、updatedAt を取っていない所がある' },
+];
+
+// GitHub につないで確かめるコマンド。
+const LIVE_COMMAND = [
+    '# トークンの置き場所を作る (1 回だけ)',
+    'cp .env.local.template .env.local',
+    '',
+    '# 確かめる',
+    'npm run check:live',
+].join('\n');
+
+// GitHub につないで確かめた結果。(2026-11-15)
+const LIVE_COLUMNS = [
+    { code: 'kind',    label: '結果',   key: 'kind' },
+    { code: 'count',   label: '個数',   key: 'count' },
+    { code: 'queries', label: 'クエリ', val: (r)=> r.queries.map(q=> <div key={q}><C>{q}</C></div>) },
+    { code: 'note',    label: '内容',   key: 'note' },
+];
+
+const LIVES = [
+    { kind: 'OK',
+      count: 12,
+      queries: [
+          'viwer',
+          'user_by_id',
+          'repositories_by_viewer',
+          'issues_by_viwer',
+          'issue_by_id',
+          'issue_comments_by_issue_id',
+          'projectsv2_by_user',
+          'projects_next_by_id',
+          'projectv2_by_user_login_projectv2_number',
+          'projectsv2_items_by_projects_v2',
+          'projectv2items_by_user_login_projectv2_number',
+          'projectv2item_by_id',
+      ],
+      note: 'GitHub が、エラーを返さなかった。検査で「注意」になる 3 つ (Issue と PullRequest の state を同じ場所で取るもの) も、GitHub は受け付けた。issue_by_id は、はじめは NG で、projectCards (Projects classic) を外して OK になった' },
+    { kind: 'NG',
+      count: 0,
+      queries: [],
+      note: '-' },
+    { kind: '送っていない (対象を決めていない)',
+      count: 6,
+      queries: [
+          'issue_by_org_repo_issue_number',
+          'issue_comments_by_org_repo_issue_number',
+          'projectv2_by_org_login_projectv2_number',
+          'projectv2items_by_org_login_projectv2_number',
+          'projectsv2_by_team',
+          'projectsv2_with_items_by_team',
+      ],
+      note: '組織 (org) とチームのクエリ。.env.local に対象を書くと、送る' },
+    { kind: '送らない',
+      count: 4,
+      queries: [
+          'create_issue_comment',
+          'update_issue_comment',
+          'delete_issue_comment',
+          'projects_next_items_by_id',
+      ],
+      note: '上の 3 つは、書き込みのため。projects_next_items_by_id は、スキーマの検査で NG のため' },
 ];
 
 // 取得メソッドの一覧。(src/js/Sogh.js)
@@ -289,6 +350,33 @@ export default function Fetching () {
 
             <P>いまのクエリを検査した結果は、次のとおりです。</P>
             <Table columns={CHECK_COLUMNS} rows={CHECKS} ids={TABLE_IDS}/>
+          </Section>
+
+          <Section title="GitHub につないで確かめる" num="3.8" lev="5">
+            <P>使用中のクエリを、GitHub に実際に送って確かめられます。読むだけで、書き込みのクエリは送りません。</P>
+            <Plane sx={SX_PLANE}>{LIVE_COMMAND}</Plane>
+            <OL>
+              <LI>トークンは、リポジトリの直下の <C>.env.local</C> に、<C>GITHUB_TOKEN</C> として書く。
+                <UL>
+                  <LI><C>.env.local.template</C> を写して作る。</LI>
+                  <LI><C>.env.local</C> は、git に入らない。画面のビルドにも入らない。</LI>
+                  <LI>読むだけなので、読み取りの権限で足りる。(classic のトークンでは、repo・read:org・read:project・read:user・user:email)</LI>
+                </UL>
+              </LI>
+              <LI>確かめること。
+                <UL>
+                  <LI>クエリを 1 回ずつ送り、GitHub がエラーを返さないか。</LI>
+                  <LI>Sogh で取得して、取り直しても値が消えないか。変更が無ければ、reload が入らないか。</LI>
+                </UL>
+              </LI>
+              <LI>viewer・リポジトリ・Issue・ProjectV2 のクエリは、viewer のデータから、対象を自動で選ぶ。</LI>
+              <LI>組織 (org) とチームのクエリは、<C>.env.local</C> に対象 (<C>CHECK_ORG</C> など) を書いたときだけ送る。</LI>
+              <LI>トークンと、取得した値は、表示しない。(表示するのは、クエリの名前・件数・エラーの文)</LI>
+              <LI>スクリプトは、<C>scripts/check-live.mjs</C>。</LI>
+            </OL>
+
+            <P>2026-11-15 に確かめた結果は、次のとおりです。</P>
+            <Table columns={LIVE_COLUMNS} rows={LIVES} ids={TABLE_IDS}/>
           </Section>
 
         </Section>

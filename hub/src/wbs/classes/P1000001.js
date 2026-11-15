@@ -38,7 +38,7 @@ function Overview ({ data }) {
             <P>{"GraphQL で取得したノードを、モデル (Repository・User・Issue など) のオブジェクトにして、種類ごとの Pool に入れて持つクラス。"}</P>
             <P>{"Loader を継承し、Sogh が Pooler を継承する。(Loader → Pooler → Sogh)"}</P>
             <P>{"constructor が、種類のコード (repository・user・project-v2・project-v2-item・issue・issue-comment・pull-request) ごとに Pool を 1 つずつ作り、_pools に入れる。"}</P>
-            <P>{"node2〜(node) は、ノードをオブジェクトにして Pool に入れて返す。(同じ id のものがあるときは、新しく作らず、その core をノードに差し替える)"}</P>
+            <P>{"node2〜(node) は、ノードをオブジェクトにして Pool に入れて返す。(同じ id のものがあるときは、新しく作らず、その core にノードを重ねる)"}</P>
             <P>{"repository(v)・issue(v) などは id で 1 つを、repositories(v)・issues(v) などは Pool のすべてを返し、get(id) はすべての Pool から id で探す。"}</P>
             <P>{"Matchmaker (matchmaker) を持ち、node2repository(node) のときに、リポジトリの owner も User の Pool に入れる。"}</P>
             <P>{"Sogh の fetch〜・asyncFetch〜 が、取得したノードを node2〜(node) に渡す。"}</P>

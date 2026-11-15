@@ -38,7 +38,9 @@ function Overview ({ data }) {
             <P>{"ノード (core) を _core に、モデルを持っている Sogh を _sogh に持つ。"}</P>
             <P>{"id()・createdAt()・updatedAt() で、どのノードにもある値を読む。"}</P>
             <P>{"Repository・User・Viewer・ProjectV2・ProjectV2Item・Issue・IssueComment・PullRequest・Label・Milestone・Assignee などが継承する。"}</P>
-            <P>{"Pool は、モデルを Pool に入れるときに sogh(v) で Sogh を入れ、同じ id のノードを取得し直したときに core(v) でノードを差し替える。"}</P>
+            <P>{"Pool は、モデルを Pool に入れるときに sogh(v) で Sogh を入れ、同じ id のノードを取得し直したときに merge(node) でノードを重ねる。"}</P>
+            <P>{"merge(node) は、core をまるごと差し替えずに、最終更新日時 (updatedAt) を比べて、来た項目を重ねる。(来たノードのほうが新しいときは来た項目を重ね、そうでないときは手元に無い項目だけを足す)"}</P>
+            <P>{"来たノードのほうが新しくて重ねたときは、そのときの日時を _reload に入れる。(reload(v) で読む)"}</P>
             <P>{"値を読むメソッドは「core の値 || null」を返すので、空文字 ('') なども null になる。"}</P>
             <Plane>{CODE}</Plane>
           </Section>

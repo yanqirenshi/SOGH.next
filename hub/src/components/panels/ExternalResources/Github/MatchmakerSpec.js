@@ -41,7 +41,7 @@ const RELATIONS = [
     { parent: 'ProjectV2Item', relation: 'fieldValues の labels / milestone / repository / pullRequests / reviewers', type: 'それぞれの型', model: 'それぞれのモデル', now: `${JSON_ONLY} (参照の組)` },
 ];
 
-// 値が消える動きの例。(にせの node を Pool に入れて、実際に動かして確かめた)
+// 値が消えていた動きの例。(node の重ね方を変える前に、にせの node を Pool に入れて、実際に動かして確かめた)
 const OVERWRITE_EXAMPLE = [
     '// viewer (項目がそろっている) を入れたあと、viewer が owner のリポジトリを入れる',
     "前: { login: 'octocat', name: 'The Octocat', email: 'octo@example.com' }",
@@ -94,8 +94,8 @@ const PROGRESS = [
       state: '済み',
       note: '項目の部品を型ごとに整理し、モデルにする型は id・updatedAt・__typename を必ず取るようにした。クエリの検査のスクリプトを足した' },
     { work: '2. node の重ね方を変える',
-      state: 'まだ',
-      note: 'Pool が、core を丸ごと差し替えずに、updatedAt を比べて重ねるようにする。GraphQLNode に reload 属性を足す' },
+      state: '済み',
+      note: 'Pool が、core を丸ごと差し替えずに、updatedAt を比べて重ねるようにした。GraphQLNode に merge(node) と reload 属性を足した。テスト (npm test) を足した' },
     { work: '3. Matchmaker を広げる',
       state: 'まだ',
       note: '入れ子で取った関連を、モデルにして Pool に入れる' },
@@ -104,7 +104,7 @@ const PROGRESS = [
 export default function MatchmakerSpec () {
     return (
         <Section title="関連をモデルにする (Matchmaker の拡張)" num="7." lev="4" sx={SX_MEMBER_TITLE}>
-          <Panel kind="warning">この章は、これから作るものの仕様です。クエリの整理までは済んでいて、Pool の重ね方と Matchmaker の拡張は、まだ実装していません。(「7.6 進み具合」を見る)</Panel>
+          <Panel kind="warning">この章は、これから作るものの仕様です。クエリの整理と、node の重ね方までは済んでいて、Matchmaker の拡張は、まだ実装していません。(「7.6 進み具合」を見る)</Panel>
 
           <Section title="ねらい" num="7.1" lev="5">
             <OL>
@@ -122,14 +122,15 @@ export default function MatchmakerSpec () {
             </OL>
           </Section>
 
-          <Section title="先に解く問題" num="7.3" lev="5">
-            <P>いまの Pool は、同じ id の node が来ると、core を丸ごと差し替えます。</P>
-            <P>入れ子の node は項目が少ないので、差し替えると、いまあるモデルの値が消えます。</P>
+          <Section title="先に解いた問題" num="7.3" lev="5">
+            <P>これまでの Pool は、同じ id の node が来ると、core を丸ごと差し替えていました。</P>
+            <P>入れ子の node は項目が少ないので、差し替えると、いまあるモデルの値が消えていました。</P>
             <Plane sx={SX_PLANE}>{OVERWRITE_EXAMPLE}</Plane>
             <OL>
-              <LI>1 つ目は、いまのコードでも起きる。(Repository の owner は、すでに User にしているため)</LI>
+              <LI>1 つ目は、Matchmaker を広げる前から起きていた。(Repository の owner は、すでに User にしているため)</LI>
               <LI><C>Matchmaker</C> をすべての関連に広げると、すべてのモデルで起きる。</LI>
-              <LI>そのため、関連を広げる前に、node の重ね方を決める。</LI>
+              <LI>そのため、関連を広げる前に、node の重ね方を変えた。(「7.4 (1) node の重ね方」)</LI>
+              <LI>いまは、上の 2 つの例のどちらでも、値は消えない。(テストで確かめている)</LI>
             </OL>
           </Section>
 
@@ -153,13 +154,32 @@ export default function MatchmakerSpec () {
                     <LI>取得が並行して動くと、古い応答があとから届くことがあるため。</LI>
                   </UL>
                 </LI>
+                <LI>重ねる単位は、一番上の項目。(title・assignees など)
+                  <UL>
+                    <LI>入れ子の中身までは、重ねない。(入れ子の中身は、Matchmaker が、別のモデルとして重ねる)</LI>
+                  </UL>
+                </LI>
+                <LI>来た値が null の項目は、null で重ねる。(GitHub に値が無い、として扱う)
+                  <UL>
+                    <LI>来ていない項目は、触らない。</LI>
+                  </UL>
+                </LI>
+                <LI>「updatedAt が無い、または null」は、手元と来た node の、どちらかに無いとき。</LI>
+                <LI>実装は、<C>GraphQLNode</C> の <C>merge(node)</C>。Pool の <C>ensure(node, makeInstance, updater)</C> が呼ぶ。
+                  <UL>
+                    <LI><C>merge(node)</C> は、何をしたかを返す。(<C>newer</C>・<C>filled</C>・<C>kept</C>・<C>always</C>)</LI>
+                    <LI>core を変えるときは <C>core(v)</C> を通すので、Issue と ProjectV2 は、注釈を読み取り直す。</LI>
+                  </UL>
+                </LI>
               </OL>
+
+              <Panel kind="note">この重ね方では、古い項目が残る場合があります。あとで、reload の利用で解きます。(「7.5 (1) reload の使い道」を見る)</Panel>
             </Section>
 
             <Section title="reload 属性" num="(2)" lev="6">
               <OL>
-                <LI><C>GraphQLNode</C> に、<C>reload</C> 属性を足す。</LI>
-                <LI>GitHub 側の変更を重ねたとき (来たほうが新しいとき) に、そのときの日時を入れる。</LI>
+                <LI><C>GraphQLNode</C> に、<C>reload</C> 属性を足す。(<C>reload()</C> で読む。はじめは null)</LI>
+                <LI>GitHub 側の変更を重ねたとき (来たほうが新しいとき) に、そのときの日時を入れる。(ISO 8601 の文字列)</LI>
                 <LI>手元の項目が増えただけのときは、入れない。</LI>
                 <LI><C>updatedAt</C> が無い、または null で、毎回重ねるときも、入れない。
                   <UL>
@@ -209,10 +229,26 @@ export default function MatchmakerSpec () {
 
           <Section title="まだ決めていないこと" num="7.5" lev="5">
 
-            <Section title="node の重ね方の細部" num="(1)" lev="6">
+            <Section title="reload の使い道" num="(1)" lev="6">
+              <P>いまの重ね方では、取り直しても、古い項目が残る場合があります。これを、reload を使って解きます。使い方は、まだ決めていません。</P>
               <OL>
-                <LI>重ねる単位。(案: 一番上の項目の単位で重ねる。入れ子の中身は、別のモデルとして重ねる)</LI>
-                <LI>来た値が null のとき。(案: null で重ねる。来ていない項目は、触らない)</LI>
+                <LI>項目の少ない新しい node を重ねたあと、古い項目が残る。
+                  <UL>
+                    <LI>例: 本文つきの Issue (更新 10:00) を持っている。</LI>
+                    <LI>GitHub で本文が変わったあと (11:00)、一覧の取得で、本文の無い Issue (11:00) が来る。</LI>
+                    <LI>題名は新しくなり、手元の日時は 11:00 になる。本文は、10:00 のまま残る。</LI>
+                    <LI>そのあと、本文つきの Issue (11:00) を取っても、日時が同じなので、本文は古いまま。</LI>
+                    <LI>このとき、reload には日時が入っている。(GitHub 側で変更があったことは、分かる)</LI>
+                  </UL>
+                </LI>
+                <LI>親の updatedAt が動かない変更は、入れ子の項目に反映されない。
+                  <UL>
+                    <LI>入れ子の項目 (assignees・projectItems など) は、親の core の中に、JSON のまま持っている。</LI>
+                    <LI>親の updatedAt が同じなら、取り直しても、入れ子の項目は重ねない。</LI>
+                    <LI>例: プロジェクトのフィールドの値を変えても、Issue の updatedAt が動かなければ、Issue の中の projectItems は古いまま。</LI>
+                    <LI>どの変更で updatedAt が動くかは、確かめていない。(「(5) 実装の前に確かめること」を見る)</LI>
+                  </UL>
+                </LI>
               </OL>
             </Section>
 
@@ -247,11 +283,14 @@ export default function MatchmakerSpec () {
                     <LI>GitHub のリファレンスには「最後に更新された日時」としか書かれていない。</LI>
                     <LI>例: Issue にラベルを付けたとき、プロジェクトに足したときに、Issue の <C>updatedAt</C> が動くか。</LI>
                     <LI>動かない変更があると、その変更は、取り直しても反映されない。</LI>
+                    <LI>node の重ね方を変えたので、いまのコードは、もうこの動きになっている。(これまでは、取り直すと、丸ごと差し替わっていた)</LI>
                   </UL>
                 </LI>
-                <LI>整理したあとのクエリを、GitHub に実際に送って、応答が返るか。
+                <LI>組織 (org) とチームのクエリを、GitHub に実際に送って、応答が返るか。
                   <UL>
-                    <LI>スキーマでの検査は通っているが、GitHub につないでの確認は、まだしていない。</LI>
+                    <LI>viewer・リポジトリ・Issue・ProjectV2 のクエリと、node の重ね方は、GitHub につないで確かめた。(「3.8 GitHub につないで確かめる」を見る)</LI>
+                    <LI>組織とチームのクエリ (6 個) は、対象を決めていないので、まだ送っていない。</LI>
+                    <LI>書き込みのクエリ (コメントの追加・更新・削除) は、送っていない。</LI>
                   </UL>
                 </LI>
               </OL>

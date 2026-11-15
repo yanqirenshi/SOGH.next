@@ -39,3 +39,8 @@ documents/node_modules
 
 
 storybook
+
+#####
+##### GitHub につないで確かめるスクリプト (scripts/check-live.mjs) の設定
+#####
+/.env.local

@@ -38,7 +38,7 @@ function Overview ({ data }) {
             <P>{"Sogh の node2user(node) が作り、Pool に入れる。(connect(token, successed, failed) や fetchUserByID(id, success, fail) で取得したとき)"}</P>
             <P>{"connect(token, successed, failed) は、ログインしているユーザーを、Viewer ではなく User にして viewer() に入れる。"}</P>
             <P>{"node2repository(node) も、リポジトリの持ち主 (owner) を node2user(node) で User にする。(持ち主が組織のときも User になる)"}</P>
-            <P>{"そのとき同じ id の User が既にあると、core が owner のノードに差し替わるので、owner のノードに無い name・email・company は null になる。"}</P>
+            <P>{"そのとき同じ id の User が既にあると、core に owner のノードが重なる。(重ねるだけなので、owner のノードに無い email・company などは残る)"}</P>
             <P>{"どのメソッドも「core の値 || null」を返すので、空文字 ('') も null になる。"}</P>
           </Section>
 

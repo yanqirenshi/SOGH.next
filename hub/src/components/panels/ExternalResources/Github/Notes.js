@@ -22,11 +22,10 @@ export default function Notes () {
                   <LI><C>projectV2Items()</C> は、projectItems が無ければ空の配列を返すので、同じクラスの中で扱いがそろっていない。</LI>
                 </UL>
               </LI>
-              <LI>項目の少ない node を Pool に入れると、いまあるモデルの値が消える。
+              <LI>取り直しても、古い項目が残る場合がある。
                 <UL>
-                  <LI>Pool は、同じ id の node が来ると、core を丸ごと差し替えるため。</LI>
-                  <LI>例: viewer が owner のリポジトリを取ると、viewer の <C>name()</C> や <C>email()</C> が null になる。</LI>
-                  <LI>直し方は、「7. 関連をモデルにする」で決めている。</LI>
+                  <LI>Pool は、同じ id の node が来ると、updatedAt を比べて、重ねるかどうかを決めるため。</LI>
+                  <LI>どんな場合かと、解き方は、「7.5 (1) reload の使い道」を見る。</LI>
                 </UL>
               </LI>
               <LI>viewer の作り方が、2 通りある。
@@ -71,6 +70,13 @@ export default function Notes () {
                 </UL>
               </LI>
               <LI>値の印の置き換えは、最初の 1 か所だけ。(同じ印を、1 つのクエリで 2 回使えない)</LI>
+              <LI>projectCards (Projects classic) を取るクエリは、いまの GitHub では動かない。
+                <UL>
+                  <LI>GitHub がエラーを返し、Issue が丸ごと取れない。(projectCards だけが抜けるのではない)</LI>
+                  <LI>使用中のクエリからは、外してある。(<C>issue_by_id</C> は、GitHub に送って確かめたときに見つけて、外した)</LI>
+                  <LI>使われていないクエリには、残っている。(9 個)</LI>
+                </UL>
+              </LI>
               <LI><C>projects_next_items_by_id</C> は、いまの GitHub では動かない。
                 <UL>
                   <LI>ProjectNextItem という型が、GitHub のスキーマから無くなっているため。</LI>
@@ -83,7 +89,7 @@ export default function Notes () {
                   <LI>直すには、別名を付けることになり、応答の形が変わる。(<C>content.state</C> で読んでいる利用側が壊れる)</LI>
                 </UL>
               </LI>
-              <LI>Pool に、消す操作と期限が無い。(取り直しは、上書きだけ)</LI>
+              <LI>Pool に、消す操作と期限が無い。(取り直しは、重ねるだけ)</LI>
               <LI>個人用アクセストークンを、REACT_APP_ の環境変数で渡している。
                 <UL>
                   <LI>ビルドした JS に埋め込まれる。</LI>
