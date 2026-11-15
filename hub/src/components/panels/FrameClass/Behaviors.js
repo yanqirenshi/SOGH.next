@@ -4,6 +4,7 @@ import Container from '@mui/material/Container';
 import { Section, P, Plane } from 'tion';
 
 import { nameOf, linesOf, memberOf, SX_MEMBER_TITLE } from './utils.js';
+import VisibilityMark from './VisibilityMark.js';
 
 // 振舞タブ。メソッドのデータから、メソッドごとに
 // Syntax / Arguments and Values / Description / Examples を描く。
@@ -12,6 +13,7 @@ import { nameOf, linesOf, memberOf, SX_MEMBER_TITLE } from './utils.js';
 //   data … メソッドのデータの配列。1 件は次の形。(data/classes/classes.json の methods と同じ)
 //     {
 //       name:        'body',               // 名前
+//       visibility:  'public',             // public / private / protected / package (見出しに記号で出す。省略したときは public)
 //       parameters:  ['v', 'callbacks={}'], // 引数。'名前=既定値' は、省略できる引数
 //       arguments:   [                     // 引数の型と説明 (省略できる。name で parameters の引数に結びつける)
 //         { name: 'v', type: 'String', description: ['段落', ...],
@@ -64,7 +66,12 @@ function Method ({ data, receiver }) {
     const values = valuesOf(params, docs, returns);
 
     return (
-        <Section title={`${name}(${params.map(p=> p.name).join(', ')})`} lev="4" sx={SX_MEMBER_TITLE}>
+        <Section title={<>
+                          <VisibilityMark visibility={data.visibility}/>
+                          {`${name}(${params.map(p=> p.name).join(', ')})`}
+                        </>}
+                 lev="4"
+                 sx={SX_MEMBER_TITLE}>
           <Section title="Syntax" lev="5">
             <Plane sx={SX_SYNTAX}>{syntaxOf(data, name, params, receiver)}</Plane>
           </Section>

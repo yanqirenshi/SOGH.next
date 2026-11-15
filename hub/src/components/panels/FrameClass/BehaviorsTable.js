@@ -3,13 +3,15 @@ import React from 'react';
 import { Table, P } from 'tion';
 
 import { nameOf, linesOf, memberOf } from './utils.js';
+import VisibilityMark from './VisibilityMark.js';
 
-// メソッドの一覧の表。(メソッド・戻り値・戻り値の型・説明)
+// メソッドの一覧の表。(可視性・メソッド・戻り値・戻り値の型・説明)
 // 説明は、Description の 1 行目だけを出す。(詳しくは振舞タブ)
 //
 // props:
 //   data … メソッドのデータの配列。(data/classes/classes.json の methods。形は Behaviors.js を見る)
 const COLUMNS = [
+    { code: 'visibility',  label: '可視性',       val: (m)=> <VisibilityMark visibility={m.visibility} sx={{ mr: 0 }}/> },
     { code: 'method',      label: 'メソッド',     val: (m)=> `${nameOf(m.name)}(${paramNamesOf(m).join(', ')})` },
     { code: 'returns',     label: '戻り値',       val: (m)=> returnsOf(m) },
     { code: 'type',        label: '戻り値の型',   val: (m)=> (m.returns && m.returns.type) || '' },
