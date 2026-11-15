@@ -3907,6 +3907,7 @@
                     "この Pool を持つ Sogh。",
                     "constructor の 1 つ目の引数が入る。",
                     "ensure(node, makeInstance, updater) が、返すオブジェクトの sogh(v) に入れる。",
+                    "isNesting() が、matchmaker の isNesting() を呼ぶのに使う。",
                     "add(data) は入れない。"
                 ],
                 "examples": [
@@ -4131,6 +4132,31 @@
                 ]
             },
             {
+                "name": "isNesting",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "nesting",
+                    "type": "Boolean",
+                    "description": [
+                        "入れ子で来たノードを入れている途中なら true。",
+                        "そうでなければ false。"
+                    ]
+                },
+                "arguments": [],
+                "description": [
+                    "いま入れようとしているノードが、入れ子で来たものかどうかを返す。",
+                    "Sogh の matchmaker の isNesting() を、そのまま返す。(Matchmaker が、入れ子を辿っている途中かどうか)",
+                    "Sogh や matchmaker が無いときは false。",
+                    "ensure(node, makeInstance, updater) が、新しく作ったオブジェクトに reload を入れるかどうかを決めるのに使う。"
+                ],
+                "examples": [
+                    "sogh.pool('user').isNesting();",
+                    "// => false"
+                ]
+            },
+            {
                 "name": "ensure",
                 "parameters": [
                     "node",
@@ -4176,6 +4202,8 @@
                 "description": [
                     "ノードから、Pool のオブジェクトを返す。(無ければ作って入れ、あれば更新する)",
                     "node.id のオブジェクトが無いときは、makeInstance(node) で作って、add(data) で入れる。",
+                    "入れ子で来たノードで、新しく作ったとき (isNesting() が true のとき) は、オブジェクトの reload(v) に、そのときの日時を入れる。",
+                    "(入れ子のノードは項目が少ないので、同じ日時のノードがあとから来たら、重ねられるようにするため。GraphQLNode の merge(node) を見る)",
                     "あるときは、updater があれば updater(obj, node) を呼び、無ければ obj.merge(node) で、core にノードを重ねる。(core をまるごと差し替えない)",
                     "重ねるかどうかは、最終更新日時 (updatedAt) を比べて決める。(GraphQLNode の merge(node) を見る)",
                     "そのため、項目の少ないノードを入れても、前のノードにあった項目は残る。",
@@ -4233,9 +4261,95 @@
                     "model(node)",
                     "Pooler"
                 ]
+            },
+            {
+                "name": "_depth",
+                "visibility": "private",
+                "type": "Number",
+                "initialValue": "0",
+                "description": [
+                    "入れ子を辿っている深さ。",
+                    "constructor が 0 にする。",
+                    "nest(fn) が、fn を呼ぶ前に 1 増やし、呼んだあとに 1 減らす。",
+                    "0 より大きいあいだは、isNesting() が true を返す。"
+                ],
+                "examples": [
+                    "sogh.matchmaker._depth;",
+                    "// => 0"
+                ],
+                "affectedBy": [
+                    "constructor",
+                    "nest(fn)"
+                ],
+                "seeAlso": [
+                    "isNesting()",
+                    "nest(fn)"
+                ]
             }
         ],
         "methods": [
+            {
+                "name": "isNesting",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "nesting",
+                    "type": "Boolean",
+                    "description": [
+                        "入れ子のノードを辿っている途中なら true。",
+                        "そうでなければ false。"
+                    ]
+                },
+                "arguments": [],
+                "description": [
+                    "入れ子のノードを辿っている途中かどうかを返す。(_depth が 0 より大きいかどうか)",
+                    "Pool の isNesting() が呼ぶ。",
+                    "Pool は、入れ子で来たノードで、初めてモデルを作ったときに、モデルの reload に日時を入れる。(yanqirenshi/SOGH.next#34)"
+                ],
+                "examples": [
+                    "sogh.matchmaker.isNesting();",
+                    "// => false",
+                    "",
+                    "sogh.matchmaker.nest(()=> sogh.matchmaker.isNesting());",
+                    "// => true"
+                ]
+            },
+            {
+                "name": "nest",
+                "parameters": [
+                    "fn"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "result",
+                    "type": "any",
+                    "description": [
+                        "fn が返した値。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "fn",
+                        "type": "Function",
+                        "description": [
+                            "入れ子のノードを Pool に入れる関数。(引数は無い)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "fn を呼び、そのあいだに Pool に入るノードを、入れ子で来たものとして扱う。",
+                    "fn を呼ぶ前に _depth を 1 増やし、呼んだあとに 1 減らす。(fn が例外を投げても、減らす)",
+                    "one(node, node2obj) と model(node) が使う。"
+                ],
+                "examples": [
+                    "const user = sogh.matchmaker.nest(()=> sogh.node2user({ __typename: 'User', id: 'U_kgDOAB', login: 'octocat' }));",
+                    "",
+                    "user.reload();",
+                    "// => \"2026-11-16T05:40:00.000Z\""
+                ]
+            },
             {
                 "name": "repository",
                 "parameters": [
@@ -4522,6 +4636,7 @@
                 ],
                 "description": [
                     "型が 1 つに決まっている関連の node を、node2obj(node) でモデルにして返す。",
+                    "node2obj(node) は、nest(fn) の中で呼ぶ。(Pool に入るノードを、入れ子で来たものとして扱うため)",
                     "node が無いとき・id が無いときは、node2obj を呼ばずに null を返す。",
                     "issue(node) などの、親の型ごとのメソッドが使う。"
                 ],
@@ -4602,6 +4717,7 @@
                 ],
                 "description": [
                     "型が複数ありうる関連 (人・ProjectV2 の owner・ProjectV2Item の content・reviewers) の node を、Pooler の node2model(node) で、__typename に合うモデルにして返す。",
+                    "node2model(node) は、nest(fn) の中で呼ぶ。(Pool に入るノードを、入れ子で来たものとして扱うため)",
                     "node が無いとき・id が無いとき・知らない __typename のときは、Pool に入れずに null を返す。"
                 ],
                 "examples": [
@@ -5003,12 +5119,15 @@
                 "type": "String | null",
                 "initialValue": "null",
                 "description": [
-                    "GitHub 側の変更を重ねた日時。(ISO 8601 の文字列)",
+                    "「同じ日時のノードが来たら、重ねてよい」という印。(ISO 8601 の文字列。印が無いときは null)",
                     "constructor が null にする。",
                     "merge(node) が、今の core より新しいノード (updatedAt が新しいノード) を重ねたときに、そのときの日時を入れる。",
+                    "Pool の ensure(node, makeInstance, updater) が、入れ子で来たノードで、初めてモデルを作ったときにも、そのときの日時を入れる。",
+                    "どちらも、今の core が、項目の少ないノードからできているかもしれない場合。",
+                    "入っているあいだは、merge(node) が、日時が同じノードでも、来た項目を重ねる。",
                     "手元に無い項目を足しただけのときと、updatedAt が無くて毎回重ねたときは、入れない。",
-                    "reload(v) で読み書きする。",
-                    "使い道は、まだ決めていない。"
+                    "一度入ったら、消さない。",
+                    "reload(v) で読み書きする。"
                 ],
                 "examples": [
                     "const graphQLNode = sogh.user('U_kgDOAB');",
@@ -5270,8 +5389,8 @@
                     "name": "reload",
                     "type": "String | null",
                     "description": [
-                        "GitHub 側の変更を重ねた日時。",
-                        "重ねたことが無いときは null。"
+                        "「同じ日時のノードが来たら、重ねてよい」という印の日時。",
+                        "印が無いときは null。"
                     ]
                 },
                 "arguments": [
@@ -5285,10 +5404,11 @@
                     }
                 ],
                 "description": [
-                    "GitHub 側の変更を重ねた日時 (_reload) を読み書きする。",
+                    "「同じ日時のノードが来たら、重ねてよい」という印の日時 (_reload) を読み書きする。",
                     "引数を 1 つ渡したときだけ、その値にする。(falsy な値は null にする)",
                     "merge(node) が、今の core より新しいノードを重ねたときに、そのときの日時 (ISO 8601 の文字列) を入れる。",
-                    "使い道は、まだ決めていない。"
+                    "Pool の ensure(node, makeInstance, updater) が、入れ子で来たノードで、初めてモデルを作ったときにも入れる。",
+                    "入っているあいだは、merge(node) が、日時が同じノードでも、来た項目を重ねる。"
                 ],
                 "examples": [
                     "graphQLNode.reload();",
@@ -5312,6 +5432,7 @@
                     "description": [
                         "何をしたか。",
                         "'newer' … 来たノードのほうが新しく、来た項目を重ねた。",
+                        "'same' … 日時が同じで、_reload が入っていたので、来た項目を重ねた。",
                         "'filled' … 手元に無い項目を足した。",
                         "'kept' … 何もしなかった。",
                         "'always' … updatedAt を比べられず、来た項目を重ねた。"
@@ -5332,7 +5453,9 @@
                     "core をまるごと差し替えずに、来た項目だけを重ねる。(入れ子で取得したノードは項目が少ないので、差し替えると、今ある値が消えるため)",
                     "重ねるかどうかは、最終更新日時 (updatedAt) を、今の core とノードで比べて決める。",
                     "来たノードのほうが新しいときは、来た項目を重ね、_reload にそのときの日時を入れる。",
-                    "日時が同じとき、来たノードのほうが古いときは、手元に無い項目だけを足す。(手元の値は上書きしない)",
+                    "日時が同じで、_reload が入っているときは、来た項目を重ねる。(_reload は変えない)",
+                    "(今の core が、項目の少ないノードで、先に updatedAt だけ進んでいるかもしれないため。yanqirenshi/SOGH.next#34)",
+                    "日時が同じで、_reload が入っていないとき、来たノードのほうが古いときは、手元に無い項目だけを足す。(手元の値は上書きしない)",
                     "今の core とノードのどちらかに updatedAt が無いとき (null のときも) は、毎回、来た項目を重ねる。(_reload は入れない)",
                     "重ねる単位は、一番上の項目。(入れ子の中身までは重ねない)",
                     "来た値が null の項目は、null で重ねる。来ていない項目 (undefined) は、触らない。",
@@ -5340,7 +5463,7 @@
                     "何も重ねなかったときは、core を作り直さない。",
                     "core が無いときは、ノードをそのまま core にする。",
                     "Pool の ensure(node, makeInstance, updater) が使う。",
-                    "この重ね方では、項目の少ない新しいノードを重ねたあとに、古い項目が残ることがある。(あとで、_reload を使って解く)"
+                    "項目の少ない新しいノードを重ねたあとは、古い項目が残るが、同じ日時の、項目のそろったノードが来たときに、重なる。"
                 ],
                 "examples": [
                     "const graphQLNode = new GraphQLNode({ id: 'U_kgDOAB', name: 'The Octocat', updatedAt: '2026-11-01T09:00:00Z' });",
@@ -5357,7 +5480,13 @@
                     "graphQLNode.core().name;",
                     "// => \"Octo\"",
                     "graphQLNode.core().email;",
-                    "// => \"octo@example.com\""
+                    "// => \"octo@example.com\"",
+                    "",
+                    "// 日時が同じで、_reload が入っている: 来た項目を重ねる",
+                    "graphQLNode.merge({ id: 'U_kgDOAB', name: 'The Octocat', updatedAt: '2026-11-02T09:00:00Z' });",
+                    "// => \"same\"",
+                    "graphQLNode.core().name;",
+                    "// => \"The Octocat\""
                 ]
             }
         ],

@@ -29,10 +29,11 @@ export default function Notes () {
                   <LI>PullRequest の関連は、最初の範囲に入れていないため。</LI>
                 </UL>
               </LI>
-              <LI>取り直しても、古い項目が残る場合がある。
+              <LI>親の updatedAt が動かない変更は、取り直しても、反映されない場合がある。
                 <UL>
                   <LI>Pool は、同じ id の node が来ると、updatedAt を比べて、重ねるかどうかを決めるため。</LI>
-                  <LI>どんな場合かと、解き方は、「7.5 (1) reload の使い道」を見る。</LI>
+                  <LI>どんな場合かは、「7.5 (1) updatedAt が動かない変更」を見る。</LI>
+                  <LI>項目の少ない node が先に来て、古い項目が残る場合は、0.4.1 で直した。(Issue 34)</LI>
                 </UL>
               </LI>
               <LI>Issue の部品の、再取得のボタンが、id の値ではなく、メソッドそのものを渡している。

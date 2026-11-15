@@ -386,6 +386,11 @@ export default function Fetching () {
                   <LI>調べた ProjectV2Item は、0 件だった。ProjectV2Item の関連は、テストでだけ確かめている。</LI>
                 </UL>
               </LI>
+              <LI>取り直しの重ね方を直したあと (sogh 0.4.1。2026-11-16) にも、確かめた。結果は、同じ。
+                <UL>
+                  <LI>GitHub 側で値を変えてから取り直す確認は、していない。(読むだけのため。テストで、にせの node を使って確かめている)</LI>
+                </UL>
+              </LI>
             </OL>
           </Section>
 
