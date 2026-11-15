@@ -2246,22 +2246,72 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "core"
-                }
+                    "name": "core",
+                    "type": "Object | null",
+                    "description": [
+                        "今の ProjectV2 のノード。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "Object | null",
+                        "optional": true,
+                        "description": [
+                            "新しい ProjectV2 のノード。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "GraphQL から取得した ProjectV2 のノード (core) を読み書きする。",
+                    "引数を渡したときは core を差し替え、initReadmeAttributes() と parseReadme() で README の属性を読み直す。",
+                    "Pool が同じ id のノードを取得し直したときも、ここで差し替わる。"
+                ],
+                "examples": [
+                    "const projectV2 = sogh.projectV2(id);",
+                    "",
+                    "projectV2.core().title;",
+                    "// => \"SOGH の整理\"",
+                    "",
+                    "projectV2.core({ ...projectV2.core(), readme: '$Priority: h' });",
+                    "projectV2.priority();",
+                    "// => \"h\""
+                ]
             },
             {
                 "name": "initReadmeAttributes",
                 "parameters": [],
                 "returnType": "any",
                 "visibility": "public",
-                "returns": null
+                "returns": null,
+                "description": [
+                    "README の属性を、初めの値に戻す。",
+                    "priority・owner・type・release は \"?\"、plan・result は start・end が null の Term、action・backlog・customer・agency・scenario・progress は \"\"、systems は [] にする。",
+                    "constructor と core(v) が、parseReadme() の前に呼ぶ。"
+                ],
+                "examples": [
+                    "projectV2.initReadmeAttributes();",
+                    "projectV2.priority();",
+                    "// => \"?\""
+                ]
             },
             {
                 "name": "initRegexs",
                 "parameters": [],
                 "returnType": "any",
                 "visibility": "public",
-                "returns": null
+                "returns": null,
+                "description": [
+                    "README から属性を読み出すための正規表現を、_regexs に作る。",
+                    "対象は priority・owner・type・release・plan・result・action・backlog・customer・agency・systems・scenario・progress。",
+                    "どれも「$名前: 値」の行を探す。(名前の先頭は、大文字でも小文字でもよい)",
+                    "constructor が 1 度だけ呼ぶ。"
+                ],
+                "examples": [
+                    "projectV2.initRegexs();",
+                    "projectV2._regexs.owner.exec('$Owner: octocat')[1];",
+                    "// => \"octocat\""
+                ]
             },
             {
                 "name": "parseReadmeItem",
@@ -2272,8 +2322,40 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "value"
-                }
+                    "name": "value",
+                    "type": "String | null",
+                    "description": [
+                        "一致したときは、1 つ目のグループの文字列。",
+                        "一致しないときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "readme",
+                        "type": "String",
+                        "description": [
+                            "README の文章。"
+                        ]
+                    },
+                    {
+                        "name": "regex",
+                        "type": "RegExp",
+                        "description": [
+                            "値を 1 つ目のグループで取り出す正規表現。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README の文章に正規表現を当てて、値を 1 つ取り出す。",
+                    "parseReadme() が、属性ごとに呼ぶ。"
+                ],
+                "examples": [
+                    "projectV2.parseReadmeItem('$Owner: octocat', projectV2._regexs.owner);",
+                    "// => \"octocat\"",
+                    "",
+                    "projectV2.parseReadmeItem('', projectV2._regexs.owner);",
+                    "// => null"
+                ]
             },
             {
                 "name": "parseReadmeItemPlan",
@@ -2283,7 +2365,32 @@
                 ],
                 "returnType": "any",
                 "visibility": "public",
-                "returns": null
+                "returns": null,
+                "arguments": [
+                    {
+                        "name": "readme",
+                        "type": "String",
+                        "description": [
+                            "README の文章。"
+                        ]
+                    },
+                    {
+                        "name": "regex",
+                        "type": "RegExp",
+                        "description": [
+                            "開始日と終了日を、1・2 つ目のグループで取り出す正規表現。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README から予定の期間 ($Plan: 開始日 終了日) を読み出して、plan に入れる。",
+                    "一致しないときは、何もしない。(plan は今のまま)"
+                ],
+                "examples": [
+                    "projectV2.parseReadmeItemPlan('$Plan: 2026-11-01 2026-11-30', projectV2._regexs.plan);",
+                    "projectV2.plan();",
+                    "// => Term { start: \"2026-11-01\", end: \"2026-11-30\" }"
+                ]
             },
             {
                 "name": "parseReadmeItemResult",
@@ -2294,15 +2401,63 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "result"
-                }
+                    "name": "result",
+                    "type": "Term",
+                    "description": [
+                        "result に入れた期間。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "readme",
+                        "type": "String",
+                        "description": [
+                            "README の文章。"
+                        ]
+                    },
+                    {
+                        "name": "regexs",
+                        "type": "RegExp[]",
+                        "description": [
+                            "実績の期間を読み出す正規表現の配列。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README から実績の期間 ($Result: 開始日 終了日、または $Result: 開始日) を読み出して、result に入れる。",
+                    "正規表現を先頭から順に試し、最初に一致したものを使う。",
+                    "終了日が無いときは、end が null になる。",
+                    "どれにも一致しないときは、start・end とも null の期間にする。"
+                ],
+                "examples": [
+                    "projectV2.parseReadmeItemResult('$Result: 2026-11-03', projectV2._regexs.result);",
+                    "// => Term { start: \"2026-11-03\", end: null }"
+                ]
             },
             {
                 "name": "parseReadme",
                 "parameters": [],
                 "returnType": "any",
                 "visibility": "public",
-                "returns": null
+                "returns": null,
+                "description": [
+                    "readme() の文章から、README の属性をすべて読み出して入れる。",
+                    "文字列の属性 (priority・owner など) は、README に無いときは null になる。",
+                    "plan は、README に無いときは今のまま。",
+                    "result は、README に無いときは start・end とも null の期間になる。",
+                    "_regexs に知らない名前があるときは、Error を投げる。"
+                ],
+                "examples": [
+                    "// README:",
+                    "//   $Priority: h",
+                    "//   $Plan: 2026-11-01 2026-11-30",
+                    "projectV2.parseReadme();",
+                    "",
+                    "projectV2.priority();",
+                    "// => \"h\"",
+                    "projectV2.type();",
+                    "// => null"
+                ]
             },
             {
                 "name": "number",
@@ -2310,8 +2465,20 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "number"
-                }
+                    "name": "number",
+                    "type": "Number | null",
+                    "description": [
+                        "ProjectV2 の番号。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "ProjectV2 の番号 (URL の /projects/{number} の数字) を返す。"
+                ],
+                "examples": [
+                    "projectV2.number();",
+                    "// => 3"
+                ]
             },
             {
                 "name": "title",
@@ -2319,8 +2486,20 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "title"
-                }
+                    "name": "title",
+                    "type": "String | null",
+                    "description": [
+                        "ProjectV2 の名前。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "ProjectV2 の名前を返す。"
+                ],
+                "examples": [
+                    "projectV2.title();",
+                    "// => \"SOGH の整理\""
+                ]
             },
             {
                 "name": "url",
@@ -2328,8 +2507,20 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "url"
-                }
+                    "name": "url",
+                    "type": "String | null",
+                    "description": [
+                        "ProjectV2 のページの URL。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "GitHub の ProjectV2 のページの URL を返す。"
+                ],
+                "examples": [
+                    "projectV2.url();",
+                    "// => \"https://github.com/users/octocat/projects/3\""
+                ]
             },
             {
                 "name": "fields",
@@ -2337,8 +2528,20 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "fields"
-                }
+                    "name": "fields",
+                    "type": "Array",
+                    "description": [
+                        "フィールドのノード (id・name・dataType など) の配列。"
+                    ]
+                },
+                "description": [
+                    "ProjectV2 のフィールド (Title・Status・Assignees など) のノードを返す。",
+                    "fields を取得していないとき (fields を含まないクエリで取得したとき) は、エラーになる。"
+                ],
+                "examples": [
+                    "projectV2.fields().map(field=> field.name);",
+                    "// => [\"Title\", \"Assignees\", \"Status\", ...]"
+                ]
             },
             {
                 "name": "shortDescription",
@@ -2346,8 +2549,20 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "shortDescription"
-                }
+                    "name": "shortDescription",
+                    "type": "String | null",
+                    "description": [
+                        "短い説明。"
+                    ]
+                },
+                "description": [
+                    "ProjectV2 の短い説明を返す。",
+                    "取得していないときは undefined。"
+                ],
+                "examples": [
+                    "projectV2.shortDescription();",
+                    "// => \"SOGH のデータモデルと API の整理\""
+                ]
             },
             {
                 "name": "readme",
@@ -2355,8 +2570,20 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "readme"
-                }
+                    "name": "readme",
+                    "type": "String | null",
+                    "description": [
+                        "README の文章。"
+                    ]
+                },
+                "description": [
+                    "ProjectV2 の README の文章を返す。",
+                    "priority などの README の属性は、この文章から読み出す。"
+                ],
+                "examples": [
+                    "projectV2.readme();",
+                    "// => \"$Priority: h\\n$Owner: octocat\\n...\""
+                ]
             },
             {
                 "name": "public",
@@ -2364,8 +2591,19 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "public"
-                }
+                    "name": "public",
+                    "type": "Boolean",
+                    "description": [
+                        "公開されているときは true。"
+                    ]
+                },
+                "description": [
+                    "ProjectV2 が公開されているかを返す。"
+                ],
+                "examples": [
+                    "projectV2.public();",
+                    "// => true"
+                ]
             },
             {
                 "name": "owner",
@@ -2375,8 +2613,34 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "owner"
-                }
+                    "name": "owner",
+                    "type": "String | null",
+                    "description": [
+                        "今の 担当者。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "新しい 担当者。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README の $Owner の値 (担当者) を読み書きする。",
+                    "引数を渡したときは、その値にする。",
+                    "README に $Owner が無いときは null。",
+                    "GitHub の ProjectV2 の owner (持ち主のユーザーや組織) ではない。",
+                    "maneger(v) と同じ値を読み書きする。"
+                ],
+                "examples": [
+                    "// README: $Owner: octocat",
+                    "projectV2.owner();",
+                    "// => \"octocat\""
+                ]
             },
             {
                 "name": "creator",
@@ -2384,8 +2648,20 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "creator"
-                }
+                    "name": "creator",
+                    "type": "Object",
+                    "description": [
+                        "作成者のノード (login など)。"
+                    ]
+                },
+                "description": [
+                    "ProjectV2 を作ったユーザーのノードを返す。",
+                    "取得していないときは undefined。"
+                ],
+                "examples": [
+                    "projectV2.creator().login;",
+                    "// => \"octocat\""
+                ]
             },
             {
                 "name": "items",
@@ -2393,8 +2669,21 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "items"
-                }
+                    "name": "items",
+                    "type": "Array",
+                    "description": [
+                        "アイテムのノードの配列。"
+                    ]
+                },
+                "description": [
+                    "ProjectV2 のアイテム (Issue・Pull request・Draft issue) のノードを返す。(core の items.edges の node)",
+                    "アイテムを取得していないときは []。",
+                    "ノードのままなので、ProjectV2Item にするときは itemsWith2ProjectV2Item() を使う。"
+                ],
+                "examples": [
+                    "projectV2.items().length;",
+                    "// => 12"
+                ]
             },
             {
                 "name": "itemsWith2ProjectV2Item",
@@ -2402,8 +2691,20 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "projectV2Items"
-                }
+                    "name": "projectV2Items",
+                    "type": "ProjectV2Item[]",
+                    "description": [
+                        "アイテムの ProjectV2Item の配列。"
+                    ]
+                },
+                "description": [
+                    "items() のノードを、Sogh の Pool に入れて ProjectV2Item にして返す。",
+                    "Sogh を持っていないとき (Pool を通さずに作ったとき) は []。"
+                ],
+                "examples": [
+                    "projectV2.itemsWith2ProjectV2Item().map(item=> item.title());",
+                    "// => [\"クラス図を描く\", ...]"
+                ]
             },
             {
                 "name": "priority",
@@ -2413,8 +2714,33 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "priority"
-                }
+                    "name": "priority",
+                    "type": "String | null",
+                    "description": [
+                        "今の優先度。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "新しい優先度。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README の $Priority の値 (優先度) を読み書きする。",
+                    "値は s (緊急)・h (高い)・n (普通)・l (低い) のどれか。(README からは、先頭の 1 文字だけを読む)",
+                    "README に $Priority が無いときは null。",
+                    "画面に出すときは priorityData() を使う。"
+                ],
+                "examples": [
+                    "// README: $Priority: h",
+                    "projectV2.priority();",
+                    "// => \"h\""
+                ]
             },
             {
                 "name": "priorityData",
@@ -2422,8 +2748,20 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "priorityData"
-                }
+                    "name": "priorityData",
+                    "type": "Object",
+                    "description": [
+                        "{ code, label, label_short } の形のデータ。"
+                    ]
+                },
+                "description": [
+                    "priority() の値を、画面に出すためのデータにして返す。",
+                    "s・h・n・l・? 以外 (null を含む) のときは、label が「なぞ」、label_short が「謎」のデータを返す。"
+                ],
+                "examples": [
+                    "projectV2.priorityData();",
+                    "// => { code: \"h\", label: \"高い\", label_short: \"高\" }"
+                ]
             },
             {
                 "name": "maneger",
@@ -2433,8 +2771,33 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "owner"
-                }
+                    "name": "owner",
+                    "type": "String | null",
+                    "description": [
+                        "今の 担当者。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "新しい 担当者。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README の $Owner の値 (担当者) を読み書きする。",
+                    "引数を渡したときは、その値にする。",
+                    "README に $Owner が無いときは null。",
+                    "owner(v) と同じ値を読み書きする。"
+                ],
+                "examples": [
+                    "// README: $Owner: octocat",
+                    "projectV2.maneger();",
+                    "// => \"octocat\""
+                ]
             },
             {
                 "name": "type",
@@ -2444,8 +2807,32 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "type"
-                }
+                    "name": "type",
+                    "type": "String | null",
+                    "description": [
+                        "今の プロジェクトの種類。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "新しい プロジェクトの種類。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README の $Type の値 (プロジェクトの種類) を読み書きする。",
+                    "引数を渡したときは、その値にする。",
+                    "README に $Type が無いときは null。"
+                ],
+                "examples": [
+                    "// README: $Type: 開発",
+                    "projectV2.type();",
+                    "// => \"開発\""
+                ]
             },
             {
                 "name": "release",
@@ -2455,8 +2842,32 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "release"
-                }
+                    "name": "release",
+                    "type": "String | null",
+                    "description": [
+                        "今の リリース。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "新しい リリース。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README の $Release の値 (リリース) を読み書きする。",
+                    "引数を渡したときは、その値にする。",
+                    "README に $Release が無いときは null。"
+                ],
+                "examples": [
+                    "// README: $Release: v0.3.1",
+                    "projectV2.release();",
+                    "// => \"v0.3.1\""
+                ]
             },
             {
                 "name": "plan",
@@ -2467,8 +2878,44 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "plan"
-                }
+                    "name": "plan",
+                    "type": "Term",
+                    "description": [
+                        "予定の期間。",
+                        "start・end は、日付の文字列か null。"
+                    ]
+                },
+                "syntax": "projectV2.plan([start, end])",
+                "arguments": [
+                    {
+                        "name": "start",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "予定の開始日 (YYYY-MM-DD)。",
+                            "end と一緒に渡す。"
+                        ]
+                    },
+                    {
+                        "name": "end",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "予定の終了日 (YYYY-MM-DD)。",
+                            "start と一緒に渡す。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "予定の期間 (README の $Plan) を読み書きする。",
+                    "start と end の 2 つを渡したときだけ、新しい期間にする。(1 つだけ渡したときは変えない)",
+                    "README に $Plan が無いときは、start・end とも null の期間。"
+                ],
+                "examples": [
+                    "// README: $Plan: 2026-11-01 2026-11-30",
+                    "projectV2.plan();",
+                    "// => Term { start: \"2026-11-01\", end: \"2026-11-30\" }"
+                ]
             },
             {
                 "name": "result",
@@ -2479,8 +2926,45 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "result"
-                }
+                    "name": "result",
+                    "type": "Term",
+                    "description": [
+                        "実績の期間。",
+                        "start・end は、日付の文字列か null。"
+                    ]
+                },
+                "syntax": "projectV2.result([start, end])",
+                "arguments": [
+                    {
+                        "name": "start",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "実績の開始日 (YYYY-MM-DD)。",
+                            "end と一緒に渡す。"
+                        ]
+                    },
+                    {
+                        "name": "end",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "実績の終了日 (YYYY-MM-DD)。",
+                            "終わっていないときは null。",
+                            "start と一緒に渡す。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "実績の期間 (README の $Result) を読み書きする。",
+                    "start と end の 2 つを渡したときだけ、新しい期間にする。(1 つだけ渡したときは変えない)",
+                    "README に $Result が無いときは、start・end とも null の期間。"
+                ],
+                "examples": [
+                    "// README: $Result: 2026-11-03",
+                    "projectV2.result();",
+                    "// => Term { start: \"2026-11-03\", end: null }"
+                ]
             },
             {
                 "name": "action",
@@ -2490,8 +2974,32 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "action"
-                }
+                    "name": "action",
+                    "type": "String | null",
+                    "description": [
+                        "今の 次のアクション。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "新しい 次のアクション。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README の $Action の値 (次のアクション) を読み書きする。",
+                    "引数を渡したときは、その値にする。",
+                    "README に $Action が無いときは null。"
+                ],
+                "examples": [
+                    "// README: $Action: 見積もりを出す",
+                    "projectV2.action();",
+                    "// => \"見積もりを出す\""
+                ]
             },
             {
                 "name": "backlog",
@@ -2501,8 +3009,32 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "backlog"
-                }
+                    "name": "backlog",
+                    "type": "String | null",
+                    "description": [
+                        "今の バックログ。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "新しい バックログ。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README の $Backlog の値 (バックログ) を読み書きする。",
+                    "引数を渡したときは、その値にする。",
+                    "README に $Backlog が無いときは null。"
+                ],
+                "examples": [
+                    "// README: $Backlog: クラス図",
+                    "projectV2.backlog();",
+                    "// => \"クラス図\""
+                ]
             },
             {
                 "name": "systems",
@@ -2512,8 +3044,33 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "systems"
-                }
+                    "name": "systems",
+                    "type": "String | null",
+                    "description": [
+                        "今の 関係するシステム。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "新しい 関係するシステム。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README の $Systems の値 (関係するシステム) を読み書きする。",
+                    "引数を渡したときは、その値にする。",
+                    "README に $Systems が無いときは null。",
+                    "初めの値は [] だが、README を読むと文字列か null になる。"
+                ],
+                "examples": [
+                    "// README: $Systems: iHub",
+                    "projectV2.systems();",
+                    "// => \"iHub\""
+                ]
             },
             {
                 "name": "agency",
@@ -2523,8 +3080,32 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "agency"
-                }
+                    "name": "agency",
+                    "type": "String | null",
+                    "description": [
+                        "今の 代理店。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "新しい 代理店。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README の $Agency の値 (代理店) を読み書きする。",
+                    "引数を渡したときは、その値にする。",
+                    "README に $Agency が無いときは null。"
+                ],
+                "examples": [
+                    "// README: $Agency: A社",
+                    "projectV2.agency();",
+                    "// => \"A社\""
+                ]
             },
             {
                 "name": "customer",
@@ -2534,8 +3115,32 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "customer"
-                }
+                    "name": "customer",
+                    "type": "String | null",
+                    "description": [
+                        "今の 顧客。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "新しい 顧客。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README の $Customer の値 (顧客) を読み書きする。",
+                    "引数を渡したときは、その値にする。",
+                    "README に $Customer が無いときは null。"
+                ],
+                "examples": [
+                    "// README: $Customer: B社",
+                    "projectV2.customer();",
+                    "// => \"B社\""
+                ]
             },
             {
                 "name": "scenario",
@@ -2545,8 +3150,32 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "scenario"
-                }
+                    "name": "scenario",
+                    "type": "String | null",
+                    "description": [
+                        "今の シナリオ。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "新しい シナリオ。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README の $Scenario の値 (シナリオ) を読み書きする。",
+                    "引数を渡したときは、その値にする。",
+                    "README に $Scenario が無いときは null。"
+                ],
+                "examples": [
+                    "// README: $Scenario: 移行",
+                    "projectV2.scenario();",
+                    "// => \"移行\""
+                ]
             },
             {
                 "name": "progress",
@@ -2556,8 +3185,33 @@
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "progress"
-                }
+                    "name": "progress",
+                    "type": "String | null",
+                    "description": [
+                        "今の 進捗。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String | null",
+                        "optional": true,
+                        "description": [
+                            "新しい 進捗。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "README の $Progress の値 (進捗) を読み書きする。",
+                    "引数を渡したときは、その値にする。",
+                    "README に $Progress が無いときは null。",
+                    "値は数字の文字列。(数値ではない)"
+                ],
+                "examples": [
+                    "// README: $Progress: 60",
+                    "projectV2.progress();",
+                    "// => \"60\""
+                ]
             }
         ],
         "position": {

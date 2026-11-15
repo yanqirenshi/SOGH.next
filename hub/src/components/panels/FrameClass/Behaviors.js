@@ -14,8 +14,10 @@ import { nameOf, linesOf, memberOf } from './utils.js';
 //       name:        'body',               // 名前
 //       parameters:  ['v', 'callbacks={}'], // 引数。'名前=既定値' は、省略できる引数
 //       arguments:   [                     // 引数の型と説明 (省略できる。name で parameters の引数に結びつける)
-//         { name: 'v', type: 'String', description: ['段落', ...] },
+//         { name: 'v', type: 'String', description: ['段落', ...],
+//           optional: true },              // 既定値の無い、省略できる引数 (Syntax で [v] にする)
 //       ],
+//       syntax:      'x.plan([start, end])', // Syntax の呼び出しの形 (省略できる。自動では表せないときに書く)
 //       returnType:  'any',                // 'Promise' のときは、Syntax に await を付ける
 //       returns:     { name: 'body',       // 戻り値の名前。Syntax に「⇒ body」と出し、Arguments and Values に並べる
 //                      type: 'String',     // 戻り値の型 (省略できる)
@@ -54,12 +56,17 @@ const SX_METHOD = {
 
 function Method ({ data, receiver }) {
     const name = nameOf(data.name);
-    const params = (data.parameters || []).map(paramOf);
+    // 引数の型と説明 (arguments) を、名前で引けるようにする。
+    const docs = Object.fromEntries((data.arguments || []).map(memberOf).map(a=> [nameOf(a.name), a]));
+    // 省略できる引数: 既定値があるもの、と arguments で optional: true のもの。
+    const params = (data.parameters || [])
+          .map(paramOf)
+          .map(p=> ({ ...p, optional: p.def !== null || !!(docs[p.name] && docs[p.name].optional) }));
     const description = linesOf(data.description);
     const examples = linesOf(data.examples);
     // 戻り値。(null は戻り値なし。名前が無いときは、Arguments and Values に並べない)
     const returns = data.returns && nameOf(data.returns.name) ? data.returns : null;
-    const values = valuesOf(params, data.arguments, returns);
+    const values = valuesOf(params, docs, returns);
 
     return (
         <Section title={`${name}(${params.map(p=> p.name).join(', ')})`} lev="4" sx={SX_METHOD}>
@@ -96,22 +103,20 @@ function Method ({ data, receiver }) {
 
 // Arguments and Values に並べるもの。(引数のあとに戻り値)
 //   [{ key, title, type, description: [行, ...] }]
-// 引数の型と説明は、arguments の同じ名前のものから取る。
-// 省略できる引数は、説明の先頭に「省略できる。既定値は …」を足す。
-function valuesOf (params, args, returns) {
-    const docs = Object.fromEntries((args || []).map(memberOf).map(a=> [nameOf(a.name), a]));
-
+// 引数の型と説明は、arguments の同じ名前のもの (docs) から取る。
+// 省略できる引数は、説明の先頭に「省略できる。(既定値は …)」を足す。
+function valuesOf (params, docs, returns) {
     const values = params.map(p=> {
         const doc = docs[p.name] || {};
+        const optional = p.def !== null
+              ? [`省略できる。既定値は ${p.def}`]
+              : (p.optional ? ['省略できる。'] : []);
 
         return {
             key:   `argument:${p.name}`,
             title: p.name,
             type:  doc.type || null,
-            description: [
-                ...(p.def === null ? [] : [`省略できる。既定値は ${p.def}`]),
-                ...linesOf(doc.description),
-            ],
+            description: [...optional, ...linesOf(doc.description)],
         };
     });
 
@@ -136,17 +141,20 @@ function paramOf (p) {
 }
 
 // 呼び出しの形。省略できる引数は [ ] で囲む。Promise を返すメソッドには await を付ける。
+// データに syntax があるときは、呼び出しの形にそれを使う。
 // 戻り値は「⇒ 名前」、戻り値なし (returns: null) は「⇒ None」。(returns が無いときは付けない)
 //   例: await sogh.asyncFetchProjectsV2ByTeam(team_id[, callbacks]) ⇒ projectV2Ids
 function syntaxOf (data, name, params, receiver) {
     const args = params.reduce((out, p, i)=> {
-        if (p.def === null) return out + (i === 0 ? '' : ', ') + p.name;
+        if (!p.optional) return out + (i === 0 ? '' : ', ') + p.name;
 
         return out + (i === 0 ? `[${p.name}]` : `[, ${p.name}]`);
     }, '');
 
     const call = `${receiver ? receiver + '.' : ''}${name}(${args})`;
-    const form = data.returnType === 'Promise' ? `await ${call}` : call;
+    const form = data.syntax
+          ? data.syntax
+          : (data.returnType === 'Promise' ? `await ${call}` : call);
 
     if (data.returns === undefined) return form;
 
