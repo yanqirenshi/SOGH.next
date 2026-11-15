@@ -1,5 +1,7 @@
 import * as attr from './attributes.js';
 
+// コメントの pullRequest は、全部の組 (本文つき) で取る。
+// (ほかのコメントのクエリは、参照の組で取る。ここは、前から本文を取っていたので、そのままにしている)
 const query = `{
   organization (login:"@login") {
     repository (name:"@name") {
@@ -14,43 +16,9 @@ const query = `{
             }
             author {
               ${attr.actor()}
-              ... on Bot {
-                id
-              }
-              ... on EnterpriseUserAccount {
-                id
-              }
-              ... on Mannequin {
-                id
-              }
-              ... on Organization {
-                id
-              }
-              ... on User {
-                id
-              }
             }
             editor {
               ${attr.actor()}
-              avatarUrl
-              ... on Bot {
-                id
-              }
-              ... on EnterpriseUserAccount {
-                id
-                name
-              }
-              ... on Mannequin {
-                id
-                email
-              }
-              ... on Organization {
-                id
-                email
-              }
-              ... on User {
-                id
-              }
             }
           }
           pageInfo {

@@ -7,7 +7,7 @@ const MAX_PR_NUM = 20;
 const query = `{
   node (id:"@team-id"){
     ... on Team {
-      id
+      ${attr.teamRef()}
       name
       projectsV2 (${attr.page_nation(10)}, query: "is:open") {
         edges {
