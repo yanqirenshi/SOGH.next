@@ -14,6 +14,7 @@ import COLORS from './config/COLORS.js';
 import OPERATOR_ITEMS from './config/OPERATOR_ITEMS.js';
 import Operators from './operators/Operators.js';
 import { withIcons, withoutIcons } from './operators/labels.js';
+import ExternalResourcesGithub from './components/panels/ExternalResources/Github.js';
 import NotFoundWbsNodeData from './wbs/NotFoundWbsNodeData.js';
 import NotFoundWbsNodeComponent from './wbs/NotFoundWbsNodeComponent.js';
 import * as serviceWorkerRegistration from './js/serviceWorkerRegistration';
@@ -35,6 +36,21 @@ const config = {
 
     // ドック
     operators: { items: OPERATOR_ITEMS, Leafs: Operators, labels: { withIcons, withoutIcons } },
+
+    // ページのタブ。コアの既定のタブに重ねる。(code が同じものは差し替え、無いものは末尾に足す)
+    tabs: {
+        // 外部リソースのページ (/external-resources)
+        PAGE_EXTERNAL_RESOURCES: {
+            list: [
+                { code: 'github', label: 'Github' },
+            ],
+        },
+    },
+
+    // タブのパネル (タブの code → パネルの部品)。コアの既定に重ねる。
+    panels: {
+        PAGE_EXTERNAL_RESOURCES: { github: ExternalResourcesGithub },
+    },
 
     // 図の設定
     diagrams: {
