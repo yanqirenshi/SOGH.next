@@ -1,5 +1,33 @@
 # 更新履歴
 
+## 0.4.1
+
+取り直しても、GitHub 側の変更が反映されない場合があったのを、直しました。
+(yanqirenshi/SOGH.next#34)
+
+### 直したもの
+
+- GitHub で Issue や ProjectV2 を変えたあと、取り直しても、変更がモデルに反映されない場合があった。
+  - 入れ子で来た node (項目が少ない) が、先にモデルの `updatedAt` を進めるので、あとから来た、項目のそろった node が「日時が同じ」と見なされ、重ならなかった。
+  - 例 1: `asyncFetchProjectsV2WithItemsByTeam()` で取り直しても、ProjectV2 の README の属性と `items()` が、古いままだった。
+  - 例 2: ProjectV2 の Item の一覧を取り直したあとで、Issue を取り直しても、`body()` と `assignees()` が、古いままだった。
+
+### 変わった動き
+
+- `reload()` に日時が入る場合が、1 つ増えました。
+  - これまで: 手元より新しい node を重ねたとき。
+  - 足したもの: 入れ子で来た node で、初めてモデルを作ったとき。
+  - `reload()` は、「同じ日時の node が来たら、重ねてよい」という印になりました。
+- 日時 (`updatedAt`) が同じ node が来たとき、モデルに `reload()` が入っていれば、来た項目を重ねます。
+  - `reload()` が入っていなければ、これまでどおり、手元に無い項目だけを足します。
+  - 来たほうが古いときも、これまでどおりです。
+- GraphQLNode の `merge(node)` が返す値に、`'same'` (日時が同じで、`reload()` が入っていたので、重ねた) が増えました。
+
+### 足したもの
+
+- Matchmaker の `isNesting()`・`nest(fn)` (入れ子の node を辿っている途中かどうか)
+- Pool の `isNesting()`
+
 ## 0.4.0
 
 GraphQL で取得した node に入れ子で付いてくる関連 (Issue の assignees など) を、すべてモデルにしました。

@@ -129,11 +129,13 @@ const CASE_COLUMNS = [
 ];
 
 const CASES = [
-    { when: '手元に無い',                     merge: '新しく作る',               reload: '入れない' },
-    { when: '来たほうが新しい',               merge: '来た項目を重ねる',         reload: 'そのときの日時を入れる' },
-    { when: '日時が同じ',                     merge: '手元に無い項目だけ足す',   reload: '入れない' },
-    { when: '来たほうが古い',                 merge: '手元に無い項目だけ足す',   reload: '入れない' },
-    { when: 'updatedAt が無い、または null',  merge: '毎回、来た項目を重ねる',   reload: '入れない' },
+    { when: '手元に無い (主に取った node)',         merge: '新しく作る',               reload: '入れない' },
+    { when: '手元に無い (入れ子で来た node)',       merge: '新しく作る',               reload: 'そのときの日時を入れる' },
+    { when: '来たほうが新しい',                     merge: '来た項目を重ねる',         reload: 'そのときの日時を入れる' },
+    { when: '日時が同じで、reload が入っている',    merge: '来た項目を重ねる',         reload: '変えない' },
+    { when: '日時が同じで、reload が入っていない',  merge: '手元に無い項目だけ足す',   reload: '入れない' },
+    { when: '来たほうが古い',                       merge: '手元に無い項目だけ足す',   reload: '変えない' },
+    { when: 'updatedAt が無い、または null',        merge: '毎回、来た項目を重ねる',   reload: '変えない' },
 ];
 
 // updatedAt を持つかどうか。(GitHub の GraphQL のリファレンスで確かめた)
@@ -168,9 +170,12 @@ const PROGRESS = [
     { work: '3. Matchmaker を広げる',
       state: '済み (PR 32)',
       note: '入れ子で取った 23 の関連を、モデルにして Pool に入れるようにした。関連を返すメソッドは、モデルを返す。モデルを 6 つ、Pool を 8 つ足した。sogh を 0.4.0 にした' },
+    { work: '4. 取り直しの重ね方を直す',
+      state: '済み (Issue 34)',
+      note: '入れ子で来た node で、初めてモデルを作ったときに、reload を入れるようにした。日時が同じでも、reload が入っていれば、来た項目を重ねるようにした。sogh を 0.4.1 にした' },
 ];
 
-// 関連をモデルにしたあとに、確かめた結果。(2026-11-15)
+// 取り直しの重ね方を直したあとに、確かめた結果。(2026-11-16)
 const VERIFY_COLUMNS = [
     { code: 'how',    label: '確かめ方', val: (r)=> <C>{r.how}</C> },
     { code: 'result', label: '結果',     key: 'result' },
@@ -178,7 +183,7 @@ const VERIFY_COLUMNS = [
 
 const VERIFIES = [
     { how: 'npm test',
-      result: '48 件が、すべて通る。(GitHub には、つながない。にせの node で、23 の関連を確かめる)' },
+      result: '57 件が、すべて通る。(GitHub には、つながない。にせの node で、23 の関連と、取り直しの重ね方を確かめる)' },
     { how: 'npm run check:live',
       result: 'クエリは OK 12 個。重ね方と関連は OK 9 個。viewer の Issue 444 件などの関連 2,497 個で、core の JSON にある数だけ、モデルが返った' },
 ];
@@ -237,10 +242,19 @@ export default function MatchmakerSpec () {
               </OL>
               <Table columns={CASE_COLUMNS} rows={CASES} ids={TABLE_IDS}/>
               <OL sx={SX_AFTER_TABLE}>
-                <LI>日時が同じでも、手元に無い項目は足す。
+                <LI>日時が同じで、reload が入っているときは、来た項目を重ねる。(0.4.1 から。<IssueLink num="34"/>)
                   <UL>
-                    <LI>先に項目の少ない node が来て、あとから項目のそろった node が来ることがあるため。</LI>
-                    <LI>例: ProjectV2Item の content として本文の無い Issue が来たあと、本文つきの Issue を取る。</LI>
+                    <LI>reload が入っているモデルは、core が、項目の少ない node からできているかもしれないため。(「(2) reload 属性」)</LI>
+                    <LI>例: 本文つきの Issue (更新 10:00) を持っている。GitHub で本文が変わったあと (11:00)、Item の一覧の取得で、本文の無い Issue (11:00) が来る。</LI>
+                    <LI>手元の日時は 11:00 になり、reload が入る。本文は、まだ 10:00 のもの。</LI>
+                    <LI>そのあと、本文つきの Issue (11:00) を取ると、日時は同じだが、reload が入っているので、本文を重ねる。</LI>
+                    <LI>0.4.0 では、ここで重ねなかったので、本文が古いまま残っていた。</LI>
+                  </UL>
+                </LI>
+                <LI>日時が同じで、reload が入っていないときは、手元に無い項目だけ足す。(手元にある項目は、上書きしない)
+                  <UL>
+                    <LI>GitHub 側の変更が無いのに、取るたびに core を作り直すことを、避けるため。</LI>
+                    <LI>例: <C>issue_by_id</C> で取った Issue を、<C>issue_by_org_repo_issue_number</C> で取り直すと、projectItems が足される。</LI>
                   </UL>
                 </LI>
                 <LI>来たほうが古いときは、手元の値を上書きしない。
@@ -261,27 +275,48 @@ export default function MatchmakerSpec () {
                 <LI>「updatedAt が無い、または null」は、手元と来た node の、どちらかに無いとき。</LI>
                 <LI>実装は、<C>GraphQLNode</C> の <C>merge(node)</C>。Pool の <C>ensure(node, makeInstance, updater)</C> が呼ぶ。
                   <UL>
-                    <LI><C>merge(node)</C> は、何をしたかを返す。(<C>newer</C>・<C>filled</C>・<C>kept</C>・<C>always</C>)</LI>
+                    <LI><C>merge(node)</C> は、何をしたかを返す。(<C>newer</C>・<C>same</C>・<C>filled</C>・<C>kept</C>・<C>always</C>)</LI>
                     <LI>core を変えるときは <C>core(v)</C> を通すので、Issue と ProjectV2 は、注釈を読み取り直す。</LI>
                   </UL>
                 </LI>
               </OL>
 
-              <Panel kind="note">この重ね方では、古い項目が残る場合があります。あとで、reload の利用で解きます。(「7.5 (1) reload の使い道」を見る)</Panel>
+              <Panel kind="note">0.4.0 では、取り直しても、GitHub 側の変更が反映されない場合がありました。0.4.1 で、reload を使って直しました。親の updatedAt が動かない変更は、いまも、反映されない場合があります。(「7.5 (1) updatedAt が動かない変更」を見る)</Panel>
             </Section>
 
             <Section title="reload 属性" num="(2)" lev="6">
               <OL>
                 <LI><C>GraphQLNode</C> に、<C>reload</C> 属性を足す。(<C>reload()</C> で読む。はじめは null)</LI>
-                <LI>GitHub 側の変更を重ねたとき (来たほうが新しいとき) に、そのときの日時を入れる。(ISO 8601 の文字列)</LI>
+                <LI><C>reload</C> は、「同じ日時の node が来たら、重ねてよい」という印。次の 2 つのときに、そのときの日時を入れる。(ISO 8601 の文字列)
+                  <UL>
+                    <LI>GitHub 側の変更を重ねたとき。(来たほうが新しいとき)</LI>
+                    <LI>入れ子で来た node で、初めてモデルを作ったとき。(0.4.1 から。<IssueLink num="34"/>)</LI>
+                  </UL>
+                </LI>
+                <LI>どちらも、手元の core が、項目の少ない node からできているかもしれない場合。
+                  <UL>
+                    <LI>入れ子で来た node は、項目が少ない。(本文や README を持たない)</LI>
+                    <LI>新しい node を重ねたときも、来た node の項目が少なければ、ほかの項目は古いまま残る。</LI>
+                  </UL>
+                </LI>
+                <LI>入れ子で来たかどうかは、<C>Matchmaker</C> が入れ子を辿っている途中かどうかで、見分ける。
+                  <UL>
+                    <LI><C>Matchmaker</C> の <C>isNesting()</C> が返す。<C>Pool</C> の <C>ensure(node, makeInstance, updater)</C> が、モデルを作ったときに見る。</LI>
+                    <LI>入れ子で来た node でも、すでにモデルがあるときは、入れない。(重ね方は、上の表のとおり)</LI>
+                  </UL>
+                </LI>
                 <LI>手元の項目が増えただけのときは、入れない。</LI>
                 <LI><C>updatedAt</C> が無い、または null で、毎回重ねるときも、入れない。
                   <UL>
                     <LI>値が変わったかどうかを見ないので、入れると、取るたびに <C>reload</C> が変わってしまうため。</LI>
-                    <LI><C>reload</C> は、<C>updatedAt</C> で変更が分かったときだけの印になる。</LI>
                   </UL>
                 </LI>
-                <LI><C>reload</C> の使い道は、あとで決める。いまは、属性を足すところまで。</LI>
+                <LI>一度入った <C>reload</C> は、消さない。
+                  <UL>
+                    <LI>そのモデルには、日時が同じ node が来るたびに、来た項目を重ねる。</LI>
+                  </UL>
+                </LI>
+                <LI><C>reload</C> の、ほかの使い道は、決めていない。(利用側が、取り直すきっかけにする、など)</LI>
               </OL>
             </Section>
 
@@ -331,7 +366,7 @@ export default function MatchmakerSpec () {
                 <LI>DraftIssue と Team は、モデルと Pool を、新しく足した。</LI>
                 <LI>ProjectV2 の owner が Issue・PullRequest のときに取っている項目は、<C>id</C>・<C>number</C>・<C>updatedAt</C> だけ。
                   <UL>
-                    <LI>Pool は、手元に無い項目だけを足すので、すでにあるモデルの値は消えない。(「(1) node の重ね方」)</LI>
+                    <LI>Pool は、来た項目だけを重ねるので、すでにあるモデルの、ほかの値は消えない。(「(1) node の重ね方」)</LI>
                   </UL>
                 </LI>
                 <LI>「モデルにしない」型を残すと、同じメソッドの戻り値に、モデルと JSON が混ざる。そのため、すべてモデルにする。</LI>
@@ -425,28 +460,22 @@ export default function MatchmakerSpec () {
 
           <Section title="まだ決めていないこと・残っていること" num="7.5" lev="5">
 
-            <Section title="reload の使い道" num="(1)" lev="6">
-              <P>いまの重ね方では、取り直しても、古い項目が残る場合があります。これを、reload を使って解きます。使い方は、まだ決めていません。</P>
+            <Section title="updatedAt が動かない変更" num="(1)" lev="6">
+              <P>親の updatedAt が動かない変更は、取り直しても、反映されない場合があります。解き方は、まだ決めていません。</P>
               <OL>
-                <LI>項目の少ない新しい node を重ねたあと、古い項目が残る。
-                  <UL>
-                    <LI>例: 本文つきの Issue (更新 10:00) を持っている。</LI>
-                    <LI>GitHub で本文が変わったあと (11:00)、一覧の取得で、本文の無い Issue (11:00) が来る。</LI>
-                    <LI>題名は新しくなり、手元の日時は 11:00 になる。本文は、10:00 のまま残る。</LI>
-                    <LI>そのあと、本文つきの Issue (11:00) を取っても、日時が同じなので、本文は古いまま。</LI>
-                    <LI>このとき、reload には日時が入っている。(GitHub 側で変更があったことは、分かる)</LI>
-                  </UL>
-                </LI>
-                <LI>親の updatedAt が動かない変更のうち、関連の増減は、反映されない。
+                <LI>親の updatedAt が動かない変更のうち、関連の増減は、反映されないことがある。
                   <UL>
                     <LI>どの node が関連しているか (id の並び) は、親の core の中に、JSON のまま持っている。</LI>
-                    <LI>親の updatedAt が同じなら、取り直しても、親の core の JSON は重ねない。</LI>
-                    <LI>例: Issue をプロジェクトに足しても、Issue の updatedAt が動かなければ、<C>issue.projectV2Items()</C> は増えない。</LI>
+                    <LI>親の updatedAt が同じで、親に reload が入っていなければ、取り直しても、親の core の JSON は重ねない。</LI>
+                    <LI>親に reload が入っていれば、重ねるので、反映される。(「7.4 (2) reload 属性」)</LI>
+                    <LI>例: Issue をプロジェクトに足しても、Issue の updatedAt が動かず、reload も入っていなければ、<C>issue.projectV2Items()</C> は増えない。</LI>
                     <LI>関連先の値の変更は、反映される。(関連先のモデルは、自分の updatedAt で、Pool の中で重なるため)</LI>
                     <LI>例: プロジェクトのフィールドの値を変えて、ProjectV2Item の updatedAt が動けば、<C>issue.projectV2Items()</C> が返すモデルは、新しい値になる。</LI>
                     <LI>どの変更で updatedAt が動くかは、確かめていない。(「(2) まだ確かめていないこと」を見る)</LI>
                   </UL>
                 </LI>
+                <LI>reload の、ほかの使い道は、決めていない。(利用側が、取り直すきっかけにする、など)</LI>
+                <LI>項目の少ない node が先に来て、古い項目が残る場合は、0.4.1 で直した。(<IssueLink num="34"/>。「7.4 (1) node の重ね方」を見る)</LI>
               </OL>
             </Section>
 
@@ -497,7 +526,7 @@ export default function MatchmakerSpec () {
 
           <Section title="進み具合" num="7.6" lev="5">
             <Table columns={PROGRESS_COLUMNS} rows={PROGRESS} ids={TABLE_IDS}/>
-            <P>関連をモデルにしたあとに、確かめた結果は、次のとおりです。(2026-11-15)</P>
+            <P>取り直しの重ね方を直したあとに、確かめた結果は、次のとおりです。(2026-11-16)</P>
             <Table columns={VERIFY_COLUMNS} rows={VERIFIES} ids={TABLE_IDS}/>
           </Section>
         </Section>

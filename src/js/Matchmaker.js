@@ -16,6 +16,28 @@ import { nodesOf } from './models/GraphQLNode.js';
 export default class Matchmaker {
     constructor (sogh) {
         this.sogh = sogh;
+
+        // 入れ子を辿っている深さ。0 のときは、辿っていない。
+        this._depth = 0;
+    }
+    /* **************************************************************** *
+     *  入れ子
+     * **************************************************************** */
+    // 入れ子の node を辿っている途中かどうか。
+    // Pool が、入れ子で来た node かどうかを見分けるのに使う。
+    // (入れ子で来た node で、初めてモデルを作ったときに、reload を入れるため。yanqirenshi/SOGH.next#34)
+    isNesting () {
+        return this._depth > 0;
+    }
+    // fn の中で Pool に入る node を、入れ子で来たものとして扱う。
+    nest (fn) {
+        this._depth++;
+
+        try {
+            return fn();
+        } finally {
+            this._depth--;
+        }
     }
     /* **************************************************************** *
      *  親の型ごと
@@ -81,7 +103,7 @@ export default class Matchmaker {
         if (!node || !node.id)
             return null;
 
-        return node2obj(node);
+        return this.nest(()=> node2obj(node));
     }
     // 型が 1 つに決まっている、複数の関連。(nodes と edges のどちらの形でもよい)
     list (connection, node2obj) {
@@ -91,6 +113,6 @@ export default class Matchmaker {
     }
     // 型が複数ありうる関連。__typename でモデルを選ぶ。
     model (node) {
-        return this.sogh.node2model(node);
+        return this.nest(()=> this.sogh.node2model(node));
     }
 }

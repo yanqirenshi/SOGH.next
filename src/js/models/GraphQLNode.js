@@ -52,8 +52,12 @@ export default class GraphQLNode {
     /* **************************************************************** *
      *  Merge
      * **************************************************************** */
-    // GitHub 側の変更を重ねた日時。(ISO 8601 の文字列)
-    // merge(node) が、手元より新しい node を重ねたときに入れる。重ねたことが無ければ null。
+    // 「同じ日時の node が来たら、重ねてよい」という印。(ISO 8601 の文字列。印が無ければ null)
+    // 次の 2 つのときに、そのときの日時を入れる。
+    //   1. merge(node) が、手元より新しい node を重ねたとき。(GitHub 側の変更を重ねた)
+    //   2. 入れ子で来た node で、初めてモデルを作ったとき。(Pool の ensure が入れる)
+    // どちらも、手元の core が、項目の少ない node からできているかもしれない場合。
+    // (yanqirenshi/SOGH.next#34)
     reload (v) {
         if (arguments.length===1)
             this._reload = v || null;
@@ -66,9 +70,16 @@ export default class GraphQLNode {
     //
     // 重ねるかどうかは、最終更新日時 (updatedAt) を、いまの core と node で比べて決める。
     //
-    //   来たほうが新しい            … 来た項目を重ねる。reload に、いまの日時を入れる。  ⇒ 'newer'
-    //   日時が同じ・来たほうが古い  … 手元に無い項目だけ足す。                          ⇒ 'filled' (足した) / 'kept' (何もしなかった)
-    //   どちらかに updatedAt が無い … 毎回、来た項目を重ねる。reload は入れない。        ⇒ 'always'
+    //   来たほうが新しい              … 来た項目を重ねる。reload に、いまの日時を入れる。  ⇒ 'newer'
+    //   日時が同じで、reload がある   … 来た項目を重ねる。reload は変えない。              ⇒ 'same'
+    //   日時が同じで、reload が無い   … 手元に無い項目だけ足す。                          ⇒ 'filled' (足した) / 'kept' (何もしなかった)
+    //   来たほうが古い                … 手元に無い項目だけ足す。                          ⇒ 'filled' (足した) / 'kept' (何もしなかった)
+    //   どちらかに updatedAt が無い   … 毎回、来た項目を重ねる。reload は入れない。        ⇒ 'always'
+    //
+    // 「日時が同じで、reload がある」ときに重ねるのは、手元の core が、項目の少ない node で
+    // 先に updatedAt だけ進んでいるかもしれないため。(yanqirenshi/SOGH.next#34)
+    // たとえば、Item の content として来た Issue (本文が無い) が、先に updatedAt を進めたあとで、
+    // 同じ日時の、本文つきの Issue が来る場合。
     //
     // 重ねる単位は、一番上の項目。(title・assignees など。入れ子の中身までは重ねない)
     // 来た値が null の項目は、null で重ねる。来ていない項目 (undefined) は、触らない。
@@ -92,6 +103,11 @@ export default class GraphQLNode {
 
         const comparable = held!==null && came!==null;
         const newer = comparable && came > held;
+        // 日時が同じで、reload が入っている。
+        const same = comparable && came === held && this._reload!==null;
+
+        // 来た項目を、そのまま重ねてよいか。
+        const overlay = !comparable || newer || same;
 
         // 重ねる項目。
         const keys = Object.keys(node).filter(key=> {
@@ -99,8 +115,8 @@ export default class GraphQLNode {
             if (node[key]===undefined)
                 return false;
 
-            // 日時を比べられて、来たほうが新しくないときは、手元に無い項目だけ。
-            if (comparable && !newer)
+            // 重ねてよくないときは、手元に無い項目だけ。
+            if (!overlay)
                 return core[key]===undefined;
 
             return true;
@@ -120,8 +136,9 @@ export default class GraphQLNode {
             this._reload = new Date().toISOString();
 
         if (!comparable) return 'always';
+        if (newer) return 'newer';
 
-        return newer ? 'newer' : 'filled';
+        return same ? 'same' : 'filled';
     }
 }
 

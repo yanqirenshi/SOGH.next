@@ -41,6 +41,8 @@ function Overview ({ data }) {
             <P>{"型が複数ありうる関連 (人・ProjectV2 の owner・ProjectV2Item の content・reviewers) は、model(node) で、__typename に合うモデルにする。"}</P>
             <P>{"人は、__typename で User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれかになる。(リポジトリの owner が組織のときは Organization)"}</P>
             <P>{"入れ子の node も node2〜(node) を通るので、そこからさらに中の関連も辿る。"}</P>
+            <P>{"入れ子の node を辿っているあいだは、isNesting() が true を返す。(one(node, node2obj) と model(node) が、nest(fn) の中で、node を Pool に入れる)"}</P>
+            <P>{"Pool は、入れ子で来た node で、初めてモデルを作ったときに、モデルの reload に日時を入れる。(入れ子の node は項目が少ないので、同じ日時の node があとから来たら、重ねられるようにするため)"}</P>
             <P>{"親の core には、入れ子の JSON をそのまま残す。関連を返すメソッド (issue.assignees() など) は、JSON の id で Pool からモデルを引く。(GraphQLNode の relation(node)・relations(connection))"}</P>
             <P>{"件数の上限で切れた関連は、取れた分だけをモデルにする。"}</P>
             <P>{"逆向きの関連 (User から、その人の Issue など) は持たない。"}</P>
