@@ -120,10 +120,18 @@ test('来た値が null の項目は、null で重ねる。来ていない項目
 test('merge は、何をしたかを返す', ()=> {
     const node = new GraphQLNode({ id: 'U_1', name: 'A', updatedAt: T1 });
 
-    assert.equal(node.merge({ id: 'U_1', name: 'B', updatedAt: T2 }), 'newer');
-    assert.equal(node.merge({ id: 'U_1', email: 'a@example.com', updatedAt: T2 }), 'filled');
-    assert.equal(node.merge({ id: 'U_1', name: 'C', updatedAt: T2 }), 'kept');
-    assert.equal(node.merge({ id: 'U_1', name: 'D' }), 'always');
+    // reload が無いあいだ。
+    assert.equal(node.merge({ id: 'U_1', email: 'a@example.com', updatedAt: T1 }), 'filled');
+    assert.equal(node.merge({ id: 'U_1', name: 'B', updatedAt: T1 }), 'kept');
+
+    // 来たほうが新しい。(ここで、reload が入る)
+    assert.equal(node.merge({ id: 'U_1', name: 'C', updatedAt: T2 }), 'newer');
+
+    // reload が入ったあと。
+    assert.equal(node.merge({ id: 'U_1', name: 'D', updatedAt: T2 }), 'same');
+    assert.equal(node.merge({ id: 'U_1', name: 'E', updatedAt: T1 }), 'kept', '来たほうが古いときは、reload があっても、重ねない');
+
+    assert.equal(node.merge({ id: 'U_1', name: 'F' }), 'always');
     assert.equal(node.merge(null), 'kept');
 });
 
@@ -225,10 +233,10 @@ test('ProjectV2 は、README の無い node (参照の組) を重ねても、注
 });
 
 /* ****************************************************************
- * 決めたとおりの動き (あとで、reload の利用で解く)
+ * 日時が同じで、reload が入っているとき (yanqirenshi/SOGH.next#34)
  * **************************************************************** */
 
-test('項目の少ない新しい node を重ねたあとは、同じ日時の node が来ても、古い項目は残る', ()=> {
+test('項目の少ない新しい node を重ねたあとで、同じ日時の node が来たら、重ねる', ()=> {
     const sogh = new Sogh();
 
     // 本文つきの Issue (T1) を持っている。
@@ -238,11 +246,34 @@ test('項目の少ない新しい node を重ねたあとは、同じ日時の n
     sogh.node2issue({ id: 'I_1', title: 'New', updatedAt: T2 });
 
     assert.equal(issue.title(), 'New');
-    assert.equal(issue.body(), 'old body');
-    assert.match(issue.reload(), ISO, 'GitHub 側の変更があったことは、reload で分かる');
+    assert.equal(issue.body(), 'old body', '本文は来ていないので、まだ古い');
+    assert.match(issue.reload(), ISO, 'GitHub 側の変更を重ねたので、reload が入る');
 
-    // 本文つきの Issue (T2) を取り直しても、日時が同じなので、本文は古いまま。
+    // 本文つきの Issue (T2) を取り直す。日時は同じだが、reload が入っているので、重ねる。
     sogh.node2issue({ id: 'I_1', title: 'New', body: 'new body', updatedAt: T2 });
 
-    assert.equal(issue.body(), 'old body');
+    assert.equal(issue.body(), 'new body');
+});
+
+test('日時が同じで、reload が入っているときは、来た項目を重ねる。reload は変えない', ()=> {
+    const node = new GraphQLNode({ id: 'U_1', name: 'Held', email: 'held@example.com', updatedAt: T1 });
+
+    node.reload(T2);
+
+    node.merge({ id: 'U_1', name: 'Came', updatedAt: T1 });
+
+    assert.equal(node.core().name, 'Came', '来た項目は、重ねる');
+    assert.equal(node.core().email, 'held@example.com', '来ていない項目は、残る');
+    assert.equal(node.reload(), T2);
+});
+
+test('来たほうが古いときは、reload が入っていても、手元に無い項目だけ足す', ()=> {
+    const node = new GraphQLNode({ id: 'U_1', name: 'Held', updatedAt: T2 });
+
+    node.reload(T2);
+
+    node.merge({ id: 'U_1', name: 'Came', email: 'came@example.com', updatedAt: T1 });
+
+    assert.equal(node.core().name, 'Held');
+    assert.equal(node.core().email, 'came@example.com');
 });

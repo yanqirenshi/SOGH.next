@@ -286,6 +286,143 @@ test('入れ子で先に入ったモデルに、あとから来た親の node �
 });
 
 /* ****************************************************************
+ * 入れ子で来た node と reload (yanqirenshi/SOGH.next#34)
+ * **************************************************************** */
+
+const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+const T2 = '2026-11-02T09:00:00Z';
+
+test('入れ子で来た node で、初めてモデルを作ったときは、reload に日時を入れる', ()=> {
+    const sogh = new Sogh();
+
+    const issue = sogh.node2issue({
+        __typename: 'Issue', id: 'I_1', updatedAt: T1,
+        assignees: { nodes: [user('U_1', 'alice')] },
+        repository: { __typename: 'Repository', id: 'R_1', name: 'hello', updatedAt: T1, owner: org('O_1', 'acme') },
+    });
+
+    assert.equal(issue.reload(), null, '主に取った node には、入れない');
+    assert.match(sogh.user('U_1').reload(), ISO);
+    assert.match(sogh.repository('R_1').reload(), ISO);
+    assert.match(sogh.organization('O_1').reload(), ISO, '入れ子の中の入れ子にも、入れる');
+});
+
+test('入れ子で来た node でも、すでにモデルがあるときは、reload を入れない', ()=> {
+    const sogh = new Sogh();
+
+    // 先に、主に取った User がある。
+    const alice = sogh.node2user(user('U_1', 'alice'));
+
+    // 同じ User が、同じ日時で、入れ子で来る。
+    sogh.node2issue({ __typename: 'Issue', id: 'I_1', updatedAt: T1, assignees: { nodes: [user('U_1', 'alice')] } });
+
+    assert.equal(alice.reload(), null);
+});
+
+test('入れ子を辿り終わったら、入れ子の扱いは終わる。(途中で例外が出ても)', ()=> {
+    const sogh = new Sogh();
+
+    sogh.node2issue({ __typename: 'Issue', id: 'I_1', updatedAt: T1, assignees: { nodes: [user('U_1', 'alice')] } });
+
+    assert.equal(sogh.matchmaker.isNesting(), false);
+
+    assert.throws(()=> sogh.matchmaker.nest(()=> { throw new Error('x'); }));
+
+    assert.equal(sogh.matchmaker.isNesting(), false);
+    assert.equal(sogh.node2user(user('U_2', 'bob')).reload(), null);
+});
+
+test('入れ子で先に入ったモデルに、同じ日時の親の node が来たら、手元にある項目も重ねる', ()=> {
+    const sogh = new Sogh();
+
+    // ProjectV2Item の project として、項目の少ない ProjectV2 が先に入る。(reload が入る)
+    sogh.node2projectV2Item({
+        __typename: 'ProjectV2Item', id: 'PVTI_1', updatedAt: T1,
+        project: { __typename: 'ProjectV2', id: 'PVT_1', title: 'ref', updatedAt: T1 },
+    });
+
+    // 同じ日時の、項目の多い node が来る。
+    sogh.node2projectV2({ __typename: 'ProjectV2', id: 'PVT_1', title: 'full', readme: '$Owner: foo', updatedAt: T1 });
+
+    const project = sogh.projectV2('PVT_1');
+
+    assert.equal(project.title(), 'full');
+    assert.equal(project.owner(), 'foo');
+});
+
+/* ****************************************************************
+ * 取り直し (yanqirenshi/SOGH.next#34 の 3 つの場合)
+ * **************************************************************** */
+
+test('ProjectV2 を Item 付きで取り直すと、README の属性と items() が新しくなる', ()=> {
+    const sogh = new Sogh();
+
+    // ProjectV2 → items → Item → project で、同じ ProjectV2 (項目が少ない) に戻る。
+    const node = (t, readme, item_ids)=> ({
+        __typename: 'ProjectV2', id: 'PVT_1', number: 1, title: 'p', readme, updatedAt: t,
+        items: { edges: item_ids.map(id=> ({ node: {
+            __typename: 'ProjectV2Item', id, updatedAt: t,
+            project: { __typename: 'ProjectV2', id: 'PVT_1', number: 1, title: 'p', updatedAt: t },
+        } })) },
+    });
+
+    const project = sogh.node2projectV2(node(T1, '$Owner: alice', ['PVTI_1']));
+
+    assert.equal(project.owner(), 'alice');
+    assert.equal(project.items().length, 1);
+
+    // GitHub で README が変わり、Item が 1 つ増えた。
+    sogh.node2projectV2(node(T2, '$Owner: bob', ['PVTI_1', 'PVTI_2']));
+
+    assert.equal(project.owner(), 'bob');
+    assert.equal(project.items().length, 2);
+});
+
+test('Item の一覧を取り直したあとで、Issue を取り直すと、本文と担当者が新しくなる', ()=> {
+    const sogh = new Sogh();
+
+    const node = (t, body, logins)=> ({
+        __typename: 'Issue', id: 'I_1', number: 1, title: 't', body, updatedAt: t,
+        assignees: { nodes: logins.map(login=> user('U_' + login, login)) },
+    });
+    // Item の content として、本文の無い Issue が来る。
+    const item = (t)=> ({
+        __typename: 'ProjectV2Item', id: 'PVTI_1', updatedAt: t,
+        content: { __typename: 'Issue', id: 'I_1', number: 1, title: 't', updatedAt: t },
+    });
+
+    const issue = sogh.node2issue(node(T1, 'old body', ['alice']));
+
+    // GitHub で本文と担当者が変わった。先に Item の一覧を、そのあとで Issue を取り直す。
+    sogh.node2projectV2Item(item(T2));
+    sogh.node2issue(node(T2, 'new body', ['alice', 'bob']));
+
+    assert.equal(issue.body(), 'new body');
+    assert.deepEqual(issue.assignees().map(a=> a.login()), ['alice', 'bob']);
+});
+
+test('Issue が、自分の参照を入れ子に持っていても、取り直すと、本文が新しくなる', ()=> {
+    const sogh = new Sogh();
+
+    // Issue → projectItems → Item → content で、同じ Issue (本文が無い) に戻る。
+    const node = (t, body)=> ({
+        __typename: 'Issue', id: 'I_1', number: 1, title: 't', body, updatedAt: t,
+        projectItems: { edges: [{ node: {
+            __typename: 'ProjectV2Item', id: 'PVTI_1', updatedAt: t,
+            content: { __typename: 'Issue', id: 'I_1', number: 1, title: 't', updatedAt: t },
+        } }] },
+    });
+
+    const issue = sogh.node2issue(node(T1, 'old body'));
+
+    assert.equal(issue.body(), 'old body');
+
+    sogh.node2issue(node(T2, 'new body'));
+
+    assert.equal(issue.body(), 'new body');
+});
+
+/* ****************************************************************
  * Viewer
  * **************************************************************** */
 

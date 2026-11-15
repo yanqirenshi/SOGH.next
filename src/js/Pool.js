@@ -28,9 +28,19 @@ export default class Pool {
     get (id) {
         return this._ht[id] || null;
     }
+    // いま入れようとしている node が、入れ子で来たものかどうか。(Matchmaker が辿っている途中かどうか)
+    isNesting () {
+        const matchmaker = this._sogh ? this._sogh.matchmaker : null;
+
+        return matchmaker ? matchmaker.isNesting() : false;
+    }
     // node のモデルを返す。無ければ作って入れる。
     // 同じ id のモデルがあるときは、core を丸ごと差し替えずに、node を重ねる。
     // (重ね方は、GraphQLNode の merge(node) を見る)
+    //
+    // 入れ子で来た node で、初めてモデルを作ったときは、reload に日時を入れる。
+    // (入れ子の node は項目が少ないので、同じ日時の node があとから来たら、重ねられるようにする。
+    //  yanqirenshi/SOGH.next#34)
     ensure (node, makeInstance, updater) {
         let obj = this.get(node.id);
 
@@ -40,6 +50,9 @@ export default class Pool {
             obj = makeInstance(node);
 
             this.add(obj);
+
+            if (this.isNesting())
+                obj.reload(new Date().toISOString());
         }
 
         obj.sogh(this._sogh);
