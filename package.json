@@ -6,7 +6,8 @@
     "scripts": {
         "transpile": "babel src -d dist --copy-files",
         "prepublishOnly": "npm run transpile",
-        "check:queries": "node scripts/check-queries.mjs"
+        "check:queries": "node scripts/check-queries.mjs",
+        "test": "node --test \"test/**/*.test.mjs\""
     },
     "repository": {
         "type": "git",

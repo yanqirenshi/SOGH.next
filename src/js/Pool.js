@@ -28,11 +28,14 @@ export default class Pool {
     get (id) {
         return this._ht[id] || null;
     }
+    // node のモデルを返す。無ければ作って入れる。
+    // 同じ id のモデルがあるときは、core を丸ごと差し替えずに、node を重ねる。
+    // (重ね方は、GraphQLNode の merge(node) を見る)
     ensure (node, makeInstance, updater) {
         let obj = this.get(node.id);
 
         if (obj) {
-            updater ? updater(obj, node) : obj.core(node);
+            updater ? updater(obj, node) : obj.merge(node);
         } else {
             obj = makeInstance(node);
 
