@@ -48,19 +48,18 @@ export default class Issue extends GraphQLNode {
         return this._core.url || null;
     }
     milestone () {
-        return this._core.milestone || null;
+        return this.relation(this._core.milestone);
     }
+    // User の配列。
     assignees () {
-        if (!this._core.assignees)
-            return [];
-
-        return this._core.assignees.nodes;
+        return this.relations(this._core.assignees);
     }
     labels () {
-        if (!this._core.labels)
-            return [];
-
-        return this._core.labels.nodes;
+        return this.relations(this._core.labels);
+    }
+    // IssueComment の配列。(件数の上限で切れたときは、取れた分だけ)
+    comments () {
+        return this.relations(this._core.comments);
     }
     /* ****************************************************************
      *  Owner
@@ -75,8 +74,9 @@ export default class Issue extends GraphQLNode {
     /* ****************************************************************
      *  Auther
      * **************************************************************** */
+    // 人 (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか)。
     author () {
-        return this._core.author || null;
+        return this.relation(this._core.author);
     }
     /* **************************************************************** *
      * Timestamps
@@ -87,16 +87,15 @@ export default class Issue extends GraphQLNode {
     /* **************************************************************** *
      *  Project
      * **************************************************************** */
+    // 最初の ProjectV2Item の ProjectV2。(projectV2() と同じ)
     project () {
-        const field_Item = this.fieldItem ();
-
-        return field_Item ? field_Item.project : null;
+        return this.projectV2();
     }
     /* **************************************************************** *
      *  Repository
      * **************************************************************** */
     repository () {
-        return this.core().repository;
+        return this.relation(this._core.repository);
     }
     /* **************************************************************** *
      *  Points
@@ -192,16 +191,19 @@ export default class Issue extends GraphQLNode {
     /* **************************************************************** *
      *  Field Values
      * **************************************************************** */
+    // 最初の ProjectV2Item の JSON。(モデルは projectV2Item() で引く)
+    // projectItems を取得していないときは、null。
     fieldItem () {
-        const x = this.core().projectItems.edges;
+        const project_items = this.core().projectItems;
 
-        if (!x[0])
+        if (!project_items || !project_items.edges || !project_items.edges[0])
             return null;
 
-        return x[0].node;
+        return project_items.edges[0].node;
     }
+    // fieldValues を直接読むので、返す値は JSON のまま。(yanqirenshi/SOGH.next#29)
     fieldValueContents (name) {
-        const item = this.projectV2Item();
+        const item = this.fieldItem();
 
         if (!item)
             return null;
@@ -339,10 +341,11 @@ export default class Issue extends GraphQLNode {
             + description.slice(pos+3);
     }
     issueData2requestData (data) {
+        // id の文字列・JSON・モデルの、どれでもよい。
         const id = (d) => {
             if ((typeof d)==='string')
                 return d;
-            return d.id;
+            return (typeof d.id)==='function' ? d.id() : d.id;
         };
 
         const ids = (l) => l.map(d=>id(d));
@@ -360,19 +363,18 @@ export default class Issue extends GraphQLNode {
     /* ****************************************************************
      * ProjectV2
      * **************************************************************** */
+    // ProjectV2Item の配列。
     projectV2Items () {
-        if (!this.core().projectItems)
-            return [];
-
-        return this.core().projectItems.edges.map(e=> e.node);
+        return this.relations(this.core().projectItems);
     }
     projectV2Item () {
         return this.projectV2Items()[0] || null;
     }
+    // ProjectV2 の配列。(ProjectV2Item の project)
     projectsV2 () {
-        const items = this.projectV2Items();
-
-        return items.map(item=> item.project);
+        return this.projectV2Items()
+            .map(item=> item.project())
+            .filter(project=> project!==null);
     }
     projectV2 () {
         return this.projectsV2()[0] || null;
@@ -409,7 +411,7 @@ export default class Issue extends GraphQLNode {
     }
     milestoneId () {
         const m = this.milestone();
-        return m ? m.id : null;
+        return m ? m.id() : null;
     }
     projects () {
         return this.projectCards().map(d=> d.column.project);

@@ -16,15 +16,15 @@ export default function Title (props) {
         return (
             <TableCell>
               <span>
-                <LinkSogh to="issue" data={{id: issue.id}} sogh={sogh}>
-                  {issue.title}
+                <LinkSogh to="issue" data={{id: issue.id()}} sogh={sogh}>
+                  {issue.title()}
                 </LinkSogh>
               </span>
 
               <span style={{marginLeft:8}}>
                 (
-                <Link href={issue.url}>
-                  {issue.number}
+                <Link href={issue.url()}>
+                  {issue.number()}
                 </Link>
                 )
               </span>

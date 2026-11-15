@@ -8,8 +8,6 @@ import Link from '../common/Link.js';
 export default function Title (props) {
     const issue = props.issue;
 
-    const repository = issue.repository();
-
     const color = issue.closedAt() ? '#aaa' : null;
 
     return (

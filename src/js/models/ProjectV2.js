@@ -155,32 +155,29 @@ export default class ProjectV2 extends GraphQLNode {
     public () {
         return this._core.public;
     }
+    // README の $Owner の値 (文字列)。GitHub の owner は ownerNode() で引く。
     owner (v) {
         if (arguments.length===1)
             this._owner = v;
 
         return this._owner;
     }
+    // GitHub の owner。User・Organization・Issue・PullRequest のどれか。
+    // (owner() は README の $Owner を返すので、別の名前にしてある)
+    ownerNode () {
+        return this.relation(this._core.owner);
+    }
+    // 人 (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか)。
     creator () {
-        return this._core.creator;
+        return this.relation(this._core.creator);
     }
+    // ProjectV2Item の配列。(件数の上限で切れたときは、取れた分だけ)
     items () {
-        const data = this.core().items;
-
-        if (!data)
-            return [];
-
-        const nodes = data.edges.map(edge=> edge.node);
-
-        return nodes;
+        return this.relations(this.core().items);
     }
+    // items() と同じ。(items() がモデルを返すようになったので、残してある古い名前)
     itemsWith2ProjectV2Item () {
-        const sogh = this.sogh();
-
-        if (!sogh)
-            return [];
-
-        return this.items().map(d=> sogh.node2projectV2Item(d));
+        return this.items();
     }
     /////
     ///// README Attributes

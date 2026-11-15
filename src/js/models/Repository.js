@@ -13,8 +13,9 @@ export default class Repository extends GraphQLNode {
     descriptionHTML () {
         return this._core.descriptionHTML || null;
     }
+    // User か Organization。
     owner () {
-        return this._core.owner || null;
+        return this.relation(this._core.owner);
     }
     pushedAt () {
         return this._core.pushedAt || null;

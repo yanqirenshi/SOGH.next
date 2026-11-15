@@ -24,10 +24,10 @@ export default function ProjectV2Item (props) {
             <S>
               <Link href={item.projectPath()}
                     style={{marginRight: 6}}>
-                {project.title}
+                {project.title()}
               </Link>
 
-              (<Link href={project.url}>{project.number}</Link>)</S>
+              (<Link href={project.url()}>{project.number()}</Link>)</S>
             <S variant="h4" sx={{mt:1}}>
               {item.title()}
             </S>

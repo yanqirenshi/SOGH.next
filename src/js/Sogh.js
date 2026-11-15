@@ -35,7 +35,7 @@ export default class Sogh extends Pooler {
 
         if ('project-v2'===to)
             return base
-            .replace(':login',  data.creator().login)
+            .replace(':login',  data.creator().login())
             .replace(':number', data.number());
 
         if ('project-v2-data'===to) {

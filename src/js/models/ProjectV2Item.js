@@ -2,12 +2,15 @@ import GraphQLNode from './GraphQLNode.js';
 
 export default class ProjectV2Item extends GraphQLNode {
     // constructor (data) { super(data); }
+    // 人 (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか)。
     creator () {
-        return this._core.creator || null;
+        return this.relation(this._core.creator);
     }
     path () {
         return this.sogh().href('project-v2-items', this);
     }
+    // fieldValues そのものはモデルにしないので、箱は JSON のまま返す。(yanqirenshi/SOGH.next#29)
+    // 箱の中の関連のモデルは、assignees()・labels() などで引く。
     fieldValues () {
         return this._core.fieldValues.nodes || [];
     }
@@ -21,8 +24,9 @@ export default class ProjectV2Item extends GraphQLNode {
 
         return field_value;
     }
+    // ProjectV2。
     project () {
-        return this._core.project;
+        return this.relation(this._core.project);
     }
     projectNumber () {
         return this._core.project.number;
@@ -31,10 +35,10 @@ export default class ProjectV2Item extends GraphQLNode {
         return this._core.project.owner.login;
     }
     projectPath () {
-        const project = this.project();
         const sogh = this.sogh();
 
-        return sogh.href('project-v2-data', project);
+        // href は、project の JSON (owner.login と number) を読む。
+        return sogh.href('project-v2-data', this._core.project);
     }
     type () {
         return this._core.type || null;
@@ -59,40 +63,46 @@ export default class ProjectV2Item extends GraphQLNode {
 
         return field_value ? field_value.name : null;
     }
+    // User の配列。
     assignees () {
         const field_value = this.getFieldValueByName('Assignees');
 
-        return field_value ? field_value.users.nodes : [];
+        return field_value ? this.relations(field_value.users) : [];
     }
     labels () {
         const field_value = this.getFieldValueByName('Labels');
 
-        return field_value ? field_value.labels.nodes : [];
+        return field_value ? this.relations(field_value.labels) : [];
     }
+    // PullRequest の配列。
     linkedPullRequests () {
         const field_value = this.getFieldValueByName('Linked pull requests');
 
-        return field_value ? field_value.pullRequests.nodes : [];
+        return field_value ? this.relations(field_value.pullRequests) : [];
     }
+    // User・Team・Mannequin・Bot の配列。
     reviewers () {
         const field_value = this.getFieldValueByName('Reviewers');
 
-        return field_value ? field_value.reviewers.nodes : [];
+        return field_value ? this.relations(field_value.reviewers) : [];
     }
     repository () {
         const field_value = this.getFieldValueByName('Repository');
 
-        return field_value ? field_value.repository : null;
+        return field_value ? this.relation(field_value.repository) : null;
     }
     milestone () {
         const field_value = this.getFieldValueByName('Milestone');
-        return field_value ? field_value.milestone : null;
+        return field_value ? this.relation(field_value.milestone) : null;
     }
+    // Issue・PullRequest・DraftIssue のどれか。
     content () {
-        return this.core().content;
+        return this.relation(this.core().content);
     }
     contentTypename () {
-        return this.content().__typename;
+        const content = this.core().content;
+
+        return content ? content.__typename : null;
     }
     /* ****************************************************************
      *  Plan

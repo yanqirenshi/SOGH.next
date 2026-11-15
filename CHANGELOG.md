@@ -1,5 +1,76 @@
 # 更新履歴
 
+## 0.4.0
+
+GraphQL で取得した node に入れ子で付いてくる関連 (Issue の assignees など) を、すべてモデルにしました。
+関連を返すメソッドは、JSON ではなくモデルを返します。
+(仕様: yanqirenshi/SOGH.next#25〜#30)
+
+### 利用側への影響 (破壊的な変更です)
+
+- 関連を返すメソッドが、JSON ではなく、モデル (またはモデルの配列) を返します。値は、プロパティではなくメソッドで読んでください。
+  - 例: `issue.assignees().find(a => a.login === login)` は `issue.assignees().find(a => a.login() === login)` に、`item.content().id` は `item.content().id()` に書き換えます。
+  - 関連が無いときは、`null` か空の配列を返します。
+
+  | クラス | メソッド | 返すモデル |
+  | --- | --- | --- |
+  | Repository | `owner()` | User・Organization |
+  | Issue | `assignees()` | User の配列 |
+  | Issue | `author()` | 人 (User・Organization・Bot・Mannequin・EnterpriseUserAccount) |
+  | Issue | `labels()` | Label の配列 |
+  | Issue | `milestone()` | Milestone |
+  | Issue | `repository()` | Repository |
+  | Issue | `projectV2Items()`・`projectV2Item()` | ProjectV2Item |
+  | Issue | `projectsV2()`・`projectV2()`・`project()` | ProjectV2 |
+  | IssueComment | `author()` | 人 |
+  | ProjectV2 | `creator()` | 人 |
+  | ProjectV2 | `items()`・`itemsWith2ProjectV2Item()` | ProjectV2Item の配列 |
+  | ProjectV2Item | `project()` | ProjectV2 |
+  | ProjectV2Item | `content()` | Issue・PullRequest・DraftIssue |
+  | ProjectV2Item | `creator()` | 人 |
+  | ProjectV2Item | `assignees()` | User の配列 |
+  | ProjectV2Item | `labels()` | Label の配列 |
+  | ProjectV2Item | `milestone()` | Milestone |
+  | ProjectV2Item | `repository()` | Repository |
+  | ProjectV2Item | `linkedPullRequests()` | PullRequest の配列 |
+  | ProjectV2Item | `reviewers()` | User・Team・Mannequin・Bot の配列 |
+  | PullRequest | `assignees()` | User の配列 (core に無いときは空の配列。これまでは TypeError) |
+
+- 次のメソッドは、これまでどおり JSON を返します。
+  - Issue の `fieldItem()`・`fieldValueContents()`・`fieldValues()`・`getFieldValueByName()`
+  - ProjectV2Item の `fieldValues()`・`getFieldValueByName()` (箱に付いている creator も JSON)
+  - PullRequest の `repository()`・`author()`
+- `Assignee` と `Viewer` のクラスを消しました。(`import { Assignee, Viewer } from 'sogh'` は、使えません)
+  - assignees は User を返します。
+  - viewer は User にして、`user` の Pool に入れます。(`asyncFetchViewer()` も、`connect()` と同じく User を返します)
+- Repository の owner が Organization のときは、User ではなく Organization のモデルになります。
+- ProjectV2 の `owner()` は、これまでどおり README の `$Owner` の値 (文字列) を返します。GitHub の owner は、新しい `ownerNode()` で読みます。
+- 同じ id の node が来たとき、モデルの core を丸ごと差し替えずに、来た項目だけを重ねます。(重ねるかどうかは updatedAt で決めます。GraphQLNode の `merge(node)`)
+- コメントの作成・更新・削除のクエリは、値を GraphQL の variables で渡します。クエリ (`create_issue_comment` など) から、置き換え用の文字列 `@id`・`@body` が無くなりました。
+
+### 足したもの
+
+- モデル: Organization・Bot・Mannequin・EnterpriseUserAccount・DraftIssue・Team
+- Pool: organization・bot・mannequin・enterprise-user-account・draft-issue・team・label・milestone (合わせて 15)
+- Pooler: `node2organization()` などの、新しい Pool に入れるメソッドと、取り出すメソッド (`organization(id)` など)。`__typename` でモデルを選ぶ `node2model(node)`
+- Issue の `comments()`、IssueComment の `editor()`・`pullRequest()`、ProjectV2 の `ownerNode()`
+- GraphQLNode の `relation(node)`・`relations(connection)` (関連の JSON から、Pool のモデルを引く)、`merge(node)`・`reload()`
+- ProjectV2Item の `isArchived()` (GitHub 標準のアーカイブ状態)
+- クエリは、データモデルになる型をどこで取るときも、`__typename`・`id`・`updatedAt` を取ります。
+- スクリプト: `npm test`・`npm run check:queries` (クエリを GitHub のスキーマで検査)・`npm run check:live` (GitHub に実際につないで確かめる。読むだけ)
+
+### 直したもの
+
+- `issue_by_id` が、廃止された Projects (classic) の projectCards を取っていたため、GitHub がエラーを返し、`asyncFetchIssueByID` などが Issue を取れなかった。
+- 改行や `"` を含む本文で、コメントのクエリが壊れていた。
+- `deleteIssueComment` が、GraphQL のエラーでも成功扱いになっていた。
+- 再取得や `body()` の変更のあと、Issue の注釈 ($Point・$Owner など) と ProjectV2 の README の属性が、古いまま残っていた。
+- body を取っていない node から Issue を作ると、落ちていた。
+- ProjectV2Item の `milestone()`・`linkedPullRequests()`・`reviewers()` が、日付の値を返していた。
+- `Sogh` の `callback()` が、引数を渡していなかった。`fetchProjectV2ItemsByProjectNext` のクエリ名が誤っていた。`projectsv2_items_by_projects_v2` のクエリが、GraphQL として不正だった。
+- `Loader.fetch` が、トークンをクエリとして送っていた。エラーのときに、実際のエラーではなく関数を返していた。
+- `Pooler.get()` が、知らない id で、中身の無い ProjectV2 を足していた。
+
 ## 0.3.0
 
 MUI と Emotion を peerDependencies に移し、React 19 に対応しました。

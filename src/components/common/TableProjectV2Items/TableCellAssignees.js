@@ -10,9 +10,9 @@ export default function TableCellAssignees (props) {
         <TableCell>
           {item.assignees().map(ass=> {
               return (
-                  <Avatar key={ass.id}
-                          alt={ass.name || ass.login}
-                          src={ass.avatarUrl}
+                  <Avatar key={ass.id()}
+                          alt={ass.name() || ass.login()}
+                          src={ass.avatarUrl()}
                           sx={{ width: 24, height: 24, display: 'inline-block', ml:0.5, mr:0.5 }}/>
               );
           })}
