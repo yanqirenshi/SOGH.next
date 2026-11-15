@@ -11,12 +11,16 @@ import { C, TABLE_IDS, SX_AFTER_TABLE, SX_PLANE } from './utils.js';
 const CLASSES = [
     'GraphQLNode (id / createdAt / updatedAt / core / sogh)',
     '  ├─ Repository',
-    '  ├─ User',
-    '  ├─ Viewer           … User とほぼ同じ項目',
-    '  ├─ Assignee         … User とほぼ同じ項目',
+    '  ├─ User             … viewer と assignees も、User',
+    '  ├─ Organization     … 人 (0.4.0 で足した)',
+    '  ├─ Bot              … 人 (0.4.0 で足した)',
+    '  ├─ Mannequin        … 人 (0.4.0 で足した)',
+    '  ├─ EnterpriseUserAccount  … 人 (0.4.0 で足した)',
+    '  ├─ Team             … ProjectV2Item の reviewers に入る (0.4.0 で足した)',
     '  ├─ Issue            … 本文の注釈 ($Point・$Owner など) を読み取る',
     '  ├─ IssueComment',
     '  ├─ PullRequest',
+    '  ├─ DraftIssue       … ProjectV2Item の content に入る (0.4.0 で足した)',
     '  ├─ Label',
     '  ├─ Milestone',
     '  ├─ ProjectV2        … README の注釈 ($Priority・$Plan など) を読み取る',
@@ -40,6 +44,14 @@ const POOLS = [
     { code: 'issue',           model: 'Issue',         node2: 'node2issue(node)',         getter: 'issue(id)' },
     { code: 'issue-comment',   model: 'IssueComment',  node2: 'node2issueComment(node)',  getter: 'issueComment(id)' },
     { code: 'pull-request',    model: 'PullRequest',   node2: 'node2pullRequest(node)',   getter: 'pullRequest(id)' },
+    { code: 'organization',    model: 'Organization',  node2: 'node2organization(node)',  getter: 'organization(id)' },
+    { code: 'bot',             model: 'Bot',           node2: 'node2bot(node)',           getter: 'bot(id)' },
+    { code: 'mannequin',       model: 'Mannequin',     node2: 'node2mannequin(node)',     getter: 'mannequin(id)' },
+    { code: 'enterprise-user-account', model: 'EnterpriseUserAccount', node2: 'node2enterpriseUserAccount(node)', getter: 'enterpriseUserAccount(id)' },
+    { code: 'draft-issue',     model: 'DraftIssue',    node2: 'node2draftIssue(node)',    getter: 'draftIssue(id)' },
+    { code: 'team',            model: 'Team',          node2: 'node2team(node)',          getter: 'team(id)' },
+    { code: 'label',           model: 'Label',         node2: 'node2label(node)',         getter: 'label(id)' },
+    { code: 'milestone',       model: 'Milestone',     node2: 'node2milestone(node)',     getter: 'milestone(id)' },
 ];
 
 // 注釈。(本文・README・フィールドに書く決まりごと)
@@ -175,13 +187,16 @@ export default function DataModel () {
               <OL>
                 <LI>すべてのモデルは、<C>GraphQLNode</C> を継承する。</LI>
                 <LI><C>core()</C> に、GitHub から取った node (JSON) をそのまま持つ。</LI>
-                <LI>モデルのメソッドは、core を読むだけの薄い窓。値が無いときは、多くのメソッドが null を返す。</LI>
+                <LI>値を返すメソッドは、core を読むだけの薄い窓。値が無いときは、多くのメソッドが null を返す。</LI>
+                <LI>関連を返すメソッドは、Pool からモデルを引いて返す。(「4.3 モデルどうしのつながり」を見る)</LI>
+                <LI>人は、型ごとのモデル。(User・Organization・Bot・Mannequin・EnterpriseUserAccount)</LI>
+                <LI><C>Viewer</C> と <C>Assignee</C> のクラスは、0.4.0 で消した。(どちらも、User を使う)</LI>
                 <LI>クラスごとの属性と振舞は、「クラス」のページを見る。</LI>
               </OL>
             </Section>
 
             <Section title="Pool (取得したモデルの置き場)" num="4.2" lev="5">
-              <P>Pool は、種類ごとに 1 つあります。キーは、GitHub の node id です。</P>
+              <P>Pool は、種類ごとに 1 つあります。キーは、GitHub の node id です。いまは、15 あります。(下の 8 つは、0.4.0 で足しました)</P>
               <Table columns={POOL_COLUMNS} rows={POOLS} ids={TABLE_IDS}/>
               <OL sx={SX_AFTER_TABLE}>
                 <LI>同じ id の node を入れ直すと、いまあるモデルの core に、node を重ねる。(モデルは同じものが残る)
@@ -194,18 +209,35 @@ export default function DataModel () {
                 <LI><C>Issue</C> と <C>ProjectV2</C> は、core が変わると、注釈を読み取り直す。</LI>
                 <LI><C>sogh.get(id)</C> は、すべての Pool を順に探す。(node id は、種類をまたいで重ならない)</LI>
                 <LI>Pool から消す操作は無い。ページを開いている間は、貯まり続ける。</LI>
-                <LI>Label・Milestone・Assignee・Project・Card・Column は、Pool を持たない。Issue や ProjectV2Item の core の中に、JSON のまま残る。</LI>
+                <LI>型が複数ある関連の node は、<C>node2model(node)</C> が、<C>__typename</C> に合う Pool に入れる。</LI>
+                <LI>viewer は、<C>user</C> の Pool に入る。(<C>connect</C> でも、<C>asyncFetchViewer</C> でも、同じ)</LI>
+                <LI>Project・Card・Column (Projects classic) は、Pool を持たない。</LI>
               </OL>
             </Section>
 
             <Section title="モデルどうしのつながり" num="4.3" lev="5">
+              <P>入れ子で取った関連 (Issue の assignees など) は、モデルになります。</P>
               <OL>
-                <LI>Repository の owner は、<C>Matchmaker</C> が User にして Pool に入れる。(Repository の core の owner は、JSON のまま残る)</LI>
-                <LI>Issue の repository・author・milestone・assignees・labels は、core の中の JSON をそのまま返す。モデルにはしない。</LI>
-                <LI>ProjectV2Item の content (Issue・PullRequest・DraftIssue) も、JSON のまま返す。</LI>
+                <LI><C>Matchmaker</C> が、入れ子の node を、親より先に、モデルにして Pool に入れる。
+                  <UL>
+                    <LI>入れ子の node の中の関連も、同じようにたどる。</LI>
+                  </UL>
+                </LI>
+                <LI>親の core には、入れ子の JSON が、そのまま残る。</LI>
+                <LI>関連を返すメソッド (<C>issue.assignees()</C> など) は、JSON の id で、Pool からモデルを引いて返す。
+                  <UL>
+                    <LI>値は、メソッドで読む。(<C>assignee.login()</C>)</LI>
+                    <LI>関連が無いとき、クエリで取っていないときは、null か、空の配列を返す。</LI>
+                  </UL>
+                </LI>
+                <LI>JSON のまま返すメソッドも、残っている。
+                  <UL>
+                    <LI>fieldValues を直に読むもの。(ProjectV2Item の <C>fieldValues()</C>・<C>getFieldValueByName(name)</C>、Issue の <C>fieldItem()</C>・<C>fieldValues()</C>・<C>fieldValueContents(name)</C> など)</LI>
+                    <LI>PullRequest の <C>repository()</C> と <C>author()</C>。</LI>
+                  </UL>
+                </LI>
               </OL>
-              <P>id でたどってモデルを得られるつながりは、Repository から User だけです。</P>
-              <P>すべての関連をモデルにする仕様は、「7. 関連をモデルにする」に書いています。</P>
+              <P>モデルにした関連の一覧と、決めたことは、「7. 関連をモデルにする」に書いています。</P>
             </Section>
 
             <Section title="注釈" num="4.4" lev="5">

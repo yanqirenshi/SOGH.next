@@ -14,12 +14,19 @@ export default function Notes () {
 
           <Section title="動きが食い違っているもの" num="6.1" lev="5">
             <OL>
-              <LI>Issue の <C>dueDate()</C>・<C>nextActionDate()</C>・<C>fieldItem()</C>・<C>fieldValues()</C>・<C>project()</C> は、取り方によって TypeError になる。
+              <LI>Issue の <C>dueDate()</C>・<C>nextActionDate()</C>・<C>fieldValues()</C> は、取り方によって TypeError になる。
                 <UL>
                   <LI>これらは、core に projectItems があることを前提にしている。</LI>
                   <LI>projectItems を取るクエリは、<C>issue_by_org_repo_issue_number</C> と <C>search_issues</C> だけ。</LI>
                   <LI><C>issue_by_id</C> と <C>issues_by_viwer</C> は、projectItems を取らない。</LI>
-                  <LI><C>projectV2Items()</C> は、projectItems が無ければ空の配列を返すので、同じクラスの中で扱いがそろっていない。</LI>
+                  <LI><C>fieldItem()</C>・<C>project()</C>・<C>projectV2Items()</C> は、projectItems が無ければ、null か空の配列を返す。同じクラスの中で、扱いがそろっていない。</LI>
+                  <LI><C>fieldItem()</C> と <C>project()</C> は、0.4.0 で、TypeError にならないように直った。</LI>
+                </UL>
+              </LI>
+              <LI>PullRequest の <C>repository()</C> と <C>author()</C> だけが、JSON を返す。
+                <UL>
+                  <LI>ほかの関連を返すメソッドは、モデルを返す。(「7.2 モデルにした関連」を見る)</LI>
+                  <LI>PullRequest の関連は、最初の範囲に入れていないため。</LI>
                 </UL>
               </LI>
               <LI>取り直しても、古い項目が残る場合がある。
@@ -28,10 +35,10 @@ export default function Notes () {
                   <LI>どんな場合かと、解き方は、「7.5 (1) reload の使い道」を見る。</LI>
                 </UL>
               </LI>
-              <LI>viewer の作り方が、2 通りある。
+              <LI>Issue の部品の、再取得のボタンが、id の値ではなく、メソッドそのものを渡している。
                 <UL>
-                  <LI><C>connect</C> は、<C>User</C> を作る。</LI>
-                  <LI><C>asyncFetchViewer</C> は、<C>Viewer</C> を作る。</LI>
+                  <LI><C>src/components/Issue/Operators.js</C> が、<C>issue.id()</C> ではなく、<C>issue.id</C> を渡している。</LI>
+                  <LI>関連をモデルにする前から、ある。</LI>
                 </UL>
               </LI>
               <LI>失敗したときの戻り値が、メソッドごとに違う。
@@ -101,7 +108,8 @@ export default function Notes () {
 
           <Section title="小さな不ぞろい" num="6.3" lev="5">
             <OL>
-              <LI><C>User</C>・<C>Viewer</C>・<C>Assignee</C> が、ほぼ同じ項目を持つ。</LI>
+              <LI>ProjectV2 の <C>owner()</C> は、GitHub の owner ではなく、README の <C>$Owner</C> の値を返す。(GitHub の owner は、<C>ownerNode()</C>)</LI>
+              <LI><C>dev/src/lib/</C> に、sogh の古い写しがある。(<C>Viewer</C> と <C>Assignee</C> が残っている)</LI>
               <LI>環境変数の名前が <C>REACT_APP_GITHU_PARSONAL_TOKEN</C>。(GITHU・PARSONAL のつづり)</LI>
               <LI>クエリの名前に <C>viwer</C> がある。(<C>viwer</C>・<C>issues_by_viwer</C>)</LI>
               <LI>項目の部品の名前の付け方が、3 通りある。(<C>issue_comment</C>・<C>projectv2Fields</C>・<C>ProjectV2ItemFieldDateValue</C>)</LI>

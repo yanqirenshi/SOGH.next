@@ -6,8 +6,8 @@ import { SX_MEMBER_TITLE } from '../../FrameClass/utils.js';
 import { C, TABLE_IDS, SX_AFTER_TABLE, SX_PLANE } from './utils.js';
 
 // 「Github」タブの「7. 関連をモデルにする (Matchmaker の拡張)」。
-// これから作るものの仕様。まだ実装していない。
-// 決めたことと、まだ決めていないことを分けて書く。
+// 仕様と、その結果。sogh 0.4.0 で実装した。
+// 決めたことと、まだ決めていないこと・残っていることを分けて書く。
 //
 // 決めたことの (4)〜(7) は、GitHub の Issue で、1 つずつ決めた。(親は 25 番。子は 26〜30 番)
 
@@ -18,46 +18,44 @@ function IssueLink ({ num }) {
     return <a href={URL_ISSUES + num} target="_blank" rel="noreferrer">Issue {num}</a>;
 }
 
-// いま、クエリが入れ子で取っている関連。(Sogh が使うクエリを読んで洗い出した)
-// 「置き換え先」は、決めたモデル。この表の関連が、最初にモデルにする関連になる。
+// クエリが入れ子で取っている関連と、モデル。(Sogh が使うクエリを読んで洗い出した)
+// この表の 23 の関連を、モデルにした。「読むメソッド」は、親のモデルのメソッド。
 const RELATION_COLUMNS = [
     { code: 'parent',   label: '親',           key: 'parent' },
     { code: 'relation', label: '関連',         val: (r)=> <C>{r.relation}</C> },
     { code: 'type',     label: 'GitHub の型',  key: 'type' },
-    { code: 'model',    label: '置き換え先',   key: 'model' },
-    { code: 'now',      label: 'いまの状態',   key: 'now' },
+    { code: 'model',    label: 'モデル',       key: 'model' },
+    { code: 'method',   label: '読むメソッド', val: (r)=> <C>{r.method}</C> },
 ];
 
-const JSON_ONLY = 'JSON のまま';
-
-// 人が入る関連の型と、置き換え先。(「7.4 (4) 型が複数ある関連」)
+// 人が入る関連の型と、モデル。(「7.4 (4) 型が複数ある関連」)
 const PERSON_TYPES = 'User / Organization / Bot / Mannequin / EnterpriseUserAccount';
 const PERSON_MODEL = '人 (型ごとのモデル)';
 
 const RELATIONS = [
-    { parent: 'Repository',    relation: 'owner',                       type: 'User / Organization',                       model: 'User / Organization',                 now: 'モデルにしている (Organization も、User にしている)' },
-    { parent: 'Issue',         relation: 'assignees',                   type: 'User',                                      model: 'User',                                now: JSON_ONLY },
-    { parent: 'Issue',         relation: 'author',                      type: PERSON_TYPES,                                model: PERSON_MODEL,                          now: JSON_ONLY },
-    { parent: 'Issue',         relation: 'labels',                      type: 'Label',                                     model: 'Label',                               now: `${JSON_ONLY} (Pool が無い)` },
-    { parent: 'Issue',         relation: 'milestone',                   type: 'Milestone',                                 model: 'Milestone',                           now: `${JSON_ONLY} (Pool が無い)` },
-    { parent: 'Issue',         relation: 'repository',                  type: 'Repository',                                model: 'Repository',                          now: JSON_ONLY },
-    { parent: 'Issue',         relation: 'projectItems',                type: 'ProjectV2Item',                             model: 'ProjectV2Item',                       now: `${JSON_ONLY} (2 つのクエリだけが取る)` },
-    { parent: 'Issue',         relation: 'comments',                    type: 'IssueComment',                              model: 'IssueComment',                        now: `${JSON_ONLY} (1 つのクエリだけが取る)` },
-    { parent: 'IssueComment',  relation: 'author',                      type: PERSON_TYPES,                                model: PERSON_MODEL,                          now: JSON_ONLY },
-    { parent: 'IssueComment',  relation: 'editor',                      type: PERSON_TYPES,                                model: PERSON_MODEL,                          now: JSON_ONLY },
-    { parent: 'IssueComment',  relation: 'pullRequest',                 type: 'PullRequest',                               model: 'PullRequest',                         now: `${JSON_ONLY} (参照の組)` },
-    { parent: 'ProjectV2',     relation: 'creator',                     type: PERSON_TYPES,                                model: PERSON_MODEL,                          now: JSON_ONLY },
-    { parent: 'ProjectV2',     relation: 'owner',                       type: 'User / Organization / Issue / PullRequest', model: 'User / Organization / Issue / PullRequest', now: JSON_ONLY },
-    { parent: 'ProjectV2',     relation: 'items',                       type: 'ProjectV2Item',                             model: 'ProjectV2Item',                       now: `${JSON_ONLY} (team のクエリだけが取る)` },
-    { parent: 'ProjectV2Item', relation: 'project',                     type: 'ProjectV2',                                 model: 'ProjectV2',                           now: `${JSON_ONLY} (参照の組と owner)` },
-    { parent: 'ProjectV2Item', relation: 'content',                     type: 'Issue / PullRequest / DraftIssue',          model: 'Issue / PullRequest / DraftIssue',    now: `${JSON_ONLY} (参照の組。本文が無い)` },
-    { parent: 'ProjectV2Item', relation: 'creator',                     type: PERSON_TYPES,                                model: PERSON_MODEL,                          now: JSON_ONLY },
-    { parent: 'ProjectV2Item', relation: 'fieldValues の users',        type: 'User',                                      model: 'User',                                now: JSON_ONLY },
-    { parent: 'ProjectV2Item', relation: 'fieldValues の labels',       type: 'Label',                                     model: 'Label',                               now: JSON_ONLY },
-    { parent: 'ProjectV2Item', relation: 'fieldValues の milestone',    type: 'Milestone',                                 model: 'Milestone',                           now: JSON_ONLY },
-    { parent: 'ProjectV2Item', relation: 'fieldValues の repository',   type: 'Repository',                                model: 'Repository',                          now: `${JSON_ONLY} (参照の組)` },
-    { parent: 'ProjectV2Item', relation: 'fieldValues の pullRequests', type: 'PullRequest',                               model: 'PullRequest',                         now: `${JSON_ONLY} (参照の組)` },
-    { parent: 'ProjectV2Item', relation: 'fieldValues の reviewers',    type: 'User / Mannequin / Bot / Team',             model: 'User / Mannequin / Bot / Team',       now: `${JSON_ONLY} (参照の組)` },
+    { parent: 'Repository',    relation: 'owner',                       type: 'User / Organization',                       model: 'User / Organization',                 method: 'owner()' },
+    { parent: 'Issue',         relation: 'assignees',                   type: 'User',                                      model: 'User',                                method: 'assignees()' },
+    { parent: 'Issue',         relation: 'author',                      type: PERSON_TYPES,                                model: PERSON_MODEL,                          method: 'author()' },
+    { parent: 'Issue',         relation: 'labels',                      type: 'Label',                                     model: 'Label',                               method: 'labels()' },
+    { parent: 'Issue',         relation: 'milestone',                   type: 'Milestone',                                 model: 'Milestone',                           method: 'milestone()' },
+    { parent: 'Issue',         relation: 'repository',                  type: 'Repository',                                model: 'Repository',                          method: 'repository()' },
+    { parent: 'Issue',         relation: 'projectItems',                type: 'ProjectV2Item',                             model: 'ProjectV2Item',                       method: 'projectV2Items()' },
+    { parent: 'Issue',         relation: 'comments',                    type: 'IssueComment',                              model: 'IssueComment',                        method: 'comments()' },
+    { parent: 'IssueComment',  relation: 'author',                      type: PERSON_TYPES,                                model: PERSON_MODEL,                          method: 'author()' },
+    { parent: 'IssueComment',  relation: 'editor',                      type: PERSON_TYPES,                                model: PERSON_MODEL,                          method: 'editor()' },
+    { parent: 'IssueComment',  relation: 'pullRequest',                 type: 'PullRequest',                               model: 'PullRequest',                         method: 'pullRequest()' },
+    { parent: 'ProjectV2',     relation: 'creator',                     type: PERSON_TYPES,                                model: PERSON_MODEL,                          method: 'creator()' },
+    { parent: 'ProjectV2',     relation: 'owner',                       type: 'User / Organization / Issue / PullRequest', model: 'User / Organization / Issue / PullRequest', method: 'ownerNode()' },
+    { parent: 'ProjectV2',     relation: 'items',                       type: 'ProjectV2Item',                             model: 'ProjectV2Item',                       method: 'items()' },
+    { parent: 'ProjectV2Item', relation: 'project',                     type: 'ProjectV2',                                 model: 'ProjectV2',                           method: 'project()' },
+    { parent: 'ProjectV2Item', relation: 'content',                     type: 'Issue / PullRequest / DraftIssue',          model: 'Issue / PullRequest / DraftIssue',    method: 'content()' },
+    { parent: 'ProjectV2Item', relation: 'creator',                     type: PERSON_TYPES,                                model: PERSON_MODEL,                          method: 'creator()' },
+    { parent: 'ProjectV2Item', relation: 'fieldValues の users',        type: 'User',                                      model: 'User',                                method: 'assignees()' },
+    { parent: 'ProjectV2Item', relation: 'fieldValues の labels',       type: 'Label',                                     model: 'Label',                               method: 'labels()' },
+    { parent: 'ProjectV2Item', relation: 'fieldValues の milestone',    type: 'Milestone',                                 model: 'Milestone',                           method: 'milestone()' },
+    { parent: 'ProjectV2Item', relation: 'fieldValues の repository',   type: 'Repository',                                model: 'Repository',                          method: 'repository()' },
+    { parent: 'ProjectV2Item', relation: 'fieldValues の pullRequests', type: 'PullRequest',                               model: 'PullRequest',                         method: 'linkedPullRequests()' },
+    { parent: 'ProjectV2Item', relation: 'fieldValues の reviewers',    type: 'User / Mannequin / Bot / Team',             model: 'User / Mannequin / Bot / Team',       method: 'reviewers()' },
 ];
 
 // 人の型と、モデル・Pool。(Issue 27)
@@ -67,8 +65,8 @@ const PERSON_COLUMNS = [
     { code: 'pool',  label: 'Pool',                     key: 'pool' },
 ];
 
-const POOL_NEW = '新しく足す';
-const POOL_HAS = 'すでにある';
+const POOL_NEW = '0.4.0 で足した';
+const POOL_HAS = 'もとからある';
 
 const PERSONS = [
     { type: 'User',                  model: 'User',                  pool: POOL_HAS },
@@ -162,35 +160,58 @@ const PROGRESS_COLUMNS = [
 
 const PROGRESS = [
     { work: '1. クエリを整える',
-      state: '済み',
+      state: '済み (PR 22)',
       note: '項目の部品を型ごとに整理し、モデルにする型は id・updatedAt・__typename を必ず取るようにした。クエリの検査のスクリプトを足した' },
     { work: '2. node の重ね方を変える',
-      state: '済み',
+      state: '済み (PR 24)',
       note: 'Pool が、core を丸ごと差し替えずに、updatedAt を比べて重ねるようにした。GraphQLNode に merge(node) と reload 属性を足した。テスト (npm test) を足した' },
     { work: '3. Matchmaker を広げる',
-      state: 'まだ',
-      note: '入れ子で取った関連を、モデルにして Pool に入れる。始める前に決めることは、すべて決めた (「7.4 決めたこと」の (4)〜(7))' },
+      state: '済み (PR 32)',
+      note: '入れ子で取った 23 の関連を、モデルにして Pool に入れるようにした。関連を返すメソッドは、モデルを返す。モデルを 6 つ、Pool を 8 つ足した。sogh を 0.4.0 にした' },
+];
+
+// 関連をモデルにしたあとに、確かめた結果。(2026-11-15)
+const VERIFY_COLUMNS = [
+    { code: 'how',    label: '確かめ方', val: (r)=> <C>{r.how}</C> },
+    { code: 'result', label: '結果',     key: 'result' },
+];
+
+const VERIFIES = [
+    { how: 'npm test',
+      result: '48 件が、すべて通る。(GitHub には、つながない。にせの node で、23 の関連を確かめる)' },
+    { how: 'npm run check:live',
+      result: 'クエリは OK 12 個。重ね方と関連は OK 9 個。viewer の Issue 444 件などの関連 2,497 個で、core の JSON にある数だけ、モデルが返った' },
 ];
 
 export default function MatchmakerSpec () {
     return (
         <Section title="関連をモデルにする (Matchmaker の拡張)" num="7." lev="4" sx={SX_MEMBER_TITLE}>
-          <Panel kind="warning">この章は、これから作るものの仕様です。クエリの整理と、node の重ね方までは済んでいます。Matchmaker の拡張は、決めることはすべて決めましたが、まだ実装していません。(「7.6 進み具合」を見る)</Panel>
+          <Panel kind="note">この章の内容は、sogh 0.4.0 で実装しました。関連を返すメソッドは、JSON ではなく、モデルを返します。(「7.6 進み具合」を見る)</Panel>
 
           <Section title="ねらい" num="7.1" lev="5">
             <OL>
               <LI>GraphQL で取得した node に入れ子で付いてくる関連 (Issue の assignees など) を、すべてモデルにする。</LI>
               <LI>モデルにする仕事は、<C>Matchmaker</C> が受け持つ。</LI>
-              <LI>いまの <C>Matchmaker</C> がモデルにしているのは、Repository の owner だけ。</LI>
+              <LI>0.3.0 までの <C>Matchmaker</C> がモデルにしていたのは、Repository の owner だけ。0.4.0 で、下の表の関連に広げた。</LI>
             </OL>
           </Section>
 
-          <Section title="いま取っている関連" num="7.2" lev="5">
+          <Section title="モデルにした関連" num="7.2" lev="5">
             <Table columns={RELATION_COLUMNS} rows={RELATIONS} ids={TABLE_IDS}/>
             <OL sx={SX_AFTER_TABLE}>
-              <LI>「いまの状態」は、取得したあとのモデルの中での持ち方。</LI>
-              <LI>「置き換え先」は、決めたモデル。この表の 23 の関連が、最初にモデルにする関連になる。(「7.4 (6) 対象の範囲」を見る)</LI>
+              <LI>クエリが入れ子で取っている、23 の関連。(「7.4 (6) 対象の範囲」を見る)</LI>
               <LI>「人」は、型ごとのモデル。(「7.4 (4) 型が複数ある関連」を見る)</LI>
+              <LI>「読むメソッド」は、親のモデルのメソッド。モデル (またはモデルの配列) を返す。(「7.4 (5) 読み方」を見る)</LI>
+              <LI>ProjectV2 の owner は、<C>ownerNode()</C> で読む。
+                <UL>
+                  <LI><C>owner()</C> は、README の <C>$Owner</C> の値 (文字列) を返すメソッドとして、もとからあるため。</LI>
+                </UL>
+              </LI>
+              <LI>クエリによって、取っていない関連がある。(「5.4 入れ子で取るもの」を見る)
+                <UL>
+                  <LI>取っていない関連を読むと、null か、空の配列が返る。</LI>
+                </UL>
+              </LI>
               <LI>クエリでは、どの関連も、<C>id</C> と <C>updatedAt</C> を取っている。(「5. 取得する項目」を見る)</LI>
             </OL>
           </Section>
@@ -300,14 +321,14 @@ export default function MatchmakerSpec () {
               <P>人 (作成者・編集者・持ち主に入る型) は、型ごとにモデルを作ります。(<IssueLink num="27"/>)</P>
               <Table columns={PERSON_COLUMNS} rows={PERSONS} ids={TABLE_IDS}/>
               <OL sx={SX_AFTER_TABLE}>
-                <LI>どのモデルにするかは、<C>__typename</C> で決める。</LI>
-                <LI>いまの <C>Matchmaker</C> は、Repository の owner が Organization のときも、User のモデルにしている。これを、Organization のモデルにする。</LI>
+                <LI>どのモデルにするかは、<C>__typename</C> で決める。(Pooler の <C>node2model(node)</C>)</LI>
+                <LI>0.3.0 までは、Repository の owner が Organization のときも、User のモデルにしていた。0.4.0 からは、Organization のモデルになる。</LI>
               </OL>
 
               <P>人以外で、型が複数ある関連は、入る型のすべてを、モデルにします。(<IssueLink num="28"/>)</P>
               <Table columns={MULTI_COLUMNS} rows={MULTIS} ids={TABLE_IDS}/>
               <OL sx={SX_AFTER_TABLE}>
-                <LI>DraftIssue と Team は、モデルと Pool を、新しく足す。</LI>
+                <LI>DraftIssue と Team は、モデルと Pool を、新しく足した。</LI>
                 <LI>ProjectV2 の owner が Issue・PullRequest のときに取っている項目は、<C>id</C>・<C>number</C>・<C>updatedAt</C> だけ。
                   <UL>
                     <LI>Pool は、手元に無い項目だけを足すので、すでにあるモデルの値は消えない。(「(1) node の重ね方」)</LI>
@@ -321,11 +342,24 @@ export default function MatchmakerSpec () {
               <OL>
                 <LI>関連を返すメソッド (<C>issue.assignees()</C> など) の戻り値を、JSON から、モデル (またはモデルの配列) に変える。(<IssueLink num="26"/>)</LI>
                 <LI>関連を読むメソッドは、1 つにそろえる。(JSON を返すメソッドを、別の名前で残すことはしない)</LI>
-                <LI>利用側の読み方が変わる。(<C>assignee.login</C> から <C>assignee.login()</C> へ)
+                <LI>モデルの引き方。
                   <UL>
-                    <LI>破壊的な変更になるので、sogh のバージョンを上げる。</LI>
-                    <LI>sogh の部品 (<C>src/components/</C>) の 14 ファイルを、同時に直す。</LI>
-                    <LI>iHub のコア (ihub.core) の 3 か所を、新しい sogh に合わせて直す。</LI>
+                    <LI><C>Matchmaker</C> が、入れ子の node を、親より先に、モデルにして Pool に入れる。</LI>
+                    <LI>親の core には、入れ子の JSON を、そのまま残す。</LI>
+                    <LI>関連を返すメソッドは、JSON の id で、Pool からモデルを引く。(<C>GraphQLNode</C> の <C>relation(node)</C> と <C>relations(connection)</C>)</LI>
+                    <LI>関連が無いとき、id が無いとき、Pool に無いときは、null か、空の配列を返す。</LI>
+                  </UL>
+                </LI>
+                <LI>利用側の読み方が変わった。(<C>assignee.login</C> から <C>assignee.login()</C> へ)
+                  <UL>
+                    <LI>破壊的な変更なので、sogh のバージョンを、0.4.0 に上げた。</LI>
+                    <LI>sogh の部品 (<C>src/components/</C>) は、モデルの読み方に直した。(12 ファイル)</LI>
+                    <LI>iHub のコア (ihub.core) の 3 か所は、まだ直していない。(「7.5 (3) 直していないもの」を見る)</LI>
+                  </UL>
+                </LI>
+                <LI><C>PullRequest</C> の <C>assignees()</C> も、User のモデルの配列を返す。
+                  <UL>
+                    <LI>core に <C>assignees</C> が無いときは、空の配列を返す。(これまでは、TypeError になっていた)</LI>
                   </UL>
                 </LI>
               </OL>
@@ -333,19 +367,19 @@ export default function MatchmakerSpec () {
 
             <Section title="対象の範囲" num="(6)" lev="6">
               <OL>
-                <LI>最初にモデルにする関連は、「7.2 いま取っている関連」の表の、23 の関連。(<IssueLink num="29"/>)</LI>
-                <LI>Pool を、8 つ足す。(いまの 7 つと合わせて、15 になる)
+                <LI>最初にモデルにする関連は、「7.2 モデルにした関連」の表の、23 の関連。(<IssueLink num="29"/>)</LI>
+                <LI>Pool を、8 つ足した。(もとからの 7 つと合わせて、15 になった。「4.2 Pool」を見る)
                   <UL>
                     <LI>人の型: Organization・Bot・Mannequin・EnterpriseUserAccount。</LI>
                     <LI>型が複数ある関連の型: DraftIssue・Team。</LI>
                     <LI>モデルのクラスはあるが、Pool が無かったもの: Label・Milestone。</LI>
                   </UL>
                 </LI>
-                <LI>assignees は、User のモデルにする。<C>Assignee</C> のクラスは、使わない。</LI>
-                <LI>viewer は、User のモデルにそろえる。<C>Viewer</C> のクラスは、使わない。
+                <LI>assignees は、User のモデルにする。<C>Assignee</C> のクラスは、消した。</LI>
+                <LI>viewer は、User のモデルにそろえる。<C>Viewer</C> のクラスは、消した。
                   <UL>
-                    <LI>いまは、<C>connect()</C> で取ると User (Pool に入る)、<C>asyncFetchViewer()</C> で取ると Viewer (Pool に入らない) になる。</LI>
-                    <LI><C>asyncFetchViewer()</C> も、User のモデルを作って、<C>user</C> の Pool に入れる。</LI>
+                    <LI>0.3.0 までは、<C>connect()</C> で取ると User (Pool に入る)、<C>asyncFetchViewer()</C> で取ると Viewer (Pool に入らない) になっていた。</LI>
+                    <LI>0.4.0 からは、<C>asyncFetchViewer()</C> も、User のモデルを作って、<C>user</C> の Pool に入れる。</LI>
                   </UL>
                 </LI>
                 <LI>Projects (classic) の関連は、対象から外す。
@@ -389,7 +423,7 @@ export default function MatchmakerSpec () {
 
           </Section>
 
-          <Section title="まだ決めていないこと" num="7.5" lev="5">
+          <Section title="まだ決めていないこと・残っていること" num="7.5" lev="5">
 
             <Section title="reload の使い道" num="(1)" lev="6">
               <P>いまの重ね方では、取り直しても、古い項目が残る場合があります。これを、reload を使って解きます。使い方は、まだ決めていません。</P>
@@ -403,25 +437,32 @@ export default function MatchmakerSpec () {
                     <LI>このとき、reload には日時が入っている。(GitHub 側で変更があったことは、分かる)</LI>
                   </UL>
                 </LI>
-                <LI>親の updatedAt が動かない変更は、入れ子の項目に反映されない。
+                <LI>親の updatedAt が動かない変更のうち、関連の増減は、反映されない。
                   <UL>
-                    <LI>入れ子の項目 (assignees・projectItems など) は、親の core の中に、JSON のまま持っている。</LI>
-                    <LI>親の updatedAt が同じなら、取り直しても、入れ子の項目は重ねない。</LI>
-                    <LI>例: プロジェクトのフィールドの値を変えても、Issue の updatedAt が動かなければ、Issue の中の projectItems は古いまま。</LI>
-                    <LI>どの変更で updatedAt が動くかは、確かめていない。(「(2) 実装の前に確かめること」を見る)</LI>
+                    <LI>どの node が関連しているか (id の並び) は、親の core の中に、JSON のまま持っている。</LI>
+                    <LI>親の updatedAt が同じなら、取り直しても、親の core の JSON は重ねない。</LI>
+                    <LI>例: Issue をプロジェクトに足しても、Issue の updatedAt が動かなければ、<C>issue.projectV2Items()</C> は増えない。</LI>
+                    <LI>関連先の値の変更は、反映される。(関連先のモデルは、自分の updatedAt で、Pool の中で重なるため)</LI>
+                    <LI>例: プロジェクトのフィールドの値を変えて、ProjectV2Item の updatedAt が動けば、<C>issue.projectV2Items()</C> が返すモデルは、新しい値になる。</LI>
+                    <LI>どの変更で updatedAt が動くかは、確かめていない。(「(2) まだ確かめていないこと」を見る)</LI>
                   </UL>
                 </LI>
               </OL>
             </Section>
 
-            <Section title="実装の前に確かめること" num="(2)" lev="6">
+            <Section title="まだ確かめていないこと" num="(2)" lev="6">
               <OL>
                 <LI><C>updatedAt</C> が、どの変更で動くか。
                   <UL>
                     <LI>GitHub のリファレンスには「最後に更新された日時」としか書かれていない。</LI>
                     <LI>例: Issue にラベルを付けたとき、プロジェクトに足したときに、Issue の <C>updatedAt</C> が動くか。</LI>
                     <LI>動かない変更があると、その変更は、取り直しても反映されない。</LI>
-                    <LI>node の重ね方を変えたので、いまのコードは、もうこの動きになっている。(これまでは、取り直すと、丸ごと差し替わっていた)</LI>
+                  </UL>
+                </LI>
+                <LI>ProjectV2Item の関連を、GitHub につないで確かめること。
+                  <UL>
+                    <LI>GitHub につないだ確認では、調べた ProjectV2Item が 0 件だった。</LI>
+                    <LI>ProjectV2Item の関連 (content・fieldValues の中の関連など) は、テスト (にせの node) でだけ確かめている。</LI>
                   </UL>
                 </LI>
                 <LI>組織 (org) とチームのクエリを、GitHub に実際に送って、応答が返るか。
@@ -434,20 +475,21 @@ export default function MatchmakerSpec () {
               </OL>
             </Section>
 
-            <Section title="実装のときに決めること" num="(3)" lev="6">
+            <Section title="直していないもの" num="(3)" lev="6">
               <OL>
-                <LI>関連を返すメソッドが、モデルを、どこから読むか。
+                <LI>iHub のコア (ihub.core) の 3 か所が、古い読み方のまま。(別のパッケージなので、ここでは直していない)
                   <UL>
-                    <LI>親の core に、入れ子の JSON を残すか、id だけを持つか。</LI>
+                    <LI><C>Bridge.js</C> と <C>bridgeSlice.js</C> の <C>ass.login</C> は、<C>ass.login()</C> に直す。</LI>
+                    <LI><C>ScrumProjectItem.js</C> の <C>item.content().id</C> は、<C>item.content().id()</C> に直す。</LI>
                   </UL>
                 </LI>
-                <LI><C>Assignee</C> と <C>Viewer</C> のクラスを、消すか。(使わなくなる)</LI>
-                <LI><C>PullRequest</C> の <C>assignees()</C> の直し方。
+                <LI><C>PullRequest</C> の <C>repository()</C> と <C>author()</C> は、JSON のまま返す。
                   <UL>
-                    <LI>core に <C>assignees</C> があることを前提にしていて、取っていないと、TypeError になる。</LI>
-                    <LI>ProjectV2Item の content として来た PullRequest は、<C>assignees</C> を取っていない。</LI>
+                    <LI>PullRequest の関連は、最初の範囲に入れていないため。</LI>
+                    <LI>いまは、どのクエリも、PullRequest の repository と author を取っていない。</LI>
                   </UL>
                 </LI>
+                <LI><C>dev/src/lib/</C> にある sogh の古い写しには、<C>Assignee</C> と <C>Viewer</C> が残っている。</LI>
               </OL>
             </Section>
 
@@ -455,6 +497,8 @@ export default function MatchmakerSpec () {
 
           <Section title="進み具合" num="7.6" lev="5">
             <Table columns={PROGRESS_COLUMNS} rows={PROGRESS} ids={TABLE_IDS}/>
+            <P>関連をモデルにしたあとに、確かめた結果は、次のとおりです。(2026-11-15)</P>
+            <Table columns={VERIFY_COLUMNS} rows={VERIFIES} ids={TABLE_IDS}/>
           </Section>
         </Section>
     );
