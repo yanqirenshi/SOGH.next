@@ -13,9 +13,16 @@ const QUERY_EXAMPLE = [
     '  node(id: "@id") {                             ← 値の印',
     '    ... on Issue {',
     '      comments(after: "", first: 100) {         ← ページ送りの印 (page_nation)',
-    '        nodes {',
-    '          id url body bodyHTML ...              ← 項目の部品 (issue_comment)',
-    '          author { login url avatarUrl ... }    ← 項目の部品 (actor)',
+    '        nodes {                                 ← ここから下の nodes の中は、項目の部品 (issueCommentNode)',
+    '          __typename id url body updatedAt ...  ← IssueComment の項目 (issue_comment)',
+    '          pullRequest {',
+    '            __typename id number updatedAt ...  ← PullRequest の参照の組 (pullRequestRef)',
+    '          }',
+    '          author {                              ← 型が複数ある場所 (actor)',
+    '            __typename login url ...',
+    '            ... on User { id updatedAt ... }    ← 型ごとに、id と updatedAt を取る',
+    '            ... on Bot { id updatedAt ... }',
+    '          }',
     '        }',
     '        pageInfo { endCursor hasNextPage ... }  ← 項目の部品 (page_info)',
     '      }',
@@ -62,6 +69,57 @@ const UNUSED_QUERIES = [
     'update_issue_body',
 ];
 
+// クエリを検査するコマンド。
+const CHECK_COMMAND = [
+    '# 検査する',
+    'npm run check:queries -- --schema <schema.docs.graphql の場所>',
+    '',
+    '# クエリを直す前に、取っている項目を書き出しておく',
+    'npm run check:queries -- --schema <...> --dump before.json',
+    '',
+    '# クエリを直したあとに、前と比べる',
+    'npm run check:queries -- --schema <...> --compare before.json',
+].join('\n');
+
+// いまのクエリを検査した結果。(37 個)
+const CHECK_COLUMNS = [
+    { code: 'kind',    label: '種類',   key: 'kind' },
+    { code: 'count',   label: '個数',   key: 'count' },
+    { code: 'queries', label: 'クエリ', val: (r)=> r.queries.map(q=> <div key={q}><C>{q}</C></div>) },
+    { code: 'note',    label: '内容',   key: 'note' },
+];
+
+const CHECKS = [
+    { kind: 'NG (使用中)',
+      count: 1,
+      queries: ['projects_next_items_by_id'],
+      note: 'ProjectNextItem という型が、GitHub のスキーマから無くなっている。このクエリがあるので、検査は終了コード 1 で終わる' },
+    { kind: 'NG (未使用)',
+      count: 2,
+      queries: ['create_issue', 'update_issue_body'],
+      note: '入力の印 (@issue-data) を、検査のために空のオブジェクトに置き換えているため。クエリの間違いではない' },
+    { kind: '注意',
+      count: 7,
+      queries: [
+          'projectsv2_items_by_projects_v2',
+          'projectsv2_with_items_by_team',
+          'projectv2_by_org_login_projectv2_number',
+          'projectv2item_by_id',
+          'projectv2items_by_org_login_projectv2_number',
+          'projectv2items_by_user_login_projectv2_number',
+          'search_issues',
+      ],
+      note: 'ProjectV2Item の content で、Issue の state と PullRequest の state を取っている。型が違う (IssueState と PullRequestState) ので、GraphQL の決まりでは正しくない' },
+    { kind: 'キー (使用中)',
+      count: 0,
+      queries: [],
+      note: '使用中のクエリは、データモデルになる型のすべてで、id と updatedAt を取っている' },
+    { kind: 'キー (未使用)',
+      count: 2,
+      queries: ['issues_by_milestone', 'issues_by_report_label'],
+      note: '項目を直に書いていて、updatedAt を取っていない所がある' },
+];
+
 // 取得メソッドの一覧。(src/js/Sogh.js)
 const COLUMNS = [
     { code: 'target',  label: '取得するもの', key: 'target' },
@@ -102,7 +160,8 @@ export default function Fetching () {
             <OL>
               <LI>項目の部品。(<C>queries/attributes.js</C>)
                 <UL>
-                  <LI>「この型からは、この項目を取る」という文字列を返す関数。43 個ある。</LI>
+                  <LI>「この型からは、この項目を取る」という文字列を返す関数。57 個ある。</LI>
+                  <LI>型ごとの部品と、その決まりは、「5.3 型ごとの、項目の部品」を見る。</LI>
                 </UL>
               </LI>
               <LI>クエリの本体。(src/js/queries/ の 1 ファイルに 1 クエリ)
@@ -201,6 +260,35 @@ export default function Fetching () {
                 </UL>
               </LI>
             </OL>
+          </Section>
+
+          <Section title="クエリの検査" num="3.7" lev="5">
+            <P>クエリは、GitHub が公開している GraphQL のスキーマで検査できます。GitHub にはつながず、トークンも要りません。</P>
+            <Plane sx={SX_PLANE}>{CHECK_COMMAND}</Plane>
+            <OL>
+              <LI>スキーマのファイル (<C>schema.docs.graphql</C>) は、GitHub のドキュメントのサイトから取る。(リポジトリには入れていない)
+                <UL>
+                  <LI>https://docs.github.com/public/fpt/schema.docs.graphql</LI>
+                </UL>
+              </LI>
+              <LI>検査すること。
+                <UL>
+                  <LI>クエリが、GraphQL として読めるか。</LI>
+                  <LI>スキーマに無い型・項目を使っていないか。(NG)</LI>
+                  <LI>型の違う項目を、同じ名前で、同じ場所に取っていないか。(注意)</LI>
+                  <LI>データモデルになる型の項目を取る場所で、id と updatedAt を取っているか。(キー)</LI>
+                </UL>
+              </LI>
+              <LI><C>--dump</C> で「取っている項目」の一覧を書き出し、<C>--compare</C> で前後を比べられる。
+                <UL>
+                  <LI>クエリを直したときに、項目が減っていないことを確かめるために使う。</LI>
+                </UL>
+              </LI>
+              <LI>スクリプトは、<C>scripts/check-queries.mjs</C>。</LI>
+            </OL>
+
+            <P>いまのクエリを検査した結果は、次のとおりです。</P>
+            <Table columns={CHECK_COLUMNS} rows={CHECKS} ids={TABLE_IDS}/>
           </Section>
 
         </Section>

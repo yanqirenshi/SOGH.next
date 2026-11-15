@@ -64,78 +64,105 @@ const ANNOTATIONS = [
       note: 'フィールドの名前で引く' },
 ];
 
-// クエリが取る属性。(src/js/queries/attributes.js)
-const ATTRIBUTE_COLUMNS = [
-    { code: 'kind',       label: '種類',       key: 'kind' },
-    { code: 'attributes', label: '取る属性',   key: 'attributes' },
-    { code: 'nested',     label: '入れ子で取るもの', key: 'nested' },
+// 型ごとの、項目の部品。(src/js/queries/attributes.js)
+// 項目の多い型は、参照の組 (〜Ref) と、全部の組 (無印) を持つ。
+const PART_COLUMNS = [
+    { code: 'type',   label: '型',     key: 'type' },
+    { code: 'kind',   label: '組',     key: 'kind' },
+    { code: 'part',   label: '部品',   val: (r)=> <C>{r.part}</C> },
+    { code: 'fields', label: '取る項目', key: 'fields' },
 ];
 
-const ATTRIBUTES = [
-    { kind: 'user',
-      attributes: 'id, login, name, avatarUrl, url, email, company, createdAt, updatedAt',
-      nested: '-' },
-    { kind: 'repository',
-      attributes: 'id, name, url, description, descriptionHTML, createdAt, updatedAt, pushedAt',
-      nested: 'owner (id, login, resourcePath)' },
-    { kind: 'issue',
-      attributes: 'id, url, title, number, body, bodyHTML, createdAt, updatedAt, closedAt',
-      nested: 'author, repository, milestone, assignees (10 件まで), labels (10 件まで)' },
-    { kind: 'issue comment',
-      attributes: 'id, url, body, bodyHTML, publishedAt, lastEditedAt, isMinimized, authorAssociation, createdAt, updatedAt ほか',
-      nested: 'author, editor, pullRequest' },
-    { kind: 'projectV2',
-      attributes: 'id, number, url, public, title, readme, shortDescription, viewerCanUpdate, closed, createdAt, updatedAt, closedAt',
-      nested: 'fields (10 件まで), creator, owner' },
-    { kind: 'projectV2 item',
-      attributes: 'id, type, isArchived, createdAt, updatedAt',
-      nested: 'fieldValues (30 件まで), creator, content (Issue・PullRequest・DraftIssue)' },
+const REF = '参照';
+const FULL = '全部';
+const ONE = '1 つ';
+
+const PARTS = [
+    { type: 'User',          kind: REF,  part: 'userRef()',        fields: '__typename, id, login, name, avatarUrl, url, resourcePath, createdAt, updatedAt' },
+    { type: 'User',          kind: FULL, part: 'user()',           fields: '参照の組 + email, company' },
+    { type: 'Repository',    kind: REF,  part: 'repositoryRef()',  fields: '__typename, id, name, url, createdAt, updatedAt' },
+    { type: 'Repository',    kind: FULL, part: 'repositories()',   fields: '参照の組 + description, descriptionHTML, pushedAt, owner' },
+    { type: 'Issue',         kind: REF,  part: 'issueRef()',       fields: '__typename, id, url, number, title, state, createdAt, updatedAt, closedAt' },
+    { type: 'Issue',         kind: FULL, part: 'issue()',          fields: '参照の組 + body, bodyHTML' },
+    { type: 'PullRequest',   kind: REF,  part: 'pullRequestRef()', fields: '__typename, id, number, url, title, state, closed, createdAt, updatedAt, closedAt' },
+    { type: 'PullRequest',   kind: FULL, part: 'pull_request()',   fields: '参照の組 + body, bodyHTML' },
+    { type: 'ProjectV2',     kind: REF,  part: 'projectV2Ref()',   fields: '__typename, id, number, url, title, closed, createdAt, updatedAt' },
+    { type: 'ProjectV2',     kind: FULL, part: 'projectv2()',      fields: '参照の組 + public, readme, resourcePath, shortDescription, viewerCanUpdate, closedAt' },
+    { type: 'IssueComment',  kind: ONE,  part: 'issue_comment()',  fields: '__typename, id, url, body, bodyHTML, resourcePath, publishedAt, lastEditedAt, minimizedReason, isMinimized, includesCreatedEdit, databaseId, createdViaEmail, authorAssociation, createdAt, updatedAt' },
+    { type: 'ProjectV2Item', kind: ONE,  part: 'ProjectV2Item()',  fields: '__typename, id, type, isArchived, createdAt, updatedAt' },
+    { type: 'Label',         kind: ONE,  part: 'label()',          fields: '__typename, id, name, url, color, createdAt, updatedAt' },
+    { type: 'Milestone',     kind: ONE,  part: 'milestone()',      fields: '__typename, id, url, title, state, number, dueOn, createdAt, updatedAt' },
+    { type: 'DraftIssue',    kind: ONE,  part: 'draftIssue()',     fields: '__typename, id, title, createdAt, updatedAt' },
+    { type: 'Organization',  kind: REF,  part: 'organizationRef()', fields: '__typename, id, login, name, avatarUrl, url, resourcePath, email, createdAt, updatedAt' },
+    { type: 'Bot',           kind: REF,  part: 'botRef()',         fields: '__typename, id, login, avatarUrl, url, resourcePath, createdAt, updatedAt' },
+    { type: 'Mannequin',     kind: REF,  part: 'mannequinRef()',   fields: '__typename, id, login, avatarUrl, url, resourcePath, email, createdAt, updatedAt' },
+    { type: 'EnterpriseUserAccount', kind: REF, part: 'enterpriseUserAccountRef()', fields: '__typename, id, login, name, avatarUrl, url, resourcePath, createdAt, updatedAt' },
+    { type: 'Team',          kind: REF,  part: 'teamRef()',        fields: '__typename, id, slug, createdAt, updatedAt' },
 ];
 
-// 型ごとの、項目の組。(同じ型を、何通りの項目の組で取っているか)
-const FIELD_SET_COLUMNS = [
-    { code: 'type',  label: '型',         key: 'type' },
-    { code: 'count', label: '通り',       val: (r)=> r.sets.length },
-    { code: 'sets',  label: '項目の組',   val: (r)=> r.sets.map(s=> <div key={s}>{s}</div>) },
+// 型が複数ある場所の、項目の部品。
+const UNION_COLUMNS = [
+    { code: 'part',  label: '部品',     val: (r)=> <C>{r.part}</C> },
+    { code: 'where', label: '使う場所', key: 'where' },
+    { code: 'how',   label: '取り方',   val: (r)=> r.how.map(s=> <div key={s}>{s}</div>) },
 ];
 
-const FIELD_SETS = [
-    { type: 'User など (人)',
-      sets: [
-          'user()',
-          'owner()',
-          'actor()',
-          'projectv2Creator()',
-          'projectV2FieldValue_Creator()',
-          'リポジトリの owner の直書き (repositories() の中)',
-          'reviewers の直書き (id だけ)',
+const UNIONS = [
+    { part: 'actor()',
+      where: 'Issue の author、IssueComment の author と editor、ProjectV2 と ProjectV2Item の creator、フィールドの値の creator',
+      how: [
+          '共通: __typename, login, url, avatarUrl, resourcePath',
+          'User は userRef()',
+          'Organization は organizationRef()',
+          'Bot は botRef()',
+          'Mannequin は mannequinRef()',
+          'EnterpriseUserAccount は enterpriseUserAccountRef()',
       ] },
-    { type: 'PullRequest',
-      sets: [
-          'pull_request()',
-          'projectV2ItemContentPullRequest()',
-          'コメントの pullRequest の直書き (id・number・title・url)',
-          'フィールドの値の pullRequests の直書き (id・url・title)',
+    { part: 'repositoryOwner()',
+      where: 'Repository の owner',
+      how: [
+          '共通: __typename, id, login, avatarUrl, url, resourcePath',
+          'User は userRef()',
+          'Organization は organizationRef()',
       ] },
-    { type: 'Repository',
-      sets: [
-          'repositories()',
-          'フィールドの値の repository の直書き (name・id・url)',
-          'repository クエリの直書き',
+    { part: 'projectv2Owner()',
+      where: 'ProjectV2 の owner',
+      how: [
+          '共通: __typename, id',
+          'User は userRef()',
+          'Organization は organizationRef()',
+          'Issue・PullRequest は id, number, updatedAt',
       ] },
-    { type: 'Issue',
-      sets: [
-          'issue()',
-          'projectV2ItemContentIssue()',
-          'create_issue クエリの直書き',
+    { part: 'ProjectV2ItemFieldReviewerValue()',
+      where: 'ProjectV2Item の reviewers',
+      how: [
+          'User は userRef()',
+          'Team は teamRef()',
+          'Mannequin は mannequinRef()',
+          'Bot は botRef()',
       ] },
-    { type: 'ProjectV2',
-      sets: [
-          'projectv2()',
-          'Item の project の直書き (id・number・title・url・owner)',
+    { part: 'projectV2ItemContent〜()',
+      where: 'ProjectV2Item の content',
+      how: [
+          'DraftIssue は draftIssue()',
+          'Issue は issueRef() と、repository (repositories())',
+          'PullRequest は pullRequestRef()',
       ] },
-    { type: 'Label',     sets: ['label()'] },
-    { type: 'Milestone', sets: ['milestone()'] },
+];
+
+// 入れ子で取るもの。(主に取る型ごと)
+const NESTED_COLUMNS = [
+    { code: 'type',   label: '主に取る型',       key: 'type' },
+    { code: 'nested', label: '入れ子で取るもの', key: 'nested' },
+    { code: 'some',   label: 'クエリによって取るもの', key: 'some' },
+];
+
+const NESTED = [
+    { type: 'Repository',    nested: 'owner',                                                      some: '-' },
+    { type: 'Issue',         nested: 'author, repository, milestone, assignees (10 件まで), labels (10 件まで)', some: 'projectItems (1 件), comments (100 件まで), projectCards' },
+    { type: 'IssueComment',  nested: 'author, editor, pullRequest',                                some: '-' },
+    { type: 'ProjectV2',     nested: 'fields, creator, owner',                                     some: 'items' },
+    { type: 'ProjectV2Item', nested: 'fieldValues, creator, content',                              some: 'project' },
 ];
 
 export default function DataModel () {
@@ -185,32 +212,69 @@ export default function DataModel () {
 
           <Section title="取得する項目" num="5." lev="4" sx={SX_MEMBER_TITLE}>
 
-            <Section title="取る属性" num="5.1" lev="5">
-              <P>それぞれの種類を、主に取るときの属性です。</P>
-              <Table columns={ATTRIBUTE_COLUMNS} rows={ATTRIBUTES} ids={TABLE_IDS}/>
+            <Section title="項目の部品の決まり" num="5.1" lev="5">
+              <P>クエリに埋め込む項目は、<C>queries/attributes.js</C> の「項目の部品」で決めています。</P>
+              <OL>
+                <LI>データモデルになる型は、どこで取るときも、id と updatedAt を取る。
+                  <UL>
+                    <LI>同じ id の node を重ねるかどうかを、updatedAt で決めるため。(「7. 関連をモデルにする」を見る)</LI>
+                  </UL>
+                </LI>
+                <LI>データモデルになる型は、型の名前 (<C>__typename</C>) も取る。
+                  <UL>
+                    <LI>型が複数ある場所で、どの型かを見分けるため。</LI>
+                  </UL>
+                </LI>
+                <LI>項目の多い型は、項目の組を 2 つ持つ。
+                  <UL>
+                    <LI>参照の組 (名前が〜Ref)。ほかの型の入れ子として取るときに使う。</LI>
+                    <LI>全部の組 (無印)。その型を主に取るときに使う。参照の組を含む。</LI>
+                    <LI>入れ子でも全部の組で取ると、応答が大きくなるため。(例: ProjectV2Item 100 件のそれぞれに、Issue の本文が付く)</LI>
+                  </UL>
+                </LI>
+                <LI>項目の少ない型 (Label・Milestone など) は、組が 1 つ。</LI>
+                <LI>部品が返すのは、その型の項目だけ。</LI>
+              </OL>
             </Section>
 
-            <Section title="件数の上限" num="5.2" lev="5">
+            <Section title="型ごとの、項目の部品" num="5.2" lev="5">
+              <Table columns={PART_COLUMNS} rows={PARTS} ids={TABLE_IDS}/>
+              <OL sx={SX_AFTER_TABLE}>
+                <LI>Label の updatedAt は、null のことがある。</LI>
+                <LI>Organization・Bot・Mannequin・EnterpriseUserAccount・Team は、型が複数ある場所で使う。</LI>
+              </OL>
+            </Section>
+
+            <Section title="型が複数ある場所の、項目の部品" num="5.3" lev="5">
+              <P>作成者や持ち主は、場所によって、入る型が複数あります。その場所では、型ごとに項目を取ります。</P>
+              <Table columns={UNION_COLUMNS} rows={UNIONS} ids={TABLE_IDS}/>
+              <OL sx={SX_AFTER_TABLE}>
+                <LI>型が複数ある場所では、User の email と company を取らない。
+                  <UL>
+                    <LI>email の型が、User (必ず値が入る) と、Organization・Mannequin (null がありうる) で違うため。</LI>
+                    <LI>型の違う項目を、同じ名前で、同じ場所に取ると、クエリとして正しくなくなる。</LI>
+                    <LI>email と company は、型が User と決まっている場所 (assignees など) で、<C>user()</C> で取る。</LI>
+                  </UL>
+                </LI>
+                <LI>Team の name と avatarUrl も、同じ理由で取らない。(User と型が違う)</LI>
+              </OL>
+            </Section>
+
+            <Section title="入れ子で取るもの" num="5.4" lev="5">
+              <Table columns={NESTED_COLUMNS} rows={NESTED} ids={TABLE_IDS}/>
+            </Section>
+
+            <Section title="件数の上限" num="5.5" lev="5">
               <OL>
                 <LI>一覧は、1 回に 100 件。(<C>attributes.page_nation()</C>)</LI>
                 <LI>Issue の assignees と labels は、10 件まで。</LI>
-                <LI>ProjectV2 の fields は、一覧のクエリで 10 件まで、Item のクエリで 30 件まで。</LI>
+                <LI>ProjectV2 の fields は、クエリによって 10 件まで、20 件まで、30 件まで、100 件まで。</LI>
                 <LI>ProjectV2Item の fieldValues は、クエリによって 20 件まで、または 30 件まで。その中のラベルとプルリクエストも同じ。</LI>
                 <LI>入れ子の上限は、ページングしていない。
                   <UL>
                     <LI>上限を超えた分は、取れない。</LI>
                   </UL>
                 </LI>
-              </OL>
-            </Section>
-
-            <Section title="型ごとの、項目の組" num="5.3" lev="5">
-              <P>同じ型でも、取る場所によって、取る項目の組が違います。</P>
-              <Table columns={FIELD_SET_COLUMNS} rows={FIELD_SETS} ids={TABLE_IDS}/>
-              <OL sx={SX_AFTER_TABLE}>
-                <LI>人の 7 通りのうち、<C>actor()</C> は id を取っていない。</LI>
-                <LI>人の 7 通りのうち、updatedAt を取っているのは、<C>user()</C> だけ。</LI>
-                <LI>名前に () が付いているものは、<C>queries/attributes.js</C> の項目の部品。「直書き」は、クエリに直に書いているもの。</LI>
               </OL>
             </Section>
 

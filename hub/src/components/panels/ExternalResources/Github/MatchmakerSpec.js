@@ -23,22 +23,22 @@ const JSON_ONLY = 'JSON のまま';
 const RELATIONS = [
     { parent: 'Repository',    relation: 'owner',           type: 'User / Organization',             model: 'User',          now: 'モデルにしている' },
     { parent: 'Issue',         relation: 'assignees',       type: 'User',                            model: 'User',          now: JSON_ONLY },
-    { parent: 'Issue',         relation: 'author',          type: 'User / Bot / Organization ほか',  model: '都度判断',      now: `${JSON_ONLY} (id を取っていない)` },
+    { parent: 'Issue',         relation: 'author',          type: 'User / Bot / Organization ほか',  model: '都度判断',      now: JSON_ONLY },
     { parent: 'Issue',         relation: 'labels',          type: 'Label',                           model: 'Label',         now: `${JSON_ONLY} (Pool が無い)` },
     { parent: 'Issue',         relation: 'milestone',       type: 'Milestone',                       model: 'Milestone',     now: `${JSON_ONLY} (Pool が無い)` },
     { parent: 'Issue',         relation: 'repository',      type: 'Repository',                      model: 'Repository',    now: JSON_ONLY },
     { parent: 'Issue',         relation: 'projectItems',    type: 'ProjectV2Item',                   model: 'ProjectV2Item', now: `${JSON_ONLY} (2 つのクエリだけが取る)` },
     { parent: 'Issue',         relation: 'comments',        type: 'IssueComment',                    model: 'IssueComment',  now: `${JSON_ONLY} (1 つのクエリだけが取る)` },
     { parent: 'IssueComment',  relation: 'author / editor', type: 'User / Bot ほか',                 model: '都度判断',      now: JSON_ONLY },
-    { parent: 'IssueComment',  relation: 'pullRequest',     type: 'PullRequest',                     model: 'PullRequest',   now: `${JSON_ONLY} (4 項目だけ)` },
+    { parent: 'IssueComment',  relation: 'pullRequest',     type: 'PullRequest',                     model: 'PullRequest',   now: `${JSON_ONLY} (参照の組)` },
     { parent: 'ProjectV2',     relation: 'creator',         type: 'User / Bot ほか',                 model: '都度判断',      now: JSON_ONLY },
     { parent: 'ProjectV2',     relation: 'owner',           type: 'User / Organization',             model: '都度判断',      now: JSON_ONLY },
     { parent: 'ProjectV2',     relation: 'items',           type: 'ProjectV2Item',                   model: 'ProjectV2Item', now: `${JSON_ONLY} (team のクエリだけが取る)` },
-    { parent: 'ProjectV2Item', relation: 'project',         type: 'ProjectV2',                       model: 'ProjectV2',     now: `${JSON_ONLY} (4 項目と owner だけ)` },
-    { parent: 'ProjectV2Item', relation: 'content',         type: 'Issue / PullRequest / DraftIssue', model: '都度判断',     now: `${JSON_ONLY} (本文が無い)` },
+    { parent: 'ProjectV2Item', relation: 'project',         type: 'ProjectV2',                       model: 'ProjectV2',     now: `${JSON_ONLY} (参照の組と owner)` },
+    { parent: 'ProjectV2Item', relation: 'content',         type: 'Issue / PullRequest / DraftIssue', model: '都度判断',     now: `${JSON_ONLY} (参照の組。本文が無い)` },
     { parent: 'ProjectV2Item', relation: 'creator',         type: 'User / Bot ほか',                 model: '都度判断',      now: JSON_ONLY },
     { parent: 'ProjectV2Item', relation: 'fieldValues の users', type: 'User',                       model: 'User',          now: JSON_ONLY },
-    { parent: 'ProjectV2Item', relation: 'fieldValues の labels / milestone / repository / pullRequests / reviewers', type: 'それぞれの型', model: 'それぞれのモデル', now: `${JSON_ONLY} (項目が少ない)` },
+    { parent: 'ProjectV2Item', relation: 'fieldValues の labels / milestone / repository / pullRequests / reviewers', type: 'それぞれの型', model: 'それぞれのモデル', now: `${JSON_ONLY} (参照の組)` },
 ];
 
 // 値が消える動きの例。(にせの node を Pool に入れて、実際に動かして確かめた)
@@ -82,10 +82,29 @@ const UPDATED_AT = [
       nodes: 'Actor (author などの型の入れ物。中身の User や Bot は持っている), fieldValues のうちラベル・ユーザー・リポジトリ・マイルストーン・プルリクエスト・レビュアーの値 (値を入れる箱で、モデルにする対象ではない)' },
 ];
 
+// 進み具合。(上から順に進める)
+const PROGRESS_COLUMNS = [
+    { code: 'work',  label: '作業',   key: 'work' },
+    { code: 'state', label: '状態',   key: 'state' },
+    { code: 'note',  label: '内容',   key: 'note' },
+];
+
+const PROGRESS = [
+    { work: '1. クエリを整える',
+      state: '済み',
+      note: '項目の部品を型ごとに整理し、モデルにする型は id・updatedAt・__typename を必ず取るようにした。クエリの検査のスクリプトを足した' },
+    { work: '2. node の重ね方を変える',
+      state: 'まだ',
+      note: 'Pool が、core を丸ごと差し替えずに、updatedAt を比べて重ねるようにする。GraphQLNode に reload 属性を足す' },
+    { work: '3. Matchmaker を広げる',
+      state: 'まだ',
+      note: '入れ子で取った関連を、モデルにして Pool に入れる' },
+];
+
 export default function MatchmakerSpec () {
     return (
         <Section title="関連をモデルにする (Matchmaker の拡張)" num="7." lev="4" sx={SX_MEMBER_TITLE}>
-          <Panel kind="warning">この章は、これから作るものの仕様です。まだ実装していません。</Panel>
+          <Panel kind="warning">この章は、これから作るものの仕様です。クエリの整理までは済んでいて、Pool の重ね方と Matchmaker の拡張は、まだ実装していません。(「7.6 進み具合」を見る)</Panel>
 
           <Section title="ねらい" num="7.1" lev="5">
             <OL>
@@ -97,6 +116,10 @@ export default function MatchmakerSpec () {
 
           <Section title="いま取っている関連" num="7.2" lev="5">
             <Table columns={RELATION_COLUMNS} rows={RELATIONS} ids={TABLE_IDS}/>
+            <OL sx={SX_AFTER_TABLE}>
+              <LI>「いまの状態」は、取得したあとのモデルの中での持ち方。</LI>
+              <LI>クエリでは、どの関連も、<C>id</C> と <C>updatedAt</C> を取っている。(「5. 取得する項目」を見る)</LI>
+            </OL>
           </Section>
 
           <Section title="先に解く問題" num="7.3" lev="5">
@@ -156,9 +179,11 @@ export default function MatchmakerSpec () {
                     <LI>型ごとに取る。(<C>{'... on User { id updatedAt }'}</C> など)</LI>
                   </UL>
                 </LI>
-                <LI>いまは、同じ型を取る項目の組が、何通りもある。(「5.3 型ごとの、項目の組」を見る)
+                <LI>型の名前 (<C>__typename</C>) も取る。(型が複数ある関連で、どの型かを見分けるため)</LI>
+                <LI>クエリは、この決まりに合わせて整理した。(「5. 取得する項目」を見る)
                   <UL>
-                    <LI>実装するときは、この項目の組をどう整理するかが、最初の作業になる。</LI>
+                    <LI>使用中のクエリは、モデルにする型のすべてで、<C>id</C> と <C>updatedAt</C> を取っている。</LI>
+                    <LI>検査のスクリプトで確かめられる。(「3.7 クエリの検査」を見る)</LI>
                   </UL>
                 </LI>
               </OL>
@@ -174,7 +199,7 @@ export default function MatchmakerSpec () {
                     <LI>作成者・編集者。(Issue の author、IssueComment の author と editor、ProjectV2 と ProjectV2Item の creator)</LI>
                     <LI>持ち主。(Repository の owner、ProjectV2 の owner)</LI>
                     <LI>ProjectV2Item の content。(Issue・PullRequest・DraftIssue)</LI>
-                    <LI>ProjectV2Item の reviewers。(User・Team・Mannequin)</LI>
+                    <LI>ProjectV2Item の reviewers。(User・Team・Mannequin・Bot)</LI>
                   </UL>
                 </LI>
               </OL>
@@ -188,7 +213,6 @@ export default function MatchmakerSpec () {
               <OL>
                 <LI>重ねる単位。(案: 一番上の項目の単位で重ねる。入れ子の中身は、別のモデルとして重ねる)</LI>
                 <LI>来た値が null のとき。(案: null で重ねる。来ていない項目は、触らない)</LI>
-                <LI>型の名前 (<C>__typename</C>) を、クエリで取るか。(型が複数ある関連の判断のときに決める)</LI>
               </OL>
             </Section>
 
@@ -225,9 +249,18 @@ export default function MatchmakerSpec () {
                     <LI>動かない変更があると、その変更は、取り直しても反映されない。</LI>
                   </UL>
                 </LI>
+                <LI>整理したあとのクエリを、GitHub に実際に送って、応答が返るか。
+                  <UL>
+                    <LI>スキーマでの検査は通っているが、GitHub につないでの確認は、まだしていない。</LI>
+                  </UL>
+                </LI>
               </OL>
             </Section>
 
+          </Section>
+
+          <Section title="進み具合" num="7.6" lev="5">
+            <Table columns={PROGRESS_COLUMNS} rows={PROGRESS} ids={TABLE_IDS}/>
           </Section>
         </Section>
     );

@@ -71,7 +71,18 @@ export default function Notes () {
                 </UL>
               </LI>
               <LI>値の印の置き換えは、最初の 1 か所だけ。(同じ印を、1 つのクエリで 2 回使えない)</LI>
-              <LI>同じ型を取る項目の組が、何通りもある。(「5.3 型ごとの、項目の組」を見る)</LI>
+              <LI><C>projects_next_items_by_id</C> は、いまの GitHub では動かない。
+                <UL>
+                  <LI>ProjectNextItem という型が、GitHub のスキーマから無くなっているため。</LI>
+                  <LI><C>fetchProjectNextItemByID(id)</C> が使っている。</LI>
+                </UL>
+              </LI>
+              <LI>ProjectV2Item の content で、Issue の state と PullRequest の state を、同じ場所で取っている。(7 個のクエリ)
+                <UL>
+                  <LI>型が違う (IssueState と PullRequestState) ので、GraphQL の決まりでは正しくない。</LI>
+                  <LI>直すには、別名を付けることになり、応答の形が変わる。(<C>content.state</C> で読んでいる利用側が壊れる)</LI>
+                </UL>
+              </LI>
               <LI>Pool に、消す操作と期限が無い。(取り直しは、上書きだけ)</LI>
               <LI>個人用アクセストークンを、REACT_APP_ の環境変数で渡している。
                 <UL>
@@ -89,7 +100,7 @@ export default function Notes () {
               <LI>クエリの名前に <C>viwer</C> がある。(<C>viwer</C>・<C>issues_by_viwer</C>)</LI>
               <LI>項目の部品の名前の付け方が、3 通りある。(<C>issue_comment</C>・<C>projectv2Fields</C>・<C>ProjectV2ItemFieldDateValue</C>)</LI>
               <LI>項目の部品が返す形が、2 通りある。(項目だけを返すものと、{'{ }'} で囲んで返すもの)</LI>
-              <LI>項目の部品があるのに、同じ内容を直に書いているクエリがある。(<C>projectv2item_by_id</C> のフィールドの値など)</LI>
+              <LI>使われていないクエリには、項目を、部品を使わずに直に書いているものが残っている。</LI>
               <LI>入れ子の件数の上限が、クエリごとに違う。(20 と 30。定数を宣言しているが、使っていないクエリもある)</LI>
               <LI>組織 (org) のクエリでも、値の印の名前が <C>@user-login</C> になっている。</LI>
               <LI>Sogh のメソッドから使われていないクエリが、15 個ある。(「3.6 クエリの使われ方」を見る)</LI>
