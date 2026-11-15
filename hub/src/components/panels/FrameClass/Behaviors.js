@@ -54,6 +54,12 @@ const SX_METHOD = {
     },
 };
 
+// Syntax の呼び出しの形 (Plane) を、大きく、余白を広くして見せる。
+const SX_SYNTAX = {
+    fontSize: '22px',
+    padding: '22px 33px',
+};
+
 function Method ({ data, receiver }) {
     const name = nameOf(data.name);
     // 引数の型と説明 (arguments) を、名前で引けるようにする。
@@ -71,7 +77,7 @@ function Method ({ data, receiver }) {
     return (
         <Section title={`${name}(${params.map(p=> p.name).join(', ')})`} lev="4" sx={SX_METHOD}>
           <Section title="Syntax" lev="5">
-            <Plane>{syntaxOf(data, name, params, receiver)}</Plane>
+            <Plane sx={SX_SYNTAX}>{syntaxOf(data, name, params, receiver)}</Plane>
           </Section>
 
           <Section title="Arguments and Values" lev="5">
