@@ -195,7 +195,7 @@ const ASYNC = 'async';
 
 const METHODS = [
     { target: 'viewer',                     methods: ['connect'],                                                                                                  style: CALLBACK, paging: '-',        returns: 'User' },
-    { target: 'viewer',                     methods: ['asyncFetchViewer'],                                                                                         style: ASYNC,    paging: '-',        returns: 'Viewer' },
+    { target: 'viewer',                     methods: ['asyncFetchViewer'],                                                                                         style: ASYNC,    paging: '-',        returns: 'User' },
     { target: 'viewer のリポジトリ',        methods: ['asyncFetchRepositoriesByViewer'],                                                                           style: ASYNC,    paging: '全件',     returns: 'id の配列' },
     { target: 'viewer のリポジトリ',        methods: ['fetchRepositoriesByViewer'],                                                                                style: CALLBACK, paging: '1 ページ', returns: '{ contents, pageInfo }' },
     { target: 'User',                       methods: ['fetchUserByID'],                                                                                            style: CALLBACK, paging: '-',        returns: '{ contents }' },
@@ -367,6 +367,7 @@ export default function Fetching () {
                 <UL>
                   <LI>クエリを 1 回ずつ送り、GitHub がエラーを返さないか。</LI>
                   <LI>Sogh で取得して、取り直しても値が消えないか。変更が無ければ、reload が入らないか。</LI>
+                  <LI>関連を返すメソッドが、core の JSON にある数だけ、モデルを返すか。</LI>
                 </UL>
               </LI>
               <LI>viewer・リポジトリ・Issue・ProjectV2 のクエリは、viewer のデータから、対象を自動で選ぶ。</LI>
@@ -377,6 +378,15 @@ export default function Fetching () {
 
             <P>2026-11-15 に確かめた結果は、次のとおりです。</P>
             <Table columns={LIVE_COLUMNS} rows={LIVES} ids={TABLE_IDS}/>
+            <OL sx={SX_AFTER_TABLE}>
+              <LI>関連をモデルにしたあと (sogh 0.4.0) に、もう一度確かめた。クエリの結果は、同じ。</LI>
+              <LI>重ね方と関連の確認は、9 個すべて OK。
+                <UL>
+                  <LI>関連 2,497 個で、core の JSON にある数だけ、モデルが返った。</LI>
+                  <LI>調べた ProjectV2Item は、0 件だった。ProjectV2Item の関連は、テストでだけ確かめている。</LI>
+                </UL>
+              </LI>
+            </OL>
           </Section>
 
         </Section>

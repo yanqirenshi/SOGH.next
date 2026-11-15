@@ -44,6 +44,7 @@ export default function Overview () {
             <OL>
               <LI><C>Loader</C> は、HTTP と認証を受け持つ。GitHub の GraphQL のエンドポイントに POST する。</LI>
               <LI><C>Pooler</C> は、取得した node (JSON) をモデルに変換し、種類ごとの Pool に id で保存する。</LI>
+              <LI><C>Matchmaker</C> (src/js/Matchmaker.js) は、node に入れ子で付いてくる関連を、モデルにして Pool に入れる。<C>Pooler</C> が呼ぶ。(「7. 関連をモデルにする」を見る)</LI>
               <LI><C>Sogh</C> は、「何を取得するか」のメソッドを持つ。クエリ (src/js/queries/) と組み合わせる。</LI>
               <LI>モデル (src/js/models/) は、node を包んで、読みやすいメソッドを生やしたクラス。</LI>
             </OL>

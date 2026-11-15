@@ -13,7 +13,7 @@ import MatchmakerSpec from './Github/MatchmakerSpec.js';
 // 外部リソースのページ (/external-resources) の「Github」タブのパネル。
 // GitHub の API でデータを取得して、データモデルにするまでの仕様を出す。
 // 1〜6 章は、sogh の src/js/ の、いまの動きを整理したもの。
-// 7 章は、これから作るものの仕様。(まだ実装していない)
+// 7 章は、関連をモデルにする仕様と、決めたこと。(sogh 0.4.0 で実装した)
 //
 // 中身は、章ごとに Github/ の部品に分けている。
 //   Overview       … 1. 全体像、2. 認証と接続
@@ -32,7 +32,7 @@ export default function Github () {
           <Container maxWidth="lg" sx={{ pt: 3, pb: 22 }}>
             <P>GitHub の API でデータを取得して、データモデルにするまでの仕様です。</P>
             <P>1〜6 章は、sogh (src/js/) のコードを読んで、いまの動きを整理したものです。</P>
-            <P>7 章は、これから作るものの仕様です。(まだ実装していません)</P>
+            <P>7 章は、関連をモデルにする仕様と、決めたことです。(sogh 0.4.0 で実装しました)</P>
 
             <Overview/>
             <Fetching/>
