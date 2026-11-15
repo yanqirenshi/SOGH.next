@@ -1,11 +1,10 @@
 import React from 'react';
 
-import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import Tooltip from '@mui/material/Tooltip';
 import { Section, P, Plane, UL, LI } from 'tion';
 
-import { nameOf, linesOf, memberOf, SX_MEMBER_TITLE, VISIBILITY_SYMBOLS } from './utils.js';
+import { nameOf, linesOf, memberOf, SX_MEMBER_TITLE } from './utils.js';
+import VisibilityMark from './VisibilityMark.js';
 
 // 属性タブ。属性のデータから、属性ごとに
 // Value Type / Initial Value / Description / Examples / Affected By / See Also を描く。
@@ -72,33 +71,11 @@ function Attribute ({ data }) {
     );
 }
 
-// 見出しの、可視性の記号の <pre>。
-// <pre> は、そのままだと行を分けて幅いっぱいに広がるので、見出しの 1 行の中に置く。
-const SX_VISIBILITY = {
-    display: 'inline',
-    m: 0,
-    mr: 1,
-    px: 1,
-    py: 0.25,
-    fontSize: 'inherit',
-    lineHeight: 'inherit',
-    backgroundColor: 'grey.100',
-    borderRadius: 1,
-};
-
-// 見出し。可視性の記号 (<pre> でくくる) と名前。(例: - _priority)
-// 記号はクラス図 (d3.classes) と同じ。可視性が無いときは、クラス図と同じく public (+) にする。
-// 記号にマウスを乗せると、可視性 (public など) をツールチップで出す。
+// 見出し。可視性の記号 (VisibilityMark) と名前。(例: - _priority)
 function Title ({ data }) {
-    const visibility = data.visibility || 'public';
-    const symbol = VISIBILITY_SYMBOLS[visibility] || '';
-
     return (
         <>
-          { symbol &&
-            <Tooltip title={visibility} arrow>
-              <Box component="pre" sx={SX_VISIBILITY}>{symbol}</Box>
-            </Tooltip> }
+          <VisibilityMark visibility={data.visibility}/>
           {nameOf(data.name)}
         </>
     );
