@@ -5,7 +5,8 @@
     "main": "dist/index.js",
     "scripts": {
         "transpile": "babel src -d dist --copy-files",
-        "prepublishOnly": "npm run transpile"
+        "prepublishOnly": "npm run transpile",
+        "check:queries": "node scripts/check-queries.mjs"
     },
     "repository": {
         "type": "git",
@@ -36,6 +37,7 @@
         "@mui/icons-material": "^9.2.0",
         "@mui/material": "^9.2.0",
         "babel-loader": "^8.2.2",
+        "graphql": "^17.1.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0"
     },
