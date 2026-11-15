@@ -6,8 +6,7 @@ const MAX_PR_NUM = 20;
 
 const query = `{
   organization (login: "@user-login") {
-    id
-    login
+    ${attr.organizationRef()}
     projectV2 (number: @projectv2-number) {
       ${attr.projectv2()}
       fields(first: 20) {

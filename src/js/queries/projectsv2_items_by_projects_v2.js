@@ -16,11 +16,7 @@ const query = `{
       }
       items(${attr.page_nation()}) {
         nodes {
-          id
-          type
-          isArchived
-          createdAt
-          updatedAt
+          ${attr.ProjectV2Item()}
           ${attr.projectV2ItemFieldValues(MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM)}
           creator ${attr.projectV2FieldValue_Creator()}
           content {

@@ -18,24 +18,9 @@ const query = `{
       items(${attr.page_nation()}) {
         nodes {
           ${attr.ProjectV2Item()}
-
-          project {
-            id
-            number
-            title
-            url
-            owner {
-              __typename
-              ... on User {
-                login
-              }
-            }
-          }
-
+          ${attr.projectV2ItemProject()}
           ${attr.projectV2ItemFieldValues(MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM)}
-
           creator ${attr.projectV2FieldValue_Creator()}
-
           content {
             ... on DraftIssue  ${attr.projectV2ItemContentDraftIssue()}
             ... on Issue       ${attr.projectV2ItemContentIssue()}
