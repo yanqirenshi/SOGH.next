@@ -2176,65 +2176,387 @@
         "attributes": [
             {
                 "name": "_priorities",
-                "visibility": "private"
+                "visibility": "private",
+                "type": "Object",
+                "initialValue": "{\n  s:   { code: \"s\", label: \"緊急\", label_short: \"緊\" },\n  h:   { code: \"h\", label: \"高い\", label_short: \"高\" },\n  n:   { code: \"n\", label: \"普通\", label_short: \"普\" },\n  l:   { code: \"l\", label: \"低い\", label_short: \"低\" },\n  \"?\": { code: \"?\", label: \"なぞ\", label_short: \"謎\" },\n}",
+                "description": [
+                    "優先度の code から、画面に出すためのデータ ({ code, label, label_short }) を引く表。",
+                    "constructor が入れる。",
+                    "すべての ProjectV2 で、同じ表 (モジュールの定数 priorities) を使う。"
+                ],
+                "examples": [
+                    "projectV2._priorities.h;",
+                    "// => { code: \"h\", label: \"高い\", label_short: \"高\" }"
+                ],
+                "affectedBy": [
+                    "constructor"
+                ],
+                "seeAlso": [
+                    "priorityData()",
+                    "priority(v)"
+                ]
             },
             {
                 "name": "_priority",
-                "visibility": "private"
+                "visibility": "private",
+                "type": "String | null",
+                "initialValue": "\"?\"",
+                "description": [
+                    "README の $Priority の値 (優先度)。",
+                    "initReadmeAttributes() が \"?\" にし、そのあと parseReadme() が README の値にする。",
+                    "値は s (緊急)・h (高い)・n (普通)・l (低い) のどれか。(README からは、先頭の 1 文字だけを読む)",
+                    "README に $Priority が無いときは null になる。"
+                ],
+                "examples": [
+                    "// README: $Priority: high",
+                    "projectV2.priority();",
+                    "// => \"h\""
+                ],
+                "affectedBy": [
+                    "priority(v)",
+                    "initReadmeAttributes()",
+                    "parseReadme()",
+                    "core(v)"
+                ],
+                "seeAlso": [
+                    "priority(v)",
+                    "priorityData()",
+                    "_priorities"
+                ]
             },
             {
                 "name": "_owner",
-                "visibility": "private"
+                "visibility": "private",
+                "type": "String | null",
+                "initialValue": "\"?\"",
+                "description": [
+                    "README の $Owner の値 (担当者)。",
+                    "initReadmeAttributes() が \"?\" にし、そのあと parseReadme() が README の値にする。",
+                    "README に $Owner が無いときは null になる。",
+                    "GitHub の ProjectV2 の owner (持ち主のユーザーや組織) ではない。"
+                ],
+                "examples": [
+                    "// README: $Owner: octocat",
+                    "projectV2.owner();",
+                    "// => \"octocat\""
+                ],
+                "affectedBy": [
+                    "owner(v)",
+                    "maneger(v)",
+                    "initReadmeAttributes()",
+                    "parseReadme()",
+                    "core(v)"
+                ],
+                "seeAlso": [
+                    "owner(v)",
+                    "maneger(v)"
+                ]
             },
             {
                 "name": "_type",
-                "visibility": "private"
+                "visibility": "private",
+                "type": "String | null",
+                "initialValue": "\"?\"",
+                "description": [
+                    "README の $Type の値 (プロジェクトの種類)。",
+                    "initReadmeAttributes() が \"?\" にし、そのあと parseReadme() が README の値にする。",
+                    "README に $Type が無いときは null になる。"
+                ],
+                "examples": [
+                    "// README: $Type: 開発",
+                    "projectV2.type();",
+                    "// => \"開発\""
+                ],
+                "affectedBy": [
+                    "type(v)",
+                    "initReadmeAttributes()",
+                    "parseReadme()",
+                    "core(v)"
+                ],
+                "seeAlso": [
+                    "type(v)"
+                ]
             },
             {
                 "name": "_release",
-                "visibility": "private"
+                "visibility": "private",
+                "type": "String | null",
+                "initialValue": "\"?\"",
+                "description": [
+                    "README の $Release の値 (リリース)。",
+                    "initReadmeAttributes() が \"?\" にし、そのあと parseReadme() が README の値にする。",
+                    "README に $Release が無いときは null になる。"
+                ],
+                "examples": [
+                    "// README: $Release: v0.3.1",
+                    "projectV2.release();",
+                    "// => \"v0.3.1\""
+                ],
+                "affectedBy": [
+                    "release(v)",
+                    "initReadmeAttributes()",
+                    "parseReadme()",
+                    "core(v)"
+                ],
+                "seeAlso": [
+                    "release(v)"
+                ]
             },
             {
                 "name": "_plan",
                 "visibility": "private",
-                "type": "Term"
+                "type": "Term",
+                "initialValue": "Term { start: null, end: null }",
+                "description": [
+                    "予定の期間 (README の $Plan)。",
+                    "initReadmeAttributes() が start・end とも null の期間にし、そのあと parseReadme() が README の値にする。",
+                    "README に $Plan が無いときは、初めの値のまま。",
+                    "start・end は、日付の文字列 (YYYY-MM-DD) か null。"
+                ],
+                "examples": [
+                    "// README: $Plan: 2026-11-01 2026-11-30",
+                    "projectV2.plan();",
+                    "// => Term { start: \"2026-11-01\", end: \"2026-11-30\" }"
+                ],
+                "affectedBy": [
+                    "plan(start, end)",
+                    "parseReadmeItemPlan(readme, regex)",
+                    "initReadmeAttributes()",
+                    "parseReadme()",
+                    "core(v)"
+                ],
+                "seeAlso": [
+                    "plan(start, end)",
+                    "Term"
+                ]
             },
             {
                 "name": "_result",
                 "visibility": "private",
-                "type": "Term"
+                "type": "Term",
+                "initialValue": "Term { start: null, end: null }",
+                "description": [
+                    "実績の期間 (README の $Result)。",
+                    "initReadmeAttributes() が start・end とも null の期間にし、そのあと parseReadme() が README の値にする。",
+                    "README に終了日が無いとき ($Result: 開始日) は、end が null になる。",
+                    "README に $Result が無いときは、start・end とも null の期間になる。"
+                ],
+                "examples": [
+                    "// README: $Result: 2026-11-03",
+                    "projectV2.result();",
+                    "// => Term { start: \"2026-11-03\", end: null }"
+                ],
+                "affectedBy": [
+                    "result(start, end)",
+                    "parseReadmeItemResult(readme, regexs)",
+                    "initReadmeAttributes()",
+                    "parseReadme()",
+                    "core(v)"
+                ],
+                "seeAlso": [
+                    "result(start, end)",
+                    "Term"
+                ]
             },
             {
                 "name": "_action",
-                "visibility": "private"
+                "visibility": "private",
+                "type": "String | null",
+                "initialValue": "\"\"",
+                "description": [
+                    "README の $Action の値 (次のアクション)。",
+                    "initReadmeAttributes() が \"\" にし、そのあと parseReadme() が README の値にする。",
+                    "README に $Action が無いときは null になる。"
+                ],
+                "examples": [
+                    "// README: $Action: 見積もりを出す",
+                    "projectV2.action();",
+                    "// => \"見積もりを出す\""
+                ],
+                "affectedBy": [
+                    "action(v)",
+                    "initReadmeAttributes()",
+                    "parseReadme()",
+                    "core(v)"
+                ],
+                "seeAlso": [
+                    "action(v)"
+                ]
             },
             {
                 "name": "_backlog",
-                "visibility": "private"
+                "visibility": "private",
+                "type": "String | null",
+                "initialValue": "\"\"",
+                "description": [
+                    "README の $Backlog の値 (バックログ)。",
+                    "initReadmeAttributes() が \"\" にし、そのあと parseReadme() が README の値にする。",
+                    "README に $Backlog が無いときは null になる。"
+                ],
+                "examples": [
+                    "// README: $Backlog: クラス図",
+                    "projectV2.backlog();",
+                    "// => \"クラス図\""
+                ],
+                "affectedBy": [
+                    "backlog(v)",
+                    "initReadmeAttributes()",
+                    "parseReadme()",
+                    "core(v)"
+                ],
+                "seeAlso": [
+                    "backlog(v)"
+                ]
             },
             {
                 "name": "_systems",
-                "visibility": "private"
+                "visibility": "private",
+                "type": "String | null",
+                "initialValue": "[]",
+                "description": [
+                    "README の $Systems の値 (関係するシステム)。",
+                    "initReadmeAttributes() が [] にし、そのあと parseReadme() が README の値にする。",
+                    "README に $Systems が無いときは null になる。",
+                    "初めの値は [] だが、README を読むと文字列か null になる。"
+                ],
+                "examples": [
+                    "// README: $Systems: iHub",
+                    "projectV2.systems();",
+                    "// => \"iHub\""
+                ],
+                "affectedBy": [
+                    "systems(v)",
+                    "initReadmeAttributes()",
+                    "parseReadme()",
+                    "core(v)"
+                ],
+                "seeAlso": [
+                    "systems(v)"
+                ]
             },
             {
                 "name": "_customer",
-                "visibility": "private"
+                "visibility": "private",
+                "type": "String | null",
+                "initialValue": "\"\"",
+                "description": [
+                    "README の $Customer の値 (顧客)。",
+                    "initReadmeAttributes() が \"\" にし、そのあと parseReadme() が README の値にする。",
+                    "README に $Customer が無いときは null になる。"
+                ],
+                "examples": [
+                    "// README: $Customer: B社",
+                    "projectV2.customer();",
+                    "// => \"B社\""
+                ],
+                "affectedBy": [
+                    "customer(v)",
+                    "initReadmeAttributes()",
+                    "parseReadme()",
+                    "core(v)"
+                ],
+                "seeAlso": [
+                    "customer(v)"
+                ]
             },
             {
                 "name": "_agency",
-                "visibility": "private"
+                "visibility": "private",
+                "type": "String | null",
+                "initialValue": "\"\"",
+                "description": [
+                    "README の $Agency の値 (代理店)。",
+                    "initReadmeAttributes() が \"\" にし、そのあと parseReadme() が README の値にする。",
+                    "README に $Agency が無いときは null になる。"
+                ],
+                "examples": [
+                    "// README: $Agency: A社",
+                    "projectV2.agency();",
+                    "// => \"A社\""
+                ],
+                "affectedBy": [
+                    "agency(v)",
+                    "initReadmeAttributes()",
+                    "parseReadme()",
+                    "core(v)"
+                ],
+                "seeAlso": [
+                    "agency(v)"
+                ]
             },
             {
                 "name": "_scenario",
-                "visibility": "private"
+                "visibility": "private",
+                "type": "String | null",
+                "initialValue": "\"\"",
+                "description": [
+                    "README の $Scenario の値 (シナリオ)。",
+                    "initReadmeAttributes() が \"\" にし、そのあと parseReadme() が README の値にする。",
+                    "README に $Scenario が無いときは null になる。"
+                ],
+                "examples": [
+                    "// README: $Scenario: 移行",
+                    "projectV2.scenario();",
+                    "// => \"移行\""
+                ],
+                "affectedBy": [
+                    "scenario(v)",
+                    "initReadmeAttributes()",
+                    "parseReadme()",
+                    "core(v)"
+                ],
+                "seeAlso": [
+                    "scenario(v)"
+                ]
             },
             {
                 "name": "_progress",
-                "visibility": "private"
+                "visibility": "private",
+                "type": "String | null",
+                "initialValue": "\"\"",
+                "description": [
+                    "README の $Progress の値 (進捗)。",
+                    "initReadmeAttributes() が \"\" にし、そのあと parseReadme() が README の値にする。",
+                    "README に $Progress が無いときは null になる。",
+                    "値は数字の文字列。(数値ではない)"
+                ],
+                "examples": [
+                    "// README: $Progress: 60",
+                    "projectV2.progress();",
+                    "// => \"60\""
+                ],
+                "affectedBy": [
+                    "progress(v)",
+                    "initReadmeAttributes()",
+                    "parseReadme()",
+                    "core(v)"
+                ],
+                "seeAlso": [
+                    "progress(v)"
+                ]
             },
             {
                 "name": "_regexs",
-                "visibility": "private"
+                "visibility": "private",
+                "type": "Object",
+                "initialValue": "{\n  priority: /.*\\$[P|p]riority:\\s+(\\S).*/,\n  owner:    /.*\\$[O|o]wner:\\s+(\\S+).*/,\n  type:     /.*\\$[T|t]ype:\\s+(\\S+).*/,\n  release:  /.*\\$[R|r]elease:\\s+(\\S+).*/,\n  plan:     /.*\\$[P|p]lan:\\s+(\\d+-\\d+-\\d+)\\s+(\\d+-\\d+-\\d+).*/,\n  result: [\n    /.*\\$[R|r]esult:\\s+(\\d+-\\d+-\\d+)\\s+(\\d+-\\d+-\\d+).*/,\n    /.*\\$[R|r]esult:\\s+(\\d+-\\d+-\\d+).*/,\n  ],\n  action:   /.*\\$[A|a]ction:\\s+(\\S+).*/,\n  backlog:  /.*\\$[B|b]acklog:\\s+(\\S+).*/,\n  customer: /.*\\$[C|c]ustomer:\\s+(\\S+).*/,\n  agency:   /.*\\$[A|a]gency:\\s+(\\S+).*/,\n  systems:  /.*\\$[S|s]ystems:\\s+(\\S+).*/,\n  scenario: /.*\\$[S|s]cenario:\\s+(\\S+).*/,\n  progress: /.*\\$[P|p]rogress:\\s+(\\d+).*/,\n}",
+                "description": [
+                    "README から属性を読み出すための正規表現。(属性の名前 → 正規表現)",
+                    "initRegexs() が作る。",
+                    "どれも「$名前: 値」の行を探す。(名前の先頭は、大文字でも小文字でもよい)",
+                    "result だけは正規表現の配列で、先頭から順に試す。"
+                ],
+                "examples": [
+                    "projectV2._regexs.owner.exec('$Owner: octocat')[1];",
+                    "// => \"octocat\""
+                ],
+                "affectedBy": [
+                    "initRegexs()"
+                ],
+                "seeAlso": [
+                    "parseReadme()",
+                    "parseReadmeItem(readme, regex)"
+                ]
             }
         ],
         "methods": [

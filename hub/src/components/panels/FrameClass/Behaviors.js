@@ -3,7 +3,7 @@ import React from 'react';
 import Container from '@mui/material/Container';
 import { Section, P, Plane } from 'tion';
 
-import { nameOf, linesOf, memberOf } from './utils.js';
+import { nameOf, linesOf, memberOf, SX_MEMBER_TITLE } from './utils.js';
 
 // 振舞タブ。メソッドのデータから、メソッドごとに
 // Syntax / Arguments and Values / Description / Examples を描く。
@@ -43,17 +43,6 @@ export default function Behaviors (props) {
     );
 }
 
-// メソッドの見出し (Section の見出し要素) の下に、横幅いっぱいの線を引く。
-// Section は、見出しを data-lev 属性の付いた要素で描くので、それを選ぶ。
-// (子孫の Section の見出し (Syntax など) には効かないように、直下の見出しだけを選ぶ)
-const SX_METHOD = {
-    '& > div:first-of-type > [data-lev]': {
-        borderBottom: '1px solid',
-        borderColor: 'grey.500',
-        pb: 0.5,
-    },
-};
-
 // Syntax の呼び出しの形 (Plane) を、大きく、余白を広くして見せる。
 const SX_SYNTAX = {
     fontSize: '22px',
@@ -75,7 +64,7 @@ function Method ({ data, receiver }) {
     const values = valuesOf(params, docs, returns);
 
     return (
-        <Section title={`${name}(${params.map(p=> p.name).join(', ')})`} lev="4" sx={SX_METHOD}>
+        <Section title={`${name}(${params.map(p=> p.name).join(', ')})`} lev="4" sx={SX_MEMBER_TITLE}>
           <Section title="Syntax" lev="5">
             <Plane sx={SX_SYNTAX}>{syntaxOf(data, name, params, receiver)}</Plane>
           </Section>

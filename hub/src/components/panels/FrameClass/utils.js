@@ -29,3 +29,15 @@ export const VISIBILITY_SYMBOLS = {
     protected: '#',
     package:   '~',
 };
+
+// 属性・メソッドの見出し (tion の Section の sx)。
+// 見出しの下に、横幅いっぱいの線を引く。
+// Section は、見出しを data-lev 属性の付いた要素で描くので、それを選ぶ。
+// (子孫の Section の見出し (Syntax など) には効かないように、直下の見出しだけを選ぶ)
+export const SX_MEMBER_TITLE = {
+    '& > div:first-of-type > [data-lev]': {
+        borderBottom: '1px solid',
+        borderColor: 'grey.500',
+        pb: 0.5,
+    },
+};
