@@ -26,6 +26,30 @@ export default class GraphQLNode {
         return this._core.updatedAt || null;
     }
     /* **************************************************************** *
+     *  関連
+     * **************************************************************** */
+    // core に入れ子で残っている関連の JSON から、Pool にあるモデルを引く。
+    // (入れ子の node は、Matchmaker が先に Pool に入れている)
+    // JSON が無いとき・id が無いとき・Pool に無いときは、null。
+    relation (node) {
+        if (!node || !node.id)
+            return null;
+
+        const sogh = this.sogh();
+
+        if (!sogh)
+            return null;
+
+        return sogh.get(node.id);
+    }
+    // 複数の関連。{ nodes: [...] } と { edges: [{ node }] } の、どちらの形でもよい。
+    // Pool に無いものは、外す。
+    relations (connection) {
+        return nodesOf(connection)
+            .map(node=> this.relation(node))
+            .filter(obj=> obj!==null);
+    }
+    /* **************************************************************** *
      *  Merge
      * **************************************************************** */
     // GitHub 側の変更を重ねた日時。(ISO 8601 の文字列)
@@ -99,6 +123,24 @@ export default class GraphQLNode {
 
         return newer ? 'newer' : 'filled';
     }
+}
+
+// 関連の JSON から、node の配列を取り出す。
+// { nodes: [...] } と { edges: [{ node }] } の、どちらの形でもよい。
+export function nodesOf (connection) {
+    if (!connection)
+        return [];
+
+    if (Array.isArray(connection))
+        return connection;
+
+    if (Array.isArray(connection.nodes))
+        return connection.nodes;
+
+    if (Array.isArray(connection.edges))
+        return connection.edges.map(edge=> edge ? edge.node : null);
+
+    return [];
 }
 
 // 日時の文字列 (ISO 8601) を、比べられる数値にする。読めないときは null。

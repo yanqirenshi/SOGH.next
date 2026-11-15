@@ -40,15 +40,15 @@ export default function Table (props) {
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                         <TableCell>
                           <div style={{display:'flex', alignItems: 'center'}}>
-                            <Avatar src={owner.avatarUrl}
+                            <Avatar src={owner.avatarUrl()}
                                     style={{marginRight:22}}/>
                             <p style={{marginRight:22}}>
-                              <Link href={`/owners/${owner.id}`}>
-                                {owner.login}
+                              <Link href={`/owners/${owner.id()}`}>
+                                {owner.login()}
                               </Link>
                             </p>
 
-                            <LinkGithub href={obj.url(owner.url)}/>
+                            <LinkGithub href={obj.url(owner.url())}/>
                           </div>
                         </TableCell>
 

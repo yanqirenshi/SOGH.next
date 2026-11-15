@@ -10,6 +10,7 @@
 // 確かめること:
 //   A. クエリの確認 … 使用中のクエリを 1 回ずつ送り、GitHub がエラーを返さないかを見る。
 //   B. 重ね方の確認 … Sogh で取得して、取り直しても値が消えないこと、変更が無ければ reload が入らないことを見る。
+//   C. 関連の確認   … 関連を返すメソッドが、core の JSON にある関連の数だけ、モデルを返すかを見る。
 //
 // 安全のための決まり:
 //   - 読むだけ。書き込み (コメントの追加・更新・削除) のクエリは、送らない。
@@ -255,7 +256,8 @@ async function checkMerge (token) {
     // リポジトリを取る。(owner として、viewer の項目の少ない node が来る)
     const repository_ids = await sogh.asyncFetchRepositoriesByViewer();
     const repositories = repository_ids.map(id=> sogh.repository(id));
-    const owned = repositories.filter(r=> r.owner() && r.owner().id === viewer.id()).length;
+    // owner() は、Pool のモデルを返す。viewer が owner なら、viewer と同じモデルになる。
+    const owned = repositories.filter(r=> r.owner() === viewer).length;
 
     console.log(`     リポジトリ ${repositories.length} 件。うち、viewer が owner のもの ${owned} 件。`);
 
@@ -304,6 +306,85 @@ async function checkMerge (token) {
     const no_updated_at = models.filter(m=> !m.updatedAt()).length;
 
     check('取得したモデルが、updatedAt を持っている', no_updated_at === 0, `持っていないもの ${no_updated_at} 件 / ${models.length} 件`);
+
+    await checkRelations(sogh, repositories, projects);
+}
+
+/* ****************************************************************
+ * C. 関連の確認
+ * **************************************************************** */
+
+// 関連を返すメソッドが、core の JSON にある関連の数だけ、モデルを返すかを見る。
+// (Matchmaker が、入れ子の node を Pool に入れていれば、数が合う)
+async function checkRelations (sogh, repositories, projects) {
+    console.log('');
+    console.log('== C. 関連の確認 ==');
+
+    const count = (connection)=> {
+        if (!connection) return 0;
+        if (Array.isArray(connection.nodes)) return connection.nodes.filter(n=> n && n.id).length;
+        if (Array.isArray(connection.edges)) return connection.edges.filter(e=> e && e.node && e.node.id).length;
+        return 0;
+    };
+    const one = (node)=> (node && node.id) ? 1 : 0;
+    const isModel = (obj)=> obj !== null && typeof obj.id === 'function';
+
+    // 合わなかった関連の数を、名前ごとに数える。
+    const misses = {};
+    let total = 0;
+    const expect = (name, expected, got)=> {
+        total++;
+        if (expected !== got)
+            misses[name] = (misses[name] || 0) + 1;
+    };
+    const expectOne = (name, node, obj)=> expect(name, one(node), isModel(obj) ? 1 : 0);
+    const expectList = (name, connection, list)=> expect(name, count(connection), list.filter(isModel).length);
+
+    for (const r of repositories)
+        expectOne('Repository.owner', r.core().owner, r.owner());
+
+    for (const p of projects) {
+        expectOne('ProjectV2.creator', p.core().creator, p.creator());
+        expectOne('ProjectV2.owner', p.core().owner, p.ownerNode());
+        expectList('ProjectV2.items', p.core().items, p.items());
+    }
+
+    const issue_ids = await sogh.asyncFetchIssueByViewer();
+    const issues = issue_ids.map(id=> sogh.issue(id));
+
+    console.log(`     viewer の Issue ${issues.length} 件。`);
+
+    for (const i of issues) {
+        const core = i.core();
+
+        expectList('Issue.assignees', core.assignees, i.assignees());
+        expectOne('Issue.author', core.author, i.author());
+        expectList('Issue.labels', core.labels, i.labels());
+        expectOne('Issue.milestone', core.milestone, i.milestone());
+        expectOne('Issue.repository', core.repository, i.repository());
+    }
+
+    const items = sogh.pool('project-v2-item').list();
+
+    for (const item of items) {
+        const core = item.core();
+
+        expectOne('ProjectV2Item.project', core.project, item.project());
+        expectOne('ProjectV2Item.content', core.content, item.content());
+        expectOne('ProjectV2Item.creator', core.creator, item.creator());
+    }
+
+    console.log(`     ProjectV2Item ${items.length} 件。`);
+
+    const counts = ['user', 'organization', 'bot', 'mannequin', 'enterprise-user-account', 'team', 'draft-issue', 'label', 'milestone']
+          .map(code=> `${code} ${sogh.pool(code).list().length}`)
+          .join('・');
+
+    console.log(`     Pool の件数: ${counts}`);
+
+    check('関連を返すメソッドが、core の JSON にある数だけモデルを返す',
+          Object.keys(misses).length === 0,
+          `合わなかったもの ${JSON.stringify(misses)} / 調べた関連 ${total} 個`);
 }
 
 /* ****************************************************************
@@ -337,7 +418,7 @@ async function main () {
 
     console.log('');
     console.log(`クエリ: OK ${ok} 個・NG ${ng} 個・飛ばした ${skipped} 個。`);
-    console.log(`重ね方: OK ${checks.length - check_ng} 個・NG ${check_ng} 個。`);
+    console.log(`重ね方・関連: OK ${checks.length - check_ng} 個・NG ${check_ng} 個。`);
 
     // process.exit() は使わない。(Windows で、通信を閉じている途中に呼ぶと、Node が異常終了するため)
     process.exitCode = ng === 0 && check_ng === 0 ? 0 : 1;

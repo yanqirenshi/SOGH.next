@@ -35,13 +35,6 @@
         "type": "classes"
     },
     {
-        "id": 1000005,
-        "parent": 1030,
-        "name": "Assignee",
-        "description": "src/js/models/Assignee.js (extends GraphQLNode)",
-        "type": "classes"
-    },
-    {
         "id": 1000006,
         "parent": 1031,
         "name": "Card",
@@ -147,10 +140,45 @@
         "type": "classes"
     },
     {
-        "id": 1000021,
+        "id": 1000022,
         "parent": 1030,
-        "name": "Viewer",
-        "description": "src/js/models/Viewer.js (extends GraphQLNode)",
+        "name": "Organization",
+        "description": "src/js/models/Organization.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000023,
+        "parent": 1030,
+        "name": "Bot",
+        "description": "src/js/models/Bot.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000024,
+        "parent": 1030,
+        "name": "Mannequin",
+        "description": "src/js/models/Mannequin.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000025,
+        "parent": 1030,
+        "name": "EnterpriseUserAccount",
+        "description": "src/js/models/EnterpriseUserAccount.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000026,
+        "parent": 1030,
+        "name": "DraftIssue",
+        "description": "src/js/models/DraftIssue.js (extends GraphQLNode)",
+        "type": "classes"
+    },
+    {
+        "id": 1000027,
+        "parent": 1030,
+        "name": "Team",
+        "description": "src/js/models/Team.js (extends GraphQLNode)",
         "type": "classes"
     }
 ]

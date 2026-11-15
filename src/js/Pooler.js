@@ -19,6 +19,14 @@ export default class Pooler extends Loader {
             ['issue',           model.Issue],
             ['issue-comment',   model.IssueComment],
             ['pull-request',    model.PullRequest],
+            ['organization',    model.Organization],
+            ['bot',             model.Bot],
+            ['mannequin',       model.Mannequin],
+            ['enterprise-user-account', model.EnterpriseUserAccount],
+            ['draft-issue',     model.DraftIssue],
+            ['team',            model.Team],
+            ['label',           model.Label],
+            ['milestone',       model.Milestone],
         ].reduce((ht, data)=> {
             const key = data[0];
 
@@ -55,8 +63,9 @@ export default class Pooler extends Loader {
     /* **************************************************************** *
      *  Viewer                                                          *
      * **************************************************************** */
+    // viewer は User にそろえて、user の Pool に入れる。(yanqirenshi/SOGH.next#29)
     node2viewer (d) {
-        this._viewer = d ? new model.Viewer(d) : null;
+        this._viewer = d ? this.node2user(d) : null;
 
         return this._viewer;
     }
@@ -99,7 +108,7 @@ export default class Pooler extends Loader {
     node2projectV2 (node) {
         const {pool, item_class} = this.getPoolAndItemClass('project-v2');
 
-        // this.matchmaker.user(node);
+        this.matchmaker.projectV2(node);
 
         return pool.ensure(node, (d)=> new item_class(d));
     }
@@ -117,7 +126,7 @@ export default class Pooler extends Loader {
     node2projectV2Item (node) {
         const pool = this.pool('project-v2-item');
 
-        // this.matchmaker.user(node);
+        this.matchmaker.projectV2Item(node);
 
         const obj = pool.ensure(node, (d)=> new model.ProjectV2Item(d));
 
@@ -136,7 +145,7 @@ export default class Pooler extends Loader {
     node2issue (node) {
         const pool = this.pool('issue');
 
-        // this.matchmaker.user(node);
+        this.matchmaker.issue(node);
 
         return pool.ensure(node, (d)=> new model.Issue(d));
     }
@@ -154,7 +163,7 @@ export default class Pooler extends Loader {
     node2issueComment (node) {
         const pool = this.pool('issue-comment');
 
-        // this.matchmaker.user(node);
+        this.matchmaker.issueComment(node);
 
         return pool.ensure(node, (d)=> new model.IssueComment(d));
     }
@@ -169,7 +178,7 @@ export default class Pooler extends Loader {
     node2pullRequest (node) {
         const pool = this.pool('pull-request');
 
-        // this.matchmaker.user(node);
+        this.matchmaker.pullRequest(node);
 
         return pool.ensure(node, (d)=> new model.PullRequest(d));
     }
@@ -181,4 +190,103 @@ export default class Pooler extends Loader {
 
         return pool.get(v);
     }
+    /* **************************************************************** *
+     *  Organization・Bot・Mannequin・EnterpriseUserAccount (人)         *
+     * **************************************************************** */
+    node2organization (node) {
+        return this.pool('organization').ensure(node, (d)=> new model.Organization(d));
+    }
+    organization (v) {
+        return this.pool('organization').get(v);
+    }
+    node2bot (node) {
+        return this.pool('bot').ensure(node, (d)=> new model.Bot(d));
+    }
+    bot (v) {
+        return this.pool('bot').get(v);
+    }
+    node2mannequin (node) {
+        return this.pool('mannequin').ensure(node, (d)=> new model.Mannequin(d));
+    }
+    mannequin (v) {
+        return this.pool('mannequin').get(v);
+    }
+    node2enterpriseUserAccount (node) {
+        return this.pool('enterprise-user-account').ensure(node, (d)=> new model.EnterpriseUserAccount(d));
+    }
+    enterpriseUserAccount (v) {
+        return this.pool('enterprise-user-account').get(v);
+    }
+    /* **************************************************************** *
+     *  DraftIssue                                                      *
+     * **************************************************************** */
+    node2draftIssue (node) {
+        return this.pool('draft-issue').ensure(node, (d)=> new model.DraftIssue(d));
+    }
+    draftIssue (v) {
+        return this.pool('draft-issue').get(v);
+    }
+    /* **************************************************************** *
+     *  Team                                                            *
+     * **************************************************************** */
+    node2team (node) {
+        return this.pool('team').ensure(node, (d)=> new model.Team(d));
+    }
+    team (v) {
+        return this.pool('team').get(v);
+    }
+    /* **************************************************************** *
+     *  Label                                                           *
+     * **************************************************************** */
+    node2label (node) {
+        return this.pool('label').ensure(node, (d)=> new model.Label(d));
+    }
+    label (v) {
+        return this.pool('label').get(v);
+    }
+    /* **************************************************************** *
+     *  Milestone                                                       *
+     * **************************************************************** */
+    node2milestone (node) {
+        return this.pool('milestone').ensure(node, (d)=> new model.Milestone(d));
+    }
+    milestone (v) {
+        return this.pool('milestone').get(v);
+    }
+    /* **************************************************************** *
+     *  __typename で選ぶ                                               *
+     * **************************************************************** */
+    // 型が複数ありうる関連 (人・ProjectV2 の owner・ProjectV2Item の content・reviewers) の node を、
+    // __typename に合うモデルにして、Pool に入れる。
+    // node が無いとき・id が無いとき・知らない型のときは、null を返す。
+    node2model (node) {
+        if (!node || !node.id)
+            return null;
+
+        const name = NODE2MODEL[node.__typename];
+
+        if (!name)
+            return null;
+
+        return this[name](node);
+    }
 }
+
+// __typename と、モデルを作るメソッドの名前。
+const NODE2MODEL = {
+    User:                  'node2user',
+    Organization:          'node2organization',
+    Bot:                   'node2bot',
+    Mannequin:             'node2mannequin',
+    EnterpriseUserAccount: 'node2enterpriseUserAccount',
+    Team:                  'node2team',
+    Repository:            'node2repository',
+    Issue:                 'node2issue',
+    IssueComment:          'node2issueComment',
+    PullRequest:           'node2pullRequest',
+    DraftIssue:            'node2draftIssue',
+    ProjectV2:             'node2projectV2',
+    ProjectV2Item:         'node2projectV2Item',
+    Label:                 'node2label',
+    Milestone:             'node2milestone',
+};

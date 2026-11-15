@@ -16,7 +16,10 @@ export default function SubTitle (props) {
     const project = issue.projectV2();
 
     const clickProject = ()=> {
-        actions.project.click(project.owner.login, project.number);
+        // owner は User か Organization。(ProjectV2 の owner() は README の $Owner なので、ownerNode() を使う)
+        const owner = project.ownerNode();
+
+        actions.project.click(owner ? owner.login() : null, project.number());
     };
 
     const repository = issue.repository();
@@ -32,19 +35,19 @@ export default function SubTitle (props) {
           }}>
 
             <Box sx={{mr:2}}>
-              <Link href={repository.url}>
-                {repository.name}
+              <Link href={repository.url()}>
+                {repository.name()}
               </Link>
             </Box>
 
             <Box>
               <span onClick={clickProject}>
-                {project.title}
+                {project.title()}
               </span>
               <span style={{marginLeft:11}}>
                 (
-                <Link href={project.url}>
-                  {project.number}
+                <Link href={project.url()}>
+                  {project.number()}
                 </Link>
                 )
               </span>
@@ -55,15 +58,15 @@ export default function SubTitle (props) {
           <Box sx={{display: 'flex'}}>
             {milestone &&
              <Box sx={{m:1}}>
-               <Chip key={milestone.id}
+               <Chip key={milestone.id()}
                      sx={{background:'#fff'}}
                      label={
                          <>
-                           <span>{milestone.title}</span>
+                           <span>{milestone.title()}</span>
                            <span style={{marginLeft:11}}>
                              (
-                             <Link href={milestone.url}>
-                               {milestone.number}
+                             <Link href={milestone.url()}>
+                               {milestone.number()}
                              </Link>
                              )
                            </span>
@@ -74,12 +77,12 @@ export default function SubTitle (props) {
             <Box sx={{m:1, display: 'flex'}}>
               {issue.labels().map(label=> {
                   return (
-                      <Chip key={label.id}
+                      <Chip key={label.id()}
                             sx={{
-                                background:'#'+label.color,
+                                background:'#'+label.color(),
                                 ml:0.3, mr:0.3,
                             }}
-                            label={label.name}/>
+                            label={label.name()}/>
                   );
               })}
             </Box>
@@ -96,12 +99,12 @@ export default function SubTitle (props) {
 
                 {issue.assignees().map(assignee=> {
                     return (
-                        <Link key={assignee.id}
-                              href={assignee.url}>
+                        <Link key={assignee.id()}
+                              href={assignee.url()}>
                           <Chip sx={{background:'#fff'}}
-                                avatar={<Avatar alt={assignee.login}
-                                   src={assignee.avatarUrl} />}
-                                label={assignee.name || assignee.login}/>
+                                avatar={<Avatar alt={assignee.login()}
+                                   src={assignee.avatarUrl()} />}
+                                label={assignee.name() || assignee.login()}/>
                         </Link>
                     );
                 })}
@@ -111,9 +114,9 @@ export default function SubTitle (props) {
                 <span style={{marginRight:6}}>
                   Create:
                 </span>
-                <Link href={author.url}>
-                  <Avatar alt={author.login}
-                          src={author.avatarUrl}
+                <Link href={author.url()}>
+                  <Avatar alt={author.login()}
+                          src={author.avatarUrl()}
                           sx={{width:22,height:22}} />
                 </Link>
               </Box>

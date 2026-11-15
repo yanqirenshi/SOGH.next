@@ -45,7 +45,7 @@ export default function Title (props) {
 
           <Box sx={{display:'flex', justifyContent:'center'}}>
             <Chip title="Created At"
-                  label={project.creator().login}
+                  label={project.creator().login()}
                   sx={{m:1}}/>
 
             <Chip title="Scope"

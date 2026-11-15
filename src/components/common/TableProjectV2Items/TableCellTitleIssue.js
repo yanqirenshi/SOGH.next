@@ -37,7 +37,7 @@ export default function TableCellTitleIssue (props) {
              </>}
           </S>
           <S variant="caption">
-            {repository.name}
+            {repository && repository.name()}
           </S>
         </TableCell>
     );

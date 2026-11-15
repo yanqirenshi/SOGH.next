@@ -37,14 +37,14 @@
             {
                 "name": "_viewer",
                 "visibility": "private",
-                "type": "User | Viewer | null",
+                "type": "User | null",
                 "initialValue": "null",
                 "description": [
                     "ログインしているユーザー (viewer)。",
                     "constructor が null にし、viewer(v) で入れる。",
                     "Sogh の connect(token, successed, failed) は、User の Pool に入れた User を入れる。(失敗したときは null を入れる)",
-                    "Pooler の node2viewer(d) は、Pool に入れない Viewer を作って入れる。(Sogh の asyncFetchViewer() が使う)",
-                    "そのため、どちらで入れたかで、クラス (User か Viewer か) が違う。",
+                    "Pooler の node2viewer(d) も、User にして User の Pool に入れたものを入れる。(Sogh の asyncFetchViewer() が使う)",
+                    "そのため、どちらで入れても、クラスは User で、Pool の User と同じオブジェクトになる。",
                     "isConnected() は、これが null かどうかを見る。",
                     "connect で入れた User は Pool の User と同じオブジェクトなので、あとで Matchmaker が同じ id のリポジトリの owner を User の Pool に入れると、その core に owner のノードが重なる。(重ねるだけなので、name()・email() などは残る)"
                 ],
@@ -178,7 +178,7 @@
                 "visibility": "public",
                 "returns": {
                     "name": "viewer",
-                    "type": "User | Viewer | null",
+                    "type": "User | null",
                     "description": [
                         "今のユーザー。",
                         "接続していないときは null。"
@@ -187,7 +187,7 @@
                 "arguments": [
                     {
                         "name": "v",
-                        "type": "User | Viewer | null",
+                        "type": "User | null",
                         "description": [
                             "新しいユーザー。"
                         ],
@@ -198,7 +198,7 @@
                     "ログインしているユーザー (_viewer) を読み書きする。",
                     "引数を渡したときは、その値にする。",
                     "Sogh の connect(token, successed, failed) は、取得した User をこれで入れる。(失敗したときは null を入れる)",
-                    "Pooler の node2viewer(d) で入れたときは、User ではなく Viewer になる。"
+                    "Pooler の node2viewer(d) は、これを使わずに、User の Pool に入れた User を _viewer に直に入れる。"
                 ],
                 "examples": [
                     "await sogh.connect('ghp_xxxxxxxx');",
@@ -755,10 +755,10 @@
                 "type": "Matchmaker",
                 "initialValue": "new Matchmaker(this)",
                 "description": [
-                    "ノードを Pool に入れるときに、そのノードに含まれる関係するノードも Pool に入れるもの。",
+                    "ノードを Pool に入れるときに、そのノードに入れ子で含まれる関連のノードも、モデルにして Pool に入れるもの。",
                     "constructor が、自分 (Sogh) を渡して作る。",
-                    "node2repository(node) が matchmaker.repository(node) を、node2user(node) が matchmaker.user(node) を呼ぶ。",
-                    "ほかの node2〜(node) では呼ばない。(コメントアウトされている)"
+                    "node2repository(node)・node2user(node)・node2issue(node)・node2issueComment(node)・node2pullRequest(node)・node2projectV2(node)・node2projectV2Item(node) が、Pool に入れる前に、Matchmaker の親の型のメソッド (repository(node)・user(node)・issue(node) など) を呼ぶ。",
+                    "node2organization(node)・node2label(node) など、あとから増えた node2〜(node) は呼ばない。"
                 ],
                 "examples": [
                     "sogh.matchmaker.sogh === sogh;",
@@ -770,6 +770,8 @@
                 "seeAlso": [
                     "node2repository(node)",
                     "node2user(node)",
+                    "node2issue(node)",
+                    "node2projectV2Item(node)",
                     "Matchmaker"
                 ]
             },
@@ -777,16 +779,16 @@
                 "name": "_pools",
                 "visibility": "private",
                 "type": "{ [code]: Pool }",
-                "initialValue": "{\n  'repository':      new Pool(this, model.Repository),\n  'user':            new Pool(this, model.User),\n  'project-v2':      new Pool(this, model.ProjectV2),\n  'project-v2-item': new Pool(this, model.ProjectV2Item),\n  'issue':           new Pool(this, model.Issue),\n  'issue-comment':   new Pool(this, model.IssueComment),\n  'pull-request':    new Pool(this, model.PullRequest),\n}",
+                "initialValue": "{\n  'repository':      new Pool(this, model.Repository),\n  'user':            new Pool(this, model.User),\n  'project-v2':      new Pool(this, model.ProjectV2),\n  'project-v2-item': new Pool(this, model.ProjectV2Item),\n  'issue':           new Pool(this, model.Issue),\n  'issue-comment':   new Pool(this, model.IssueComment),\n  'pull-request':    new Pool(this, model.PullRequest),\n  'organization':    new Pool(this, model.Organization),\n  'bot':             new Pool(this, model.Bot),\n  'mannequin':       new Pool(this, model.Mannequin),\n  'enterprise-user-account': new Pool(this, model.EnterpriseUserAccount),\n  'draft-issue':     new Pool(this, model.DraftIssue),\n  'team':            new Pool(this, model.Team),\n  'label':           new Pool(this, model.Label),\n  'milestone':       new Pool(this, model.Milestone),\n}",
                 "description": [
                     "種類のコード → Pool の表。",
-                    "constructor が、7 つの種類の Pool を作って入れる。(あとから増えたり減ったりしない)",
+                    "constructor が、15 の種類の Pool を作って入れる。(あとから増えたり減ったりしない)",
                     "どの Pool も、自分 (Sogh) と、その種類のモデルのクラスを持つ。",
-                    "Viewer の Pool は無い。(node2viewer(d) が作る Viewer は、Pool に入らない)"
+                    "viewer の Pool は無い。(node2viewer(d) は、viewer を User にして user の Pool に入れる)"
                 ],
                 "examples": [
                     "Object.keys(sogh._pools);",
-                    "// => [\"repository\", \"user\", \"project-v2\", \"project-v2-item\", \"issue\", \"issue-comment\", \"pull-request\"]"
+                    "// => [\"repository\", \"user\", \"project-v2\", \"project-v2-item\", \"issue\", \"issue-comment\", \"pull-request\", \"organization\", \"bot\", \"mannequin\", \"enterprise-user-account\", \"draft-issue\", \"team\", \"label\", \"milestone\"]"
                 ],
                 "affectedBy": [
                     "constructor"
@@ -826,14 +828,14 @@
                 ],
                 "description": [
                     "種類のコードから、その種類の Pool を返す。",
-                    "コードは repository・user・project-v2・project-v2-item・issue・issue-comment・pull-request のどれか。",
+                    "コードは repository・user・project-v2・project-v2-item・issue・issue-comment・pull-request・organization・bot・mannequin・enterprise-user-account・draft-issue・team・label・milestone のどれか。",
                     "知らないコードのときは null。"
                 ],
                 "examples": [
                     "sogh.pool('issue').list().length;",
                     "// => 12",
                     "",
-                    "sogh.pool('label');",
+                    "sogh.pool('viewer');",
                     "// => null"
                 ]
             },
@@ -864,7 +866,8 @@
                 "description": [
                     "すべての Pool から、id でオブジェクトを探して返す。",
                     "GitHub の node id は種類をまたいで一意なので、種類を指定しなくてよい。",
-                    "Pool を repository・user・project-v2・project-v2-item・issue・issue-comment・pull-request の順に見て、最初に見つかったものを返す。",
+                    "Pool を repository・user・project-v2・project-v2-item・issue・issue-comment・pull-request・organization・bot・mannequin・enterprise-user-account・draft-issue・team・label・milestone の順に見て、最初に見つかったものを返す。",
+                    "GraphQLNode の relation(node)・relations(connection) が、関連のモデルを引くのに使う。",
                     "見つからないときは null。"
                 ],
                 "examples": [
@@ -920,9 +923,9 @@
                 "visibility": "public",
                 "returns": {
                     "name": "viewer",
-                    "type": "Viewer | null",
+                    "type": "User | null",
                     "description": [
-                        "作った Viewer。",
+                        "Pool の User。",
                         "d が無いときは null。"
                     ]
                 },
@@ -931,16 +934,16 @@
                         "name": "d",
                         "type": "Object | null",
                         "description": [
-                            "viewer のノード。"
+                            "viewer のノード。(id は必須)"
                         ]
                     }
                 ],
                 "description": [
-                    "ノードから Viewer を作り、viewer (_viewer) に入れて返す。",
-                    "Viewer は Pool に入れない。(sogh() も入らない)",
+                    "viewer のノードを、node2user(node) で User にして User の Pool に入れ、viewer (_viewer) に入れて返す。",
+                    "同じ id の User があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
                     "d が無いとき (null など) は、viewer を null にする。",
                     "Sogh の asyncFetchViewer() が使う。",
-                    "Sogh の connect(token, successed, failed) は、これを使わず、User の Pool に入れた User を viewer にする。"
+                    "Sogh の connect(token, successed, failed) は、これを使わず、node2user(node) で User の Pool に入れた User を viewer にする。(どちらも、viewer は Pool の User になる)"
                 ],
                 "examples": [
                     "const viewer = sogh.node2viewer({ id: 'U_kgDOAB', login: 'octocat', name: 'The Octocat' });",
@@ -948,6 +951,8 @@
                     "viewer.login();",
                     "// => \"octocat\"",
                     "sogh.viewer() === viewer;",
+                    "// => true",
+                    "sogh.user('U_kgDOAB') === viewer;",
                     "// => true"
                 ]
             },
@@ -976,20 +981,21 @@
                 ],
                 "description": [
                     "リポジトリのノードを、Repository にして Pool に入れて返す。",
-                    "先に matchmaker.repository(node) で、owner を User の Pool に入れる。(組織のときも User になる)",
+                    "先に matchmaker.repository(node) で、owner を __typename に合うモデル (User か Organization) にして、その Pool に入れる。",
+                    "core には、owner の JSON をそのまま残す。(owner() は、その id で Pool のモデルを引く)",
                     "同じ id の Repository があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
                     "Sogh の fetchRepositoriesByViewer(success, fail)・asyncFetchRepositoriesByViewer() が使う。"
                 ],
                 "examples": [
                     "const repository = sogh.node2repository({",
                     "    id: 'R_kgDOAB', name: 'hello-world',",
-                    "    owner: { id: 'U_kgDOAB', login: 'octocat', resourcePath: '/octocat' },",
+                    "    owner: { __typename: 'User', id: 'U_kgDOAB', login: 'octocat', resourcePath: '/octocat' },",
                     "});",
                     "",
                     "repository.name();",
                     "// => \"hello-world\"",
-                    "sogh.user('U_kgDOAB').login();",
-                    "// => \"octocat\""
+                    "repository.owner() === sogh.user('U_kgDOAB');",
+                    "// => true"
                 ]
             },
             {
@@ -1086,7 +1092,7 @@
                     "ユーザーのノードを、User にして Pool に入れて返す。",
                     "先に matchmaker.user(node) を呼ぶ。(今は何もしない)",
                     "同じ id の User があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node)。ノードに無い項目は、残る)",
-                    "Sogh の connect(token, successed, failed)・fetchUserByID(id, success, fail) と、Matchmaker の repository(node) が使う。"
+                    "Sogh の connect(token, successed, failed)・fetchUserByID(id, success, fail) と、node2viewer(d)・node2model(node) と、Matchmaker の issue(node) などが使う。"
                 ],
                 "examples": [
                     "const user = sogh.node2user({ id: 'U_kgDOAB', login: 'octocat', name: 'The Octocat' });",
@@ -1124,7 +1130,7 @@
                 "description": [
                     "id から、Pool の User を返す。",
                     "無いときは null。",
-                    "組織 (Organization) も、node2repository(node) でリポジトリの owner として入ったときは、User として返る。"
+                    "組織 (Organization) は User の Pool に入らないので、organization(v) で引く。"
                 ],
                 "examples": [
                     "sogh.user('U_kgDOAB').login();",
@@ -1157,6 +1163,7 @@
                 "description": [
                     "ProjectV2 のノードを、ProjectV2 にして Pool に入れて返す。",
                     "クラスは getPoolAndItemClass(code) で引く。",
+                    "先に matchmaker.projectV2(node) で、入れ子の creator・owner・items をモデルにして Pool に入れる。(core には JSON をそのまま残す)",
                     "同じ id の ProjectV2 があるときは、新しく作らず、その core にノードを重ねる。(core が変わったときは、README の属性も読み直す)",
                     "Sogh の asyncFetchProjectsV2ByTeam(team_id, callbacks) などが使う。"
                 ],
@@ -1259,9 +1266,10 @@
                 ],
                 "description": [
                     "ProjectV2 のアイテムのノードを、ProjectV2Item にして Pool に入れて返す。",
+                    "先に matchmaker.projectV2Item(node) で、入れ子の project・content・creator と、fieldValues の中の関連をモデルにして Pool に入れる。(core には JSON をそのまま残す)",
                     "同じ id の ProjectV2Item があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
                     "Pool に入れたあとで、もう一度 sogh(v) に自分を入れる。(Pool も入れるので、結果は同じ)",
-                    "Sogh の asyncFetchProjectV2ItemByID(id) や、ProjectV2 の itemsWith2ProjectV2Item() などが使う。"
+                    "Sogh の asyncFetchProjectV2ItemByID(id) や、Matchmaker の issue(node)・projectV2(node) などが使う。"
                 ],
                 "examples": [
                     "const item = sogh.node2projectV2Item({ id: 'PVTI_lADOAB', type: 'ISSUE', fieldValues: { nodes: [] } });",
@@ -1328,6 +1336,7 @@
                 ],
                 "description": [
                     "Issue のノードを、Issue にして Pool に入れて返す。",
+                    "先に matchmaker.issue(node) で、入れ子の assignees・author・labels・milestone・repository・projectItems・comments をモデルにして Pool に入れる。(core には JSON をそのまま残す)",
                     "同じ id の Issue があるときは、新しく作らず、その core にノードを重ねる。(core が変わったときは、本文の注釈 ($Point など) も読み直す)",
                     "Sogh の asyncFetchIssueByID(id) などが使う。"
                 ],
@@ -1430,8 +1439,9 @@
                 ],
                 "description": [
                     "Issue のコメントのノードを、IssueComment にして Pool に入れて返す。",
+                    "先に matchmaker.issueComment(node) で、入れ子の author・editor・pullRequest をモデルにして Pool に入れる。(core には JSON をそのまま残す)",
                     "同じ id の IssueComment があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
-                    "Sogh の asyncFetchIssueCommentsByID(id) や updateIssueComment(id, body, callbacks) などが使う。"
+                    "Sogh の asyncFetchIssueCommentsByID(id) や updateIssueComment(id, body, callbacks)、Matchmaker の issue(node) などが使う。"
                 ],
                 "examples": [
                     "const comment = sogh.node2issueComment({ id: 'IC_kwDOAB', body: 'LGTM' });",
@@ -1498,8 +1508,9 @@
                 ],
                 "description": [
                     "Pull request のノードを、PullRequest にして Pool に入れて返す。",
+                    "先に matchmaker.pullRequest(node) で、入れ子の assignees を User にして Pool に入れる。(core には JSON をそのまま残す)",
                     "同じ id の PullRequest があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
-                    "SOGH の中では、呼ぶところが無い。"
+                    "Sogh からは呼ばない。Matchmaker の issueComment(node)・projectV2Item(node) と、node2model(node) が使う。"
                 ],
                 "examples": [
                     "const pullRequest = sogh.node2pullRequest({ id: 'PR_kwDOAB', number: 2, title: 'Fix typo' });",
@@ -1574,6 +1585,599 @@
                     "sogh.pullRequest('PR_kwDOAB').title();",
                     "// => \"Fix typo\""
                 ]
+            },
+            {
+                "name": "node2organization",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "organization",
+                    "type": "Organization",
+                    "description": [
+                        "Pool の Organization。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "組織 (Organization) のノード。(id は必須)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "組織 (Organization) のノードを、Organization にして Pool に入れて返す。",
+                    "同じ id の Organization があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
+                    "Matchmaker は呼ばない。(Organization の入れ子の関連は辿らない)",
+                    "node2model(node) が、__typename が Organization のノードに使う。(Repository の owner、ProjectV2 の owner、author・creator など)"
+                ],
+                "examples": [
+                    "const organization = sogh.node2organization({ __typename: 'Organization', id: 'O_kgDOAB', login: 'github' });",
+                    "",
+                    "organization.login();",
+                    "// => \"github\""
+                ]
+            },
+            {
+                "name": "organization",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "organization",
+                    "type": "Organization | null",
+                    "description": [
+                        "Pool の Organization。",
+                        "無いときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String",
+                        "description": [
+                            "組織の id。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "id から、Pool の Organization を返す。",
+                    "無いときは null。"
+                ],
+                "examples": [
+                    "sogh.organization('O_kgDOAB').login();",
+                    "// => \"github\""
+                ]
+            },
+            {
+                "name": "node2bot",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "bot",
+                    "type": "Bot",
+                    "description": [
+                        "Pool の Bot。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "Bot のノード。(id は必須)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "Bot のノードを、Bot にして Pool に入れて返す。",
+                    "同じ id の Bot があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
+                    "Matchmaker は呼ばない。(Bot の入れ子の関連は辿らない)",
+                    "node2model(node) が、__typename が Bot のノードに使う。(author・creator・editor や、ProjectV2Item の reviewers など)"
+                ],
+                "examples": [
+                    "const bot = sogh.node2bot({ __typename: 'Bot', id: 'BOT_kgDOAB', login: 'dependabot' });",
+                    "",
+                    "bot.login();",
+                    "// => \"dependabot\""
+                ]
+            },
+            {
+                "name": "bot",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "bot",
+                    "type": "Bot | null",
+                    "description": [
+                        "Pool の Bot。",
+                        "無いときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String",
+                        "description": [
+                            "Bot の id。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "id から、Pool の Bot を返す。",
+                    "無いときは null。"
+                ],
+                "examples": [
+                    "sogh.bot('BOT_kgDOAB').login();",
+                    "// => \"dependabot\""
+                ]
+            },
+            {
+                "name": "node2mannequin",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "mannequin",
+                    "type": "Mannequin",
+                    "description": [
+                        "Pool の Mannequin。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "Mannequin のノード。(id は必須)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "Mannequin のノードを、Mannequin にして Pool に入れて返す。",
+                    "同じ id の Mannequin があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
+                    "Matchmaker は呼ばない。(Mannequin の入れ子の関連は辿らない)",
+                    "node2model(node) が、__typename が Mannequin のノードに使う。(author・creator・editor や、ProjectV2Item の reviewers など)"
+                ],
+                "examples": [
+                    "const mannequin = sogh.node2mannequin({ __typename: 'Mannequin', id: 'MQ_kgDOAB', login: 'old-octocat' });",
+                    "",
+                    "mannequin.login();",
+                    "// => \"old-octocat\""
+                ]
+            },
+            {
+                "name": "mannequin",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "mannequin",
+                    "type": "Mannequin | null",
+                    "description": [
+                        "Pool の Mannequin。",
+                        "無いときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String",
+                        "description": [
+                            "Mannequin の id。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "id から、Pool の Mannequin を返す。",
+                    "無いときは null。"
+                ],
+                "examples": [
+                    "sogh.mannequin('MQ_kgDOAB').login();",
+                    "// => \"old-octocat\""
+                ]
+            },
+            {
+                "name": "node2enterpriseUserAccount",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "enterpriseUserAccount",
+                    "type": "EnterpriseUserAccount",
+                    "description": [
+                        "Pool の EnterpriseUserAccount。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "EnterpriseUserAccount のノード。(id は必須)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "EnterpriseUserAccount のノードを、EnterpriseUserAccount にして Pool に入れて返す。",
+                    "同じ id の EnterpriseUserAccount があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
+                    "Matchmaker は呼ばない。(EnterpriseUserAccount の入れ子の関連は辿らない)",
+                    "node2model(node) が、__typename が EnterpriseUserAccount のノードに使う。(author・creator・editor など)"
+                ],
+                "examples": [
+                    "const account = sogh.node2enterpriseUserAccount({ __typename: 'EnterpriseUserAccount', id: 'EUA_kgDOAB', login: 'octocat' });",
+                    "",
+                    "account.login();",
+                    "// => \"octocat\""
+                ]
+            },
+            {
+                "name": "enterpriseUserAccount",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "enterpriseUserAccount",
+                    "type": "EnterpriseUserAccount | null",
+                    "description": [
+                        "Pool の EnterpriseUserAccount。",
+                        "無いときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String",
+                        "description": [
+                            "EnterpriseUserAccount の id。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "id から、Pool の EnterpriseUserAccount を返す。",
+                    "無いときは null。"
+                ],
+                "examples": [
+                    "sogh.enterpriseUserAccount('EUA_kgDOAB').login();",
+                    "// => \"octocat\""
+                ]
+            },
+            {
+                "name": "node2draftIssue",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "draftIssue",
+                    "type": "DraftIssue",
+                    "description": [
+                        "Pool の DraftIssue。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "下書きの Issue (DraftIssue) のノード。(id は必須)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "下書きの Issue (DraftIssue) のノードを、DraftIssue にして Pool に入れて返す。",
+                    "同じ id の DraftIssue があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
+                    "Matchmaker は呼ばない。(DraftIssue の入れ子の関連は辿らない)",
+                    "node2model(node) が、__typename が DraftIssue のノードに使う。(ProjectV2Item の content)"
+                ],
+                "examples": [
+                    "const draftIssue = sogh.node2draftIssue({ __typename: 'DraftIssue', id: 'DI_lADOAB', title: '下書きのタスク' });",
+                    "",
+                    "draftIssue.title();",
+                    "// => \"下書きのタスク\""
+                ]
+            },
+            {
+                "name": "draftIssue",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "draftIssue",
+                    "type": "DraftIssue | null",
+                    "description": [
+                        "Pool の DraftIssue。",
+                        "無いときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String",
+                        "description": [
+                            "下書きの Issue の id。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "id から、Pool の DraftIssue を返す。",
+                    "無いときは null。"
+                ],
+                "examples": [
+                    "sogh.draftIssue('DI_lADOAB').title();",
+                    "// => \"下書きのタスク\""
+                ]
+            },
+            {
+                "name": "node2team",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "team",
+                    "type": "Team",
+                    "description": [
+                        "Pool の Team。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "Team のノード。(id は必須)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "Team のノードを、Team にして Pool に入れて返す。",
+                    "同じ id の Team があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
+                    "Matchmaker は呼ばない。(Team の入れ子の関連は辿らない)",
+                    "node2model(node) が、__typename が Team のノードに使う。(ProjectV2Item の reviewers)"
+                ],
+                "examples": [
+                    "const team = sogh.node2team({ __typename: 'Team', id: 'T_kwDOAB', slug: 'core' });",
+                    "",
+                    "team.slug();",
+                    "// => \"core\""
+                ]
+            },
+            {
+                "name": "team",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "team",
+                    "type": "Team | null",
+                    "description": [
+                        "Pool の Team。",
+                        "無いときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String",
+                        "description": [
+                            "Team の id。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "id から、Pool の Team を返す。",
+                    "無いときは null。"
+                ],
+                "examples": [
+                    "sogh.team('T_kwDOAB').slug();",
+                    "// => \"core\""
+                ]
+            },
+            {
+                "name": "node2label",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "label",
+                    "type": "Label",
+                    "description": [
+                        "Pool の Label。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "ラベルのノード。(id は必須)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "ラベルのノードを、Label にして Pool に入れて返す。",
+                    "同じ id の Label があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
+                    "Matchmaker は呼ばない。(Label の入れ子の関連は辿らない)",
+                    "Matchmaker の issue(node) (Issue の labels)・projectV2Item(node) (フィールドの値の labels) と、node2model(node) が使う。"
+                ],
+                "examples": [
+                    "const label = sogh.node2label({ __typename: 'Label', id: 'LA_kwDOAB', name: 'bug', color: 'd73a4a' });",
+                    "",
+                    "label.name();",
+                    "// => \"bug\""
+                ]
+            },
+            {
+                "name": "label",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "label",
+                    "type": "Label | null",
+                    "description": [
+                        "Pool の Label。",
+                        "無いときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String",
+                        "description": [
+                            "ラベルの id。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "id から、Pool の Label を返す。",
+                    "無いときは null。"
+                ],
+                "examples": [
+                    "sogh.label('LA_kwDOAB').name();",
+                    "// => \"bug\""
+                ]
+            },
+            {
+                "name": "node2milestone",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "milestone",
+                    "type": "Milestone",
+                    "description": [
+                        "Pool の Milestone。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "マイルストーンのノード。(id は必須)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "マイルストーンのノードを、Milestone にして Pool に入れて返す。",
+                    "同じ id の Milestone があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
+                    "Matchmaker は呼ばない。(Milestone の入れ子の関連は辿らない)",
+                    "Matchmaker の issue(node) (Issue の milestone)・projectV2Item(node) (フィールドの値の milestone) と、node2model(node) が使う。"
+                ],
+                "examples": [
+                    "const milestone = sogh.node2milestone({ __typename: 'Milestone', id: 'MI_kwDOAB', title: 'v1.0' });",
+                    "",
+                    "milestone.title();",
+                    "// => \"v1.0\""
+                ]
+            },
+            {
+                "name": "milestone",
+                "parameters": [
+                    "v"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "milestone",
+                    "type": "Milestone | null",
+                    "description": [
+                        "Pool の Milestone。",
+                        "無いときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "v",
+                        "type": "String",
+                        "description": [
+                            "マイルストーンの id。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "id から、Pool の Milestone を返す。",
+                    "無いときは null。"
+                ],
+                "examples": [
+                    "sogh.milestone('MI_kwDOAB').title();",
+                    "// => \"v1.0\""
+                ]
+            },
+            {
+                "name": "node2model",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "model",
+                    "type": "GraphQLNode | null",
+                    "description": [
+                        "Pool のモデル。(User・Organization・Issue など)",
+                        "node が無いとき・id が無いとき・知らない __typename のときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object | null",
+                        "description": [
+                            "関連のノード。(__typename と id を使う)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "型が複数ありうる関連 (人・ProjectV2 の owner・ProjectV2Item の content・reviewers) のノードを、__typename に合うモデルにして Pool に入れて返す。",
+                    "モデルにするのは、__typename に合う node2〜(node)。(User は node2user、Organization は node2organization、Issue は node2issue など)",
+                    "使える __typename は、User・Organization・Bot・Mannequin・EnterpriseUserAccount・Team・Repository・Issue・IssueComment・PullRequest・DraftIssue・ProjectV2・ProjectV2Item・Label・Milestone の 15。",
+                    "node が無いとき・id が無いとき・知らない __typename のとき (__typename が無いときも) は、Pool に入れずに null を返す。",
+                    "Matchmaker の model(node) が使う。"
+                ],
+                "examples": [
+                    "const owner = sogh.node2model({ __typename: 'Organization', id: 'O_kgDOAB', login: 'github' });",
+                    "",
+                    "owner === sogh.organization('O_kgDOAB');",
+                    "// => true",
+                    "",
+                    "sogh.node2model({ id: 'O_kgDOAB', login: 'github' });",
+                    "// => null"
+                ]
             }
         ],
         "position": {
@@ -1581,7 +2185,7 @@
             "y": 0
         },
         "size": {
-            "w": 260
+            "w": 310
         }
     },
     {
@@ -1780,8 +2384,8 @@
                 "description": [
                     "行き先の名前 (to) とデータ (data) から、画面のパスを作って返す。",
                     "_routes の to のひな形の :login・:number などを、data の値に置き換える。",
-                    "project-v2 は ProjectV2 を受け取り、creator().login と number() を使う。(owner ではなく、作成者の login)",
-                    "project-v2-data は ProjectV2 のノード (オブジェクト) を受け取り、owner.login と number を使う。",
+                    "project-v2 は ProjectV2 を受け取り、creator().login() と number() を使う。(owner ではなく、作成者のモデルの login)",
+                    "project-v2-data は ProjectV2 のノード (オブジェクト) を受け取り、owner.login と number を使う。(ProjectV2Item の projectPath() は、core の project の JSON を渡す)",
                     "project-v2-items は ProjectV2Item を受け取り、projectOwnerLogin()・projectNumber()・id() を使う。",
                     "それ以外の行き先では、:id だけを data.id に置き換える。(issue のひな形には :id が無いので、ひな形のまま返す)",
                     "_routes に無い行き先のときは、data に id があると TypeError を投げ、id が無いと undefined を返す。"
@@ -1843,7 +2447,7 @@
                 ],
                 "description": [
                     "token を入れて viewer (token のユーザー) を取得し、viewer に入れる。",
-                    "viewer は、User にして user の Pool に入れたものになる。(asyncFetchViewer() の Viewer とは違う)",
+                    "viewer は、User にして user の Pool に入れたものになる。(asyncFetchViewer() も同じ)",
                     "成功したときは、successed(viewer) を呼ぶ。",
                     "失敗したときは、viewer を null にして、failed({ status: 'error', error }) を呼ぶ。",
                     "error は、HTTP のエラーのときは fetch の Response、GraphQL のエラー (data が null) のときは TypeError。",
@@ -2199,7 +2803,7 @@
                         "type": "User",
                         "description": [
                             "ProjectV2 の持ち主のユーザー。",
-                            "login() を使うので、Viewer でもよい。"
+                            "login() を使う。(viewer() の User でもよい)"
                         ]
                     },
                     {
@@ -2630,15 +3234,15 @@
                 "visibility": "public",
                 "returns": {
                     "name": "viewer",
-                    "type": "Promise<Viewer | Error | Response>",
+                    "type": "Promise<User | Error | Response>",
                     "description": [
-                        "取得した Viewer。",
+                        "取得した viewer の User。(Pool の User)",
                         "失敗したときは、エラー。"
                     ]
                 },
                 "description": [
-                    "viewer (token のユーザー) を取得し、Viewer にして viewer に入れる。",
-                    "Viewer は Pool に入れない。(connect(token, successed, failed) は、User にして user の Pool に入れる)",
+                    "viewer (token のユーザー) を取得し、Pooler の node2viewer(d) で User にして user の Pool に入れ、viewer に入れる。",
+                    "connect(token, successed, failed) と同じく、viewer は Pool の User になる。",
                     "token は、先に token(v) などで入れておく。",
                     "送り先は endpoint() の値。",
                     "失敗したときは、viewer を変えずに、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない)"
@@ -2647,7 +3251,9 @@
                     "sogh.token(token);",
                     "const viewer = await sogh.asyncFetchViewer();",
                     "viewer.login();",
-                    "// => \"octocat\""
+                    "// => \"octocat\"",
+                    "sogh.user(viewer.id()) === viewer;",
+                    "// => true"
                 ]
             },
             {
@@ -3612,7 +4218,7 @@
                 "description": [
                     "この Matchmaker を持つ Sogh。",
                     "constructor の引数が入る。",
-                    "repository(node) が、node2user(node) を呼ぶのに使う。"
+                    "各メソッドが、入れ子の node をモデルにして Pool に入れるとき (sogh の node2〜(node)・node2model(node) を呼ぶとき) に使う。"
                 ],
                 "examples": [
                     "sogh.matchmaker.sogh === sogh;",
@@ -3623,6 +4229,8 @@
                 ],
                 "seeAlso": [
                     "repository(node)",
+                    "issue(node)",
+                    "model(node)",
                     "Pooler"
                 ]
             }
@@ -3646,21 +4254,23 @@
                     }
                 ],
                 "description": [
-                    "リポジトリのノードの owner を、sogh の node2user(node) で User の Pool に入れる。",
-                    "owner が無いときは、何もしない。",
-                    "owner が組織 (Organization) のときも、User として入れる。",
+                    "リポジトリのノードの owner を、model(node) で __typename に合うモデル (User か Organization) にして、その Pool に入れる。",
+                    "owner が無いとき・id が無いとき・知らない __typename のときは、何もしない。",
                     "owner のノードは、リポジトリと一緒に取得した一部の項目だけ。(email・company などは無い)",
-                    "同じ id の User が既にあるときは、その core に owner のノードを重ねる。(Sogh の connect(token, successed, failed) で viewer にした User の name()・email() などは、残る)",
-                    "リポジトリは Pool に入れない。(入れるのは Pooler の node2repository(node))"
+                    "同じ id のモデルが既にあるときは、その core に owner のノードを重ねる。(Sogh の connect(token, successed, failed) で viewer にした User の name()・email() などは、残る)",
+                    "リポジトリは Pool に入れない。(入れるのは Pooler の node2repository(node))",
+                    "Pooler の node2repository(node) が、Repository を Pool に入れる前に呼ぶ。"
                 ],
                 "examples": [
                     "sogh.matchmaker.repository({",
                     "    id: 'R_kgDOAB', name: 'docs',",
-                    "    owner: { id: 'O_kgDOAB', login: 'github', resourcePath: '/github' },",
+                    "    owner: { __typename: 'Organization', id: 'O_kgDOAB', login: 'github', resourcePath: '/github' },",
                     "});",
                     "",
-                    "sogh.user('O_kgDOAB').login();",
-                    "// => \"github\""
+                    "sogh.organization('O_kgDOAB').login();",
+                    "// => \"github\"",
+                    "sogh.user('O_kgDOAB');",
+                    "// => null"
                 ]
             },
             {
@@ -3688,6 +4298,316 @@
                     "sogh.matchmaker.user({ id: 'U_kgDOAB', login: 'octocat' });",
                     "// => undefined"
                 ]
+            },
+            {
+                "name": "issue",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": null,
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "Issue のノード。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "Issue のノードに入れ子で来た関連を、モデルにして Pool に入れる。",
+                    "assignees は User に、labels は Label に、milestone は Milestone に、repository は Repository に、projectItems は ProjectV2Item に、comments は IssueComment にする。",
+                    "author は、model(node) で __typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) にする。",
+                    "複数の関連 (assignees など) の JSON は、nodes と edges のどちらの形でもよい。(件数の上限で切れたときは、取得できた分だけ)",
+                    "関連が無いとき・id が無いときは、何もしない。",
+                    "入れ子の node も node2〜(node) を通るので、そこからさらに中の関連も辿る。(projectItems の project など)",
+                    "Issue そのものは Pool に入れない。(入れるのは Pooler の node2issue(node)。core には、関連の JSON がそのまま残る)",
+                    "Pooler の node2issue(node) が、Issue を Pool に入れる前に呼ぶ。"
+                ],
+                "examples": [
+                    "sogh.matchmaker.issue({",
+                    "    id: 'I_kwDOAB',",
+                    "    assignees: { nodes: [{ __typename: 'User', id: 'U_kgDOAB', login: 'octocat' }] },",
+                    "    labels: { nodes: [{ __typename: 'Label', id: 'LA_kwDOAB', name: 'bug' }] },",
+                    "});",
+                    "",
+                    "sogh.user('U_kgDOAB').login();",
+                    "// => \"octocat\"",
+                    "sogh.label('LA_kwDOAB').name();",
+                    "// => \"bug\""
+                ]
+            },
+            {
+                "name": "issueComment",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": null,
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "Issue のコメントのノード。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "IssueComment のノードに入れ子で来た関連を、モデルにして Pool に入れる。",
+                    "author と editor は、model(node) で __typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) にする。",
+                    "pullRequest は、PullRequest にする。",
+                    "関連が無いとき・id が無いときは、何もしない。",
+                    "Pooler の node2issueComment(node) が、IssueComment を Pool に入れる前に呼ぶ。"
+                ],
+                "examples": [
+                    "sogh.matchmaker.issueComment({",
+                    "    id: 'IC_kwDOAB',",
+                    "    author: { __typename: 'User', id: 'U_kgDOAB', login: 'octocat' },",
+                    "    editor: { __typename: 'Bot', id: 'BOT_kgDOAB', login: 'dependabot' },",
+                    "});",
+                    "",
+                    "sogh.bot('BOT_kgDOAB').login();",
+                    "// => \"dependabot\""
+                ]
+            },
+            {
+                "name": "pullRequest",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": null,
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "Pull request のノード。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "PullRequest のノードに入れ子で来た assignees を、User にして Pool に入れる。",
+                    "PullRequest のほかの関連 (repository・author) は、モデルにしない。(関連をモデルにする最初の範囲 (yanqirenshi/SOGH.next#29) に入っていない)",
+                    "assignees だけは、PullRequest の assignees() が User を返すので、Pool に入れる。",
+                    "いまは、どのクエリも PullRequest の assignees を取得しないので、Sogh で取得したノードでは何もしない。",
+                    "Pooler の node2pullRequest(node) が、PullRequest を Pool に入れる前に呼ぶ。"
+                ],
+                "examples": [
+                    "sogh.matchmaker.pullRequest({",
+                    "    id: 'PR_kwDOAB',",
+                    "    assignees: { edges: [{ node: { __typename: 'User', id: 'U_kgDOAB', login: 'octocat' } }] },",
+                    "});",
+                    "",
+                    "sogh.user('U_kgDOAB').login();",
+                    "// => \"octocat\""
+                ]
+            },
+            {
+                "name": "projectV2",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": null,
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "ProjectV2 のノード。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "ProjectV2 のノードに入れ子で来た関連を、モデルにして Pool に入れる。",
+                    "creator は、model(node) で __typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) にする。",
+                    "owner は、model(node) で __typename に合うモデル (User・Organization・Issue・PullRequest のどれか) にする。",
+                    "items は、ProjectV2Item にする。(件数の上限で切れたときは、取得できた分だけ)",
+                    "関連が無いとき・id が無いときは、何もしない。",
+                    "Pooler の node2projectV2(node) が、ProjectV2 を Pool に入れる前に呼ぶ。"
+                ],
+                "examples": [
+                    "sogh.matchmaker.projectV2({",
+                    "    id: 'PVT_kwDOAB',",
+                    "    owner: { __typename: 'Organization', id: 'O_kgDOAB', login: 'github' },",
+                    "    items: { edges: [{ node: { __typename: 'ProjectV2Item', id: 'PVTI_lADOAB' } }] },",
+                    "});",
+                    "",
+                    "sogh.organization('O_kgDOAB').login();",
+                    "// => \"github\"",
+                    "sogh.projectV2Item('PVTI_lADOAB').id();",
+                    "// => \"PVTI_lADOAB\""
+                ]
+            },
+            {
+                "name": "projectV2Item",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": null,
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object",
+                        "description": [
+                            "ProjectV2 のアイテムのノード。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "ProjectV2Item のノードに入れ子で来た関連を、モデルにして Pool に入れる。",
+                    "project は ProjectV2 にする。",
+                    "content は、model(node) で __typename に合うモデル (Issue・PullRequest・DraftIssue のどれか) にする。",
+                    "creator は、model(node) で __typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) にする。",
+                    "fieldValues の箱そのものはモデルにせず、箱の中の関連だけをモデルにする。",
+                    "箱の中の users は User に、labels は Label に、milestone は Milestone に、repository は Repository に、pullRequests は PullRequest にする。",
+                    "箱の中の reviewers は、model(node) で __typename に合うモデル (User・Team・Mannequin・Bot のどれか) にする。",
+                    "箱に付いている creator は、モデルにしない。",
+                    "関連が無いとき・id が無いときは、何もしない。",
+                    "Pooler の node2projectV2Item(node) が、ProjectV2Item を Pool に入れる前に呼ぶ。"
+                ],
+                "examples": [
+                    "sogh.matchmaker.projectV2Item({",
+                    "    id: 'PVTI_lADOAB',",
+                    "    content: { __typename: 'DraftIssue', id: 'DI_lADOAB', title: '下書きのタスク' },",
+                    "    fieldValues: { nodes: [{ field: { name: 'Labels' }, labels: { nodes: [{ __typename: 'Label', id: 'LA_kwDOAB', name: 'bug' }] } }] },",
+                    "});",
+                    "",
+                    "sogh.draftIssue('DI_lADOAB').title();",
+                    "// => \"下書きのタスク\"",
+                    "sogh.label('LA_kwDOAB').name();",
+                    "// => \"bug\""
+                ]
+            },
+            {
+                "name": "one",
+                "parameters": [
+                    "node",
+                    "node2obj"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "model",
+                    "type": "GraphQLNode | null",
+                    "description": [
+                        "node2obj が返したモデル。",
+                        "node が無いとき・id が無いときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object | null",
+                        "description": [
+                            "関連のノード。"
+                        ]
+                    },
+                    {
+                        "name": "node2obj",
+                        "type": "Function",
+                        "description": [
+                            "node をモデルにして Pool に入れる関数。(n=> sogh.node2milestone(n) など)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "型が 1 つに決まっている関連の node を、node2obj(node) でモデルにして返す。",
+                    "node が無いとき・id が無いときは、node2obj を呼ばずに null を返す。",
+                    "issue(node) などの、親の型ごとのメソッドが使う。"
+                ],
+                "examples": [
+                    "sogh.matchmaker.one({ id: 'MI_kwDOAB', title: 'v1.0' }, n=> sogh.node2milestone(n)).title();",
+                    "// => \"v1.0\"",
+                    "",
+                    "sogh.matchmaker.one(null, n=> sogh.node2milestone(n));",
+                    "// => null"
+                ]
+            },
+            {
+                "name": "list",
+                "parameters": [
+                    "connection",
+                    "node2obj"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "models",
+                    "type": "GraphQLNode[]",
+                    "description": [
+                        "モデルの配列。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "connection",
+                        "type": "Object | Array | null",
+                        "description": [
+                            "複数の関連の JSON。({ nodes: [...] } か { edges: [{ node }] } の形)"
+                        ]
+                    },
+                    {
+                        "name": "node2obj",
+                        "type": "Function",
+                        "description": [
+                            "node をモデルにして Pool に入れる関数。(n=> sogh.node2user(n) など)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "型が 1 つに決まっている、複数の関連の node を、one(node, node2obj) でモデルにして、配列で返す。",
+                    "connection の形は、{ nodes: [...] } と { edges: [{ node }] } のどちらでもよい。(GraphQLNode の nodesOf(connection) で取り出す)",
+                    "null になったもの (id が無いものなど) は、配列から外す。",
+                    "connection が無いときは []。"
+                ],
+                "examples": [
+                    "sogh.matchmaker.list({ nodes: [{ id: 'U_kgDOAB', login: 'octocat' }, { login: 'no-id' }] }, n=> sogh.node2user(n))",
+                    "    .map(user=> user.login());",
+                    "// => [\"octocat\"]"
+                ]
+            },
+            {
+                "name": "model",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "model",
+                    "type": "GraphQLNode | null",
+                    "description": [
+                        "__typename に合うモデル。",
+                        "node が無いとき・id が無いとき・知らない __typename のときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object | null",
+                        "description": [
+                            "関連のノード。(__typename と id を使う)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "型が複数ありうる関連 (人・ProjectV2 の owner・ProjectV2Item の content・reviewers) の node を、Pooler の node2model(node) で、__typename に合うモデルにして返す。",
+                    "node が無いとき・id が無いとき・知らない __typename のときは、Pool に入れずに null を返す。"
+                ],
+                "examples": [
+                    "sogh.matchmaker.model({ __typename: 'Mannequin', id: 'MQ_kgDOAB', login: 'old-octocat' }) === sogh.mannequin('MQ_kgDOAB');",
+                    "// => true"
+                ]
             }
         ],
         "position": {
@@ -3695,16 +4615,16 @@
             "y": 980
         },
         "size": {
-            "w": 190
+            "w": 280
         }
     },
     {
-        "id": "Assignee",
-        "name": "Assignee",
+        "id": "Bot",
+        "name": "Bot",
         "layer": "model",
-        "filePath": "src/js/models/Assignee.js",
+        "filePath": "src/js/models/Bot.js",
         "description": [
-            "src/js/models/Assignee.js",
+            "src/js/models/Bot.js",
             "extends GraphQLNode"
         ],
         "attributes": [],
@@ -3723,54 +4643,11 @@
                     ]
                 },
                 "description": [
-                    "ユーザーの login (ユーザー名) を返す。"
+                    "Bot の login (名前) を返す。"
                 ],
                 "examples": [
-                    "assignee.login();",
-                    "// => \"octocat\""
-                ]
-            },
-            {
-                "name": "name",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "name",
-                    "type": "String | null",
-                    "description": [
-                        "名前。",
-                        "無いときは null。"
-                    ]
-                },
-                "description": [
-                    "ユーザーの名前 (プロフィールの Name) を返す。"
-                ],
-                "examples": [
-                    "assignee.name();",
-                    "// => \"The Octocat\""
-                ]
-            },
-            {
-                "name": "email",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "email",
-                    "type": "String | null",
-                    "description": [
-                        "メールアドレス。",
-                        "無いときは null。"
-                    ]
-                },
-                "description": [
-                    "ユーザーの、公開しているメールアドレスを返す。",
-                    "空 ('') のときも null を返す。"
-                ],
-                "examples": [
-                    "assignee.email();",
-                    "// => \"octocat@example.com\""
+                    "bot.login();",
+                    "// => \"dependabot\""
                 ]
             },
             {
@@ -3782,37 +4659,58 @@
                     "name": "url",
                     "type": "String | null",
                     "description": [
-                        "ユーザーのページの URL。",
+                        "Bot のページの URL。",
                         "無いときは null。"
                     ]
                 },
                 "description": [
-                    "GitHub のユーザーのページの URL を返す。"
+                    "GitHub の Bot のページの URL を返す。"
                 ],
                 "examples": [
-                    "assignee.url();",
-                    "// => \"https://github.com/octocat\""
+                    "bot.url();",
+                    "// => \"https://github.com/apps/dependabot\""
                 ]
             },
             {
-                "name": "company",
+                "name": "avatarUrl",
                 "parameters": [],
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "company",
+                    "name": "avatarUrl",
                     "type": "String | null",
                     "description": [
-                        "会社。",
+                        "アバター画像の URL。",
                         "無いときは null。"
                     ]
                 },
                 "description": [
-                    "ユーザーのプロフィールの会社 (Company) を返す。"
+                    "Bot のアバター画像の URL を返す。"
                 ],
                 "examples": [
-                    "assignee.company();",
-                    "// => \"@github\""
+                    "bot.avatarUrl();",
+                    "// => \"https://avatars.githubusercontent.com/in/29110?v=4\""
+                ]
+            },
+            {
+                "name": "resourcePath",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "resourcePath",
+                    "type": "String | null",
+                    "description": [
+                        "ページのパス。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "Bot のページのパス (URL の、ホストより後ろ) を返す。"
+                ],
+                "examples": [
+                    "bot.resourcePath();",
+                    "// => \"/apps/dependabot\""
                 ]
             }
         ],
@@ -3865,12 +4763,180 @@
         "stereotype": "classic・廃止予定"
     },
     {
+        "id": "DraftIssue",
+        "name": "DraftIssue",
+        "layer": "model",
+        "filePath": "src/js/models/DraftIssue.js",
+        "description": [
+            "src/js/models/DraftIssue.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "title",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "title",
+                    "type": "String | null",
+                    "description": [
+                        "タイトル。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "下書きの Issue のタイトルを返す。",
+                    "空 ('') のときも null を返す。"
+                ],
+                "examples": [
+                    "draftIssue.title();",
+                    "// => \"下書きのタスク\""
+                ]
+            }
+        ],
+        "position": {
+            "x": 4920,
+            "y": 1720
+        },
+        "size": {
+            "w": 160
+        }
+    },
+    {
+        "id": "EnterpriseUserAccount",
+        "name": "EnterpriseUserAccount",
+        "layer": "model",
+        "filePath": "src/js/models/EnterpriseUserAccount.js",
+        "description": [
+            "src/js/models/EnterpriseUserAccount.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "login",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "login",
+                    "type": "String | null",
+                    "description": [
+                        "login。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "アカウントの login (ユーザー名) を返す。"
+                ],
+                "examples": [
+                    "enterpriseUserAccount.login();",
+                    "// => \"octocat\""
+                ]
+            },
+            {
+                "name": "name",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "name",
+                    "type": "String | null",
+                    "description": [
+                        "名前。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "アカウントの名前を返す。"
+                ],
+                "examples": [
+                    "enterpriseUserAccount.name();",
+                    "// => \"The Octocat\""
+                ]
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "url",
+                    "type": "String | null",
+                    "description": [
+                        "アカウントのページの URL。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "GitHub のアカウントのページの URL を返す。"
+                ],
+                "examples": [
+                    "enterpriseUserAccount.url();",
+                    "// => \"https://github.com/enterprises/octo-enterprise/people/octocat\""
+                ]
+            },
+            {
+                "name": "avatarUrl",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "avatarUrl",
+                    "type": "String | null",
+                    "description": [
+                        "アバター画像の URL。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "アカウントのアバター画像の URL を返す。"
+                ],
+                "examples": [
+                    "enterpriseUserAccount.avatarUrl();",
+                    "// => \"https://avatars.githubusercontent.com/u/583231?v=4\""
+                ]
+            },
+            {
+                "name": "resourcePath",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "resourcePath",
+                    "type": "String | null",
+                    "description": [
+                        "ページのパス。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "アカウントのページのパス (URL の、ホストより後ろ) を返す。"
+                ],
+                "examples": [
+                    "enterpriseUserAccount.resourcePath();",
+                    "// => \"/enterprises/octo-enterprise/people/octocat\""
+                ]
+            }
+        ],
+        "position": {
+            "x": 4450,
+            "y": 1720
+        },
+        "size": {
+            "w": 210
+        }
+    },
+    {
         "id": "GraphQLNode",
         "name": "GraphQLNode",
         "layer": "model",
         "filePath": "src/js/models/GraphQLNode.js",
         "description": [
-            "src/js/models/GraphQLNode.js"
+            "src/js/models/GraphQLNode.js",
+            "export function nodesOf(connection) … 関連の JSON ({ nodes: [...] } か { edges: [{ node }] }) から、node の配列を取り出す。(無いとき・形が違うときは []。配列を渡すと、そのまま返す)"
         ],
         "attributes": [
             {
@@ -3996,7 +5062,7 @@
                     "モデルを持っている Sogh を読み書きする。",
                     "引数を 1 つ渡したときだけ、その値にする。(falsy な値は null にする)",
                     "Pool は、モデルを Pool に入れるときに、ここで Sogh を入れる。",
-                    "ProjectV2Item の path() のように、Sogh を使うメソッドがある。"
+                    "ProjectV2Item の path() や、関連のモデルを Pool から引く relation(node)・relations(connection) のように、Sogh を使うメソッドがある。"
                 ],
                 "examples": [
                     "graphQLNode.sogh();",
@@ -4116,6 +5182,84 @@
                 ]
             },
             {
+                "name": "relation",
+                "parameters": [
+                    "node"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "model",
+                    "type": "GraphQLNode | null",
+                    "description": [
+                        "Pool のモデル。(User・Repository など)",
+                        "無いときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "node",
+                        "type": "Object | null",
+                        "description": [
+                            "core に入れ子で残っている関連の JSON。(id を使う)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "core に入れ子で残っている関連の JSON から、その id で Pool のモデルを引いて返す。(Sogh の get(id) で、すべての Pool から探す)",
+                    "入れ子の node は、親を Pool に入れるときに、Matchmaker が先にモデルにして Pool に入れている。",
+                    "node が無いとき・id が無いときは null。",
+                    "Sogh を持っていないとき (Pool を通さずに作ったとき) と、Pool に無いときも null。",
+                    "Issue の author()・Repository の owner() など、関連を 1 つ返すメソッドが使う。"
+                ],
+                "examples": [
+                    "issue.relation(issue.core().repository) === issue.repository();",
+                    "// => true",
+                    "",
+                    "issue.relation(null);",
+                    "// => null"
+                ]
+            },
+            {
+                "name": "relations",
+                "parameters": [
+                    "connection"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "models",
+                    "type": "GraphQLNode[]",
+                    "description": [
+                        "Pool のモデルの配列。",
+                        "無いときは []。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "connection",
+                        "type": "Object | Array | null",
+                        "description": [
+                            "関連の JSON。({ nodes: [...] } か { edges: [{ node }] } の形。node の配列でもよい)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "複数の関連の JSON から、node ごとに relation(node) で Pool のモデルを引き、配列にして返す。",
+                    "JSON の形は、{ nodes: [...] } と { edges: [{ node }] } のどちらでもよい。(nodesOf(connection) で node の配列を取り出す)",
+                    "Pool に無いもの (relation(node) が null のもの) は、配列から外す。",
+                    "JSON が無いときや、形が違うときは []。",
+                    "Issue の assignees()・ProjectV2 の items() など、関連を配列で返すメソッドが使う。"
+                ],
+                "examples": [
+                    "issue.relations(issue.core().assignees).map(user=> user.login());",
+                    "// => [\"octocat\"]",
+                    "",
+                    "issue.relations(undefined);",
+                    "// => []"
+                ]
+            },
+            {
                 "name": "reload",
                 "parameters": [
                     "v"
@@ -4222,7 +5366,7 @@
             "y": 1380
         },
         "size": {
-            "w": 160
+            "w": 210
         }
     },
     {
@@ -4483,17 +5627,18 @@
                 "visibility": "public",
                 "returns": {
                     "name": "milestone",
-                    "type": "Object | null",
+                    "type": "Milestone | null",
                     "description": [
-                        "マイルストーンのノード。"
+                        "Pool の Milestone。",
+                        "無いときは null。"
                     ]
                 },
                 "description": [
-                    "Issue のマイルストーンのノード (id・title・dueOn など) を返す。",
+                    "Issue のマイルストーンを、Milestone のモデルで返す。(core の milestone の id で、Pool から引く)",
                     "マイルストーンが無いとき、取得していないときは null。"
                 ],
                 "examples": [
-                    "issue.milestone().title;",
+                    "issue.milestone().title();",
                     "// => \"v1.0\""
                 ]
             },
@@ -4504,18 +5649,19 @@
                 "visibility": "public",
                 "returns": {
                     "name": "assignees",
-                    "type": "Object[]",
+                    "type": "User[]",
                     "description": [
-                        "ユーザーのノード (id・login・name など) の配列。"
+                        "Pool の User の配列。"
                     ]
                 },
                 "description": [
-                    "Issue の担当者 (assignees) のユーザーのノードを返す。(core の assignees.nodes)",
+                    "Issue の担当者 (assignees) を、User のモデルの配列で返す。(core の assignees の id で、Pool から引く)",
+                    "core の assignees は、nodes と edges のどちらの形でもよい。",
                     "取得していないときは []。",
                     "本文の $Owner (owner()) とは別のもの。"
                 ],
                 "examples": [
-                    "issue.assignees().map(user=> user.login);",
+                    "issue.assignees().map(user=> user.login());",
                     "// => [\"octocat\"]"
                 ]
             },
@@ -4526,18 +5672,40 @@
                 "visibility": "public",
                 "returns": {
                     "name": "labels",
-                    "type": "Object[]",
+                    "type": "Label[]",
                     "description": [
-                        "ラベルのノード (id・name・url・color) の配列。"
+                        "Pool の Label の配列。"
                     ]
                 },
                 "description": [
-                    "Issue のラベルのノードを返す。(core の labels.nodes)",
+                    "Issue のラベルを、Label のモデルの配列で返す。(core の labels の id で、Pool から引く)",
                     "取得していないときは []。"
                 ],
                 "examples": [
-                    "issue.labels().map(label=> label.name);",
+                    "issue.labels().map(label=> label.name());",
                     "// => [\"bug\", \"documentation\"]"
+                ]
+            },
+            {
+                "name": "comments",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "comments",
+                    "type": "IssueComment[]",
+                    "description": [
+                        "Pool の IssueComment の配列。"
+                    ]
+                },
+                "description": [
+                    "Issue のコメントを、IssueComment のモデルの配列で返す。(core の comments の id で、Pool から引く)",
+                    "件数の上限で切れて取得したときは、取得できた分だけを返す。(asyncFetchIssueByOrgRepoIssueNumber() のクエリは、100 件まで取得する)",
+                    "comments を取得していないときは []。"
+                ],
+                "examples": [
+                    "issue.comments().map(comment=> comment.body());",
+                    "// => [\"LGTM です。\"]"
                 ]
             },
             {
@@ -4609,17 +5777,18 @@
                 "visibility": "public",
                 "returns": {
                     "name": "author",
-                    "type": "Object | null",
+                    "type": "User | Organization | Bot | Mannequin | EnterpriseUserAccount | null",
                     "description": [
-                        "作成者のノード。"
+                        "作成者のモデル。",
+                        "無いときは null。"
                     ]
                 },
                 "description": [
-                    "Issue を作ったユーザーのノード (login・url・avatarUrl など) を返す。",
+                    "Issue を作った人を、__typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) で返す。(core の author の id で、Pool から引く)",
                     "取得していないときは null。"
                 ],
                 "examples": [
-                    "issue.author().login;",
+                    "issue.author().login();",
                     "// => \"octocat\""
                 ]
             },
@@ -4651,20 +5820,18 @@
                 "visibility": "public",
                 "returns": {
                     "name": "project",
-                    "type": "Object | null",
+                    "type": "ProjectV2 | null",
                     "description": [
-                        "ProjectV2 のノード。"
+                        "Pool の ProjectV2。",
+                        "無いときは null。"
                     ]
                 },
                 "description": [
-                    "Issue が入っている ProjectV2 のノードを返す。(fieldItem() の project)",
-                    "ProjectV2 のアイテムが無いときは null。",
-                    "projectItems を取得していないとき (asyncFetchIssueByID() で取得したときなど) は、エラーになる。",
-                    "ProjectV2 のモデルではなく、ノードのまま。",
-                    "projectV2() も同じものを返すが、そちらは projectItems が無くてもエラーにならない。"
+                    "Issue が入っている最初の ProjectV2 を、ProjectV2 のモデルで返す。(projectV2() と同じ)",
+                    "ProjectV2 のアイテムが無いとき、projectItems を取得していないときは null。"
                 ],
                 "examples": [
-                    "issue.project().title;",
+                    "issue.project().title();",
                     "// => \"SOGH の整理\""
                 ]
             },
@@ -4675,17 +5842,18 @@
                 "visibility": "public",
                 "returns": {
                     "name": "repository",
-                    "type": "Object",
+                    "type": "Repository | null",
                     "description": [
-                        "リポジトリのノード。"
+                        "Pool の Repository。",
+                        "無いときは null。"
                     ]
                 },
                 "description": [
-                    "Issue のリポジトリのノード (id・name・owner など) を返す。",
-                    "取得していないときは undefined。"
+                    "Issue のリポジトリを、Repository のモデルで返す。(core の repository の id で、Pool から引く)",
+                    "取得していないときは null。"
                 ],
                 "examples": [
-                    "issue.repository().name;",
+                    "issue.repository().name();",
                     "// => \"hello-world\""
                 ]
             },
@@ -4959,9 +6127,10 @@
                 },
                 "description": [
                     "Issue の最初の ProjectV2 のアイテムのノードを返す。(core の projectItems.edges の最初の node)",
+                    "ProjectV2Item のモデルではなく、JSON のまま。(モデルは projectV2Item() で引く)",
                     "アイテムが無いときは null。",
-                    "projectItems を取得していないときは、エラーになる。",
-                    "projectV2Item() も同じものを返すが、そちらは projectItems が無くても null を返す。"
+                    "projectItems を取得していないときも、null。",
+                    "fieldValueContents(name) が使う。"
                 ],
                 "examples": [
                     "issue.fieldItem().project.title;",
@@ -4994,11 +6163,12 @@
                     }
                 ],
                 "description": [
-                    "最初の ProjectV2 のアイテムから、名前が name のフィールドの値を探し、値を書き換えるときに使うデータにして返す。",
+                    "最初の ProjectV2 のアイテム (fieldItem() のノード) から、名前が name のフィールドの値を探し、値を書き換えるときに使うデータにして返す。",
+                    "fieldValues を直接読むので、返すデータの中身 (project・item・field_item・value) は、モデルではなく JSON のまま。",
                     "value の形は、フィールドの型 (dataType) で変わる。(ASSIGNEES は { users }、REPOSITORY は { repository }、LABELS は { labels }、TITLE は { text }、SINGLE_SELECT は { optionId }、DATE は { date })",
                     "それ以外の型 (TEXT・NUMBER など) のフィールドのときは、Error を投げる。",
                     "アイテムが無いとき、名前が name のフィールドの値が無いときは null。",
-                    "projectItems を取得していないときも、エラーにならずに null を返す。"
+                    "projectItems を取得していないときも、null。"
                 ],
                 "examples": [
                     "const contents = issue.fieldValueContents('Due.Date');",
@@ -5023,6 +6193,7 @@
                 },
                 "description": [
                     "最初の ProjectV2 のアイテムの、フィールドの値のノード (fieldValues.nodes) を返す。",
+                    "フィールドの値は、モデルにしない。(JSON のまま)",
                     "アイテムが無いときは []。",
                     "projectItems を取得していないときは、エラーになる。"
                 ],
@@ -5056,6 +6227,7 @@
                 ],
                 "description": [
                     "fieldValues() から、フィールドの名前が name の値のノードを探して返す。",
+                    "返す値は、モデルではなく JSON のまま。",
                     "見つからないとき、name が空のときは null。",
                     "projectItems を取得していないときは、エラーになる。(name が空のときを除く)"
                 ],
@@ -5375,8 +6547,8 @@
                     "フォームのデータを、Issue を作るリクエスト (GraphQL の createIssue の input) の形にして返す。",
                     "body は、issueData2requestDataDescription(data) で作る。",
                     "repository は、id() メソッドを持つもの (Repository など) でなければならない。",
-                    "projects・milestone・labels・assignees は、id の文字列か、id プロパティを持つノードを渡す。",
-                    "id() メソッドを持つモデル (Label など) を渡すと、id のところに関数がそのまま入る。"
+                    "projects・milestone・labels・assignees は、id の文字列・id プロパティを持つノード (JSON)・id() メソッドを持つモデル (Label・User など) の、どれでもよい。",
+                    "labels()・assignees() などが返すモデルを、そのまま渡せる。"
                 ],
                 "examples": [
                     "issue.issueData2requestData({",
@@ -5397,15 +6569,14 @@
                 "visibility": "public",
                 "returns": {
                     "name": "projectV2Items",
-                    "type": "Object[]",
+                    "type": "ProjectV2Item[]",
                     "description": [
-                        "ProjectV2 のアイテムのノードの配列。"
+                        "Pool の ProjectV2Item の配列。"
                     ]
                 },
                 "description": [
-                    "Issue が入っている ProjectV2 のアイテムのノードを返す。(core の projectItems.edges の node)",
+                    "Issue が入っている ProjectV2 のアイテムを、ProjectV2Item のモデルの配列で返す。(core の projectItems の id で、Pool から引く)",
                     "projectItems を取得していないときは []。",
-                    "ノードのままで、ProjectV2Item のモデルではない。",
                     "projectItems を取得するクエリ (asyncFetchIssueByOrgRepoIssueNumber() のクエリ) は first: 1 なので、多くても 1 件。"
                 ],
                 "examples": [
@@ -5420,17 +6591,19 @@
                 "visibility": "public",
                 "returns": {
                     "name": "projectV2Item",
-                    "type": "Object | null",
+                    "type": "ProjectV2Item | null",
                     "description": [
-                        "ProjectV2 のアイテムのノード。"
+                        "Pool の ProjectV2Item。",
+                        "無いときは null。"
                     ]
                 },
                 "description": [
-                    "projectV2Items() の最初のアイテムのノードを返す。",
-                    "アイテムが無いとき、projectItems を取得していないときは null。"
+                    "projectV2Items() の最初の ProjectV2Item を返す。",
+                    "アイテムが無いとき、projectItems を取得していないときは null。",
+                    "アイテムの JSON (ノード) は、fieldItem() で読む。"
                 ],
                 "examples": [
-                    "issue.projectV2Item().id;",
+                    "issue.projectV2Item().id();",
                     "// => \"PVTI_lAHOAbc123zgAbCdE\""
                 ]
             },
@@ -5441,18 +6614,18 @@
                 "visibility": "public",
                 "returns": {
                     "name": "projectsV2",
-                    "type": "Object[]",
+                    "type": "ProjectV2[]",
                     "description": [
-                        "ProjectV2 のノードの配列。"
+                        "Pool の ProjectV2 の配列。"
                     ]
                 },
                 "description": [
-                    "Issue が入っている ProjectV2 のノード (アイテムごとの project) を返す。",
-                    "projectItems を取得していないときは []。",
-                    "ProjectV2 のモデルではなく、ノードのまま。"
+                    "Issue が入っている ProjectV2 を、ProjectV2 のモデルの配列で返す。(projectV2Items() の、アイテムごとの project())",
+                    "project が null のアイテム (Pool に無いときなど) は、配列から外す。",
+                    "projectItems を取得していないときは []。"
                 ],
                 "examples": [
-                    "issue.projectsV2().map(project=> project.title);",
+                    "issue.projectsV2().map(project=> project.title());",
                     "// => [\"SOGH の整理\"]"
                 ]
             },
@@ -5463,18 +6636,19 @@
                 "visibility": "public",
                 "returns": {
                     "name": "projectV2",
-                    "type": "Object | null",
+                    "type": "ProjectV2 | null",
                     "description": [
-                        "ProjectV2 のノード。"
+                        "Pool の ProjectV2。",
+                        "無いときは null。"
                     ]
                 },
                 "description": [
-                    "projectsV2() の最初の ProjectV2 のノードを返す。",
+                    "projectsV2() の最初の ProjectV2 を返す。",
                     "アイテムが無いとき、projectItems を取得していないときは null。",
-                    "project() と同じものを返すが、こちらは projectItems が無くてもエラーにならない。"
+                    "project() は、これを呼ぶ。"
                 ],
                 "examples": [
-                    "issue.projectV2().title;",
+                    "issue.projectV2().title();",
                     "// => \"SOGH の整理\""
                 ]
             },
@@ -5576,7 +6750,7 @@
                     ]
                 },
                 "description": [
-                    "マイルストーンの id を返す。",
+                    "マイルストーンの id を返す。(milestone() の Milestone の id())",
                     "マイルストーンが無いときは null。"
                 ],
                 "examples": [
@@ -5741,19 +6915,63 @@
                 "visibility": "public",
                 "returns": {
                     "name": "author",
-                    "type": "Object | null",
+                    "type": "User | Organization | Bot | Mannequin | EnterpriseUserAccount | null",
                     "description": [
-                        "書いた人のノード。",
+                        "書いた人のモデル。",
                         "無いときは null。"
                     ]
                 },
                 "description": [
-                    "コメントを書いた人のノード (login・url・avatarUrl・resourcePath など) を返す。",
-                    "ノードのままで、User にはしない。"
+                    "コメントを書いた人を、__typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) で返す。(core の author の id で、Pool から引く)",
+                    "取得していないときは null。"
                 ],
                 "examples": [
-                    "issueComment.author().login;",
+                    "issueComment.author().login();",
                     "// => \"octocat\""
+                ]
+            },
+            {
+                "name": "editor",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "editor",
+                    "type": "User | Organization | Bot | Mannequin | EnterpriseUserAccount | null",
+                    "description": [
+                        "編集した人のモデル。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "コメントを編集した人を、__typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) で返す。(core の editor の id で、Pool から引く)",
+                    "編集していないとき、取得していないときは null。"
+                ],
+                "examples": [
+                    "issueComment.editor().login();",
+                    "// => \"hubot\""
+                ]
+            },
+            {
+                "name": "pullRequest",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "pullRequest",
+                    "type": "PullRequest | null",
+                    "description": [
+                        "Pool の PullRequest。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "コメントが付いている Pull request を、PullRequest のモデルで返す。(core の pullRequest の id で、Pool から引く)",
+                    "Pull request のコメントでないとき、取得していないときは null。"
+                ],
+                "examples": [
+                    "issueComment.pullRequest().title();",
+                    "// => \"クラス図を追加する\""
                 ]
             }
         ],
@@ -5911,6 +7129,132 @@
         },
         "size": {
             "w": 210
+        }
+    },
+    {
+        "id": "Mannequin",
+        "name": "Mannequin",
+        "layer": "model",
+        "filePath": "src/js/models/Mannequin.js",
+        "description": [
+            "src/js/models/Mannequin.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "login",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "login",
+                    "type": "String | null",
+                    "description": [
+                        "login。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "Mannequin の login (ユーザー名) を返す。"
+                ],
+                "examples": [
+                    "mannequin.login();",
+                    "// => \"old-octocat\""
+                ]
+            },
+            {
+                "name": "email",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "email",
+                    "type": "String | null",
+                    "description": [
+                        "メールアドレス。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "Mannequin のメールアドレスを返す。",
+                    "空 ('') のときも null を返す。"
+                ],
+                "examples": [
+                    "mannequin.email();",
+                    "// => \"old-octocat@example.com\""
+                ]
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "url",
+                    "type": "String | null",
+                    "description": [
+                        "ページの URL。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "GitHub の Mannequin のページの URL を返す。"
+                ],
+                "examples": [
+                    "mannequin.url();",
+                    "// => \"https://github.com/old-octocat\""
+                ]
+            },
+            {
+                "name": "avatarUrl",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "avatarUrl",
+                    "type": "String | null",
+                    "description": [
+                        "アバター画像の URL。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "Mannequin のアバター画像の URL を返す。"
+                ],
+                "examples": [
+                    "mannequin.avatarUrl();",
+                    "// => \"https://avatars.githubusercontent.com/u/1234567?v=4\""
+                ]
+            },
+            {
+                "name": "resourcePath",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "resourcePath",
+                    "type": "String | null",
+                    "description": [
+                        "ページのパス。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "Mannequin のページのパス (URL の、ホストより後ろ) を返す。"
+                ],
+                "examples": [
+                    "mannequin.resourcePath();",
+                    "// => \"/old-octocat\""
+                ]
+            }
+        ],
+        "position": {
+            "x": 4240,
+            "y": 1720
+        },
+        "size": {
+            "w": 160
         }
     },
     {
@@ -6081,6 +7425,153 @@
         },
         "size": {
             "w": 170
+        }
+    },
+    {
+        "id": "Organization",
+        "name": "Organization",
+        "layer": "model",
+        "filePath": "src/js/models/Organization.js",
+        "description": [
+            "src/js/models/Organization.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "login",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "login",
+                    "type": "String | null",
+                    "description": [
+                        "login。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "組織の login (組織の名前の ID) を返す。"
+                ],
+                "examples": [
+                    "organization.login();",
+                    "// => \"github\""
+                ]
+            },
+            {
+                "name": "name",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "name",
+                    "type": "String | null",
+                    "description": [
+                        "名前。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "組織の表示名を返す。"
+                ],
+                "examples": [
+                    "organization.name();",
+                    "// => \"GitHub\""
+                ]
+            },
+            {
+                "name": "email",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "email",
+                    "type": "String | null",
+                    "description": [
+                        "メールアドレス。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "組織の、公開しているメールアドレスを返す。",
+                    "空 ('') のときも null を返す。"
+                ],
+                "examples": [
+                    "organization.email();",
+                    "// => \"octo-org@example.com\""
+                ]
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "url",
+                    "type": "String | null",
+                    "description": [
+                        "組織のページの URL。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "GitHub の組織のページの URL を返す。"
+                ],
+                "examples": [
+                    "organization.url();",
+                    "// => \"https://github.com/github\""
+                ]
+            },
+            {
+                "name": "avatarUrl",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "avatarUrl",
+                    "type": "String | null",
+                    "description": [
+                        "アバター画像の URL。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "組織のアバター画像の URL を返す。"
+                ],
+                "examples": [
+                    "organization.avatarUrl();",
+                    "// => \"https://avatars.githubusercontent.com/u/9919?v=4\""
+                ]
+            },
+            {
+                "name": "resourcePath",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "resourcePath",
+                    "type": "String | null",
+                    "description": [
+                        "ページのパス。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "組織のページのパス (URL の、ホストより後ろ) を返す。"
+                ],
+                "examples": [
+                    "organization.resourcePath();",
+                    "// => \"/github\""
+                ]
+            }
+        ],
+        "position": {
+            "x": 210,
+            "y": 1720
+        },
+        "size": {
+            "w": 160
         }
     },
     {
@@ -6733,7 +8224,7 @@
                     "README の $Owner の値 (担当者)。",
                     "initReadmeAttributes() が \"?\" にし、そのあと parseReadme() が README の値にする。",
                     "README に $Owner が無いときは null になる。",
-                    "GitHub の ProjectV2 の owner (持ち主のユーザーや組織) ではない。"
+                    "GitHub の ProjectV2 の owner (持ち主のユーザーや組織) ではない。(それは ownerNode() で引く)"
                 ],
                 "examples": [
                     "// README: $Owner: octocat",
@@ -7455,12 +8946,35 @@
                     "README の $Owner の値 (担当者) を読み書きする。",
                     "引数を渡したときは、その値にする。",
                     "README に $Owner が無いときは null。",
-                    "GitHub の ProjectV2 の owner (持ち主のユーザーや組織) ではない。",
+                    "GitHub の ProjectV2 の owner (持ち主のユーザーや組織) ではない。(それは ownerNode() で引く)",
                     "maneger(v) と同じ値を読み書きする。"
                 ],
                 "examples": [
                     "// README: $Owner: octocat",
                     "projectV2.owner();",
+                    "// => \"octocat\""
+                ]
+            },
+            {
+                "name": "ownerNode",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "owner",
+                    "type": "User | Organization | Issue | PullRequest | null",
+                    "description": [
+                        "持ち主のモデル。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "GitHub の ProjectV2 の owner (持ち主) を、__typename に合うモデル (User・Organization・Issue・PullRequest のどれか) で返す。(core の owner の id で、Pool から引く)",
+                    "owner(v) は README の $Owner の値 (文字列) を返すので、別の名前にしてある。",
+                    "owner を取得していないときは null。"
+                ],
+                "examples": [
+                    "projectV2.ownerNode().login();",
                     "// => \"octocat\""
                 ]
             },
@@ -7471,17 +8985,19 @@
                 "visibility": "public",
                 "returns": {
                     "name": "creator",
-                    "type": "Object",
+                    "type": "User | Organization | Bot | Mannequin | EnterpriseUserAccount | null",
                     "description": [
-                        "作成者のノード (login など)。"
+                        "作成者のモデル。",
+                        "無いときは null。"
                     ]
                 },
                 "description": [
-                    "ProjectV2 を作ったユーザーのノードを返す。",
-                    "取得していないときは undefined。"
+                    "ProjectV2 を作った人を、__typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) で返す。(core の creator の id で、Pool から引く)",
+                    "取得していないときは null。",
+                    "Sogh の href(to, data) は、project-v2 のパスに、これの login() を使う。"
                 ],
                 "examples": [
-                    "projectV2.creator().login;",
+                    "projectV2.creator().login();",
                     "// => \"octocat\""
                 ]
             },
@@ -7492,19 +9008,20 @@
                 "visibility": "public",
                 "returns": {
                     "name": "items",
-                    "type": "Array",
+                    "type": "ProjectV2Item[]",
                     "description": [
-                        "アイテムのノードの配列。"
+                        "Pool の ProjectV2Item の配列。"
                     ]
                 },
                 "description": [
-                    "ProjectV2 のアイテム (Issue・Pull request・Draft issue) のノードを返す。(core の items.edges の node)",
-                    "アイテムを取得していないときは []。",
-                    "ノードのままなので、ProjectV2Item にするときは itemsWith2ProjectV2Item() を使う。"
+                    "ProjectV2 のアイテム (Issue・Pull request・Draft issue) を、ProjectV2Item のモデルの配列で返す。(core の items の id で、Pool から引く)",
+                    "core の items は、nodes と edges のどちらの形でもよい。",
+                    "件数の上限で切れて取得したときは、取得できた分だけを返す。",
+                    "アイテムを取得していないときは []。"
                 ],
                 "examples": [
-                    "projectV2.items().length;",
-                    "// => 12"
+                    "projectV2.items().map(item=> item.title());",
+                    "// => [\"クラス図を描く\", ...]"
                 ]
             },
             {
@@ -7516,11 +9033,12 @@
                     "name": "projectV2Items",
                     "type": "ProjectV2Item[]",
                     "description": [
-                        "アイテムの ProjectV2Item の配列。"
+                        "Pool の ProjectV2Item の配列。"
                     ]
                 },
                 "description": [
-                    "items() のノードを、Sogh の Pool に入れて ProjectV2Item にして返す。",
+                    "items() と同じものを返す。(ProjectV2Item のモデルの配列)",
+                    "items() がモデルを返すようになったので、残してある古い名前。",
                     "Sogh を持っていないとき (Pool を通さずに作ったとき) は []。"
                 ],
                 "examples": [
@@ -8062,18 +9580,19 @@
                 "visibility": "public",
                 "returns": {
                     "name": "creator",
-                    "type": "Object | null",
+                    "type": "User | Organization | Bot | Mannequin | EnterpriseUserAccount | null",
                     "description": [
-                        "作成者のノード (login・url・avatarUrl など)。",
+                        "作成者のモデル。",
                         "無いときは null。"
                     ]
                 },
                 "description": [
-                    "アイテムを作ったユーザーなどのノードを返す。(core の creator)",
-                    "ノードのままで、User にはしない。"
+                    "アイテムを作った人を、__typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) で返す。(core の creator の id で、Pool から引く)",
+                    "取得していないときは null。",
+                    "フィールドの値 (fieldValues() の箱) に付いている creator は、モデルにしない。(JSON のまま)"
                 ],
                 "examples": [
-                    "projectV2Item.creator().login;",
+                    "projectV2Item.creator().login();",
                     "// => \"octocat\""
                 ]
             },
@@ -8114,6 +9633,8 @@
                 },
                 "description": [
                     "アイテムのフィールドの値のノード (core の fieldValues.nodes) を返す。",
+                    "フィールドの値 (箱) は、モデルにしない。(JSON のまま返す)",
+                    "箱の中の関連 (担当者・ラベルなど) のモデルは、assignees()・labels() などで引く。",
                     "ノードには、__typename・field (id・name など)・値 (text・date・name など、種類ごとに違う) がある。",
                     "fieldValues を取得していないときは、エラーになる。",
                     "fieldValues.nodes が null のときは []。"
@@ -8149,6 +9670,7 @@
                 ],
                 "description": [
                     "fieldValues() から、フィールドの名前 (field.name) が name と同じものを探して返す。",
+                    "返す値は、モデルではなく JSON のまま。",
                     "名前は、大文字と小文字を含めて、完全に一致したものだけを見る。",
                     "見つからないときは null。",
                     "title()・status() などの、フィールドの値を読むメソッドは、これを使う。"
@@ -8168,19 +9690,19 @@
                 "visibility": "public",
                 "returns": {
                     "name": "project",
-                    "type": "Object",
+                    "type": "ProjectV2 | null",
                     "description": [
-                        "プロジェクトのノード。"
+                        "Pool の ProjectV2。",
+                        "無いときは null。"
                     ]
                 },
                 "description": [
-                    "アイテムが入っているプロジェクトのノードを返す。(core の project)",
-                    "ノードのままで、ProjectV2 にはしない。",
-                    "ノードには、id・number・title・url・owner がある。",
-                    "project を取得しないクエリ (projectsv2_items_by_projects_v2) で取得したときは undefined。"
+                    "アイテムが入っているプロジェクトを、ProjectV2 のモデルで返す。(core の project の id で、Pool から引く)",
+                    "project を取得しないクエリ (projectsv2_items_by_projects_v2) で取得したときは null。",
+                    "projectNumber()・projectOwnerLogin()・projectPath() は、このモデルではなく、core の project の JSON を読む。"
                 ],
                 "examples": [
-                    "projectV2Item.project().title;",
+                    "projectV2Item.project().title();",
                     "// => \"SOGH の整理\""
                 ]
             },
@@ -8241,7 +9763,7 @@
                 },
                 "description": [
                     "画面で、アイテムが入っているプロジェクトを開くためのパスを返す。",
-                    "Sogh の href(to, data) に 'project-v2-data' と project() のノードを渡して作る。(既定の形は /scrum/users/:login/projects/:number)",
+                    "Sogh の href(to, data) に 'project-v2-data' と、core の project の JSON (project() のモデルではない) を渡して作る。(既定の形は /scrum/users/:login/projects/:number)",
                     "Sogh を持っていないとき (Pool を通さずに作ったとき) や、project を取得していないときは、エラーになる。",
                     "持ち主が組織のプロジェクトでは、パスの login が \"undefined\" になる。"
                 ],
@@ -8368,19 +9890,18 @@
                 "visibility": "public",
                 "returns": {
                     "name": "assignees",
-                    "type": "Object[]",
+                    "type": "User[]",
                     "description": [
-                        "ユーザーのノードの配列。"
+                        "Pool の User の配列。"
                     ]
                 },
                 "description": [
-                    "'Assignees' フィールドの値 (担当のユーザー) を返す。",
-                    "ユーザーのノード (login・name・avatarUrl など) のままで、User にはしない。",
+                    "'Assignees' フィールドの値 (担当のユーザー) を、User のモデルの配列で返す。(フィールドの値の users の id で、Pool から引く)",
                     "クエリは 10 人まで取得する。",
                     "フィールドの値が無いときは []。"
                 ],
                 "examples": [
-                    "projectV2Item.assignees().map(user=> user.login);",
+                    "projectV2Item.assignees().map(user=> user.login());",
                     "// => [\"octocat\", \"hubot\"]"
                 ]
             },
@@ -8391,18 +9912,17 @@
                 "visibility": "public",
                 "returns": {
                     "name": "labels",
-                    "type": "Object[]",
+                    "type": "Label[]",
                     "description": [
-                        "ラベルのノードの配列。"
+                        "Pool の Label の配列。"
                     ]
                 },
                 "description": [
-                    "'Labels' フィールドの値 (ラベル) を返す。",
-                    "ラベルのノード (id・name・url・color) のままで、Label にはしない。",
+                    "'Labels' フィールドの値 (ラベル) を、Label のモデルの配列で返す。(フィールドの値の labels の id で、Pool から引く)",
                     "フィールドの値が無いときは []。"
                 ],
                 "examples": [
-                    "projectV2Item.labels().map(label=> label.name);",
+                    "projectV2Item.labels().map(label=> label.name());",
                     "// => [\"bug\", \"documentation\"]"
                 ]
             },
@@ -8413,18 +9933,17 @@
                 "visibility": "public",
                 "returns": {
                     "name": "linkedPullRequests",
-                    "type": "Object[]",
+                    "type": "PullRequest[]",
                     "description": [
-                        "Pull request のノードの配列。"
+                        "Pool の PullRequest の配列。"
                     ]
                 },
                 "description": [
-                    "'Linked pull requests' フィールドの値 (つながっている Pull request) を返す。",
-                    "Pull request のノード (id・url・title) のままで、PullRequest にはしない。",
+                    "'Linked pull requests' フィールドの値 (つながっている Pull request) を、PullRequest のモデルの配列で返す。(フィールドの値の pullRequests の id で、Pool から引く)",
                     "フィールドの値が無いときは []。"
                 ],
                 "examples": [
-                    "projectV2Item.linkedPullRequests().map(pr=> pr.title);",
+                    "projectV2Item.linkedPullRequests().map(pr=> pr.title());",
                     "// => [\"クラス図を追加する\"]"
                 ]
             },
@@ -8435,19 +9954,19 @@
                 "visibility": "public",
                 "returns": {
                     "name": "reviewers",
-                    "type": "Object[]",
+                    "type": "(User | Team | Mannequin | Bot)[]",
                     "description": [
-                        "レビューする人やチームのノードの配列。"
+                        "レビューする人やチームのモデルの配列。"
                     ]
                 },
                 "description": [
-                    "'Reviewers' フィールドの値 (レビューする人やチーム) を返す。",
-                    "クエリは id だけを取得するので、ノードは { id } だけ。",
+                    "'Reviewers' フィールドの値 (レビューする人やチーム) を、__typename に合うモデル (User・Team・Mannequin・Bot のどれか) の配列で返す。(フィールドの値の reviewers の id で、Pool から引く)",
+                    "クエリは 10 件まで取得する。",
                     "フィールドの値が無いときは []。"
                 ],
                 "examples": [
-                    "projectV2Item.reviewers();",
-                    "// => [{ id: \"MDQ6VXNlcjU4MzIzMQ==\" }]"
+                    "projectV2Item.reviewers().map(reviewer=> reviewer.id());",
+                    "// => [\"MDQ6VXNlcjU4MzIzMQ==\"]"
                 ]
             },
             {
@@ -8457,19 +9976,18 @@
                 "visibility": "public",
                 "returns": {
                     "name": "repository",
-                    "type": "Object | null",
+                    "type": "Repository | null",
                     "description": [
-                        "リポジトリのノード。",
+                        "Pool の Repository。",
                         "無いときは null。"
                     ]
                 },
                 "description": [
-                    "'Repository' フィールドの値 (アイテムのリポジトリ) を返す。",
-                    "リポジトリのノード (name・id・url) のままで、Repository にはしない。",
+                    "'Repository' フィールドの値 (アイテムのリポジトリ) を、Repository のモデルで返す。(フィールドの値の repository の id で、Pool から引く)",
                     "フィールドの値が無いときは null。"
                 ],
                 "examples": [
-                    "projectV2Item.repository().name;",
+                    "projectV2Item.repository().name();",
                     "// => \"hello-world\""
                 ]
             },
@@ -8480,19 +9998,18 @@
                 "visibility": "public",
                 "returns": {
                     "name": "milestone",
-                    "type": "Object | null",
+                    "type": "Milestone | null",
                     "description": [
-                        "マイルストーンのノード。",
+                        "Pool の Milestone。",
                         "無いときは null。"
                     ]
                 },
                 "description": [
-                    "'Milestone' フィールドの値 (マイルストーン) を返す。",
-                    "マイルストーンのノード (id・url・title・state・number・dueOn) のままで、Milestone にはしない。",
+                    "'Milestone' フィールドの値 (マイルストーン) を、Milestone のモデルで返す。(フィールドの値の milestone の id で、Pool から引く)",
                     "フィールドの値が無いときは null。"
                 ],
                 "examples": [
-                    "projectV2Item.milestone().title;",
+                    "projectV2Item.milestone().title();",
                     "// => \"v1.0\""
                 ]
             },
@@ -8503,19 +10020,19 @@
                 "visibility": "public",
                 "returns": {
                     "name": "content",
-                    "type": "Object",
+                    "type": "Issue | PullRequest | DraftIssue | null",
                     "description": [
-                        "中身のノード。"
+                        "中身のモデル。",
+                        "無いときは null。"
                     ]
                 },
                 "description": [
-                    "アイテムの中身 (Issue・Pull request・Draft issue) のノードを返す。(core の content)",
-                    "ノードのままで、Issue などにはしない。",
+                    "アイテムの中身を、__typename に合うモデル (Issue・PullRequest・DraftIssue のどれか) で返す。(core の content の id で、Pool から引く)",
                     "中身の種類は、contentTypename() で読める。",
-                    "content を取得していないときは undefined。"
+                    "content を取得していないときは null。"
                 ],
                 "examples": [
-                    "projectV2Item.content().number;",
+                    "projectV2Item.content().number();",
                     "// => 12"
                 ]
             },
@@ -8526,15 +10043,17 @@
                 "visibility": "public",
                 "returns": {
                     "name": "typename",
-                    "type": "String",
+                    "type": "String | null",
                     "description": [
-                        "中身の種類。"
+                        "中身の種類。",
+                        "無いときは null。"
                     ]
                 },
                 "description": [
                     "アイテムの中身の種類 (content の __typename) を返す。",
                     "値は \"Issue\"・\"PullRequest\"・\"DraftIssue\" のどれか。",
-                    "content が無いとき (null や undefined) は、エラーになる。"
+                    "content() のモデルではなく、core の content の JSON を読む。",
+                    "content が無いとき (null や undefined) は null。"
                 ],
                 "examples": [
                     "projectV2Item.contentTypename();",
@@ -8892,7 +10411,7 @@
                 },
                 "description": [
                     "Pull request のリポジトリのノードを返す。(core の repository)",
-                    "ノードのままで、Repository にはしない。"
+                    "ノード (JSON) のままで、Repository にはしない。(PullRequest の関連は、モデルにする最初の範囲に入っていない)"
                 ],
                 "examples": [
                     "pullRequest.repository().name;",
@@ -8914,7 +10433,7 @@
                 },
                 "description": [
                     "Pull request を作った人のノードを返す。(core の author)",
-                    "ノードのままで、User にはしない。"
+                    "ノード (JSON) のままで、User などのモデルにはしない。(PullRequest の関連は、モデルにする最初の範囲に入っていない)"
                 ],
                 "examples": [
                     "pullRequest.author().login;",
@@ -8928,18 +10447,19 @@
                 "visibility": "public",
                 "returns": {
                     "name": "assignees",
-                    "type": "Object[]",
+                    "type": "User[]",
                     "description": [
-                        "担当者のノードの配列。"
+                        "Pool の User の配列。"
                     ]
                 },
                 "description": [
-                    "Pull request の担当者のノードを返す。(core の assignees.edges の node)",
-                    "ノードのままで、User にはしない。",
-                    "assignees を取得していないときや、edges でなく nodes で取得したときは、エラーになる。(Issue の assignees() は nodes を読み、無いときは [] を返す)"
+                    "Pull request の担当者を、User のモデルの配列で返す。(core の assignees の id で、Pool から引く)",
+                    "core の assignees は、nodes と edges のどちらの形でもよい。",
+                    "assignees を取得していないときは []。",
+                    "いまは、どのクエリも PullRequest の assignees を取得しないので、Sogh で取得した PullRequest では []。"
                 ],
                 "examples": [
-                    "pullRequest.assignees().map(user=> user.login);",
+                    "pullRequest.assignees().map(user=> user.login());",
                     "// => [\"octocat\", \"hubot\"]"
                 ]
             }
@@ -9105,19 +10625,19 @@
                 "visibility": "public",
                 "returns": {
                     "name": "owner",
-                    "type": "Object | null",
+                    "type": "User | Organization | null",
                     "description": [
-                        "持ち主のノード。",
+                        "持ち主のモデル。",
                         "無いときは null。"
                     ]
                 },
                 "description": [
-                    "リポジトリの持ち主 (ユーザーか組織) のノードを返す。(core の owner)",
-                    "ノードのままで、User にはしない。(Pool の User は、sogh.user(owner.id) で引ける)",
-                    "ノードには、id・login・resourcePath がある。(asyncFetchRepositoriesByViewer() で取得したときは、avatarUrl・url もある)"
+                    "リポジトリの持ち主を、User か Organization のモデルで返す。(core の owner の id で、Pool から引く)",
+                    "持ち主が組織のときは、Organization になる。(owner の __typename で決まる)",
+                    "owner を取得していないときは null。"
                 ],
                 "examples": [
-                    "repository.owner().login;",
+                    "repository.owner().login();",
                     "// => \"octocat\""
                 ]
             },
@@ -9150,6 +10670,47 @@
         },
         "size": {
             "w": 200
+        }
+    },
+    {
+        "id": "Team",
+        "name": "Team",
+        "layer": "model",
+        "filePath": "src/js/models/Team.js",
+        "description": [
+            "src/js/models/Team.js",
+            "extends GraphQLNode"
+        ],
+        "attributes": [],
+        "methods": [
+            {
+                "name": "slug",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "slug",
+                    "type": "String | null",
+                    "description": [
+                        "slug。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "Team の slug (URL に使う名前) を返す。"
+                ],
+                "examples": [
+                    "team.slug();",
+                    "// => \"core\""
+                ]
+            }
+        ],
+        "position": {
+            "x": 4710,
+            "y": 1720
+        },
+        "size": {
+            "w": 160
         }
     },
     {
@@ -9361,89 +10922,6 @@
         ],
         "position": {
             "x": 0,
-            "y": 1720
-        },
-        "size": {
-            "w": 160
-        }
-    },
-    {
-        "id": "Viewer",
-        "name": "Viewer",
-        "layer": "model",
-        "filePath": "src/js/models/Viewer.js",
-        "description": [
-            "src/js/models/Viewer.js",
-            "extends GraphQLNode"
-        ],
-        "attributes": [],
-        "methods": [
-            {
-                "name": "login",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "login",
-                    "type": "String | null",
-                    "description": [
-                        "login。",
-                        "無いときは null。"
-                    ]
-                },
-                "description": [
-                    "ログインしているユーザーの login (ユーザー名) を返す。"
-                ],
-                "examples": [
-                    "viewer.login();",
-                    "// => \"octocat\""
-                ]
-            },
-            {
-                "name": "name",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "name",
-                    "type": "String | null",
-                    "description": [
-                        "名前。",
-                        "無いときは null。"
-                    ]
-                },
-                "description": [
-                    "ログインしているユーザーの名前 (プロフィールの Name) を返す。"
-                ],
-                "examples": [
-                    "viewer.name();",
-                    "// => \"The Octocat\""
-                ]
-            },
-            {
-                "name": "url",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "url",
-                    "type": "String | null",
-                    "description": [
-                        "ユーザーのページの URL。",
-                        "無いときは null。"
-                    ]
-                },
-                "description": [
-                    "GitHub の、ログインしているユーザーのページの URL を返す。"
-                ],
-                "examples": [
-                    "viewer.url();",
-                    "// => \"https://github.com/octocat\""
-                ]
-            }
-        ],
-        "position": {
-            "x": 210,
             "y": 1720
         },
         "size": {

@@ -84,10 +84,10 @@
         }
     },
     {
-        "id": "Viewer->GraphQLNode",
+        "id": "Organization->GraphQLNode",
         "type": "inheritance",
         "from": {
-            "classId": "Viewer",
+            "classId": "Organization",
             "point": "top"
         },
         "to": {
@@ -96,10 +96,10 @@
         }
     },
     {
-        "id": "Assignee->GraphQLNode",
+        "id": "Bot->GraphQLNode",
         "type": "inheritance",
         "from": {
-            "classId": "Assignee",
+            "classId": "Bot",
             "point": "top"
         },
         "to": {
@@ -228,6 +228,54 @@
         }
     },
     {
+        "id": "Mannequin->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "Mannequin",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "EnterpriseUserAccount->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "EnterpriseUserAccount",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "Team->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "Team",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
+        "id": "DraftIssue->GraphQLNode",
+        "type": "inheritance",
+        "from": {
+            "classId": "DraftIssue",
+            "point": "top"
+        },
+        "to": {
+            "classId": "GraphQLNode",
+            "point": "bottom"
+        }
+    },
+    {
         "id": "ProjectV2->ProjectV2Item",
         "type": "association",
         "from": {
@@ -241,7 +289,7 @@
         "label": "items",
         "toMultiplicity": "0..*",
         "description": [
-            "ProjectV2.itemsWith2ProjectV2Item() で、core の items を ProjectV2Item にする。"
+            "ProjectV2.items() で、core の items の id から Pool の ProjectV2Item を引く。(Matchmaker の projectV2(node) が、先に Pool に入れる)"
         ]
     },
     {

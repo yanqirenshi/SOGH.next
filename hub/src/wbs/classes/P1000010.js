@@ -36,7 +36,10 @@ function Overview ({ data }) {
             <P>{"GraphQL で取得した IssueComment のノード (core) を包み、本文・URL・公開した日時・書いた人を読む。"}</P>
             <P>{"GraphQLNode を継承する。"}</P>
             <P>{"Sogh の node2issueComment(node) が作り、Pool に入れる。(asyncFetchIssueCommentsByID(id) で取得したときや、createIssueComment()・updateIssueComment() の結果)"}</P>
-            <P>{"author() は、書いた人のノードのままで、User にはしない。"}</P>
+            <P>{"node2issueComment(node) は、Pool に入れる前に、Matchmaker の issueComment(node) で、入れ子で来た author・editor・pullRequest もモデルにして Pool に入れる。"}</P>
+            <P>{"author()・editor() は、書いた人・編集した人を、__typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) で返す。"}</P>
+            <P>{"pullRequest() は、コメントが付いている Pull request を、PullRequest のモデルで返す。"}</P>
+            <P>{"どれも、core の JSON の id で Pool からモデルを引く。(無いときは null)"}</P>
             <P>{"本文が空 ('') のとき、body() は null を返す。(PullRequest の body() は '' を返す)"}</P>
           </Section>
 

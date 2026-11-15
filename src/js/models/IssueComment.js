@@ -16,7 +16,15 @@ export default class IssueComment extends GraphQLNode {
     publishedAt () {
         return this._core.publishedAt || null;
     }
+    // 人 (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか)。
     author () {
-        return this._core.author || null;
+        return this.relation(this._core.author);
+    }
+    // 人。編集していないときは null。
+    editor () {
+        return this.relation(this._core.editor);
+    }
+    pullRequest () {
+        return this.relation(this._core.pullRequest);
     }
 }

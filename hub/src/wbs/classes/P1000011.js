@@ -38,8 +38,8 @@ function Overview ({ data }) {
             <P>{"Issue などに付けるラベルを 1 つ表すモデル。"}</P>
             <P>{"GraphQL で取得した Label のノード (core) を包み、名前・色・URL・説明を読む。"}</P>
             <P>{"GraphQLNode を継承する。"}</P>
-            <P>{"Pooler には Label を作るメソッドも Pool も無いので、使うときは new Label(node) で作る。"}</P>
-            <P>{"Issue の labels() や ProjectV2Item の labels() は、Label ではなく、ノードのまま返す。"}</P>
+            <P>{"Pooler の node2label(node) が作り、label の Pool に入れる。(Matchmaker が、Issue の labels や ProjectV2Item の Labels フィールドの値を Pool に入れるとき)"}</P>
+            <P>{"Issue の labels() や ProjectV2Item の labels() は、Pool の Label を返す。"}</P>
             <P>{"fontColor(hexcolor) は core を使わないので、データの無い Label でも呼べる。(SOGH のラベルの部品は、new Label() で文字の色を決めている)"}</P>
             <Plane>{CODE}</Plane>
           </Section>

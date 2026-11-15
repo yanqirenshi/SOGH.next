@@ -36,9 +36,9 @@ function Overview ({ data }) {
             <P>{"GraphQL で取得した Repository のノード (core) を包み、名前・URL・説明・持ち主・最後に push された日時を読む。"}</P>
             <P>{"GraphQLNode を継承する。"}</P>
             <P>{"Sogh の node2repository(node) が作り、Pool に入れる。(asyncFetchRepositoriesByViewer() などで取得したとき)"}</P>
-            <P>{"node2repository(node) は、Matchmaker を通して、持ち主 (owner) のノードも node2user(node) で User の Pool に入れる。"}</P>
-            <P>{"持ち主が組織のときも、User として入る。"}</P>
-            <P>{"同じ id の User が既にあると、その core に owner のノードが重なる。(重ねるだけなので、owner のノードに無い email・company などは残る)"}</P>
+            <P>{"node2repository(node) は、Matchmaker を通して、持ち主 (owner) のノードも、__typename に合うモデル (User か Organization) にして、その Pool に入れる。"}</P>
+            <P>{"owner() は、core の owner の id で Pool から引いた User か Organization を返す。(持ち主が組織のときは Organization)"}</P>
+            <P>{"同じ id のモデルが既にあると、その core に owner のノードが重なる。(重ねるだけなので、owner のノードに無い email・company などは残る)"}</P>
           </Section>
 
           <Section title="属性" lev="4" sx={SX_MEMBER_TITLE}>

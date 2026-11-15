@@ -22,8 +22,9 @@ export default class PullRequest extends GraphQLNode {
     author () {
         return this._core.author || null;
     }
+    // User の配列。core に assignees が無いときは、空の配列。
+    // (いまは、どのクエリも PullRequest の assignees を取っていない)
     assignees () {
-        const edges = this._core.assignees.edges;
-        return edges.map(e=>e.node);
+        return this.relations(this._core.assignees);
     }
 }

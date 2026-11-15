@@ -43,8 +43,8 @@ export default function TableTasks (props) {
                       <TableRow key={item.id()}>
                         <Cell>
                           {'Issue'===type &&
-                           <Link href={content.url}>
-                             {content.number}
+                           <Link href={content.url()}>
+                             {content.number()}
                            </Link>}
                           {'DraftIssue'===type && "(null)"}
                         </Cell>
@@ -88,14 +88,14 @@ function CellLabels (props) {
           <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
           {item.labels().map(label=> {
               return (
-                  <Box key={label.id}
+                  <Box key={label.id()}
                      sx={{
-                         background: '#'+label.color,
+                         background: '#'+label.color(),
                          fontSize: 11,
                          pt: 0.2, pb: 0.2, pl: 0.4, pr: 0.4,
                          borderRadius: 1,
                      }}>
-                    {label.name}
+                    {label.name()}
                   </Box>
               );
           })}
@@ -113,11 +113,11 @@ function CellAssignees (props) {
               return (
                   <Box sx={{display:'flex', alignItems:'center'}}>
                     <Box sx={{mr:0.5}}>
-                      <Avatar alt={ass.login} src={ass.avatarUrl}
+                      <Avatar alt={ass.login()} src={ass.avatarUrl()}
                               sx={{ width: 18, height: 18 }} />
                     </Box>
                     <Box sx={{whiteSpace: 'nowrap'}}>
-                      {ass.name || ass.login}
+                      {ass.name() || ass.login()}
                     </Box>
                   </Box>
               );

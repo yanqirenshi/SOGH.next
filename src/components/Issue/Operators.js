@@ -39,8 +39,8 @@ export default function Operators (props) {
     const clickRefresh = ()=> {
         actions.issue.refresh(
             issue.id,
-            issue.repository().owner.login,
-            issue.repository().name,
+            issue.repository().owner().login(),
+            issue.repository().name(),
             issue.number(),
         );
     };

@@ -8,13 +8,13 @@ import BehaviorsTable from '../../components/panels/FrameClass/BehaviorsTable.js
 import { SX_MEMBER_TITLE } from '../../components/panels/FrameClass/utils.js';
 import useClassData from '../../hooks/useClassData.js';
 
-// クラス Assignee のページ
-//   src/js/models/Assignee.js
+// クラス EnterpriseUserAccount のページ
+//   src/js/models/EnterpriseUserAccount.js
 //   extends GraphQLNode
-const CLASS = 'Assignee';
+const CLASS = 'EnterpriseUserAccount';
 
-export default function P1000005 (props) {
-    // 属性・振舞のデータ。(data/classes/classes.json の Assignee)
+export default function P1000025 (props) {
+    // 属性・振舞のデータ。(data/classes/classes.json の EnterpriseUserAccount)
     const data = useClassData(CLASS);
 
     return (
@@ -32,12 +32,12 @@ function Overview ({ data }) {
     return (
         <>
           <Section title="概要" lev="4" sx={SX_MEMBER_TITLE}>
-            <P>{"Issue などの担当者 (assignee) になれるユーザーを表すモデル。"}</P>
-            <P>{"GraphQL で取得したユーザーのノード (core) を包み、login・名前・メールアドレス・URL・会社を読む。"}</P>
+            <P>{"GitHub の EnterpriseUserAccount (Enterprise に属するアカウント) を 1 つ表すモデル。"}</P>
+            <P>{"GraphQL で取得した EnterpriseUserAccount のノード (core) を包み、login・名前・URL・アバター画像の URL・ページのパスを読む。"}</P>
             <P>{"GraphQLNode を継承する。"}</P>
-            <P>{"メソッドは、User から avatarUrl() を除いたものと同じ。"}</P>
-            <P>{"Pooler には Assignee を作るメソッドも Pool も無いので、使うときは new Assignee(node) で作る。"}</P>
-            <P>{"Issue の assignees() や ProjectV2Item の assignees() は、Assignee ではなく、ノードのまま返す。"}</P>
+            <P>{"Pooler の node2enterpriseUserAccount(node) が作り、enterprise-user-account の Pool に入れる。"}</P>
+            <P>{"Matchmaker が、入れ子で来た人のうち __typename が EnterpriseUserAccount のもの (Issue の author・IssueComment の editor・ProjectV2 の creator など) を、node2model(node) で EnterpriseUserAccount にする。"}</P>
+            <P>{"node2enterpriseUserAccount(node) は Matchmaker を呼ばないので、EnterpriseUserAccount の入れ子の関連はモデルにしない。"}</P>
             <P>{"どのメソッドも「core の値 || null」を返すので、空文字 ('') も null になる。"}</P>
           </Section>
 

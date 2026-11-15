@@ -12,8 +12,8 @@ export default function TableCellProjectNextItemContent (props) {
     const type = item.type();
     const content = item.content();
 
-    if (type==='ISSUE') {
-        const issue = sogh.issue(content.id) || sogh.node2issue(content);
+    if (type==='ISSUE' && content) {
+        const issue = content;
 
         return (
             <TableCell>
