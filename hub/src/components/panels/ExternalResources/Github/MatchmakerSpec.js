@@ -519,7 +519,6 @@ export default function MatchmakerSpec () {
                     <LI><C>ScrumProjectItem.js</C> の <C>item.content().id</C> は、<C>item.content().id()</C> に直す。</LI>
                   </UL>
                 </LI>
-                <LI><C>dev/src/lib/</C> にある sogh の古い写しには、<C>Assignee</C> と <C>Viewer</C> が残っている。</LI>
               </OL>
             </Section>
 
