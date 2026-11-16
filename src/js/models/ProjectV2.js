@@ -186,9 +186,35 @@ export default class ProjectV2 extends GraphQLNode {
     items () {
         return this.relations(this.core().items);
     }
-    // items() と同じ。(items() がモデルを返すようになったので、残してある古い名前)
-    itemsWith2ProjectV2Item () {
-        return this.items();
+    // Pool にある、この ProjectV2 の ProjectV2Item の配列。(yanqirenshi/SOGH.next#102)
+    //   1. items() (ProjectV2 の中身に入っている Item) を、その順に。
+    //   2. 別に取って Pool に入った Item (core の project の id が、この ProjectV2 のもの) を、Pool に入った順に。
+    // 同じ Item は、1 回だけ。取得はしない。(取得するのは、利用側)
+    // sogh が入っていないとき (Pool を引けないとき) は、items() と同じ。(関連も引けないので、[])
+    itemsInPool () {
+        const out = this.items();
+
+        const sogh = this.sogh();
+        const pool = sogh && typeof sogh.pool === 'function' ? sogh.pool('project-v2-item') : null;
+
+        if (!pool)
+            return out;
+
+        const ids = new Set(out.map(item=> item.id()));
+        const project_id = this.id();
+
+        for (const item of pool.list()) {
+            const core = item.core();
+            const project = core ? core.project : null;
+
+            if (!project || project.id !== project_id || ids.has(item.id()))
+                continue;
+
+            ids.add(item.id());
+            out.push(item);
+        }
+
+        return out;
     }
     /////
     ///// README Attributes

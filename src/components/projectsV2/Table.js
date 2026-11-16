@@ -25,6 +25,10 @@ export default function Table (props) {
             new_state[id] = true;
 
         setOpenTasksProjects(new_state);
+
+        // 開いたときだけ、外に知らせる。(Item の取得は、利用側がする。yanqirenshi/SOGH.next#102)
+        if (new_state[id]===true)
+            notifyTasksOpen(actions, id);
     };
 
     const header_rows = makeHeaderRows(columns);
@@ -70,6 +74,14 @@ export default function Table (props) {
           </MTable>
         </TableContainer>
     );
+}
+
+// actions.tasks.open(project_id) を呼ぶ。(渡されていないときは、何もしない)
+function notifyTasksOpen (actions, project_id) {
+    const tasks = actions ? actions.tasks : null;
+
+    if (tasks && typeof tasks.open === 'function')
+        tasks.open(project_id);
 }
 
 function makeHeaderRows (columns) {

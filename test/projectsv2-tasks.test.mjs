@@ -3,6 +3,8 @@
 //   - 「開く」を押すと、Item の表 (TableBodyRowTasks → TableTasks) が出る。
 //   - Item の表は、Issue・PullRequest・DraftIssue・content の無い Item で、落ちない。
 //   - Item の表の map で作る要素には、key が付いている。(yanqirenshi/SOGH.next#100)
+//   - 「#」の列は、Issue と PullRequest に番号のリンクを出し、DraftIssue と content の無い Item は空。(yanqirenshi/SOGH.next#101)
+//   - 行が開いたときだけ、actions.tasks.open(project_id) で外に知らせる。Item の表は、Pool にある Item を出す。(yanqirenshi/SOGH.next#102)
 //
 // 動かし方:
 //   npm test
@@ -19,6 +21,7 @@ import fs from 'node:fs';
 import { transformSync } from '@babel/core';
 
 import Sogh from '../src/js/Sogh.js';
+import * as model from '../src/js/models/index.js';
 
 const T1 = '2026-11-01T09:00:00Z';
 
@@ -263,12 +266,13 @@ test('Item の表は、Issue・PullRequest・DraftIssue・content の無い Item
     assert.equal(text(issue[6]), 'Todo');
     assert.equal(text(issue[7]), 'ISSUE');
 
-    // PullRequest: 番号の欄は空。(いまの表は、Issue と DraftIssue だけを出す)
-    assert.equal(text(cells(rows[1])[0]), '');
+    // PullRequest: 番号のリンク。(yanqirenshi/SOGH.next#101)
+    assert.equal(text(cells(rows[1])[0]), '12');
+    assert.equal(walk(cells(rows[1])[0]).find(n=> n.type === 'a').props.href, 'https://example.test/pr/12');
     assert.equal(text(cells(rows[1])[1]), 'title PVTI_2');
 
-    // DraftIssue: 番号の欄は "(null)"。
-    assert.equal(text(cells(rows[2])[0]), '(null)');
+    // DraftIssue: 番号の欄は空。(前は "(null)" だった)
+    assert.equal(text(cells(rows[2])[0]), '');
 
     // content の無い Item: 番号の欄は空で、担当者・ラベルも空。
     assert.equal(text(cells(rows[3])[0]), '');
@@ -314,4 +318,179 @@ test('Table.js は、使っていない import (Cell・TableBodyRowProject・Tab
 
     // Table 自体は、読める。
     assert.equal(typeof Table, 'function');
+});
+
+test('「#」の列: 種類は Issue・PullRequest でも、Pool にモデルが無いとき (content() が null) は、落ちずに空', ()=> {
+    // sogh を入れないので、content() は関連を引けず null。(contentTypename() は core から読む)
+    const items = [
+        new model.ProjectV2Item({ __typename: 'ProjectV2Item', id: 'PVTI_1', content: { __typename: 'Issue', id: 'I_9' }, fieldValues: fields('a') }),
+        new model.ProjectV2Item({ __typename: 'ProjectV2Item', id: 'PVTI_2', content: { __typename: 'PullRequest', id: 'PR_9' }, fieldValues: fields('b') }),
+    ];
+
+    assert.equal(items[0].contentTypename(), 'Issue');
+    assert.equal(items[0].content(), null);
+
+    const tree = draw(ReactStub.default.createElement(TableTasks, { items }));
+
+    const rows = walk(tree).filter(n=> n.type === 'TableRow' && /^PVTI_/.test(n.props.key || ''));
+
+    assert.equal(rows.length, 2);
+
+    for (const row of rows) {
+        const first = row.children.flat().filter(n=> n && typeof n === 'object')[0];
+
+        assert.equal(text(first), '');
+    }
+});
+
+/* ****************************************************************
+ * 開いたことを知らせる (yanqirenshi/SOGH.next#102)
+ * **************************************************************** */
+
+test('行が開いたときだけ、actions.tasks.open(project_id) を呼ぶ。閉じたときは呼ばない', ()=> {
+    ReactStub.__clear();
+
+    const sogh = new Sogh();
+    const project = makeProject(sogh);
+
+    const opened = [];
+    const actions = {
+        title: { click: ()=> {} },
+        tasks: { open: (id)=> opened.push(id) },
+    };
+
+    const element = ReactStub.default.createElement(ProjectsV2, { data: [project], sogh, actions });
+
+    const press = ()=> walk(draw(element)).find(n=> n.type === 'Button').props.onClick();
+
+    press(); // 開く
+    assert.deepEqual(opened, ['PVT_1']);
+
+    press(); // 閉じる
+    assert.deepEqual(opened, ['PVT_1']);
+
+    press(); // また開く
+    assert.deepEqual(opened, ['PVT_1', 'PVT_1']);
+});
+
+test('actions に tasks.open が無くても、落ちずに開く', ()=> {
+    for (const actions of [{ title: { click: ()=> {} } }, { title: { click: ()=> {} }, tasks: {} }, { title: { click: ()=> {} }, tasks: { open: 'x' } }]) {
+        ReactStub.__clear();
+
+        const sogh = new Sogh();
+        const project = makeProject(sogh);
+
+        const element = ReactStub.default.createElement(ProjectsV2, { data: [project], sogh, actions });
+
+        walk(draw(element)).find(n=> n.type === 'Button').props.onClick();
+
+        const tree = draw(element);
+
+        assert.equal(walk(tree).some(n=> n.type === 'Button' && text(n) === '閉じる'), true);
+    }
+});
+
+test('ProjectsV2 の既定の actions にも、何もしない tasks.open がある', ()=> {
+    const src = fs.readFileSync(new URL('ProjectsV2.js', SRC), 'utf8');
+
+    assert.match(src, /function defaultActions \(\) \{[\s\S]*?tasks: \{\s*open: \(project_id\)=> project_id,/);
+});
+
+test('Item の表は、Pool にある、その ProjectV2 の Item を出す。(別に取った Item も出す。ほかの ProjectV2 の Item は出さない)', ()=> {
+    ReactStub.__clear();
+
+    const sogh = new Sogh();
+    const project = makeProject(sogh);
+
+    // 別に取って Pool に入った Item。(asyncFetchProjectV2ItemsBy〜 の形)
+    sogh.node2projectV2Item({ __typename: 'ProjectV2Item', id: 'PVTI_5', updatedAt: T1, project: { __typename: 'ProjectV2', id: 'PVT_1', number: 1, updatedAt: T1 }, fieldValues: fields('five') });
+    sogh.node2projectV2Item({ __typename: 'ProjectV2Item', id: 'PVTI_9', updatedAt: T1, project: { __typename: 'ProjectV2', id: 'PVT_2', number: 2, updatedAt: T1 }, fieldValues: fields('nine') });
+
+    const element = ReactStub.default.createElement(ProjectsV2, { data: [project], sogh });
+
+    walk(draw(element)).find(n=> n.type === 'Button').props.onClick();
+
+    const rows = walk(draw(element)).filter(n=> n.type === 'TableRow' && /^PVTI_/.test(n.props.key || ''));
+
+    assert.deepEqual(rows.map(r=> r.props.key), ['PVTI_1', 'PVTI_2', 'PVTI_3', 'PVTI_4', 'PVTI_5']);
+});
+
+/* ****************************************************************
+ * actions を一部だけ渡したとき (yanqirenshi/SOGH.next#102)
+ * **************************************************************** */
+
+// 題の列の、押せる要素。(MUI の Typography を S の名前で読んでいる)
+const pressTitle = (tree)=> walk(tree).find(n=> n.type === 'S' && typeof n.props.onClick === 'function').props.onClick();
+const pressTask  = (tree)=> walk(tree).find(n=> n.type === 'Button').props.onClick();
+
+test('tasks.open だけを渡しても、題を押して落ちない (title.click は既定)。渡した tasks.open は呼ばれる', ()=> {
+    ReactStub.__clear();
+
+    const sogh = new Sogh();
+    const project = makeProject(sogh);
+
+    const opened = [];
+    const element = ReactStub.default.createElement(ProjectsV2, { data: [project], sogh, actions: { tasks: { open: (id)=> opened.push(id) } } });
+
+    assert.doesNotThrow(()=> pressTitle(draw(element)));
+
+    pressTask(draw(element));
+
+    assert.deepEqual(opened, ['PVT_1']);
+});
+
+test('組の中が空 ({ title: {} }) でも、title.click は既定を使う', ()=> {
+    ReactStub.__clear();
+
+    const sogh = new Sogh();
+    const project = makeProject(sogh);
+
+    const element = ReactStub.default.createElement(ProjectsV2, { data: [project], sogh, actions: { title: {}, tasks: { open: 'x' } } });
+
+    assert.doesNotThrow(()=> pressTitle(draw(element)));
+    assert.doesNotThrow(()=> pressTask(draw(element)));
+});
+
+test('渡した関数は、既定で上書きされずに呼ばれる', ()=> {
+    ReactStub.__clear();
+
+    const sogh = new Sogh();
+    const project = makeProject(sogh);
+
+    const clicked = [];
+    const element = ReactStub.default.createElement(ProjectsV2, { data: [project], sogh, actions: { title: { click: (id)=> clicked.push(id) } } });
+
+    pressTitle(draw(element));
+
+    assert.deepEqual(clicked, ['PVT_1']);
+
+    // tasks は渡していないので、既定 (何もしない)。開いても落ちない。
+    assert.doesNotThrow(()=> pressTask(draw(element)));
+});
+
+test('既定に無い名前 (組も、組の中の名前も) は、そのまま列の val に渡る。actions が無いときは既定だけ', ()=> {
+    for (const [given, check] of [
+        [{ issue: { refresh: ()=> 'r' }, title: { other: ()=> 'o' } },
+         (a)=> {
+             assert.equal(a.issue.refresh(), 'r');
+             assert.equal(a.title.other(), 'o');
+             assert.equal(typeof a.title.click, 'function');
+             assert.equal(typeof a.tasks.open, 'function');
+         }],
+        [undefined, (a)=> assert.deepEqual(Object.keys(a).sort(), ['tasks', 'title'])],
+        [null,      (a)=> assert.deepEqual(Object.keys(a).sort(), ['tasks', 'title'])],
+    ]) {
+        ReactStub.__clear();
+
+        const sogh = new Sogh();
+        const project = makeProject(sogh);
+
+        let seen = null;
+        // group を付ける。(group の付いた列が 1 つも無いと、表の見出しを作る所 (makeHeaderRows) が落ちる。前からの動き)
+        const columns = [{ code: 'probe', group: 'G', label: 'Probe', sx: null, val: (column, p, actions)=> { seen = actions; return null; } }];
+
+        draw(ReactStub.default.createElement(ProjectsV2, { data: [project], sogh, columns, actions: given }));
+
+        check(seen);
+    }
 });

@@ -2896,7 +2896,7 @@
                 "description": [
                     "組織 (org_login) のリポジトリ (repo_name) の、番号 (issue_number) の Issue を取得し、Pool に入れて、その id を返す。",
                     "クエリは organization (login: ...) で引くので、組織のリポジトリだけが対象。",
-                    "コメント (100 件まで) とプロジェクトのアイテム (1 件) も取得するが、Pool には入れず、Issue の core に残る。",
+                    "コメント (100 件まで) とプロジェクトのアイテム (1 件) も取得する。どちらも、Pool に入れる前に Matchmaker が IssueComment・ProjectV2Item にして Pool に入れる。Issue の core にも、JSON が残る。",
                     "issue_number は、数値にしてから送る。(文字列でも渡せる)",
                     "失敗したときは、GitHubError を投げる。(0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)"
                 ],
@@ -3113,7 +3113,7 @@
                     "チーム (team_id) の open な ProjectV2 を、アイテム (ProjectV2 ごとに 50 件まで) と一緒に、ページ送りをしながらすべて取得し、Pool に入れる。",
                     "fetchProjectsV2OfTeam(code, team_id, callbacks) に、クエリ projectsv2_with_items_by_team を渡して取る。",
                     "1 回に 10 件ずつ取得する。",
-                    "アイテムは Pool に入れず、ProjectV2 の core に残る。(items()・itemsWith2ProjectV2Item() で読む)",
+                    "アイテムも、Pool に入れる前に Matchmaker が ProjectV2Item にして Pool に入れる。ProjectV2 の core にも、アイテムの JSON が残る。(items() で、core の items の id から Pool のモデルを引いて読む)",
                     "始めに、callbacks の start() を呼ぶ。",
                     "1 回取得するごとに、fetched(その回の id の配列, それまでの id の配列) を呼ぶ。",
                     "すべて取得したときは、successed(id の配列) を呼び、id の配列を返す。",
@@ -3122,7 +3122,7 @@
                 ],
                 "examples": [
                     "const ids = await sogh.asyncFetchProjectsV2WithItemsByTeam(team_id);",
-                    "sogh.projectV2(ids[0]).itemsWith2ProjectV2Item().map(item=> item.title());",
+                    "sogh.projectV2(ids[0]).items().map(item=> item.title());",
                     "// => [\"クラス図を描く\", ...]"
                 ]
             },
@@ -3280,7 +3280,7 @@
                 ],
                 "description": [
                     "組織 (login) の、番号 (number) の ProjectV2 を、アイテム (100 件まで) と一緒に取得し、Pool に入れて、その id を返す。",
-                    "アイテムは Pool に入れず、ProjectV2 の core に残る。(items()・itemsWith2ProjectV2Item() で読む)",
+                    "アイテムも、Pool に入れる前に Matchmaker が ProjectV2Item にして Pool に入れる。ProjectV2 の core にも、アイテムの JSON が残る。(items() で、core の items の id から Pool のモデルを引いて読む)",
                     "始めに、callbacks の start(login, number) を呼ぶ。",
                     "成功したときは、successed(ノード, login, number) を呼ぶ。(ProjectV2 ではなく GraphQL のノードのままで、Pool に入れる前に呼ぶ)",
                     "失敗したときは、failed(error, login, number) を呼んでから、error (GitHubError) を投げる。(0.5.0 から。それまでは、failed に渡したエラーを戻り値として返していた。yanqirenshi/SOGH.next#61)",
@@ -7965,25 +7965,32 @@
                 ]
             },
             {
-                "name": "itemsWith2ProjectV2Item",
+                "name": "itemsInPool",
                 "parameters": [],
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
-                    "name": "projectV2Items",
+                    "name": "items",
                     "type": "ProjectV2Item[]",
                     "description": [
-                        "Pool の ProjectV2Item の配列。"
+                        "Pool にある、この ProjectV2 の ProjectV2Item の配列。"
                     ]
                 },
                 "description": [
-                    "items() と同じものを返す。(ProjectV2Item のモデルの配列)",
-                    "items() がモデルを返すようになったので、残してある古い名前。",
-                    "Sogh を持っていないとき (Pool を通さずに作ったとき) は []。"
+                    "Pool にある、この ProjectV2 の アイテムを、ProjectV2Item のモデルの配列で返す。(0.5.0 から。yanqirenshi/SOGH.next#102)",
+                    "items() (ProjectV2 の中身に入っているアイテム) と、別に取って Pool に入ったアイテム (asyncFetchProjectV2ItemsBy〜 など) を、合わせて返す。",
+                    "並び順は、items() をその順に、そのあとに、別に取ったアイテムを Pool に入った順に。同じアイテムは、1 回だけ。",
+                    "別に取ったアイテムは、core の project の id が、この ProjectV2 の id と同じものを選ぶ。(project の無いアイテムは、入らない)",
+                    "取得はしない。(取得するのは、利用側)",
+                    "Sogh を持っていないとき (Pool を通さずに作ったとき) は、items() と同じ。(関連も引けないので、[])",
+                    "items() の意味 (中身に入っているアイテム) は、変えない。",
+                    "ProjectsV2 の部品の Item の表 (Task の列の「開く」) が読む。",
+                    "0.5.0 で消した itemsWith2ProjectV2Item() (items() と同じものを返す古い名前) の代わりに、部品はこれを読む。(yanqirenshi/SOGH.next#104)"
                 ],
                 "examples": [
-                    "projectV2.itemsWith2ProjectV2Item().map(item=> item.title());",
-                    "// => [\"クラス図を描く\", ...]"
+                    "await sogh.asyncFetchProjectV2ItemsByUserLoginProjectV2Number('octocat', 3);",
+                    "projectV2.itemsInPool().map(item=> item.title());",
+                    "// => [\"クラス図を描く\", ...] (中身の Item と、取得した Item)"
                 ]
             },
             {
@@ -8541,8 +8548,7 @@
                     "フィールドの値 (箱) は、モデルにしない。(JSON のまま返す)",
                     "箱の中の関連 (担当者・ラベルなど) のモデルは、assignees()・labels() などで引く。",
                     "ノードには、__typename・field (id・name など)・値 (text・date・name など、種類ごとに違う) がある。",
-                    "fieldValues を取得していないときは、エラーになる。",
-                    "fieldValues.nodes が null のときは []。"
+                    "fieldValues を取得していないとき・nodes が配列でないときは []。(0.5.0 から。それまでは、取得していないとエラーになった。Issue と同じ守り。yanqirenshi/SOGH.next#103)"
                 ],
                 "examples": [
                     "projectV2Item.fieldValues().map(fv=> fv.field.name);",
@@ -8578,6 +8584,8 @@
                     "返す値は、モデルではなく JSON のまま。",
                     "名前は、大文字と小文字を含めて、完全に一致したものだけを見る。",
                     "見つからないときは null。",
+                    "null のノードと、field の無いノードは、飛ばす。(0.5.0 から。yanqirenshi/SOGH.next#103)",
+                    "fieldValues の無いアイテムでは、null。(そのため、title() などの値を読むメソッドは null、assignees() などの関連を読むメソッドは [] を返す)",
                     "title()・status() などの、フィールドの値を読むメソッドは、これを使う。"
                 ],
                 "examples": [

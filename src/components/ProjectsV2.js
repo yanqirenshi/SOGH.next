@@ -14,7 +14,8 @@ export default function ProjectsV2 (props) {
     const sogh = props.sogh;
     const columns = props.columns || COLUMNS;
 
-    const actions = props.actions || defaultActions();
+    // 渡された actions に無い関数は、既定の関数を使う。(一部だけ渡しても落ちない。yanqirenshi/SOGH.next#102)
+    const actions = mergeActions(defaultActions(), props.actions);
 
     return (
         <Box sx={{pt:2, pb: 22}}>
@@ -39,7 +40,41 @@ function defaultActions () {
         title: {
             click: (project_id)=> project_id,
         },
+        // Task の列の「開く」で、行が開いたとき。(閉じたときは呼ばない。Item の取得は、利用側がする。yanqirenshi/SOGH.next#102)
+        tasks: {
+            open: (project_id)=> project_id,
+        },
     };
+}
+
+// 既定の actions に、渡された actions を重ねる。(yanqirenshi/SOGH.next#102)
+//   - 既定にある組 (title・tasks) は、関数ごとに重ねる。渡された関数はそのまま使い、無い関数 (関数でないものも) は既定を使う。
+//   - 既定に無い名前 (組も、組の中の名前も) は、そのまま通す。
+//   - actions が無い (undefined・null) ときは、既定だけ。
+function mergeActions (defaults, given) {
+    if (!given || typeof given !== 'object')
+        return defaults;
+
+    const out = { ...given };
+
+    for (const [name, group] of Object.entries(defaults)) {
+        const given_group = given[name];
+
+        if (!given_group || typeof given_group !== 'object') {
+            out[name] = group;
+            continue;
+        }
+
+        const merged = { ...given_group };
+
+        for (const [fn_name, fn] of Object.entries(group))
+            if (typeof given_group[fn_name] !== 'function')
+                merged[fn_name] = fn;
+
+        out[name] = merged;
+    }
+
+    return out;
 }
 
 const COLUMNS = [

@@ -322,7 +322,8 @@ test('ProjectV2 の creator()・owner()・items() は、モデルを返す。REA
     // ownerNode() は、owner() にそろえたので、消した。
     assert.equal(typeof project.ownerNode, 'undefined');
     assert.deepEqual(project.items(), [sogh.projectV2Item('PVTI_1'), sogh.projectV2Item('PVTI_2')]);
-    assert.deepEqual(project.itemsWith2ProjectV2Item(), project.items());
+    // itemsWith2ProjectV2Item() は、消した。(Item の表は itemsInPool() を読む。yanqirenshi/SOGH.next#104)
+    assert.equal(typeof project.itemsWith2ProjectV2Item, 'undefined');
 });
 
 test('ProjectV2 の owner() は、Issue・PullRequest のモデルも返す。取得していないときは null', ()=> {

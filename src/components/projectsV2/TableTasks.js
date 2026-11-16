@@ -42,11 +42,10 @@ export default function TableTasks (props) {
                   return (
                       <TableRow key={item.id()}>
                         <Cell>
-                          {'Issue'===type &&
+                          {hasNumber(type, content) &&
                            <Link href={content.url()}>
                              {content.number()}
                            </Link>}
-                          {'DraftIssue'===type && "(null)"}
                         </Cell>
 
                         <Cell>{item.title()}</Cell>
@@ -78,6 +77,12 @@ export default function TableTasks (props) {
           </MTable>
         </TableContainer>
     );
+}
+
+// 「#」の列に、番号のリンクを出すか。(Issue と PullRequest。yanqirenshi/SOGH.next#101)
+// DraftIssue と content の無い Item は、空。Pool にモデルが無いとき (content が null) も、空。
+function hasNumber (type, content) {
+    return ('Issue'===type || 'PullRequest'===type) && !!content;
 }
 
 function CellLabels (props) {

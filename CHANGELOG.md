@@ -6,7 +6,7 @@
 また、Sogh のメソッドから使われていないクエリを、すべて消しました。
 取得のクエリを、値を GraphQL の variables で渡す形に書き直し、`asyncFetch〜` が失敗したときは例外を投げるようにしました。
 あわせて、Projects (classic) のモデルや、Issue を作るための部品など、使われていない古いものを消しました。
-(yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100)
+(yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100・yanqirenshi/SOGH.next#101・yanqirenshi/SOGH.next#102・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#104)
 
 ### 利用側への影響 (破壊的な変更です)
 
@@ -80,6 +80,15 @@
 - `Loader` のメソッドを 3 個、消しました。
   - `fetch(query, success, error)`。(yanqirenshi/SOGH.next#84。取得は `asyncFetch〜` か、`request(query, variables)` を使ってください)
   - `makeGraphQLData(data)`・`makeGraphQLDataItem(v)`。(Issue を作るための部品。yanqirenshi/SOGH.next#83)
+- `ProjectV2` の `itemsWith2ProjectV2Item()` を消しました。(`items()` と同じものを返す古い名前だった。中身に入っている Item は `items()`、Pool にある Item も合わせるときは `itemsInPool()` を使ってください。yanqirenshi/SOGH.next#104)
+- `ProjectsV2` の表の Task の列で、行が開いたときに、`actions.tasks.open(project_id)` を呼ぶようになりました。(閉じたときは、呼びません。yanqirenshi/SOGH.next#102)
+  - 部品は、Item を取得しません。「開く」で Item を出したいときは、この関数を渡し、その中で、その ProjectV2 の Item を取得してください。(`asyncFetchProjectV2ItemsByUserLoginProjectV2Number(login, number)` か `asyncFetchProjectV2ItemsByOrgLoginProjectV2Number(login, number)`。取得が終わったら、一覧を描き直す)
+  - Item の表は、Pool にある、その ProjectV2 の Item (`itemsInPool()`) を出します。取得した Item は、描き直したときに出ます。
+  - 渡していないときは、何もしません。(手元にある Item だけを出します)
+- `ProjectsV2` に渡した `actions` は、既定の actions と合わせて使うようになりました。(yanqirenshi/SOGH.next#102)
+  - これまでは、`actions` を渡すと、既定の actions がまるごと使われなくなり、一部だけを渡すと、渡していない関数を呼んだときに落ちました。(例: `tasks.open` だけを渡すと、題を押したときに落ちた)
+  - いまは、渡していない関数 (関数でないものも) は、既定の関数を使います。`title`・`tasks` の組の中も、関数ごとに合わせます。(例: `{ tasks: { open } }` だけを渡しても、`title.click` は既定)
+  - 渡した関数は、そのまま使います。既定に無い名前は、そのまま列の `val` に渡ります。
 
 ### 消したもの
 
@@ -115,6 +124,13 @@
 - `ProjectsV2` の表の Task の列の「開く」を押すと、Item の表が出るようになりました。(これまでは、表の中で「開いているか」を渡す名前が合っておらず、押しても開かず、ボタンも「開く」のままでした。yanqirenshi/SOGH.next#99)
   - Item の表は、いまのモデルのまま読めたので、直した所はありません。(Issue・PullRequest・DraftIssue・content の無い Item で、落ちないことを確かめました)
 - Item の表の担当者の要素に、`key` (担当者の id) を付けました。(React の警告が出なくなります。yanqirenshi/SOGH.next#100)
+- Item の表の「#」の列を、そろえました。(yanqirenshi/SOGH.next#101)
+  - PullRequest の Item も、Issue と同じく、番号のリンクを出します。(これまでは空でした)
+  - DraftIssue の Item は、空にしました。(これまでは "(null)" と出していました)
+  - content の無い Item と、種類は分かるが Pool にモデルが無い Item は、空です。(落ちません)
+- Item の表は、`items()` ではなく、`itemsInPool()` (中身に入っている Item と、別に取って Pool に入った Item) を出すようになりました。(yanqirenshi/SOGH.next#102)
+- `ProjectV2Item` の `fieldValues()` は、fieldValues が無いとき・nodes が配列でないときに、落ちずに空の配列を返すようになりました。`getFieldValueByName(name)` は、null と、field の無いものを飛ばします。(Issue と同じ守り。yanqirenshi/SOGH.next#103)
+  - そのため、fieldValues の無い Item でも、`title()` などの値を読むメソッドは null を、`assignees()` などの関連を読むメソッドは空の配列を返します。
 
 ### 足したもの
 
@@ -127,6 +143,10 @@
   - `clear()`: すべて消す。
   - 古いものを、自動で消す仕組み (期限) は、持ちません。
 - `ProjectV2` の `readmeOwner(v)`: README の `$Owner` の値を読む・入れる。(これまでの `owner()`。yanqirenshi/SOGH.next#71)
+- `ProjectV2` の `itemsInPool()`: Pool にある、この ProjectV2 の Item の配列を返す。(yanqirenshi/SOGH.next#102)
+  - 並び順は、`items()` (中身に入っている Item) をその順に、そのあとに、別に取って Pool に入った Item (core の project の id が、この ProjectV2 のもの) を、Pool に入った順に。同じ Item は、1 回だけ。
+  - 取得はしません。sogh が入っていないモデルでは、`items()` と同じです。
+- `ProjectsV2` の部品の `actions` の `tasks.open(project_id)`: Task の列で、行が開いたときに呼ぶ。(既定の actions では、何もしない。ほかの関数を渡さずに、これだけを渡してもよい。yanqirenshi/SOGH.next#102)
 
 ## 0.4.2
 
