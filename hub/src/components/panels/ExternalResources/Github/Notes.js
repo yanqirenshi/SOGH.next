@@ -104,7 +104,6 @@ export default function Notes () {
           <Section title="小さな不ぞろい" num="6.3" lev="5">
             <OL>
               <LI>ProjectV2 の <C>owner()</C> は、GitHub の owner ではなく、README の <C>$Owner</C> の値を返す。(GitHub の owner は、<C>ownerNode()</C>)</LI>
-              <LI><C>dev/src/lib/</C> に、sogh の古い写しがある。(<C>Viewer</C> と <C>Assignee</C> が残っている)</LI>
               <LI>環境変数の名前が <C>REACT_APP_GITHU_PARSONAL_TOKEN</C>。(GITHU・PARSONAL のつづり)</LI>
               <LI>クエリの名前に <C>viwer</C> がある。(<C>viwer</C>・<C>issues_by_viwer</C>)</LI>
               <LI>項目の部品の名前の付け方が、3 通りある。(<C>issue_comment</C>・<C>projectv2Fields</C>・<C>ProjectV2ItemFieldDateValue</C>)</LI>
