@@ -180,18 +180,6 @@
         }
     },
     {
-        "id": "Relationship->GraphQLNode",
-        "type": "inheritance",
-        "from": {
-            "classId": "Relationship",
-            "point": "top"
-        },
-        "to": {
-            "classId": "GraphQLNode",
-            "point": "bottom"
-        }
-    },
-    {
         "id": "ProjectV2Item->GraphQLNode",
         "type": "inheritance",
         "from": {

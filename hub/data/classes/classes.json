@@ -10602,56 +10602,6 @@
         }
     },
     {
-        "id": "Relationship",
-        "name": "Relationship",
-        "layer": "model",
-        "filePath": "src/js/models/Relationship.js",
-        "description": [
-            "src/js/models/Relationship.js",
-            "extends GraphQLNode"
-        ],
-        "attributes": [],
-        "methods": [
-            {
-                "name": "a",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": null,
-                "description": [
-                    "中身が空のメソッド。",
-                    "何もせず、undefined を返す。"
-                ],
-                "examples": [
-                    "relationship.a();",
-                    "// => undefined"
-                ]
-            },
-            {
-                "name": "b",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": null,
-                "description": [
-                    "中身が空のメソッド。",
-                    "何もせず、undefined を返す。"
-                ],
-                "examples": [
-                    "relationship.b();",
-                    "// => undefined"
-                ]
-            }
-        ],
-        "position": {
-            "x": 2190,
-            "y": 1720
-        },
-        "size": {
-            "w": 160
-        }
-    },
-    {
         "id": "Repository",
         "name": "Repository",
         "layer": "model",

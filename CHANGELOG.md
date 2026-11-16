@@ -3,8 +3,8 @@
 ## 0.4.2
 
 ProjectV2 の Item の表で、Item の content が無いときに落ちる場合があったのと、閉じた日の書式の誤りを、直しました。
-また、使われていなかった部品を 2 つ消しました。
-(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42)
+また、使われていなかったファイルを 20 個 (部品 19 個・モデル 1 個) 消しました。
+(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45)
 
 ### 直したもの
 
@@ -21,9 +21,33 @@ ProjectV2 の Item の表で、Item の content が無いときに落ちる場�
 
 ### 消したもの
 
+`dist/` の中のファイルを直接 import している場合は、下のファイルは読めなくなります。(パッケージの入口 `sogh` から読んでいる場合は、影響はありません)
+
 - 使われていなかった部品 `src/components/common/Label.js` と `src/components/common/UserName.js` を消した。(#37)
   - どちらも、パッケージの入口 (`src/index.js`) からは export していなかった。
   - 値を JSON として読む、古い読み方のままだった。
+- 入口 (`src/index.js`) から届かず、どこからも import されていなかったファイルを、18 個消した。(#45)
+  - 部品 (17 個。`src/components/` の下)
+    - `DraftIssue.js`
+    - `PullRequest.js`
+    - `RedactedItem.js`
+    - `ProjectV2.js`
+    - `common/Description.js`
+    - `common/IssueTitle.js`
+    - `common/TableCellLinkGithub.js`
+    - `common/TableCellLinkSogh.js`
+    - `common/TableCellProjectNextItemContent.js`
+    - `common/TableCellProjectV2ItemFieldValue.js`
+    - `common/TableCellTerm.js`
+    - `common/TableCellTermPlanResult.js`
+    - `common/TableCellTimestamps.js`
+    - `project_next_items/table/CellFieldLabel.js`
+    - `project_next_items/table/CellFieldValue.js`
+    - `project_next_items/table/CellTitle.js`
+    - `projectsV2/TableCellPlan.js`
+  - モデル (1 個)
+    - `src/js/models/Relationship.js`
+  - 同じ名前のモデル (`src/js/models/DraftIssue.js`・`PullRequest.js`・`ProjectV2.js`) は、消していません。
 
 ## 0.4.1
 
