@@ -3,9 +3,14 @@
     "version": "0.4.2",
     "description": "Scram on Github",
     "main": "dist/index.js",
+    "files": [
+        "dist",
+        "CHANGELOG.md"
+    ],
     "scripts": {
-        "transpile": "babel src -d dist --copy-files",
-        "prepublishOnly": "npm run transpile",
+        "transpile": "babel src -d dist --copy-files --delete-dir-on-start",
+        "prepublishOnly": "npm run transpile && npm run check:pack",
+        "check:pack": "node scripts/check-pack.mjs",
         "check:queries": "node scripts/check-queries.mjs",
         "check:live": "node scripts/check-live.mjs",
         "check:updated-at": "node scripts/check-updated-at.mjs",
