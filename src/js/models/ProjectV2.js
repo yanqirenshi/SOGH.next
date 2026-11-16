@@ -199,12 +199,6 @@ export default class ProjectV2 extends GraphQLNode {
             label_short: '謎',
         };
     }
-    maneger (v) {
-        if (arguments.length===1)
-            this._owner = v;
-
-        return this._owner;
-    }
     type (v) {
         if (arguments.length===1)
             this._type = v;

@@ -5185,7 +5185,7 @@
                 ],
                 "examples": [
                     "// 本文: $Owner octocat",
-                    "issue.owner();",
+                    "issue.bodyOwner();",
                     "// => \"octocat\""
                 ],
                 "affectedBy": [
@@ -5195,7 +5195,7 @@
                     "body(v)"
                 ],
                 "seeAlso": [
-                    "owner()",
+                    "bodyOwner()",
                     "getOwnerFromBody(body)"
                 ]
             },
@@ -5346,7 +5346,7 @@
                     "// => \"クラス図を描く\"",
                     "",
                     "issue.core({ ...issue.core(), body: '$Owner octocat' });",
-                    "issue.owner();",
+                    "issue.bodyOwner();",
                     "// => \"octocat\""
                 ]
             },
@@ -5474,7 +5474,7 @@
                     "Issue の担当者 (assignees) を、User のモデルの配列で返す。(core の assignees の id で、Pool から引く)",
                     "core の assignees は、nodes と edges のどちらの形でもよい。",
                     "取得していないときは []。",
-                    "本文の $Owner (owner()) とは別のもの。"
+                    "本文の $Owner (bodyOwner()) とは別のもの。"
                 ],
                 "examples": [
                     "issue.assignees().map(user=> user.login());",
@@ -5525,7 +5525,7 @@
                 ]
             },
             {
-                "name": "owner",
+                "name": "bodyOwner",
                 "parameters": [],
                 "returnType": "any",
                 "visibility": "public",
@@ -5539,11 +5539,12 @@
                 "description": [
                     "本文の $Owner の値 (担当者) を返す。",
                     "本文に $Owner が無いときは null。",
-                    "GitHub の Issue の assignees (assignees()) とは別のもの。"
+                    "GitHub の Issue の assignees (assignees()) とは別のもの。",
+                    "0.5.0 で、owner() から名前を変えた。GitHub の Issue には owner が無いので、owner() は無くした。(代わりのものは無い。yanqirenshi/SOGH.next#85)"
                 ],
                 "examples": [
                     "// 本文: $Owner octocat",
-                    "issue.owner();",
+                    "issue.bodyOwner();",
                     "// => \"octocat\""
                 ]
             },
@@ -5904,7 +5905,7 @@
                     "// => \"クラス図を描く。\\n$Owner octocat\"",
                     "",
                     "issue.body('$Owner hubot');",
-                    "issue.owner();",
+                    "issue.bodyOwner();",
                     "// => \"hubot\""
                 ]
             },
@@ -6200,47 +6201,6 @@
                 ]
             },
             {
-                "name": "addAnotetionValue",
-                "parameters": [
-                    "issue"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "issue",
-                    "type": "Issue",
-                    "description": [
-                        "引数の issue。(プロパティを書き足したもの)"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "issue",
-                        "type": "Issue",
-                        "description": [
-                            "body() メソッドを持つもの。(Issue など)"
-                        ]
-                    }
-                ],
-                "description": [
-                    "引数の issue の本文 (issue.body()) から注釈を読み出し、issue のプロパティ point・due_date・date_next_action・owner に書き込む。",
-                    "書き込むのは引数の issue で、this の _points などは変えない。",
-                    "Issue を渡すと、プロパティ owner が owner() メソッドを隠し、その Issue の owner() が呼べなくなる。",
-                    "body() メソッドを持たないもの (ノードなど) を渡すと、エラーになる。",
-                    "このクラスのどのメソッドからも呼ばれない。(constructor などは addAnotetionValueNew(issue) を使う)",
-                    "名前の Anotetion は、Annotation の綴り違い。"
-                ],
-                "examples": [
-                    "// other の本文: $Owner octocat\\n$Date.Due 2026-11-30",
-                    "issue.addAnotetionValue(other);",
-                    "",
-                    "other.due_date;",
-                    "// => \"2026-11-30\"",
-                    "other.owner();",
-                    "// => TypeError (other.owner が文字列になっている)"
-                ]
-            },
-            {
                 "name": "addAnotetionValueNew",
                 "parameters": [
                     "issue"
@@ -6272,7 +6232,7 @@
                 ],
                 "examples": [
                     "issue.addAnotetionValueNew({ body: '$Owner octocat' });",
-                    "issue.owner();",
+                    "issue.bodyOwner();",
                     "// => \"octocat\""
                 ]
             },
@@ -7238,14 +7198,12 @@
                 ],
                 "affectedBy": [
                     "readmeOwner(v)",
-                    "maneger(v)",
                     "initReadmeAttributes()",
                     "parseReadme()",
                     "core(v)"
                 ],
                 "seeAlso": [
-                    "readmeOwner(v)",
-                    "maneger(v)"
+                    "readmeOwner(v)"
                 ]
             },
             {
@@ -7976,7 +7934,6 @@
                     "引数を渡したときは、その値にする。",
                     "README に $Owner が無いときは null。",
                     "GitHub の ProjectV2 の owner (持ち主のユーザーや組織) ではない。(それは owner() で引く)",
-                    "maneger(v) と同じ値を読み書きする。",
                     "0.5.0 で、owner(v) から名前を変えた。(yanqirenshi/SOGH.next#71)"
                 ],
                 "examples": [
@@ -8108,42 +8065,6 @@
                 "examples": [
                     "projectV2.priorityData();",
                     "// => { code: \"h\", label: \"高い\", label_short: \"高\" }"
-                ]
-            },
-            {
-                "name": "maneger",
-                "parameters": [
-                    "v"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "owner",
-                    "type": "String | null",
-                    "description": [
-                        "今の 担当者。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "v",
-                        "type": "String | null",
-                        "optional": true,
-                        "description": [
-                            "新しい 担当者。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "README の $Owner の値 (担当者) を読み書きする。",
-                    "引数を渡したときは、その値にする。",
-                    "README に $Owner が無いときは null。",
-                    "readmeOwner(v) と同じ値を読み書きする。"
-                ],
-                "examples": [
-                    "// README: $Owner: octocat",
-                    "projectV2.maneger();",
-                    "// => \"octocat\""
                 ]
             },
             {

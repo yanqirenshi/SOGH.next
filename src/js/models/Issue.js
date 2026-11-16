@@ -68,7 +68,9 @@ export default class Issue extends GraphQLNode {
     /* ****************************************************************
      *  Owner
      * **************************************************************** */
-    owner () {
+    // 本文の $Owner の値 (文字列)。無いときは null。
+    // (0.5.0 で owner() から名前を変えた。GitHub の Issue には owner が無いので、owner() は無くした。yanqirenshi/SOGH.next#85)
+    bodyOwner () {
         return this._owner || null;
     }
     getOwnerFromBody (body) {
@@ -289,16 +291,6 @@ export default class Issue extends GraphQLNode {
     /* **************************************************************** *
      * ???
      * **************************************************************** */
-    addAnotetionValue (issue) {
-        const body = issue.body();
-
-        issue.point = this.getPointFromBody(body);
-        issue.due_date = this.getDueDateFromBody(body);
-        issue.date_next_action = this.getNextActionFromBody(body);
-        issue.owner = this.getOwnerFromBody(body);
-
-        return issue;
-    }
     addAnotetionValueNew (issue) {
         // body を取得していないノード (ProjectV2Item の content など) もあるので空文字で扱う。
         const body = issue.body || '';

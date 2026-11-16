@@ -63,7 +63,7 @@ const ANNOTATION_COLUMNS = [
 const ANNOTATIONS = [
     { place: 'Issue の本文',
       keys: ['$Owner', '$Point.Plan', '$Point.Result', '$Date.Due', '$Due.Date', '$Date.Next'],
-      note: '点数は「$Point.Result <人> <日付> <点>」の行を合計する' },
+      note: '点数は「$Point.Result <人> <日付> <点>」の行を合計する。$Owner の値は bodyOwner() で読む (0.5.0 から。Issue に owner() は無い)' },
     { place: 'ProjectV2 の README',
       keys: ['$Priority', '$Owner', '$Type', '$Release', '$Plan', '$Result', '$Action', '$Backlog', '$Customer', '$Agency', '$Systems', '$Scenario', '$Progress'],
       note: '$Priority は s (緊急)・h (高い)・n (普通)・l (低い)。$Owner の値は readmeOwner() で読む (0.5.0 から。owner() は GitHub の owner のモデル)' },
