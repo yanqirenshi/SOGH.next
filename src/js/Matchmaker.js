@@ -63,11 +63,15 @@ export default class Matchmaker {
         this.model(node.editor);
         this.one(node.pullRequest, n=> this.sogh.node2pullRequest(n));
     }
-    // PullRequest の関連は、最初の範囲 (yanqirenshi/SOGH.next#29 の表) に入っていない。
-    // assignees だけは、PullRequest の assignees() が User を返すので、Pool に入れる。
-    // (いまは、どのクエリも PullRequest の assignees を取っていない)
+    // PullRequest の関連は、最初の範囲 (yanqirenshi/SOGH.next#29 の表) には入っていない。
+    // PullRequest の assignees()・repository()・author() がモデルを返すので、Pool に入れる。
+    // (yanqirenshi/SOGH.next#49。いまは、どのクエリも PullRequest のこれらの関連を取っていない)
     pullRequest (node) {
-        this.list(node.assignees, n=> this.sogh.node2user(n));
+        const sogh = this.sogh;
+
+        this.list(node.assignees, n=> sogh.node2user(n));
+        this.one(node.repository, n=> sogh.node2repository(n));
+        this.model(node.author);
     }
     projectV2 (node) {
         this.model(node.creator);

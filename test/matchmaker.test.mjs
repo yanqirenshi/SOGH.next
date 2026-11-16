@@ -138,6 +138,43 @@ test('IssueComment の author・editor・pullRequest を、Pool に入れる', (
 });
 
 /* ****************************************************************
+ * PullRequest (yanqirenshi/SOGH.next#49)
+ * **************************************************************** */
+
+test('PullRequest の assignees・repository・author を、Pool に入れる', ()=> {
+    const sogh = new Sogh();
+
+    sogh.node2pullRequest({
+        __typename: 'PullRequest',
+        id: 'PR_1',
+        updatedAt: T1,
+        assignees: { nodes: [user('U_1', 'a')] },
+        repository: { __typename: 'Repository', id: 'R_1', name: 'repo', owner: org('O_1', 'acme'), updatedAt: T1 },
+        author: { __typename: 'Bot', id: 'B_1', login: 'dependabot', updatedAt: T1 },
+    });
+
+    assert.ok(sogh.user('U_1'));
+    assert.ok(sogh.repository('R_1'));
+    assert.ok(sogh.organization('O_1'), '入れ子の、さらに中の関連 (repository の owner) も辿る');
+    assert.ok(sogh.bot('B_1'));
+});
+
+test('PullRequest の repository・author が null・無い・id が無いときは、何も入れない', ()=> {
+    const sogh = new Sogh();
+
+    sogh.node2pullRequest({ __typename: 'PullRequest', id: 'PR_1', updatedAt: T1, repository: null, author: null });
+    sogh.node2pullRequest({ __typename: 'PullRequest', id: 'PR_2', updatedAt: T1 });
+    sogh.node2pullRequest({
+        __typename: 'PullRequest', id: 'PR_3', updatedAt: T1,
+        repository: { __typename: 'Repository', name: 'no-id' },
+        author: { __typename: 'User', login: 'ghost' },
+    });
+
+    assert.equal(sogh.pool('repository').list().length, 0);
+    assert.equal(sogh.pool('user').list().length, 0);
+});
+
+/* ****************************************************************
  * ProjectV2
  * **************************************************************** */
 

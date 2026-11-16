@@ -23,12 +23,6 @@ export default function Notes () {
                   <LI><C>fieldItem()</C> と <C>project()</C> は、0.4.0 で、TypeError にならないように直った。</LI>
                 </UL>
               </LI>
-              <LI>PullRequest の <C>repository()</C> と <C>author()</C> だけが、JSON を返す。
-                <UL>
-                  <LI>ほかの関連を返すメソッドは、モデルを返す。(「7.2 モデルにした関連」を見る)</LI>
-                  <LI>PullRequest の関連は、最初の範囲に入れていないため。</LI>
-                </UL>
-              </LI>
               <LI>親の updatedAt が動かない変更は、取り直しても、反映されない場合がある。
                 <UL>
                   <LI>Pool は、同じ id の node が来ると、updatedAt を比べて、重ねるかどうかを決めるため。</LI>

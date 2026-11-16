@@ -233,7 +233,6 @@ export default function DataModel () {
                 <LI>JSON のまま返すメソッドも、残っている。
                   <UL>
                     <LI>fieldValues を直に読むもの。(ProjectV2Item の <C>fieldValues()</C>・<C>getFieldValueByName(name)</C>、Issue の <C>fieldItem()</C>・<C>fieldValues()</C>・<C>fieldValueContents(name)</C> など)</LI>
-                    <LI>PullRequest の <C>repository()</C> と <C>author()</C>。</LI>
                   </UL>
                 </LI>
               </OL>

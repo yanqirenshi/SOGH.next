@@ -5,7 +5,8 @@
 ProjectV2 の Item の表で、Item の content が無いときに落ちる場合があったのと、閉じた日の書式の誤りを、直しました。
 また、使われていなかったファイルを 20 個 (部品 19 個・モデル 1 個) 消しました。
 入口からモデルを export し、モデルの型の名前を返す `typename()` を足しました。
-(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#38・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45)
+PullRequest の `repository()`・`author()` も、モデルを返すようにしました。
+(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#38・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45・yanqirenshi/SOGH.next#49)
 
 ### 直したもの
 
@@ -19,6 +20,13 @@ ProjectV2 の Item の表で、Item の content が無いときに落ちる場�
 - `TableProjectV2Items` の Closed の列が、閉じた日を `年-日-分` の書式で出していた。(#42)
   - `年-月-日` (例: `2026-03-09`) で出すようにした。
   - 0.3.0 からあった不具合です。
+
+### 変わった動き
+
+- PullRequest の `repository()` と `author()` が、JSON ではなく、モデルを返すようになった。(#49)
+  - `repository()` は Repository のモデル、`author()` は人のモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) を返す。関連が無いときは null。
+  - Matchmaker が、PullRequest の repository と author を、Pool に入れる。(assignees と同じ)
+  - いまは、どのクエリも PullRequest の repository と author を取っていないので、これまでと同じく null が返り、利用側への影響はありません。
 
 ### 消したもの
 

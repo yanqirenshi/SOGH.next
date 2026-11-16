@@ -16,11 +16,15 @@ export default class PullRequest extends GraphQLNode {
     bodyHTML () {
         return this._core.bodyHTML || '';
     }
+    // Repository。無いときは null。
+    // (いまは、どのクエリも PullRequest の repository を取っていない)
     repository () {
-        return this._core.repository || null;
+        return this.relation(this._core.repository);
     }
+    // 人 (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか)。無いときは null。
+    // (いまは、どのクエリも PullRequest の author を取っていない)
     author () {
-        return this._core.author || null;
+        return this.relation(this._core.author);
     }
     // User の配列。core に assignees が無いときは、空の配列。
     // (いまは、どのクエリも PullRequest の assignees を取っていない)

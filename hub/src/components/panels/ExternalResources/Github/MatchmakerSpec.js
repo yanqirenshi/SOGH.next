@@ -395,6 +395,7 @@ export default function MatchmakerSpec () {
                 <LI><C>PullRequest</C> の <C>assignees()</C> も、User のモデルの配列を返す。
                   <UL>
                     <LI>core に <C>assignees</C> が無いときは、空の配列を返す。(これまでは、TypeError になっていた)</LI>
+                    <LI><C>repository()</C> と <C>author()</C> も、モデルを返す。(0.4.2 から。<IssueLink num="49"/>。いまは、どのクエリも取っていないので、null が返る)</LI>
                   </UL>
                 </LI>
                 <LI>型が複数ある関連 (<C>issue.author()</C>・<C>item.content()</C>・<C>item.reviewers()</C> など) が返すモデルの型は、<C>typename()</C> で見分ける。(0.4.2 から。<IssueLink num="38"/>)
@@ -516,12 +517,6 @@ export default function MatchmakerSpec () {
                   <UL>
                     <LI><C>Bridge.js</C> と <C>bridgeSlice.js</C> の <C>ass.login</C> は、<C>ass.login()</C> に直す。</LI>
                     <LI><C>ScrumProjectItem.js</C> の <C>item.content().id</C> は、<C>item.content().id()</C> に直す。</LI>
-                  </UL>
-                </LI>
-                <LI><C>PullRequest</C> の <C>repository()</C> と <C>author()</C> は、JSON のまま返す。
-                  <UL>
-                    <LI>PullRequest の関連は、最初の範囲に入れていないため。</LI>
-                    <LI>いまは、どのクエリも、PullRequest の repository と author を取っていない。</LI>
                   </UL>
                 </LI>
                 <LI><C>dev/src/lib/</C> にある sogh の古い写しには、<C>Assignee</C> と <C>Viewer</C> が残っている。</LI>

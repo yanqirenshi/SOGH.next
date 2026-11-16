@@ -1508,7 +1508,7 @@
                 ],
                 "description": [
                     "Pull request のノードを、PullRequest にして Pool に入れて返す。",
-                    "先に matchmaker.pullRequest(node) で、入れ子の assignees を User にして Pool に入れる。(core には JSON をそのまま残す)",
+                    "先に matchmaker.pullRequest(node) で、入れ子の assignees・repository・author をモデルにして Pool に入れる。(core には JSON をそのまま残す)",
                     "同じ id の PullRequest があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
                     "Sogh からは呼ばない。Matchmaker の issueComment(node)・projectV2Item(node) と、node2model(node) が使う。"
                 ],
@@ -4506,20 +4506,22 @@
                     }
                 ],
                 "description": [
-                    "PullRequest のノードに入れ子で来た assignees を、User にして Pool に入れる。",
-                    "PullRequest のほかの関連 (repository・author) は、モデルにしない。(関連をモデルにする最初の範囲 (yanqirenshi/SOGH.next#29) に入っていない)",
-                    "assignees だけは、PullRequest の assignees() が User を返すので、Pool に入れる。",
-                    "いまは、どのクエリも PullRequest の assignees を取得しないので、Sogh で取得したノードでは何もしない。",
+                    "PullRequest のノードに入れ子で来た関連を、モデルにして Pool に入れる。(assignees は User に、repository は Repository に、author は __typename に合う人のモデルに)",
+                    "PullRequest の関連は、関連をモデルにする最初の範囲 (yanqirenshi/SOGH.next#29) には入っていない。PullRequest の assignees()・repository()・author() がモデルを返すので、Pool に入れる。(yanqirenshi/SOGH.next#49)",
+                    "いまは、どのクエリも PullRequest のこれらの関連を取得しないので、Sogh で取得したノードでは何もしない。",
                     "Pooler の node2pullRequest(node) が、PullRequest を Pool に入れる前に呼ぶ。"
                 ],
                 "examples": [
                     "sogh.matchmaker.pullRequest({",
                     "    id: 'PR_kwDOAB',",
                     "    assignees: { edges: [{ node: { __typename: 'User', id: 'U_kgDOAB', login: 'octocat' } }] },",
+                    "    author: { __typename: 'Bot', id: 'BOT_kgDOAB', login: 'dependabot' },",
                     "});",
                     "",
                     "sogh.user('U_kgDOAB').login();",
-                    "// => \"octocat\""
+                    "// => \"octocat\"",
+                    "sogh.bot('BOT_kgDOAB').login();",
+                    "// => \"dependabot\""
                 ]
             },
             {
@@ -10556,18 +10558,19 @@
                 "visibility": "public",
                 "returns": {
                     "name": "repository",
-                    "type": "Object | null",
+                    "type": "Repository | null",
                     "description": [
-                        "リポジトリのノード。",
+                        "Pool の Repository。",
                         "無いときは null。"
                     ]
                 },
                 "description": [
-                    "Pull request のリポジトリのノードを返す。(core の repository)",
-                    "ノード (JSON) のままで、Repository にはしない。(PullRequest の関連は、モデルにする最初の範囲に入っていない)"
+                    "Pull request のリポジトリを、Repository のモデルで返す。(core の repository の id で、Pool から引く)",
+                    "取得していないときは null。",
+                    "いまは、どのクエリも PullRequest の repository を取得しないので、Sogh で取得した PullRequest では null。"
                 ],
                 "examples": [
-                    "pullRequest.repository().name;",
+                    "pullRequest.repository().name();",
                     "// => \"hello-world\""
                 ]
             },
@@ -10578,18 +10581,19 @@
                 "visibility": "public",
                 "returns": {
                     "name": "author",
-                    "type": "Object | null",
+                    "type": "User | Organization | Bot | Mannequin | EnterpriseUserAccount | null",
                     "description": [
-                        "作った人のノード。",
+                        "作った人のモデル。",
                         "無いときは null。"
                     ]
                 },
                 "description": [
-                    "Pull request を作った人のノードを返す。(core の author)",
-                    "ノード (JSON) のままで、User などのモデルにはしない。(PullRequest の関連は、モデルにする最初の範囲に入っていない)"
+                    "Pull request を作った人を、__typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) で返す。(core の author の id で、Pool から引く)",
+                    "取得していないときは null。",
+                    "いまは、どのクエリも PullRequest の author を取得しないので、Sogh で取得した PullRequest では null。"
                 ],
                 "examples": [
-                    "pullRequest.author().login;",
+                    "pullRequest.author().login();",
                     "// => \"octocat\""
                 ]
             },
