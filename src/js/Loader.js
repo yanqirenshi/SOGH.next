@@ -42,10 +42,6 @@ export default class Loader {
 
         return query.replace('after: "",', '');
     }
-    // 廃止予定
-    ensureEndCursor (query, endCursor) {
-        return this.makeQuery(query,endCursor);
-    }
     /** *************************************************************** *
      *  Api
      * **************************************************************** */

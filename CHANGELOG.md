@@ -1,5 +1,37 @@
 # 更新履歴
 
+## 0.5.0
+
+古い世代の取得のメソッド (`fetch〜`) を消して、`asyncFetch〜` にそろえました。
+(yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#67)
+
+### 利用側への影響 (破壊的な変更です)
+
+- `Sogh` の、古い世代の取得のメソッド (`fetch〜`) を 8 個、消しました。代わりに、`asyncFetch〜` を使ってください。
+
+  | 消した `fetch〜` | 代わりに使うもの |
+  | --- | --- |
+  | `fetchRepositoriesByViewer(success, fail)` | `asyncFetchRepositoriesByViewer()` |
+  | `fetchIssueByID(id)` | `asyncFetchIssueByID(id)` |
+  | `fetchIssueCommentsByIssueID(id)` | `asyncFetchIssueCommentsByID(id)` |
+  | `fetchProjectsV2ByUser(user, success, fail)` | `asyncFetchProjectsV2ByViewer()` (viewer のプロジェクトだけ。ほかのユーザーは指定できない。`connect()` で viewer を入れておく必要がある) |
+  | `fetchUserByID(id, success, fail)`・`fetchProjectsV2ByID(id, success, fail)`・`fetchProjectV2ItemsByProjectNext(project, success, fail)` | 無い |
+  | `fetchProjectNextItemByID(id)` | 無い (いまの GitHub では、動かなかった) |
+
+- `fetch〜` と `asyncFetch〜` の違い:
+  - `fetch〜` は、コールバックか、`{ status, data }` (失敗したときは `{ status: 'error', error }`) を返す Promise で結果を渡した。`data` は `{ contents, pageInfo }` の形 (`contents` は id か、id の配列)。
+  - `asyncFetch〜` は、async 関数で、id か、id の配列を返す。(コールバックは取らない)
+  - `fetch〜` は、最初のページ (100 件) だけを取った。`asyncFetch〜` は、最後のページまで取る。(`asyncFetchIssueByID(id)` は 1 件)
+  - `fetch〜` は、GraphQL のエラー (`errors`) を見なかった。(`data` が null のときは、取り出しで TypeError になり、それがエラーとして渡った) `asyncFetch〜` は、`errors` を見て、エラー (Error。HTTP のエラーのときは fetch の Response) を返す。
+  - ただし、`asyncFetchRepositoriesByViewer()` と `asyncFetchProjectsV2ByViewer()` は、途中のページで失敗したときに、エラーではなく、それまでに集めた id の配列を返す。(失敗したときの戻り値をそろえるかは、yanqirenshi/SOGH.next#61 で決める)
+  - コールバックを取る 5 つの `fetch〜` は、成功したときに `success` のあとで `fail` も呼び、失敗したときは `fail` を呼んでいなかった。(内部の `fetchX` に、引数を 1 つずれて渡していたため)
+
+### 消したもの
+
+- `Sogh` の補助のメソッド `data2data(data, make, appender)`・`zzz(data, make)` と、`Loader` の `ensureEndCursor(query, endCursor)`。(`fetch〜` だけが使っていた)
+- クエリ `projects_next_items_by_id`。(いまの GitHub には、`ProjectNextItem` という型が無く、動かなかった。yanqirenshi/SOGH.next#67)
+- `fetch〜` だけが使っていたほかのクエリ (`user_by_id`・`projects_next_by_id`・`projectsv2_items_by_projects_v2`) は、残しています。(Sogh のメソッドからは使われなくなりました)
+
 ## 0.4.2
 
 ProjectV2 の Item の表で、Item の content が無いときに落ちる場合があったのと、閉じた日の書式の誤りを、直しました。

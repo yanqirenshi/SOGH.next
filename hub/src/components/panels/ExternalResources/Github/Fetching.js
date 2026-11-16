@@ -67,6 +67,9 @@ const UNUSED_QUERIES = [
     'search_issues',
     'create_issue',
     'update_issue_body',
+    'user_by_id',
+    'projects_next_by_id',
+    'projectsv2_items_by_projects_v2',
 ];
 
 // クエリを検査するコマンド。
@@ -81,7 +84,7 @@ const CHECK_COMMAND = [
     'npm run check:queries -- --schema <...> --compare before.json',
 ].join('\n');
 
-// いまのクエリを検査した結果。(37 個)
+// いまのクエリを検査した結果。(36 個)
 const CHECK_COLUMNS = [
     { code: 'kind',    label: '種類',   key: 'kind' },
     { code: 'count',   label: '個数',   key: 'count' },
@@ -91,9 +94,9 @@ const CHECK_COLUMNS = [
 
 const CHECKS = [
     { kind: 'NG (使用中)',
-      count: 1,
-      queries: ['projects_next_items_by_id'],
-      note: 'ProjectNextItem という型が、GitHub のスキーマから無くなっている。このクエリがあるので、検査は終了コード 1 で終わる' },
+      count: 0,
+      queries: [],
+      note: 'ProjectNextItem という型が GitHub のスキーマから無くなっていて NG だった projects_next_items_by_id は、0.5.0 で消した。検査は、終了コード 0 で終わる' },
     { kind: 'NG (未使用)',
       count: 2,
       queries: ['create_issue', 'update_issue_body'],
@@ -195,14 +198,13 @@ const LIVES = [
       ],
       note: '組織 (org) とチームのクエリ。.env.local に対象を書くと、送る' },
     { kind: '送らない',
-      count: 4,
+      count: 3,
       queries: [
           'create_issue_comment',
           'update_issue_comment',
           'delete_issue_comment',
-          'projects_next_items_by_id',
       ],
-      note: '上の 3 つは、書き込みのため。projects_next_items_by_id は、スキーマの検査で NG のため' },
+      note: '書き込みのため。(このときは projects_next_items_by_id も、スキーマの検査で NG のため送らなかった。0.5.0 で消した)' },
 ];
 
 // 取得メソッドの一覧。(src/js/Sogh.js)
@@ -221,8 +223,6 @@ const METHODS = [
     { target: 'viewer',                     methods: ['connect'],                                                                                                  style: CALLBACK, paging: '-',        returns: 'User' },
     { target: 'viewer',                     methods: ['asyncFetchViewer'],                                                                                         style: ASYNC,    paging: '-',        returns: 'User' },
     { target: 'viewer のリポジトリ',        methods: ['asyncFetchRepositoriesByViewer'],                                                                           style: ASYNC,    paging: '全件',     returns: 'id の配列' },
-    { target: 'viewer のリポジトリ',        methods: ['fetchRepositoriesByViewer'],                                                                                style: CALLBACK, paging: '1 ページ', returns: '{ contents, pageInfo }' },
-    { target: 'User',                       methods: ['fetchUserByID'],                                                                                            style: CALLBACK, paging: '-',        returns: '{ contents }' },
     { target: 'Issue (id)',                 methods: ['asyncFetchIssueByID', 'asyncFetchItemByID'],                                                                style: ASYNC,    paging: '-',        returns: 'id' },
     { target: 'Issue (org・repo・番号)',    methods: ['asyncFetchIssueByOrgRepoIssueNumber'],                                                                      style: ASYNC,    paging: '-',        returns: 'id' },
     { target: 'viewer の Issue (OPEN)',     methods: ['asyncFetchIssueByViewer'],                                                                                  style: ASYNC,    paging: '全件',     returns: 'id の配列' },
@@ -233,7 +233,6 @@ const METHODS = [
     { target: 'ProjectV2 (1 件)',           methods: ['asyncFetchProjectV2ByUserLoginProjectV2Number', 'asyncFetchProjectV2ByOrgLoginProjectV2Number'],            style: ASYNC,    paging: '-',        returns: 'id' },
     { target: 'ProjectV2 の Item',          methods: ['asyncFetchProjectV2ItemsByUserLoginProjectV2Number', 'asyncFetchProjectV2ItemsByOrgLoginProjectV2Number'],  style: ASYNC,    paging: '全件',     returns: 'id の配列' },
     { target: 'ProjectV2 の Item (1 件)',   methods: ['asyncFetchProjectV2ItemByID'],                                                                              style: ASYNC,    paging: '-',        returns: 'id' },
-    { target: 'ProjectV2 の Item (旧)',     methods: ['fetchProjectV2ItemsByProjectNext'],                                                                         style: CALLBACK, paging: '1 ページ', returns: '{ contents, fields, pageInfo }' },
 ];
 
 export default function Fetching () {
@@ -251,7 +250,7 @@ export default function Fetching () {
               </LI>
               <LI>クエリの本体。(src/js/queries/ の 1 ファイルに 1 クエリ)
                 <UL>
-                  <LI>GraphQL の形 (どこから、何を入れ子で取るか) を書いた文字列。37 個ある。</LI>
+                  <LI>GraphQL の形 (どこから、何を入れ子で取るか) を書いた文字列。36 個ある。</LI>
                   <LI>項目のところに、項目の部品を埋め込む。</LI>
                 </UL>
               </LI>
@@ -302,7 +301,6 @@ export default function Fetching () {
                 </UL>
               </LI>
               <LI>asyncFetch〜 は、<C>pageInfo.hasNextPage</C> が false になるまで繰り返して、全件を集める。</LI>
-              <LI>fetch〜 (古い形) は、1 ページ目しか取らない。</LI>
             </OL>
           </Section>
 
@@ -313,7 +311,6 @@ export default function Fetching () {
 
           <Section title="コールバックの決まり" num="3.4" lev="5">
             <OL>
-              <LI>fetch〜 (古い形) は、<C>success(out)</C> と <C>error(out)</C> を呼ぶ。</LI>
               <LI>更新と、一部の asyncFetch〜 は、<C>{'callbacks = { start, successed, failed, fetched }'}</C> を受け取る。</LI>
               <LI>はじめに <C>start</C> を呼び、終わったら <C>successed</C> か <C>failed</C> を呼ぶ。</LI>
               <LI><C>fetched</C> は、1 ページ取るたびに呼ぶ。(team の ProjectV2 だけ)</LI>
@@ -330,14 +327,14 @@ export default function Fetching () {
           </Section>
 
           <Section title="クエリの使われ方" num="3.6" lev="5">
-            <P>クエリは 37 個あり、Sogh のメソッドから使われているのは 22 個です。</P>
+            <P>クエリは 36 個あり、Sogh のメソッドから使われているのは 18 個です。</P>
             <OL>
-              <LI>使われているもの。(22 個)
+              <LI>使われているもの。(18 個)
                 <UL>
                   <LI>viewer・リポジトリ・Issue・コメント・ProjectV2・ProjectV2Item のクエリ。</LI>
                 </UL>
               </LI>
-              <LI>使われていないもの。(15 個)
+              <LI>使われていないもの。(18 個)
                 <UL>
                   <LI>{UNUSED_QUERIES.map(q=> <span key={q}><C>{q}</C>{' '}</span>)}</LI>
                   <LI>iHub のコア (ihub.core) からも、名前で引いている場所は無い。</LI>

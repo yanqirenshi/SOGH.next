@@ -16,7 +16,6 @@ export { default as milestones_by_repository } from './milestones_by_repository.
 export { default as project_by_id } from './project_by_id.js';
 export { default as projects_by_repository } from './projects_by_repository.js';
 export { default as projects_next_by_id } from './projects_next_by_id.js';
-export { default as projects_next_items_by_id } from './projects_next_items_by_id.js';
 export { default as projectsv2_by_team } from './projectsv2_by_team.js';
 export { default as projectsv2_with_items_by_team } from './projectsv2_with_items_by_team.js';
 export { default as projectsv2_by_user } from './projectsv2_by_user.js';

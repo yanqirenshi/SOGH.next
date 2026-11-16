@@ -35,7 +35,7 @@ function Overview ({ data }) {
             <P>{"GitHub のユーザーを 1 人表すモデル。"}</P>
             <P>{"GraphQL で取得した User のノード (core) を包み、login・名前・メールアドレス・URL・会社・アバター画像の URL を読む。"}</P>
             <P>{"GraphQLNode を継承する。"}</P>
-            <P>{"Sogh の node2user(node) が作り、Pool に入れる。(connect(token, successed, failed) や fetchUserByID(id, success, fail) で取得したとき)"}</P>
+            <P>{"Sogh の node2user(node) が作り、Pool に入れる。(connect(token, successed, failed) で取得したとき)"}</P>
             <P>{"ログインしているユーザー (viewer) も User にする。connect(token, successed, failed) でも asyncFetchViewer() でも、User にして user の Pool に入れ、viewer() に入れる。"}</P>
             <P>{"Matchmaker も、入れ子で来た担当者 (Issue の assignees など) は node2user(node) で、型が複数ありうる人 (author・リポジトリの持ち主 (owner) など) は __typename が User のときに node2model(node) で、User にする。"}</P>
             <P>{"人は、__typename で User・Organization・Bot・Mannequin・EnterpriseUserAccount に分かれる。持ち主が組織のときは User ではなく Organization になる。"}</P>

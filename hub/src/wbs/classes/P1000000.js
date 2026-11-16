@@ -40,7 +40,7 @@ function Overview ({ data }) {
             <P>{"Pooler が Loader を継承し、Sogh が Pooler を継承する。(Loader → Pooler → Sogh)"}</P>
             <P>{"そのため、Loader のメソッドは Sogh のインスタンス (const sogh = new Sogh()) から使う。"}</P>
             <P>{"Sogh の asyncFetch〜 は、postData(query, variables) で作ったリクエストを fetch で送り、text2json(r)・json2response(r, getData)・error2response(error) で結果を { type, data } にする。"}</P>
-            <P>{"fetchX(query, response2data, success, error) は、結果を { status, data } の形でコールバックに渡す古い形で、Sogh の connect(token, successed, failed) と fetch〜 が使う。"}</P>
+            <P>{"fetchX(query, response2data, success, error) は、結果を { status, data } の形でコールバックに渡す古い形で、Sogh の connect(token, successed, failed) が使う。"}</P>
             <Plane>{CODE}</Plane>
           </Section>
 

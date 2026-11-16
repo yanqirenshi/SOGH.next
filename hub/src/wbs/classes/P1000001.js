@@ -43,7 +43,7 @@ function Overview ({ data }) {
             <P>{"node2model(node) は、型が複数ありうる関連のノードを、__typename に合う node2〜(node) でモデルにする。(人は User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか)"}</P>
             <P>{"Matchmaker (matchmaker) を持ち、node2repository(node)・node2issue(node)・node2projectV2Item(node) などで、親を Pool に入れる前に、入れ子で来た関連 (リポジトリの owner、Issue の assignees など) もモデルにして Pool に入れる。"}</P>
             <P>{"node2viewer(d) は、viewer を User にして user の Pool に入れる。(viewer の Pool は無い)"}</P>
-            <P>{"Sogh の fetch〜・asyncFetch〜 が、取得したノードを node2〜(node) に渡す。"}</P>
+            <P>{"Sogh の asyncFetch〜 が、取得したノードを node2〜(node) に渡す。"}</P>
             <Plane>{CODE}</Plane>
           </Section>
 

@@ -190,7 +190,6 @@ async function checkQueries (sogh, conf) {
     }
 
     // 送らないもの
-    skip('projects_next_items_by_id', 'ProjectNextItem という型が、GitHub から無くなっている (スキーマの検査で NG)');
     skip('create_issue_comment', '書き込みなので、送らない');
     skip('update_issue_comment', '書き込みなので、送らない');
     skip('delete_issue_comment', '書き込みなので、送らない');
