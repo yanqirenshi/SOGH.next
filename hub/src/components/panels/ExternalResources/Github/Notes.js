@@ -34,24 +34,10 @@ export default function Notes () {
 
           <Section title="決めたほうがよいもの" num="6.2" lev="5">
             <OL>
-              <LI>取得のメソッドが、2 世代ある。
-                <UL>
-                  <LI>fetch〜 (コールバック) は、1 ページしか取らず、レスポンスの errors も見ない。</LI>
-                  <LI>asyncFetch〜 は、全ページを取り、errors を見る。</LI>
-                  <LI>asyncFetch〜 にそろえるかどうかを、決めたい。</LI>
-                </UL>
-              </LI>
               <LI>取得のクエリは、値を文字列の置き換えで埋め込んでいる。
                 <UL>
                   <LI>値に <C>"</C> や改行が入ると、クエリが壊れる。</LI>
                   <LI>更新は variables を使っているので、取得もそろえたい。</LI>
-                </UL>
-              </LI>
-              <LI>ProjectV2 の Item を取る古い世代の <C>fetchProjectV2ItemsByProjectNext</C> は、1 ページ (100 件) で止まる。
-                <UL>
-                  <LI>クエリ <C>projectsv2_items_by_projects_v2</C> は、ページ送りの印はあるが、<C>pageInfo</C> を取っていない。</LI>
-                  <LI>fetch〜 を消すかどうかを、先に決める。(Issue 62)</LI>
-                  <LI>asyncFetch〜 の 2 つ (<C>asyncFetchProjectV2ItemsByUserLoginProjectV2Number</C>・<C>asyncFetchProjectV2ItemsByOrgLoginProjectV2Number</C>) は、0.4.2 で、最後のページまで取るように直した。(Issue 64)</LI>
                 </UL>
               </LI>
               <LI>クエリと、応答の取り出し (<C>d.data.node.comments</C> など) が、別の場所にある。
@@ -65,12 +51,6 @@ export default function Notes () {
                   <LI>GitHub がエラーを返し、Issue が丸ごと取れない。(projectCards だけが抜けるのではない)</LI>
                   <LI>使用中のクエリからは、外してある。(<C>issue_by_id</C> は、GitHub に送って確かめたときに見つけて、外した)</LI>
                   <LI>使われていないクエリには、残っている。(9 個)</LI>
-                </UL>
-              </LI>
-              <LI><C>projects_next_items_by_id</C> は、いまの GitHub では動かない。
-                <UL>
-                  <LI>ProjectNextItem という型が、GitHub のスキーマから無くなっているため。</LI>
-                  <LI><C>fetchProjectNextItemByID(id)</C> が使っている。</LI>
                 </UL>
               </LI>
               <LI>ProjectV2Item の content で、Issue の state と PullRequest の state を、同じ場所で取っている。(7 個のクエリ)
@@ -99,7 +79,7 @@ export default function Notes () {
               <LI>使われていないクエリには、項目を、部品を使わずに直に書いているものが残っている。</LI>
               <LI>入れ子の件数の上限が、クエリごとに違う。(20 と 30。定数を宣言しているが、使っていないクエリもある)</LI>
               <LI>組織 (org) のクエリでも、値の印の名前が <C>@user-login</C> になっている。</LI>
-              <LI>Sogh のメソッドから使われていないクエリが、15 個ある。(「3.6 クエリの使われ方」を見る)</LI>
+              <LI>Sogh のメソッドから使われていないクエリが、18 個ある。(「3.6 クエリの使われ方」を見る)</LI>
               <LI><C>fetchX</C> は、エンドポイントを直に書いている。(<C>endpoint()</C> を使っていない)</LI>
               <LI>src/js/models/README.markdown が、古い。</LI>
             </OL>

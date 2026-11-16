@@ -283,50 +283,6 @@
                 ]
             },
             {
-                "name": "ensureEndCursor",
-                "parameters": [
-                    "query",
-                    "endCursor"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "query",
-                    "type": "String",
-                    "description": [
-                        "書き換えたクエリ。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "query",
-                        "type": "String",
-                        "description": [
-                            "書き換える前のクエリ。",
-                            "ページ送りのところに after: \"\", を書いておく。"
-                        ]
-                    },
-                    {
-                        "name": "endCursor",
-                        "type": "String | null",
-                        "description": [
-                            "次のページの開始位置。(前のページの pageInfo.endCursor)",
-                            "最初のページのときは null。"
-                        ],
-                        "optional": true
-                    }
-                ],
-                "description": [
-                    "makeQuery(query, endCursor) と同じ。(そのまま呼ぶ)",
-                    "コードに「廃止予定」と書かれている。",
-                    "Sogh の fetch〜 (fetchX(query, response2data, success, error) を使うもの) が、endCursor に null を渡して呼ぶ。"
-                ],
-                "examples": [
-                    "sogh.ensureEndCursor('repositories(after: \"\", first: 100) { ... }', null);",
-                    "// => 'repositories( first: 100) { ... }'"
-                ]
-            },
-            {
                 "name": "makeHeader",
                 "parameters": [],
                 "returnType": "any",
@@ -527,7 +483,7 @@
                     "HTTP 200 で GraphQL の errors が返ったときは、errors を見ない。(response2data の中で例外が起きれば、失敗になる)",
                     "response2data や success の中で例外が起きたときも、失敗になる。",
                     "送り先は endpoint() ではなく、直に書いた \"https://api.github.com/graphql\"。",
-                    "Sogh の connect(token, successed, failed) と fetch〜 が使う。"
+                    "Sogh の connect(token, successed, failed) が使う。"
                 ],
                 "examples": [
                     "await sogh.fetchX('{ viewer { login } }', res=> res.data.viewer.login);",
@@ -984,7 +940,7 @@
                     "先に matchmaker.repository(node) で、owner を __typename に合うモデル (User か Organization) にして、その Pool に入れる。",
                     "core には、owner の JSON をそのまま残す。(owner() は、その id で Pool のモデルを引く)",
                     "同じ id の Repository があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
-                    "Sogh の fetchRepositoriesByViewer(success, fail)・asyncFetchRepositoriesByViewer() が使う。"
+                    "Sogh の asyncFetchRepositoriesByViewer() が使う。"
                 ],
                 "examples": [
                     "const repository = sogh.node2repository({",
@@ -1092,7 +1048,7 @@
                     "ユーザーのノードを、User にして Pool に入れて返す。",
                     "先に matchmaker.user(node) を呼ぶ。(今は何もしない)",
                     "同じ id の User があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node)。ノードに無い項目は、残る)",
-                    "Sogh の connect(token, successed, failed)・fetchUserByID(id, success, fail) と、node2viewer(d)・node2model(node) と、Matchmaker の issue(node) などが使う。"
+                    "Sogh の connect(token, successed, failed) と、node2viewer(d)・node2model(node) と、Matchmaker の issue(node) などが使う。"
                 ],
                 "examples": [
                     "const user = sogh.node2user({ id: 'U_kgDOAB', login: 'octocat', name: 'The Octocat' });",
@@ -2206,7 +2162,7 @@
                 "description": [
                     "GraphQL のクエリの表。(クエリの名前 → クエリの文字列)",
                     "constructor が、queries/index.js のモジュール (import * as QUERIES) をそのまま入れる。",
-                    "クエリは 37 個ある。",
+                    "クエリは 36 個ある。",
                     "名前の綴りは、ファイル名のまま。(viewer ではなく viwer、issues_by_viwer など)",
                     "クエリの中の @id・@login などは、取得のメソッドが値に置き換える。",
                     "モジュールの名前空間オブジェクトなので、項目を足したり書き換えたりすると TypeError になる。"
@@ -2216,7 +2172,7 @@
                     "// => \"{\\n  viewer {\\n    id\\nlogin\\nname\\n...\"",
                     "",
                     "Object.keys(sogh._queries).length;",
-                    "// => 37"
+                    "// => 36"
                 ],
                 "affectedBy": [
                     "constructor"
@@ -2582,478 +2538,6 @@
                     "",
                     "sogh.node2objs({ id: 'I_kwDOAA3' }, node=> sogh.node2issue(node));",
                     "// => \"I_kwDOAA3\""
-                ]
-            },
-            {
-                "name": "data2data",
-                "parameters": [
-                    "data",
-                    "make",
-                    "appender"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "page",
-                    "type": "Object",
-                    "description": [
-                        "{ contents: id の配列, pageInfo } の形のオブジェクト。",
-                        "appender が足した項目も持つ。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "data",
-                        "type": "Object",
-                        "description": [
-                            "GraphQL の接続。(nodes と pageInfo を持つ)"
-                        ]
-                    },
-                    {
-                        "name": "make",
-                        "type": "Function",
-                        "description": [
-                            "ノードを受け取り、モデル (id() を持つもの) を返す関数。"
-                        ]
-                    },
-                    {
-                        "name": "appender",
-                        "type": "Function",
-                        "description": [
-                            "out に項目を足す関数。",
-                            "引数は (data, out)。"
-                        ],
-                        "optional": true
-                    }
-                ],
-                "description": [
-                    "GraphQL の接続 (nodes と pageInfo を持つもの) を、{ contents, pageInfo } の形にして返す。",
-                    "contents は、data.nodes を node2objs(node_or_nodes, make) で id の配列にしたもの。",
-                    "appender を渡したときは appender(data, out) を呼び、out に項目を足せるようにする。",
-                    "pageInfo は appender のあとで入れるので、appender が入れた pageInfo は上書きされる。",
-                    "コールバックの形の取得のメソッド (fetchRepositoriesByViewer(success, fail) など) が使う。"
-                ],
-                "examples": [
-                    "sogh.data2data(response.data.viewer.repositories,",
-                    "               node=> sogh.node2repository(node));",
-                    "// => { contents: [\"R_kgDOAA1\", \"R_kgDOAA2\"], pageInfo: { endCursor: \"Y3Vyc29yOjI=\", hasNextPage: false, ... } }"
-                ]
-            },
-            {
-                "name": "zzz",
-                "parameters": [
-                    "data",
-                    "make"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "page",
-                    "type": "Object",
-                    "description": [
-                        "{ contents: id } の形のオブジェクト。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "data",
-                        "type": "Object",
-                        "description": [
-                            "GraphQL の応答の data。(node を持つ)"
-                        ]
-                    },
-                    {
-                        "name": "make",
-                        "type": "Function",
-                        "description": [
-                            "ノードを受け取り、モデル (id() を持つもの) を返す関数。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "data.node を node2objs(node_or_nodes, make) でモデルにし、{ contents } の形にして返す。",
-                    "data.node は 1 つのノードなので、contents は id の配列ではなく、id になる。",
-                    "node(id: ...) で 1 件を取得するメソッド (fetchIssueByID(id) など) が使う。",
-                    "data.node が null のときは、make の中で TypeError になる。"
-                ],
-                "examples": [
-                    "sogh.zzz({ node: { id: 'I_kwDOAA1', title: 'SOGH の整理' } },",
-                    "         node=> sogh.node2issue(node));",
-                    "// => { contents: \"I_kwDOAA1\" }"
-                ]
-            },
-            {
-                "name": "fetchRepositoriesByViewer",
-                "parameters": [
-                    "success",
-                    "fail"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": null,
-                "arguments": [
-                    {
-                        "name": "success",
-                        "type": "Function",
-                        "description": [
-                            "取得できたときに呼ぶ関数。",
-                            "引数は { contents, pageInfo }。"
-                        ],
-                        "optional": true
-                    },
-                    {
-                        "name": "fail",
-                        "type": "Function",
-                        "description": [
-                            "失敗したときに呼ぶつもりの関数。",
-                            "実際は、取得できたときに { status: 'success', data: undefined } で呼ばれ、失敗したときは呼ばれない。"
-                        ],
-                        "optional": true
-                    }
-                ],
-                "description": [
-                    "viewer のリポジトリを取得し、Repository にして Pool に入れる。",
-                    "ページ送りはせず、先頭の 100 件だけを取得する。",
-                    "リポジトリの owner も User にして、user の Pool に入れる。(同じ id の User があるときは、その core に owner のノードを重ねる)",
-                    "取得できたときは、success({ contents: Repository の id の配列, pageInfo }) を呼ぶ。",
-                    "fail は、取得できたときに、success のあとで { status: 'success', data: undefined } を引数にして呼ばれる。(fetchX の success の位置に渡しているため)",
-                    "取得に失敗したときは、success も fail も呼ばれない。",
-                    "何も返さない。(Promise も返さないので、終わるのを待てない)"
-                ],
-                "examples": [
-                    "sogh.fetchRepositoriesByViewer(x=> console.log(x.contents));",
-                    "// => [\"R_kgDOAA1\", \"R_kgDOAA2\"]"
-                ]
-            },
-            {
-                "name": "fetchUserByID",
-                "parameters": [
-                    "id",
-                    "success",
-                    "fail"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "promise",
-                    "type": "Promise<Object>",
-                    "description": [
-                        "{ status: 'success', data: undefined } か { status: 'error', error } で解決する Promise。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "id",
-                        "type": "String",
-                        "description": [
-                            "User の node id。"
-                        ]
-                    },
-                    {
-                        "name": "success",
-                        "type": "Function",
-                        "description": [
-                            "取得できたときに呼ぶ関数。",
-                            "引数は { contents: User の id }。"
-                        ],
-                        "optional": true
-                    },
-                    {
-                        "name": "fail",
-                        "type": "Function",
-                        "description": [
-                            "失敗したときに呼ぶつもりの関数。",
-                            "実際は、取得できたときに { status: 'success', data: undefined } で呼ばれ、失敗したときは呼ばれない。"
-                        ],
-                        "optional": true
-                    }
-                ],
-                "description": [
-                    "id の User を取得し、Pool に入れる。",
-                    "取得できたときは、success({ contents: User の id }) を呼ぶ。",
-                    "fail は、取得できたときに、success のあとで { status: 'success', data: undefined } を引数にして呼ばれる。(fetchX の success の位置に渡しているため)",
-                    "取得に失敗したときは、success も fail も呼ばれない。",
-                    "返す Promise の data は undefined。(結果は success にだけ渡る)"
-                ],
-                "examples": [
-                    "await sogh.fetchUserByID('U_kgDOAA1', x=> setUserId(x.contents));",
-                    "sogh.user('U_kgDOAA1').login();",
-                    "// => \"octocat\""
-                ]
-            },
-            {
-                "name": "fetchProjectsV2ByUser",
-                "parameters": [
-                    "user",
-                    "success",
-                    "fail"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "promise",
-                    "type": "Promise<Object>",
-                    "description": [
-                        "{ status: 'success', data: undefined } か { status: 'error', error } で解決する Promise。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "user",
-                        "type": "User",
-                        "description": [
-                            "ProjectV2 の持ち主のユーザー。",
-                            "login() を使う。(viewer() の User でもよい)"
-                        ]
-                    },
-                    {
-                        "name": "success",
-                        "type": "Function",
-                        "description": [
-                            "取得できたときに呼ぶ関数。",
-                            "引数は { contents, pageInfo }。"
-                        ],
-                        "optional": true
-                    },
-                    {
-                        "name": "fail",
-                        "type": "Function",
-                        "description": [
-                            "失敗したときに呼ぶつもりの関数。",
-                            "実際は、取得できたときに { status: 'success', data: undefined } で呼ばれ、失敗したときは呼ばれない。"
-                        ],
-                        "optional": true
-                    }
-                ],
-                "description": [
-                    "user の ProjectV2 を取得し、Pool に入れる。",
-                    "ページ送りはせず、先頭の 100 件だけを取得する。",
-                    "取得できたときは、success({ contents: ProjectV2 の id の配列, pageInfo }) を呼ぶ。",
-                    "fail は、取得できたときに、success のあとで { status: 'success', data: undefined } を引数にして呼ばれる。(fetchX の success の位置に渡しているため)",
-                    "取得に失敗したときは、success も fail も呼ばれない。",
-                    "返す Promise の data は undefined。(結果は success にだけ渡る)"
-                ],
-                "examples": [
-                    "sogh.fetchProjectsV2ByUser(sogh.viewer(), x=> console.log(x.contents));",
-                    "// => [\"PVT_kwHOAA1\", \"PVT_kwHOAA2\"]"
-                ]
-            },
-            {
-                "name": "fetchProjectsV2ByID",
-                "parameters": [
-                    "id",
-                    "success",
-                    "fail"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "promise",
-                    "type": "Promise<Object>",
-                    "description": [
-                        "{ status: 'success', data: undefined } か { status: 'error', error } で解決する Promise。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "id",
-                        "type": "String",
-                        "description": [
-                            "ProjectV2 の node id。"
-                        ]
-                    },
-                    {
-                        "name": "success",
-                        "type": "Function",
-                        "description": [
-                            "取得できたときに呼ぶ関数。",
-                            "引数は { contents: ProjectV2 の id }。"
-                        ],
-                        "optional": true
-                    },
-                    {
-                        "name": "fail",
-                        "type": "Function",
-                        "description": [
-                            "失敗したときに呼ぶつもりの関数。",
-                            "実際は、取得できたときに { status: 'success', data: undefined } で呼ばれ、失敗したときは呼ばれない。"
-                        ],
-                        "optional": true
-                    }
-                ],
-                "description": [
-                    "id の ProjectV2 を取得し、Pool に入れる。",
-                    "クエリは projects_next_by_id を使う。(名前は ProjectNext だが、中身は ProjectV2 のクエリ)",
-                    "取得できたときは、success({ contents: ProjectV2 の id }) を呼ぶ。",
-                    "fail は、取得できたときに、success のあとで { status: 'success', data: undefined } を引数にして呼ばれる。(fetchX の success の位置に渡しているため)",
-                    "取得に失敗したときは、success も fail も呼ばれない。",
-                    "返す Promise の data は undefined。(結果は success にだけ渡る)"
-                ],
-                "examples": [
-                    "sogh.fetchProjectsV2ByID('PVT_kwHOAA1', x=> console.log(sogh.projectV2(x.contents).title()));",
-                    "// => SOGH の整理"
-                ]
-            },
-            {
-                "name": "fetchProjectV2ItemsByProjectNext",
-                "parameters": [
-                    "project_next",
-                    "success",
-                    "fail"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "promise",
-                    "type": "Promise<Object>",
-                    "description": [
-                        "{ status: 'success', data: undefined } か { status: 'error', error } で解決する Promise。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "project_next",
-                        "type": "ProjectV2",
-                        "description": [
-                            "アイテムを取得する ProjectV2。(id() を使う)"
-                        ]
-                    },
-                    {
-                        "name": "success",
-                        "type": "Function",
-                        "description": [
-                            "取得できたときに呼ぶ関数。",
-                            "引数は { contents, fields, pageInfo }。"
-                        ],
-                        "optional": true
-                    },
-                    {
-                        "name": "fail",
-                        "type": "Function",
-                        "description": [
-                            "失敗したときに呼ぶつもりの関数。",
-                            "実際は、取得できたときに { status: 'success', data: undefined } で呼ばれ、失敗したときは呼ばれない。"
-                        ],
-                        "optional": true
-                    }
-                ],
-                "description": [
-                    "project_next (ProjectV2) のアイテムとフィールドを取得し、アイテムを ProjectV2Item にして Pool に入れる。",
-                    "ページ送りはせず、先頭の 100 件だけを取得する。",
-                    "取得できたときは、success({ contents: ProjectV2Item の id の配列, fields: フィールドのノードの配列, pageInfo }) を呼ぶ。",
-                    "fail は、取得できたときに、success のあとで { status: 'success', data: undefined } を引数にして呼ばれる。(fetchX の success の位置に渡しているため)",
-                    "取得に失敗したときは、success も fail も呼ばれない。",
-                    "返す Promise の data は undefined。(結果は success にだけ渡る)"
-                ],
-                "examples": [
-                    "sogh.fetchProjectV2ItemsByProjectNext(projectV2, x=> console.log(x.fields.map(f=> f.name)));",
-                    "// => [\"Title\", \"Assignees\", \"Status\", ...]"
-                ]
-            },
-            {
-                "name": "fetchProjectNextItemByID",
-                "parameters": [
-                    "id"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "promise",
-                    "type": "Promise<Object>",
-                    "description": [
-                        "{ status: 'success', data: { contents: ProjectV2Item の id } } か { status: 'error', error } で解決する Promise。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "id",
-                        "type": "String",
-                        "description": [
-                            "アイテムの node id。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "id のアイテムを取得し、ProjectV2Item にして Pool に入れる。",
-                    "クエリは ProjectNextItem (ProjectV2 より前の Projects の型) で問い合わせる。",
-                    "コールバックは受け取らない。",
-                    "結果は、返す Promise の data から読む。"
-                ],
-                "examples": [
-                    "const result = await sogh.fetchProjectNextItemByID('PNI_lADOAA1');",
-                    "result.data;",
-                    "// => { contents: \"PNI_lADOAA1\" }"
-                ]
-            },
-            {
-                "name": "fetchIssueByID",
-                "parameters": [
-                    "id"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "promise",
-                    "type": "Promise<Object>",
-                    "description": [
-                        "{ status: 'success', data: { contents: Issue の id } } か { status: 'error', error } で解決する Promise。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "id",
-                        "type": "String",
-                        "description": [
-                            "Issue の node id。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "id の Issue を取得し、Pool に入れる。",
-                    "コールバックは受け取らない。",
-                    "結果は、返す Promise の data から読む。",
-                    "Issue が見つからない (node が null の) ときは、{ status: 'error', error: TypeError } で解決する。"
-                ],
-                "examples": [
-                    "const result = await sogh.fetchIssueByID('I_kwDOAA1');",
-                    "sogh.issue(result.data.contents).title();",
-                    "// => \"SOGH の整理\""
-                ]
-            },
-            {
-                "name": "fetchIssueCommentsByIssueID",
-                "parameters": [
-                    "id"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "promise",
-                    "type": "Promise<Object>",
-                    "description": [
-                        "{ status: 'success', data: { contents: IssueComment の id の配列, pageInfo } } か { status: 'error', error } で解決する Promise。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "id",
-                        "type": "String",
-                        "description": [
-                            "Issue の node id。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "id の Issue のコメントを取得し、IssueComment にして Pool に入れる。",
-                    "コメントは、更新日時の新しい順。",
-                    "ページ送りはせず、先頭の 100 件だけを取得する。",
-                    "コールバックは受け取らない。",
-                    "結果は、返す Promise の data から読む。"
-                ],
-                "examples": [
-                    "const result = await sogh.fetchIssueCommentsByIssueID('I_kwDOAA1');",
-                    "result.data.contents;",
-                    "// => [\"IC_kwDOAA2\", \"IC_kwDOAA1\"]"
                 ]
             },
             {
@@ -5138,8 +4622,8 @@
                     "graphQLNode._reload;",
                     "// => null",
                     "",
-                    "// GitHub で変更があったあとに、取得し直す",
-                    "await sogh.fetchUserByID('U_kgDOAB');",
+                    "// GitHub で変更があったあとに、取得し直す (U_kgDOAB が viewer のとき)",
+                    "await sogh.asyncFetchViewer();",
                     "graphQLNode._reload;",
                     "// => \"2026-11-15T05:40:00.000Z\""
                 ],

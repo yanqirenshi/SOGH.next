@@ -40,7 +40,7 @@ function Overview ({ data }) {
             <P>{"Sogh は、クエリの表 (_queries)・画面のパスの表 (_routes)・メンバー (_members) と、取得・更新のメソッドを足す。"}</P>
             <P>{"new Sogh() で作り、connect(token, successed, failed) で token を入れて viewer を取得してから使う。"}</P>
             <P>{"取得のメソッドは、GraphQL のノードを Issue・ProjectV2 などのモデルにして Pool に入れ、モデルではなく id を返す。(モデルは issue(id)・projectV2(id) などで Pool から引く)"}</P>
-            <P>{"取得のメソッドには、コールバックで結果を渡す fetch… の形と、Promise で id を返す asyncFetch… の形がある。"}</P>
+            <P>{"取得のメソッドは、Promise で id を返す asyncFetch… の形だけ。(コールバックで結果を渡す fetch… の形は、0.5.0 で消した)"}</P>
             <P>{"asyncFetch… は、取得に失敗しても reject しない。(エラーをそのまま返すか、それまでに取得した id の配列を返す)"}</P>
             <Plane>{CODE}</Plane>
           </Section>

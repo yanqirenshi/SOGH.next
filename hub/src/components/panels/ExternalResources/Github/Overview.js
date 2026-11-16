@@ -19,7 +19,7 @@ const LAYERS = [
     '    |',
     '    v',
     'Sogh (src/js/Sogh.js)',
-    '  取得メソッド (fetch〜 / asyncFetch〜)',
+    '  取得メソッド (asyncFetch〜)',
     '    | extends',
     'Pooler (src/js/Pooler.js)',
     '  node2xxx() で node をモデルにして Pool に入れる',
