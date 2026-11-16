@@ -397,6 +397,12 @@ export default function MatchmakerSpec () {
                     <LI>core に <C>assignees</C> が無いときは、空の配列を返す。(これまでは、TypeError になっていた)</LI>
                   </UL>
                 </LI>
+                <LI>型が複数ある関連 (<C>issue.author()</C>・<C>item.content()</C>・<C>item.reviewers()</C> など) が返すモデルの型は、<C>typename()</C> で見分ける。(0.4.2 から。<IssueLink num="38"/>)
+                  <UL>
+                    <LI><C>typename()</C> は、core の <C>__typename</C> を返す。(無いときは null)</LI>
+                    <LI>入口から <C>models</C> を export したので、<C>obj instanceof models.Bot</C> のように、instanceof でも見分けられる。</LI>
+                  </UL>
+                </LI>
               </OL>
             </Section>
 

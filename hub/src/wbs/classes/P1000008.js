@@ -37,6 +37,7 @@ function Overview ({ data }) {
             <P>{"GraphQL で取得したノードを包む、モデルの基底クラス。"}</P>
             <P>{"ノード (core) を _core に、モデルを持っている Sogh を _sogh に持つ。"}</P>
             <P>{"id()・createdAt()・updatedAt() で、どのノードにもある値を読む。"}</P>
+            <P>{"typename() は、型の名前 (core の __typename) を返す。型が複数ある関連 (Issue の author()・ProjectV2Item の content() など) が返したモデルを、見分けるのに使う。(__typename が無いときは null)"}</P>
             <P>{"Repository・User・Organization・Bot・Mannequin・EnterpriseUserAccount・Team・ProjectV2・ProjectV2Item・DraftIssue・Issue・IssueComment・PullRequest・Label・Milestone などが継承する。"}</P>
             <P>{"relation(node)・relations(connection) は、core に入れ子で残っている関連の JSON の id で、Pool からモデルを引く。(Pool に無いとき・JSON が無いときは、null か空の配列)"}</P>
             <P>{"関連を返すメソッド (Issue の assignees()・Repository の owner() など) は、これを使う。"}</P>
