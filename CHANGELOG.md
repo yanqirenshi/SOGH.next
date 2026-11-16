@@ -6,7 +6,7 @@ ProjectV2 の Item の表で、Item の content が無いときに落ちる場�
 また、使われていなかったファイルを 20 個 (部品 19 個・モデル 1 個) 消しました。
 入口からモデルを export し、モデルの型の名前を返す `typename()` を足しました。
 PullRequest の `repository()`・`author()` も、モデルを返すようにしました。
-(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#38・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45・yanqirenshi/SOGH.next#49)
+(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#38・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45・yanqirenshi/SOGH.next#49・yanqirenshi/SOGH.next#51)
 
 ### 直したもの
 
@@ -69,6 +69,7 @@ PullRequest の `repository()`・`author()` も、モデルを返すようにし
   - core の `__typename` を返す。(例: `"User"`・`"Bot"`・`"Issue"`)
   - core に `__typename` が無いときは、null を返す。
   - 型が複数ある関連 (`issue.author()`・`item.content()`・`item.reviewers()` など) が返したモデルを、見分けるのに使う。`instanceof models.Bot` のように、クラスでも見分けられる。
+- 開発用のスクリプト `npm run check:updated-at` を足した。GitHub に実際につないで、Issue・ProjectV2Item・ProjectV2 の `updatedAt` が、どの変更で動くか (関連が変わったのに、動かない変更があるか) を確かめる。(#51。読むだけ。sogh の動きは変わらない)
 
 ## 0.4.1
 

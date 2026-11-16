@@ -8,6 +8,7 @@
         "prepublishOnly": "npm run transpile",
         "check:queries": "node scripts/check-queries.mjs",
         "check:live": "node scripts/check-live.mjs",
+        "check:updated-at": "node scripts/check-updated-at.mjs",
         "test": "node --test \"test/**/*.test.mjs\""
     },
     "repository": {

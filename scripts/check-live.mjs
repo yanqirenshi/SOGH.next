@@ -6,6 +6,7 @@
 // トークンの置き場所 (どちらか):
 //   1. リポジトリの直下の .env.local に、GITHUB_TOKEN=<トークン> と書く。(.env.local.template を写して作る)
 //   2. 環境変数 GITHUB_TOKEN に入れる。(こちらが先に使われる)
+// 環境変数 CHECK_ENV_FILE があれば、.env.local の代わりに、そのパスの設定ファイルを読む。(scripts/env-file.mjs)
 //
 // 確かめること:
 //   A. クエリの確認 … 使用中のクエリを 1 回ずつ送り、GitHub がエラーを返さないかを見る。
@@ -16,39 +17,24 @@
 //   - 読むだけ。書き込み (コメントの追加・更新・削除) のクエリは、送らない。
 //   - トークンは、どこにも表示しない。
 //   - 表示するのは、クエリの名前・件数・エラーの文だけ。(取得した値そのものは表示しない)
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import Sogh from '../src/js/Sogh.js';
 
+import { envFilePath, makeGetter, warnMissingEnvFile } from './env-file.mjs';
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ENV_FILE = path.join(ROOT, '.env.local');
+const ENV_FILE = envFilePath(ROOT);
 
 /* ****************************************************************
  * 設定
  * **************************************************************** */
 
-// .env.local を読む。(KEY=VALUE の行だけ。# の行と空の行は読み飛ばす)
-function readEnvFile () {
-    if (!fs.existsSync(ENV_FILE))
-        return {};
-
-    const out = {};
-
-    for (const line of fs.readFileSync(ENV_FILE, 'utf8').split(/\r?\n/)) {
-        const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/.exec(line);
-
-        if (m)
-            out[m[1]] = m[2].replace(/^["']|["']$/g, '');
-    }
-
-    return out;
-}
-
 function config () {
-    const file = readEnvFile();
-    const get = (key)=> process.env[key] || file[key] || null;
+    warnMissingEnvFile(ENV_FILE);
+
+    const get = makeGetter(ENV_FILE);
 
     return {
         token: get('GITHUB_TOKEN'),
