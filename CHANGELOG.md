@@ -3,7 +3,8 @@
 ## 0.4.2
 
 ProjectV2 の Item の表で、Item の content が無いときに落ちる場合があったのと、閉じた日の書式の誤りを、直しました。
-(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42)
+また、使われていなかった部品を 2 つ消しました。
+(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42)
 
 ### 直したもの
 
@@ -17,6 +18,12 @@ ProjectV2 の Item の表で、Item の content が無いときに落ちる場�
 - `TableProjectV2Items` の Closed の列が、閉じた日を `年-日-分` の書式で出していた。(#42)
   - `年-月-日` (例: `2026-03-09`) で出すようにした。
   - 0.3.0 からあった不具合です。
+
+### 消したもの
+
+- 使われていなかった部品 `src/components/common/Label.js` と `src/components/common/UserName.js` を消した。(#37)
+  - どちらも、パッケージの入口 (`src/index.js`) からは export していなかった。
+  - 値を JSON として読む、古い読み方のままだった。
 
 ## 0.4.1
 
