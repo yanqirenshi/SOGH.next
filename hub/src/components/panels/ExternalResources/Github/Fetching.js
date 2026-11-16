@@ -273,10 +273,18 @@ export default function Fetching () {
               <LI>ページ送りできるのは、1 つのクエリにつき 1 か所。
                 <UL>
                   <LI>クエリの <C>pick</C> が取り出す一覧の <C>pageInfo</C> で、次のページを決める。</LI>
+                  <LI>ProjectV2 の Item を取る 2 つ (<C>projectv2items_by_〜</C>) は、<C>pick</C> が ProjectV2 (id と items) を返す。<C>fetchPages</C> の 4 つめの引数 <C>connectionOf</C> で、ページ送りする一覧 (items) を指す。(0.5.0 から。Item が 0 個のときも、どの ProjectV2 かが分かるように。<C>yanqirenshi/SOGH.next#108</C>)</LI>
                   <LI>入れ子の一覧 (assignees など) は、件数を書いている。(<C>first: 10</C> など。「5.5 件数の上限」を見る)</LI>
                 </UL>
               </LI>
               <LI>asyncFetch〜 は、<C>pageInfo.hasNextPage</C> が false になるまで繰り返して、全件を集める。</LI>
+              <LI>ProjectV2 の Item を取る 2 つ (<C>asyncFetchProjectV2ItemsByUserLoginProjectV2Number</C>・<C>asyncFetchProjectV2ItemsByOrgLoginProjectV2Number</C>) は、最後のページまで取り終えたら、その ProjectV2 の Item のうち、今回取れなかったものを、Pool から消す。(0.5.0 から。<C>yanqirenshi/SOGH.next#108</C>)
+                <UL>
+                  <LI>途中で失敗したときは、消さない。Item が 0 個になったときも、消す。</LI>
+                  <LI>消すのは ProjectV2Item のモデルだけ。中身 (Issue など) と、ほかの ProjectV2 の Item は残す。</LI>
+                  <LI>ほかの取得 (チームの Item 付き・組織の番号の ProjectV2) は、取る数に上限があるので、消さない。</LI>
+                </UL>
+              </LI>
             </OL>
           </Section>
 

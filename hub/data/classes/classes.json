@@ -1139,6 +1139,81 @@
                 ]
             },
             {
+                "name": "projectV2ItemsOf",
+                "parameters": [
+                    "project_id"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "items",
+                    "type": "ProjectV2Item[]",
+                    "description": [
+                        "Pool にある、その ProjectV2 の ProjectV2Item の配列。(Pool に入った順)"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "project_id",
+                        "type": "String",
+                        "description": [
+                            "ProjectV2 の id。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "Pool にある ProjectV2Item のうち、core の project の id が project_id のものを、Pool に入った順に返す。(0.5.0 から。yanqirenshi/SOGH.next#108)",
+                    "project の無い Item は入らない。project_id が無い (null など) ときは []。",
+                    "ProjectV2 の itemsInPool() と、removeProjectV2ItemsExcept(project_id, ids) が使う。(「その ProjectV2 の Item」を選ぶ所を 1 か所にした)"
+                ],
+                "examples": [
+                    "sogh.projectV2ItemsOf('PVT_kwHOAB').map(item=> item.id());",
+                    "// => [\"PVTI_lAHOAB1\", \"PVTI_lAHOAB2\"]"
+                ]
+            },
+            {
+                "name": "removeProjectV2ItemsExcept",
+                "parameters": [
+                    "project_id",
+                    "ids"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "removed",
+                    "type": "String[]",
+                    "description": [
+                        "消した Item の id の配列。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "project_id",
+                        "type": "String",
+                        "description": [
+                            "ProjectV2 の id。"
+                        ]
+                    },
+                    {
+                        "name": "ids",
+                        "type": "String[]",
+                        "description": [
+                            "残す Item の id の配列。(今回取れた Item)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "ProjectV2 (project_id) の Item (projectV2ItemsOf(project_id)) のうち、ids に無いものを、Pool から消す。(pool.remove(id)。0.5.0 から。yanqirenshi/SOGH.next#108)",
+                    "消すのは ProjectV2Item のモデルだけ。中身 (Issue・PullRequest・DraftIssue) は、Pool に残す。",
+                    "project_id が無い (null など) ときは、何も消さない。",
+                    "Sogh の asyncFetchProjectV2ItemsByUserLoginProjectV2Number・ByOrg〜 が、最後のページまで取り終えたときに使う。"
+                ],
+                "examples": [
+                    "sogh.removeProjectV2ItemsExcept('PVT_kwHOAB', ['PVTI_lAHOAB1']);",
+                    "// => [\"PVTI_lAHOAB2\"]"
+                ]
+            },
+            {
                 "name": "node2issue",
                 "parameters": [
                     "node"
@@ -2642,7 +2717,8 @@
                 "parameters": [
                     "code",
                     "variables",
-                    "onPage"
+                    "onPage",
+                    "connectionOf=(picked)=> picked"
                 ],
                 "returnType": "Promise",
                 "visibility": "public",
@@ -2674,15 +2750,24 @@
                         "type": "Function",
                         "description": [
                             "ページごとに呼ぶ関数。",
-                            "connection (pick で取り出した一覧。nodes か edges と、pageInfo) を受け取る。"
+                            "pick で取り出したもの (picked) を受け取る。(多くのクエリでは、一覧。nodes か edges と、pageInfo)"
+                        ]
+                    },
+                    {
+                        "name": "connectionOf",
+                        "type": "Function",
+                        "description": [
+                            "pick で取り出したもの (picked) から、pageInfo を持つ一覧を返す関数。",
+                            "既定は picked そのもの。(pick が一覧を返すクエリ)",
+                            "pick が一覧の親 (例: ProjectV2) を返すクエリでは、一覧 (例: project=> project.items) を指す。(0.5.0 から。yanqirenshi/SOGH.next#108)"
                         ]
                     }
                 ],
                 "description": [
                     "ページ送りする一覧を、pageInfo の hasNextPage が false になるまで、最後のページまで取る。(0.5.0 で足した。yanqirenshi/SOGH.next#63)",
-                    "1 ページごとに、fetchNode(code, { ...variables, after }) で取り、onPage(connection) を呼ぶ。",
+                    "1 ページごとに、fetchNode(code, { ...variables, after }) で取り、onPage(picked) を呼ぶ。",
                     "1 ページめは、変数 after を null にして送る。2 ページめからは、前のページの pageInfo.endCursor を after に入れて送る。",
-                    "pageInfo が無いときは、1 ページで終わる。",
+                    "ページ送りは、connectionOf(picked) の pageInfo で決める。pageInfo が無いときは、1 ページで終わる。",
                     "途中で失敗したときは、GitHubError を投げる。(途中まで集めた分は、返さない)",
                     "ページ送りする asyncFetch〜 と、fetchProjectsV2OfTeam(code, team_id, callbacks) が使う。"
                 ],
@@ -3338,7 +3423,12 @@
                     "2 回め以降も、ProjectV2 の項目 (fields など) を毎回取り直す。",
                     "応答の ProjectV2 そのもの (fields を含む) は、Pool に入れない。(アイテムの project は、Matchmaker が Pool に入れる)",
                     "number は、数値にしてから送る。(文字列でも渡せる)",
-                    "失敗したときは、GitHubError を投げる。(途中のページで失敗したときも、途中まで集めた分は返さない。0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)"
+                    "失敗したときは、GitHubError を投げる。(途中のページで失敗したときも、途中まで集めた分は返さない。0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)",
+                    "最後のページまで取り終えたら、その ProjectV2 の Item (Item の core の project の id で見る) のうち、今回取れなかったものを、Pool から消す。(Pooler の removeProjectV2ItemsExcept(project_id, ids)。0.5.0 から。yanqirenshi/SOGH.next#108)",
+                    "Item が 0 個になったときも、消す。途中で失敗したとき (例外を投げるとき) は、何も消さない。",
+                    "消すのは ProjectV2Item のモデルだけ。中身 (Issue・PullRequest・DraftIssue) と、ほかの ProjectV2 の Item は残す。",
+                    "クエリの pick は ProjectV2 (id と items) を返し、items を最後のページまで取る。(Item が 0 個のときも、ProjectV2 の id が分かるように)",
+                    "戻り値 (取った Item の id の配列) は、消すことで変わらない。"
                 ],
                 "examples": [
                     "const ids = await sogh.asyncFetchProjectV2ItemsByUserLoginProjectV2Number('octocat', 3);",
@@ -3385,7 +3475,12 @@
                     "2 回め以降も、ProjectV2 の項目 (fields など) を毎回取り直す。",
                     "応答の ProjectV2 そのもの (fields を含む) は、Pool に入れない。(アイテムの project は、Matchmaker が Pool に入れる)",
                     "number は、数値にしてから送る。(文字列でも渡せる)",
-                    "失敗したときは、GitHubError を投げる。(途中のページで失敗したときも、途中まで集めた分は返さない。0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)"
+                    "失敗したときは、GitHubError を投げる。(途中のページで失敗したときも、途中まで集めた分は返さない。0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)",
+                    "最後のページまで取り終えたら、その ProjectV2 の Item (Item の core の project の id で見る) のうち、今回取れなかったものを、Pool から消す。(Pooler の removeProjectV2ItemsExcept(project_id, ids)。0.5.0 から。yanqirenshi/SOGH.next#108)",
+                    "Item が 0 個になったときも、消す。途中で失敗したとき (例外を投げるとき) は、何も消さない。",
+                    "消すのは ProjectV2Item のモデルだけ。中身 (Issue・PullRequest・DraftIssue) と、ほかの ProjectV2 の Item は残す。",
+                    "クエリの pick は ProjectV2 (id と items) を返し、items を最後のページまで取る。(Item が 0 個のときも、ProjectV2 の id が分かるように)",
+                    "戻り値 (取った Item の id の配列) は、消すことで変わらない。"
                 ],
                 "examples": [
                     "const ids = await sogh.asyncFetchProjectV2ItemsByOrgLoginProjectV2Number('octo-org', 4);",
@@ -7989,7 +8084,9 @@
                     "Sogh を持っていないとき (Pool を通さずに作ったとき) は、items() と同じ。(関連も引けないので、[])",
                     "items() の意味 (中身に入っているアイテム) は、変えない。",
                     "ProjectsV2 の部品の Item の表 (Task の列の「開く」) が読む。",
-                    "0.5.0 で消した itemsWith2ProjectV2Item() (items() と同じものを返す古い名前) の代わりに、部品はこれを読む。(yanqirenshi/SOGH.next#104)"
+                    "0.5.0 で消した itemsWith2ProjectV2Item() (items() と同じものを返す古い名前) の代わりに、部品はこれを読む。(yanqirenshi/SOGH.next#104)",
+                    "別に取ったアイテムを選ぶ所は、Pooler の projectV2ItemsOf(project_id)。(Item を取り直したときに Pool から消すのと、同じ見方。yanqirenshi/SOGH.next#108)",
+                    "Item を取り直して外れたアイテムは Pool から消えるので、core の items に id が残っていても、出ない。"
                 ],
                 "examples": [
                     "await sogh.asyncFetchProjectV2ItemsByUserLoginProjectV2Number('octocat', 3);",

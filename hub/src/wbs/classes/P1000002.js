@@ -45,7 +45,8 @@ function Overview ({ data }) {
             <P>{"コールバックを受け取る asyncFetch… は、失敗したとき、failed(error, …) を呼んでから投げる。(コメントの追加・更新・削除は、例外を投げず、failed を呼ぶ)"}</P>
             <P>{"deleteIssueComment は、GitHub でコメントを消せたら、issue-comment の Pool からも消してから、successed を呼ぶ。(Pool の remove(id) を使う。0.5.0 から。yanqirenshi/SOGH.next#69)"}</P>
             <P>{"_queries の値は、クエリの定義 { query, pick }。query(code) はクエリの文字列を、queryDefinition(code) は定義を返す。クエリの値は、GraphQL の variables で渡す。(yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65)"}</P>
-            <P>{"asyncFetch… は、取得の部品 fetchNode(code, variables) (1 回送り、pick で取り出す)・fetchPages(code, variables, onPage) (最後のページまで取る)・connection2ids(connection, make) (一覧をモデルにして id の配列にする) で組み立てる。team の 2 つは、fetchProjectsV2OfTeam(code, team_id, callbacks) を使う。"}</P>
+            <P>{"asyncFetch… は、取得の部品 fetchNode(code, variables) (1 回送り、pick で取り出す)・fetchPages(code, variables, onPage, connectionOf) (最後のページまで取る)・connection2ids(connection, make) (一覧をモデルにして id の配列にする) で組み立てる。team の 2 つは、fetchProjectsV2OfTeam(code, team_id, callbacks) を使う。"}</P>
+            <P>{"asyncFetchProjectV2ItemsByUserLoginProjectV2Number・ByOrg〜 は、最後のページまで取り終えたら、その ProjectV2 の Item のうち、今回取れなかったものを、Pooler の removeProjectV2ItemsExcept(project_id, ids) で Pool から消す。(途中で失敗したときは消さない。中身の Issue などは残す。0.5.0 から。yanqirenshi/SOGH.next#108)"}</P>
             <Plane>{CODE}</Plane>
           </Section>
 

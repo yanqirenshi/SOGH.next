@@ -552,3 +552,23 @@ test('列が 0 個でも、表は落ちない (見出しの行は無い)', ()=> 
 
     assert.deepEqual(headRows(tree), []);
 });
+
+test('見出しのセルの key は、見出しの文字と、何番めかの数 (label_i) (yanqirenshi/SOGH.next#111)', ()=> {
+    ReactStub.__clear();
+    ReactStub.__begin();
+
+    const sogh = new Sogh();
+    const project = makeProject(sogh);
+
+    const columns = [plainColumn('a', 'A'), plainColumn('p.s', 'Start', 'Plan'), plainColumn('p.e', 'End', 'Plan')];
+
+    // Table を描く前の木。(HeadCell は、まだ呼ばれていないので、key が残っている)
+    const element = Table({ data: [project], actions: {}, columns });
+
+    const keys = walk(element)
+          .filter(n=> typeof n.type === 'function' && n.type.name === 'HeadCell')
+          .map(n=> n.props.key);
+
+    assert.deepEqual(keys, ['A_0', 'Plan_1', 'Start_0', 'End_1']);
+    assert.equal(keys.some(k=> k.includes('[object Object]')), false);
+});

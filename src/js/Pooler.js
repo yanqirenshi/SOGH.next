@@ -146,6 +146,38 @@ export default class Pooler extends Loader {
 
         return pool.get(v);
     }
+    // Pool にある ProjectV2Item のうち、ProjectV2 (project_id) のものを、Pool に入った順に返す。
+    // 「その ProjectV2 の Item」は、Item の core の project の id で見る。(project の無い Item は入らない)
+    // ProjectV2 の itemsInPool() と、removeProjectV2ItemsExcept() が使う。(選ぶ所を 1 か所にする。yanqirenshi/SOGH.next#108)
+    projectV2ItemsOf (project_id) {
+        if (!project_id)
+            return [];
+
+        return this.pool('project-v2-item').list().filter(item=> {
+            const core = item.core();
+            const project = core ? core.project : null;
+
+            return !!project && project.id===project_id;
+        });
+    }
+    // ProjectV2 (project_id) の Item のうち、ids に無いものを、Pool から消す。消した Item の id の配列を返す。
+    // 消すのは ProjectV2Item のモデルだけ。中身 (Issue・PullRequest・DraftIssue) は、Pool に残す。
+    // project_id が無いときは、何も消さない。(yanqirenshi/SOGH.next#108)
+    removeProjectV2ItemsExcept (project_id, ids) {
+        if (!project_id)
+            return [];
+
+        const keep = new Set(ids);
+        const pool = this.pool('project-v2-item');
+
+        return this.projectV2ItemsOf(project_id)
+            .filter(item=> !keep.has(item.id()))
+            .map(item=> {
+                pool.remove(item.id());
+
+                return item.id();
+            });
+    }
     /* **************************************************************** *
      *  Issue                                                           *
      * **************************************************************** */

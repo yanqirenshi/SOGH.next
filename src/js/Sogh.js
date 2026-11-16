@@ -208,18 +208,21 @@ export default class Sogh extends Pooler {
         return picked;
     }
     // ページ送りする一覧を、最後のページまで取る。
-    // ページごとに onPage(connection) を呼ぶ。(connection は、pick で取り出した一覧。nodes か edges と、pageInfo)
+    // ページごとに onPage(picked) を呼ぶ。(picked は、pick で取り出したもの)
+    // connectionOf(picked) は、pageInfo を持つ一覧を返す関数。(既定は picked そのもの。nodes か edges と、pageInfo)
+    // (pick が一覧の親 (例: ProjectV2) を返すクエリでは、connectionOf で一覧を指す。yanqirenshi/SOGH.next#108)
     // 2 ページめからは、変数 after に、前のページの endCursor を入れて送る。
     // 途中で失敗したときは、GitHubError を投げる。(途中まで集めた分は、返さない)
-    async fetchPages (code, variables, onPage) {
+    async fetchPages (code, variables, onPage, connectionOf=(picked)=> picked) {
         let after = null;
 
         for (;;) {
-            const connection = await this.fetchNode(code, { ...variables, after });
+            const picked = await this.fetchNode(code, { ...variables, after });
 
-            onPage(connection);
+            onPage(picked);
 
-            const page_info = connection.pageInfo;
+            const connection = connectionOf(picked);
+            const page_info = connection ? connection.pageInfo : null;
 
             if (!page_info || !page_info.hasNextPage)
                 return;
@@ -395,22 +398,34 @@ export default class Sogh extends Pooler {
     ///// ProjectV2 Item
     /////
     // ProjectV2 の Item を、最後のページまで取る。(yanqirenshi/SOGH.next#64)
+    // 最後のページまで取り終えたら、その ProjectV2 の Item のうち、今回取れなかったものを、Pool から消す。
+    // (途中で失敗したときは、消さない。yanqirenshi/SOGH.next#108)
     async asyncFetchProjectV2ItemsByUserLoginProjectV2Number (login, number) {
         let out = [];
+        let project_id = null;
 
-        await this.fetchPages('projectv2items_by_user_login_projectv2_number', { login, number: Number(number) }, (connection)=> {
-            out = out.concat(this.connection2ids(connection, node=> this.node2projectV2Item(node)));
-        });
+        await this.fetchPages('projectv2items_by_user_login_projectv2_number', { login, number: Number(number) }, (project)=> {
+            project_id = project.id || project_id;
+            out = out.concat(this.connection2ids(project.items, node=> this.node2projectV2Item(node)));
+        }, (project)=> project.items);
+
+        this.removeProjectV2ItemsExcept(project_id, out);
 
         return out;
     }
     // ProjectV2 の Item を、最後のページまで取る。(yanqirenshi/SOGH.next#64)
+    // 最後のページまで取り終えたら、その ProjectV2 の Item のうち、今回取れなかったものを、Pool から消す。
+    // (途中で失敗したときは、消さない。yanqirenshi/SOGH.next#108)
     async asyncFetchProjectV2ItemsByOrgLoginProjectV2Number (login, number) {
         let out = [];
+        let project_id = null;
 
-        await this.fetchPages('projectv2items_by_org_login_projectv2_number', { org: login, number: Number(number) }, (connection)=> {
-            out = out.concat(this.connection2ids(connection, node=> this.node2projectV2Item(node)));
-        });
+        await this.fetchPages('projectv2items_by_org_login_projectv2_number', { org: login, number: Number(number) }, (project)=> {
+            project_id = project.id || project_id;
+            out = out.concat(this.connection2ids(project.items, node=> this.node2projectV2Item(node)));
+        }, (project)=> project.items);
+
+        this.removeProjectV2ItemsExcept(project_id, out);
 
         return out;
     }

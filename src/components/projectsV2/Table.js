@@ -43,7 +43,7 @@ export default function Table (props) {
                       <TableRow key={i}>
                         {row.map((d,i)=> {
                             return (
-                                <HeadCell key={d+'_'+i}
+                                <HeadCell key={d.label+'_'+i}
                                           rowSpan={d.row_span}
                                           colSpan={d.col_span}>
                                   {d.label}

@@ -46,6 +46,7 @@ function Overview ({ data }) {
             <P>{"Sogh の asyncFetch〜 が、取得したノードを node2〜(node) に渡す。"}</P>
             <P>{"node2pullRequest(node) は、ProjectV2Item の content として別名 pullRequestState で来た state を、Pool に入れる前に state に戻す。(0.5.0 から。yanqirenshi/SOGH.next#68)"}</P>
             <P>{"node2projectV2Item(node) も、Pool に入れる前に、content の pullRequestState を state に戻す。(ProjectV2Item の core に残る content も、取り方によらず state になる)"}</P>
+            <P>{"projectV2ItemsOf(project_id) は、Pool にある ProjectV2Item のうち、core の project の id が project_id のものを、Pool に入った順に返す。removeProjectV2ItemsExcept(project_id, ids) は、そのうち ids に無いものを Pool から消す。(ProjectV2 の itemsInPool() と、Sogh の Item を取るメソッドが使う。選ぶ所を 1 か所にした。0.5.0 から。yanqirenshi/SOGH.next#108)"}</P>
             <P>{"node2team(node) は、reviewers の Team が別名 teamName・teamAvatarUrl で取った値を、Pool に入れる前に、name・avatarUrl に戻す。(0.5.0 から。yanqirenshi/SOGH.next#39)"}</P>
             <P>{"node2projectV2Item(node) も、Pool に入れる前に、fieldValues の reviewers の中の Team を、name・avatarUrl に戻す。(ProjectV2Item の core に残る Team も、取り方によらず name・avatarUrl になる)"}</P>
             <Plane>{CODE}</Plane>
