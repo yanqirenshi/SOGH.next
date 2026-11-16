@@ -6,7 +6,7 @@
 また、Sogh のメソッドから使われていないクエリを、すべて消しました。
 取得のクエリを、値を GraphQL の variables で渡す形に書き直し、`asyncFetch〜` が失敗したときは例外を投げるようにしました。
 あわせて、Projects (classic) のモデルや、Issue を作るための部品など、使われていない古いものを消しました。
-(yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91)
+(yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95)
 
 ### 利用側への影響 (破壊的な変更です)
 
@@ -94,6 +94,9 @@
 - Projects (classic) のモデルのファイル `src/js/models/Project.js`・`Card.js`・`Column.js`。(yanqirenshi/SOGH.next#81)
 - 古い文書 `src/js/README.md`・`src/js/models/README.markdown`。(いまのコードと合っていなかった。パッケージにも、入らなくなります。yanqirenshi/SOGH.next#77)
 - `Issue.js` の `moment` の import。(Issue を作るための部品だけが使っていた。package.json の依存は、そのまま)
+- `Issue` の属性 `regex` (本文の注釈を読む正規表現の表)。どこからも使われていなかった。(yanqirenshi/SOGH.next#95)
+  - 点数の 4 つは、整数だけを読む古い書き方で、本文を読むメソッド (小数も読む) とは違っていました。`issue.regex` を読んでいた場合は、本文を読むメソッド (`points()`・`getPointFromBody(body)` など) を使ってください。
+  - 本文を読むメソッドの中の正規表現は、変わりません。
 - クエリの項目の部品 (`src/js/queries/attributes.js`) のうち、どのクエリからも使われなくなった 7 個。(`project`・`project_card`・`project_column` (Projects (classic) 用) と、`project_next`・`project_next_fields`・`project_next_item`・`project_next_item_field_value` (古い Projects 用))
 
 ### 変わった動き
@@ -105,6 +108,9 @@
 - `deleteIssueComment` は、成功したら、`successed` を呼ぶ前に、消したコメントを Pool からも消します。(yanqirenshi/SOGH.next#69)
 - `Loader` の `fetchX` も、送り先を `endpoint()` から取ります。(これまでは URL を直に書いていた。yanqirenshi/SOGH.next#76)
 - hub のひな形 (`hub/.env.local.template`) の、個人用アクセストークンの所に、注意を書きました。(この値はビルドした JS に埋め込まれるので、ビルドは手元以外に置かない。yanqirenshi/SOGH.next#70。パッケージには入りません)
+- `ProjectsV2` の表の Plan・Result の Start・End の列に、日付を出すようにしました。(これまでは、いつも空でした。yanqirenshi/SOGH.next#94)
+  - Plan は `plan()`、Result は `result()` の start・end を、README に書いた日付の文字列のまま出します。書いていないときは、空のままです。
+  - 列の `code`・グループ・見出しは、変わりません。
 
 ### 足したもの
 

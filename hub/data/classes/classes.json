@@ -5283,31 +5283,6 @@
                     "pointResultTotal()",
                     "getPointFromBody(body)"
                 ]
-            },
-            {
-                "name": "regex",
-                "visibility": "public",
-                "type": "Object",
-                "initialValue": "{\n  point: {\n    plan:    /.*[@|$][P|p]oint\\.[P|p]lan:*\\s+(\\d+).*/,\n    result:  /.*[@|$][P|p]oint\\.[R|r]esult:*\\s+(\\d+).*/,\n    plans:   /\\$[P|p]oint.[P|p]lan:*\\s+(\\S+)\\s+(\\d+-\\d+-\\d+)\\s+(\\d+)/g,\n    results: /\\$Point.[R|r]esult:*\\s+(\\S+)\\s+(\\d+-\\d+-\\d+)\\s+(\\d+)/g,\n  },\n  date_due:    /.*[@|$]Date\\.Due:*\\s+(\\d+-\\d+-\\d+).*/,\n  due_date:    /.*[@|$]Due\\.Date:*\\s+(\\d+-\\d+-\\d+).*/,\n  next_action: /.*[@|$]Date\\.Next:*\\s+(\\d+-\\d+-\\d+).*/,\n  owner:       /.*\\$[O|o]wner:*\\s+(\\S+).*/,\n}",
-                "description": [
-                    "本文の注釈を読むための正規表現。(名前 → 正規表現)",
-                    "constructor が作る。",
-                    "どのメソッドもこの正規表現を使っていない。(getPointFromBody(body) などは、メソッドの中に自分の正規表現を書いている)",
-                    "ポイントを整数しか読まないなど、メソッドの中の正規表現とは少し違う。"
-                ],
-                "examples": [
-                    "issue.regex.owner.exec('$Owner octocat')[1];",
-                    "// => \"octocat\""
-                ],
-                "affectedBy": [
-                    "constructor"
-                ],
-                "seeAlso": [
-                    "getOwnerFromBody(body)",
-                    "getPointFromBody(body)",
-                    "getDueDateFromBody(body)",
-                    "getNextActionFromBody(body)"
-                ]
             }
         ],
         "methods": [

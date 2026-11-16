@@ -12,18 +12,8 @@ export default class Issue extends GraphQLNode {
         if (arguments.length===1)
             this.parseBody(data);
 
-        this.regex = {
-            point: {
-                plan:    /.*[@|$][P|p]oint\.[P|p]lan:*\s+(\d+).*/,
-                result:  /.*[@|$][P|p]oint\.[R|r]esult:*\s+(\d+).*/,
-                plans:   /\$[P|p]oint.[P|p]lan:*\s+(\S+)\s+(\d+-\d+-\d+)\s+(\d+)/g,
-                results: /\$Point.[R|r]esult:*\s+(\S+)\s+(\d+-\d+-\d+)\s+(\d+)/g,
-            },
-            date_due:    /.*[@|$]Date\.Due:*\s+(\d+-\d+-\d+).*/,
-            due_date:    /.*[@|$]Due\.Date:*\s+(\d+-\d+-\d+).*/,
-            next_action: /.*[@|$]Date\.Next:*\s+(\d+-\d+-\d+).*/,
-            owner:       /.*\$[O|o]wner:*\s+(\S+).*/,
-        };
+        // 本文を読む正規表現は、読むメソッド (getPointFromBody(body) など) の中にある。
+        // (使われていなかった this.regex は、0.5.0 で消した。yanqirenshi/SOGH.next#95)
     }
     core (v) {
         if (arguments.length===1) {
