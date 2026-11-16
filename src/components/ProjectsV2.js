@@ -26,6 +26,14 @@ export default function ProjectsV2 (props) {
     );
 }
 
+// 期間 (Term) の start か end を返す。期間でないもの (null など) のときは null。
+function termDate (term, part) {
+    if (!term || typeof term !== 'object')
+        return null;
+
+    return term[part] || null;
+}
+
 function defaultActions () {
     return {
         title: {
@@ -100,7 +108,7 @@ const COLUMNS = [
         },
     },
     {
-        code: 'owner',
+        code: 'readmeOwner',
         label: 'Owner',
         sx: {whiteSpace: 'nowrap'},
         val: (column, project, actions)=> {
@@ -125,7 +133,8 @@ const COLUMNS = [
         label: 'Start',
         sx: null,
         val: (column, project, actions)=> {
-            return null;
+            // README の $Plan の日付 (文字列) をそのまま出す。書いていないときは null (空)。(yanqirenshi/SOGH.next#94)
+            return termDate(project.plan(), 'start');
         },
     },
     {
@@ -134,7 +143,8 @@ const COLUMNS = [
         label: 'End',
         sx: null,
         val: (column, project, actions)=> {
-            return null;
+            // README の $Plan の日付 (文字列) をそのまま出す。書いていないときは null (空)。(yanqirenshi/SOGH.next#94)
+            return termDate(project.plan(), 'end');
         },
     },
     {
@@ -143,7 +153,8 @@ const COLUMNS = [
         label: 'Start',
         sx: null,
         val: (column, project, actions)=> {
-            return null;
+            // README の $Result の日付 (文字列) をそのまま出す。書いていないときは null (空)。(yanqirenshi/SOGH.next#94)
+            return termDate(project.result(), 'start');
         },
     },
     {
@@ -152,7 +163,8 @@ const COLUMNS = [
         label: 'End',
         sx: null,
         val: (column, project, actions)=> {
-            return null;
+            // README の $Result の日付 (文字列) をそのまま出す。書いていないときは null (空)。(yanqirenshi/SOGH.next#94)
+            return termDate(project.result(), 'end');
         },
     },
     {

@@ -1,7 +1,7 @@
 // owner まわりの名前のテスト。
 //   - Issue の owner() は、bodyOwner() にした。(本文の $Owner の値。yanqirenshi/SOGH.next#85)
 //   - ProjectV2 の maneger() は、消した。README の $Owner は readmeOwner() で読む。(yanqirenshi/SOGH.next#86)
-//   - Issue の addAnotetionValue(issue) は、消した。addAnotetionValueNew(issue) は残る。(yanqirenshi/SOGH.next#87)
+//   - Issue の addAnotetionValue(issue) は、消した。(yanqirenshi/SOGH.next#87。本文の注釈は parseBody(issue) が読む。yanqirenshi/SOGH.next#91)
 //
 // 動かし方:
 //   npm test
@@ -56,13 +56,13 @@ test('Issue に owner() は無い (GitHub の Issue には owner が無いので
  * Issue の addAnotetionValue (yanqirenshi/SOGH.next#87)
  * **************************************************************** */
 
-test('Issue の addAnotetionValue(issue) は無い。addAnotetionValueNew(issue) は残る', ()=> {
+test('Issue の addAnotetionValue(issue) は無い。本文の注釈は parseBody(issue) が読む', ()=> {
     const sogh = new Sogh();
 
     const issue = sogh.node2issue({ __typename: 'Issue', id: 'I_1', updatedAt: T1 });
 
     assert.equal(typeof issue.addAnotetionValue, 'undefined');
-    assert.equal(typeof issue.addAnotetionValueNew, 'function');
+    assert.equal(typeof issue.parseBody, 'function');
 });
 
 /* ****************************************************************
@@ -78,10 +78,12 @@ test('ProjectV2 の maneger() は無い。README の $Owner は readmeOwner() �
     assert.equal(project.readmeOwner(), 'alice');
 });
 
-test('ProjectsV2 の表の Owner の列は、readmeOwner() を読む', ()=> {
+test('ProjectsV2 の表の Owner の列は、code が readmeOwner で、readmeOwner() を読む (yanqirenshi/SOGH.next#89)', ()=> {
     // 部品は JSX なので、Node では読めない。ファイルの中身で確かめる。
     const src = fs.readFileSync(new URL('../src/components/ProjectsV2.js', import.meta.url), 'utf8');
 
-    assert.match(src, /code: 'owner',[\s\S]*?project\.readmeOwner\(\)/);
+    // 見出しは 'Owner' のまま。(画面は変えない)
+    assert.match(src, /code: 'readmeOwner',\s*label: 'Owner',[\s\S]*?project\.readmeOwner\(\)/);
+    assert.equal(/code: 'owner'/.test(src), false);
     assert.equal(src.includes('maneger'), false);
 });

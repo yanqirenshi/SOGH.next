@@ -104,9 +104,20 @@ export default class ProjectV2 extends GraphQLNode {
 
         return this.result(null, null);
     }
+    // README の属性を読み出す。
+    // README に書いていない属性は、initReadmeAttributes() の初めの値のまま残す。(null で上書きしない。yanqirenshi/SOGH.next#90)
+    // plan・result は、parseReadmeItemPlan・parseReadmeItemResult が決める。(前と同じ)
     parseReadme () {
         const regexs = this._regexs;
         const readme = this.readme();
+
+        // 書いてあったときだけ、値を入れる。
+        const set = (setter, regex)=> {
+            const v = this.parseReadmeItem(readme, regex);
+
+            if (v!==null)
+                setter.call(this, v);
+        };
 
         for (const k in regexs) {
 
@@ -115,20 +126,20 @@ export default class ProjectV2 extends GraphQLNode {
             if (!regex) continue;
 
             switch (k) {
-            case 'priority': this.priority(this.parseReadmeItem(readme, regex)); break;
-            case 'owner':    this.readmeOwner(this.parseReadmeItem(readme, regex)); break;
-            case 'type':     this.type(this.parseReadmeItem(readme, regex));     break;
-            case 'release':  this.release(this.parseReadmeItem(readme, regex));  break;
-            case 'plan':     this.parseReadmeItemPlan (readme, regex);           break;
-            case 'result':   this.parseReadmeItemResult(readme, regex);          break;
-            case 'action':   this.action(this.parseReadmeItem(readme, regex));   break;
-            case 'backlog':  this.backlog(this.parseReadmeItem(readme, regex));  break;
+            case 'priority': set(this.priority, regex);                        break;
+            case 'owner':    set(this.readmeOwner, regex);                     break;
+            case 'type':     set(this.type, regex);                            break;
+            case 'release':  set(this.release, regex);                         break;
+            case 'plan':     this.parseReadmeItemPlan (readme, regex);         break;
+            case 'result':   this.parseReadmeItemResult(readme, regex);        break;
+            case 'action':   set(this.action, regex);                          break;
+            case 'backlog':  set(this.backlog, regex);                         break;
 
-            case 'customer': this.customer(this.parseReadmeItem(readme, regex)); break;
-            case 'agency':   this.agency(this.parseReadmeItem(readme, regex));   break;
-            case 'systems':  this.systems(this.parseReadmeItem(readme, regex));  break;
-            case 'scenario': this.scenario(this.parseReadmeItem(readme, regex)); break;
-            case 'progress': this.progress(this.parseReadmeItem(readme, regex)); break;
+            case 'customer': set(this.customer, regex);                        break;
+            case 'agency':   set(this.agency, regex);                          break;
+            case 'systems':  set(this.systems, regex);                         break;
+            case 'scenario': set(this.scenario, regex);                        break;
+            case 'progress': set(this.progress, regex);                        break;
 
             default: throw new Error(`Not found key. key=${k}`);
             }
@@ -160,7 +171,7 @@ export default class ProjectV2 extends GraphQLNode {
     owner () {
         return this.relation(this._core.owner);
     }
-    // README の $Owner の値 (文字列)。README に $Owner が無いときは null。(0.5.0 で owner() から名前を変えた。yanqirenshi/SOGH.next#71)
+    // README の $Owner の値 (文字列)。README に $Owner が無いときは '?'。(0.5.0 で owner() から名前を変えた。yanqirenshi/SOGH.next#71)
     readmeOwner (v) {
         if (arguments.length===1)
             this._owner = v;

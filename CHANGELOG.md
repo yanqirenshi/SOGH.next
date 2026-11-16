@@ -6,7 +6,7 @@
 また、Sogh のメソッドから使われていないクエリを、すべて消しました。
 取得のクエリを、値を GraphQL の variables で渡す形に書き直し、`asyncFetch〜` が失敗したときは例外を投げるようにしました。
 あわせて、Projects (classic) のモデルや、Issue を作るための部品など、使われていない古いものを消しました。
-(yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87)
+(yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95)
 
 ### 利用側への影響 (破壊的な変更です)
 
@@ -64,7 +64,15 @@
   - GitHub の Issue には owner が無いので、`owner()` は無くしました。(代わりのものは、ありません)
   - 本文から読む、ほかの値 (`points()`・`dueDate()`・`nextActionDate()`) の名前は、変わりません。
 - `ProjectV2` の `maneger(v)` を消しました。README の `$Owner` は、`readmeOwner(v)` で読んでください。(同じ値を読み書きしていた。yanqirenshi/SOGH.next#86)
-- `Issue` の `addAnotetionValue(issue)` を消しました。(どこからも呼ばれず、渡したモデルの `owner()` をプロパティで隠してしまっていた。`addAnotetionValueNew(issue)` は、残しています。yanqirenshi/SOGH.next#87)
+- `Issue` の `addAnotetionValue(issue)` を消しました。(どこからも呼ばれず、渡したモデルの `owner()` をプロパティで隠してしまっていた。本文の注釈は、`parseBody(issue)` が読みます。yanqirenshi/SOGH.next#87)
+- `Issue` の `addAnotetionValueNew(issue)` を、`parseBody(issue)` に名前を変えました。(引数と、することは同じ。古い名前は残していません。yanqirenshi/SOGH.next#91)
+- `ProjectV2` の README に書いていない属性は、null ではなく、初めの値を返すようになりました。(yanqirenshi/SOGH.next#90)
+  - `priority()`・`readmeOwner()`・`type()`・`release()` は `'?'`。`action()`・`backlog()`・`customer()`・`agency()`・`scenario()`・`progress()` は `''`。`systems()` は `[]`。
+  - これまでは、README を読むときに null で上書きしていました。null かどうかで「書いていない」を見分けていた場合は、初めの値で見分けてください。
+  - README に書いてあるときの値と、`plan()`・`result()` の動きは、変わりません。
+  - 取り直しで README から属性が消えたときも、初めの値に戻ります。
+  - `ProjectsV2` の表では、Type・Owner・Release の列に、空ではなく `?` が出ます。Priority の列は「謎 (null)」から「謎 (?)」になります。
+- `ProjectsV2` の表の既定の列のうち、Owner の列の `code` を、`'owner'` から `'readmeOwner'` に変えました。(見出しは `Owner` のまま。README の `$Owner` を出す列で、ProjectV2 の `owner()` とは別のもの。yanqirenshi/SOGH.next#89)
 - パッケージの入口から、Projects (classic) のモデル `Project`・`Card`・`Column` を消しました。`models` の中からも消しました。(yanqirenshi/SOGH.next#81)
 - `Issue` のメソッドを 9 個、消しました。
   - Projects (classic) 用 (6 個): `projectCards()`・`getColumnFirst()`・`getFirstColumnProject()`・`getFirstColumnProjectID()`・`projects()`・`projectIds()`。(yanqirenshi/SOGH.next#82。同じ所にあった `milestoneId()` は、残しています)
@@ -86,6 +94,9 @@
 - Projects (classic) のモデルのファイル `src/js/models/Project.js`・`Card.js`・`Column.js`。(yanqirenshi/SOGH.next#81)
 - 古い文書 `src/js/README.md`・`src/js/models/README.markdown`。(いまのコードと合っていなかった。パッケージにも、入らなくなります。yanqirenshi/SOGH.next#77)
 - `Issue.js` の `moment` の import。(Issue を作るための部品だけが使っていた。package.json の依存は、そのまま)
+- `Issue` の属性 `regex` (本文の注釈を読む正規表現の表)。どこからも使われていなかった。(yanqirenshi/SOGH.next#95)
+  - 点数の 4 つは、整数だけを読む古い書き方で、本文を読むメソッド (小数も読む) とは違っていました。`issue.regex` を読んでいた場合は、本文を読むメソッド (`points()`・`getPointFromBody(body)` など) を使ってください。
+  - 本文を読むメソッドの中の正規表現は、変わりません。
 - クエリの項目の部品 (`src/js/queries/attributes.js`) のうち、どのクエリからも使われなくなった 7 個。(`project`・`project_card`・`project_column` (Projects (classic) 用) と、`project_next`・`project_next_fields`・`project_next_item`・`project_next_item_field_value` (古い Projects 用))
 
 ### 変わった動き
@@ -97,6 +108,9 @@
 - `deleteIssueComment` は、成功したら、`successed` を呼ぶ前に、消したコメントを Pool からも消します。(yanqirenshi/SOGH.next#69)
 - `Loader` の `fetchX` も、送り先を `endpoint()` から取ります。(これまでは URL を直に書いていた。yanqirenshi/SOGH.next#76)
 - hub のひな形 (`hub/.env.local.template`) の、個人用アクセストークンの所に、注意を書きました。(この値はビルドした JS に埋め込まれるので、ビルドは手元以外に置かない。yanqirenshi/SOGH.next#70。パッケージには入りません)
+- `ProjectsV2` の表の Plan・Result の Start・End の列に、日付を出すようにしました。(これまでは、いつも空でした。yanqirenshi/SOGH.next#94)
+  - Plan は `plan()`、Result は `result()` の start・end を、README に書いた日付の文字列のまま出します。書いていないときは、空のままです。
+  - 列の `code`・グループ・見出しは、変わりません。
 
 ### 足したもの
 

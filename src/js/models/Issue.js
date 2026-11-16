@@ -10,20 +10,10 @@ export default class Issue extends GraphQLNode {
         this._points = { plan: null, result: null, results: null };
 
         if (arguments.length===1)
-            this.addAnotetionValueNew(data);
+            this.parseBody(data);
 
-        this.regex = {
-            point: {
-                plan:    /.*[@|$][P|p]oint\.[P|p]lan:*\s+(\d+).*/,
-                result:  /.*[@|$][P|p]oint\.[R|r]esult:*\s+(\d+).*/,
-                plans:   /\$[P|p]oint.[P|p]lan:*\s+(\S+)\s+(\d+-\d+-\d+)\s+(\d+)/g,
-                results: /\$Point.[R|r]esult:*\s+(\S+)\s+(\d+-\d+-\d+)\s+(\d+)/g,
-            },
-            date_due:    /.*[@|$]Date\.Due:*\s+(\d+-\d+-\d+).*/,
-            due_date:    /.*[@|$]Due\.Date:*\s+(\d+-\d+-\d+).*/,
-            next_action: /.*[@|$]Date\.Next:*\s+(\d+-\d+-\d+).*/,
-            owner:       /.*\$[O|o]wner:*\s+(\S+).*/,
-        };
+        // 本文を読む正規表現は、読むメソッド (getPointFromBody(body) など) の中にある。
+        // (使われていなかった this.regex は、0.5.0 で消した。yanqirenshi/SOGH.next#95)
     }
     core (v) {
         if (arguments.length===1) {
@@ -31,7 +21,7 @@ export default class Issue extends GraphQLNode {
 
             // 再取得などで core が差し替わったら、本文の注釈 ($Point など) を解析し直す。
             if (this._core)
-                this.addAnotetionValueNew(this._core);
+                this.parseBody(this._core);
         }
 
         return super.core();
@@ -185,7 +175,7 @@ export default class Issue extends GraphQLNode {
         core.body = v || '';
 
         // 本文が変わったので注釈 ($Point など) を解析し直す。
-        this.addAnotetionValueNew(core);
+        this.parseBody(core);
 
         return core.body;
     }
@@ -289,9 +279,11 @@ export default class Issue extends GraphQLNode {
         return next_action ? next_action[1] : null;;
     }
     /* **************************************************************** *
-     * ???
+     * 本文の注釈
      * **************************************************************** */
-    addAnotetionValueNew (issue) {
+    // 本文の注釈 ($Point・$Date.Due・$Date.Next・$Owner) を読み出して持つ。
+    // (0.5.0 で addAnotetionValueNew(issue) から名前を変えた。yanqirenshi/SOGH.next#91)
+    parseBody (issue) {
         // body を取得していないノード (ProjectV2Item の content など) もあるので空文字で扱う。
         const body = issue.body || '';
 
