@@ -1,4 +1,5 @@
 import GraphQLNode from './GraphQLNode.js';
+import { fieldValueOf } from './fieldValue.js';
 
 export default class Issue extends GraphQLNode {
     constructor (data) {
@@ -208,26 +209,12 @@ export default class Issue extends GraphQLNode {
         if (!fieldItem)
             return null;
 
-        const getValue = (field_item)=> {
-            const type = field_item.field.dataType;
-
-            switch (type) {
-            case 'ASSIGNEES':     return { users:      field_item.users };
-            case 'REPOSITORY':    return { repository: field_item.repository };
-            case 'LABELS':        return { labels:     field_item.labels };
-            case 'TITLE':         return { text:       field_item.text };
-            case 'SINGLE_SELECT': return { optionId:   field_item.optionId };
-            case 'DATE':          return { date:       field_item.date };
-            default:
-                throw new Error('Not Supported yet. dataType=' + type);
-            }
-        };
-
+        // value は、フィールドの種類ごとの値。知らない種類のときは null。(ProjectV2Item と同じ関数。yanqirenshi/SOGH.next#120)
         return {
             project: item.project,
             item:    item,
             field_item:   fieldItem,
-            value: getValue(fieldItem),
+            value: fieldValueOf(fieldItem),
         };
     }
     // 最初の Item の fieldValues の nodes。(JSON のまま)

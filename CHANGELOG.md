@@ -6,7 +6,7 @@
 また、Sogh のメソッドから使われていないクエリを、すべて消しました。
 取得のクエリを、値を GraphQL の variables で渡す形に書き直し、`asyncFetch〜` が失敗したときは例外を投げるようにしました。
 あわせて、Projects (classic) のモデルや、Issue を作るための部品など、使われていない古いものを消しました。
-(yanqirenshi/SOGH.next#39・yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100・yanqirenshi/SOGH.next#101・yanqirenshi/SOGH.next#102・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#104・yanqirenshi/SOGH.next#105・yanqirenshi/SOGH.next#108・yanqirenshi/SOGH.next#111・yanqirenshi/SOGH.next#114・yanqirenshi/SOGH.next#117・yanqirenshi/SOGH.next#118)
+(yanqirenshi/SOGH.next#39・yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100・yanqirenshi/SOGH.next#101・yanqirenshi/SOGH.next#102・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#104・yanqirenshi/SOGH.next#105・yanqirenshi/SOGH.next#108・yanqirenshi/SOGH.next#111・yanqirenshi/SOGH.next#114・yanqirenshi/SOGH.next#117・yanqirenshi/SOGH.next#118・yanqirenshi/SOGH.next#120)
 
 ### 利用側への影響 (破壊的な変更です)
 
@@ -177,6 +177,12 @@
   - sogh が受け付ける MUI の範囲 (`peerDependencies`) は、変えていません。(見直しは yanqirenshi/SOGH.next#121)
 - `PanelIssue` の日付の欄 2 か所は、日付が無いとき、欄の value に空の文字を渡すようにしました。(これまでは null を渡して、React の警告が出ていました。yanqirenshi/SOGH.next#118)
   - モデルの `dueDate()`・`nextActionDate()` の戻り値は、変わりません。(日付が無いときは、いまも null です)
+- `Issue`・`ProjectV2Item` の `fieldValueContents(name)` は、知らない種類のフィールドのときも、エラーを投げなくなりました。(yanqirenshi/SOGH.next#120)
+  - これまでは、下の「足したもの」の 6 つの種類も含めて、知らない種類のときは `Error('Not Supported yet. dataType=…')` を投げていました。
+  - いまは、`value` だけを null にして、`{ project, item, field_item, value: null }` を返します。
+  - その名前のフィールドの値が無いときは、いままでどおり、全体が null です。
+  - フィールドの値を取り出す処理は、`src/js/models/fieldValue.js` の `fieldValueOf(field_item)` の 1 か所にまとめ、Issue と ProjectV2Item の両方から呼びます。(これまでは、同じ switch が 2 か所にありました。パッケージの入口からは、export しません)
+  - いままでの 6 つの種類 (DATE・TITLE・SINGLE_SELECT・ASSIGNEES・LABELS・REPOSITORY) の `value` の形と、Issue の `fieldValueContents(name)` が最初の Item だけを読むことは、変わりません。
 
 ### 足したもの
 
@@ -192,6 +198,13 @@
 - `ProjectV2` の `readmeOwner(v)`: README の `$Owner` の値を読む・入れる。(これまでの `owner()`。yanqirenshi/SOGH.next#71)
 - `ProjectV2Item` の `fieldValueContents(name)`: 名前が name のフィールドの値を書き換えるときに、利用側へ渡す値 `{ project, item, field_item, value }` を返す。(Issue の `fieldValueContents(name)` と同じ形。JSON のまま。値が無いときは null。yanqirenshi/SOGH.next#114)
 - `PanelIssue` の `item` (ProjectV2Item のモデル)。(上の「利用側への影響」を見る。yanqirenshi/SOGH.next#114)
+- `Issue`・`ProjectV2Item` の `fieldValueContents(name)` が `value` を返す種類に、6 つを足しました。(値は、フィールドの値の JSON から、そのまま取ります。モデルにはしません。yanqirenshi/SOGH.next#120)
+  - TEXT: `{ text }`
+  - NUMBER: `{ number }`
+  - ITERATION: `{ iterationId }`
+  - MILESTONE: `{ milestone }`
+  - LINKED_PULL_REQUESTS: `{ pullRequests }`
+  - REVIEWERS: `{ reviewers }`
 - `ProjectV2` の `itemsInPool()`: Pool にある、この ProjectV2 の Item の配列を返す。(yanqirenshi/SOGH.next#102)
   - 並び順は、`items()` (中身に入っている Item) をその順に、そのあとに、別に取って Pool に入った Item (core の project の id が、この ProjectV2 のもの) を、Pool に入った順に。同じ Item は、1 回だけ。
   - 取得はしません。sogh が入っていないモデルでは、`items()` と同じです。

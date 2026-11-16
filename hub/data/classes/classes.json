@@ -5987,6 +5987,7 @@
                     "description": [
                         "{ project, item, field_item, value } の形のデータ。",
                         "project は ProjectV2 のノード、item はアイテムのノード、field_item はフィールドの値のノード。",
+                        "value は、フィールドの型ごとの値。知らない型のときは null。",
                         "見つからないときは null。"
                     ]
                 },
@@ -6002,8 +6003,10 @@
                 "description": [
                     "最初の ProjectV2 のアイテム (fieldItem() のノード) から、名前が name のフィールドの値を探し、値を書き換えるときに使うデータにして返す。",
                     "fieldValues を直接読むので、返すデータの中身 (project・item・field_item・value) は、モデルではなく JSON のまま。",
-                    "value の形は、フィールドの型 (dataType) で変わる。(ASSIGNEES は { users }、REPOSITORY は { repository }、LABELS は { labels }、TITLE は { text }、SINGLE_SELECT は { optionId }、DATE は { date })",
-                    "それ以外の型 (TEXT・NUMBER など) のフィールドのときは、Error を投げる。",
+                    "value の形は、フィールドの型 (dataType) で変わる。(ASSIGNEES は { users }、REPOSITORY は { repository }、LABELS は { labels }、TITLE は { text }、SINGLE_SELECT は { optionId }、DATE は { date }、TEXT は { text }、NUMBER は { number }、ITERATION は { iterationId }、MILESTONE は { milestone }、LINKED_PULL_REQUESTS は { pullRequests }、REVIEWERS は { reviewers })",
+                    "value の中の値は、フィールドの値の JSON (field_item) から、そのまま取る。(モデルにはしない。TEXT・NUMBER・ITERATION・MILESTONE・LINKED_PULL_REQUESTS・REVIEWERS は、0.5.0 で足した。yanqirenshi/SOGH.next#120)",
+                    "上の 12 のほかの、知らない型のフィールドのときは、エラーを投げず、value だけを null にして返す。({ project, item, field_item, value: null }。0.5.0 から。それまでは、Error を投げていた。yanqirenshi/SOGH.next#120)",
+                    "値を取り出す処理は、src/js/models/fieldValue.js の fieldValueOf(field_item) の 1 か所にあり、Issue と ProjectV2Item の fieldValueContents(name) の両方が呼ぶ。(パッケージの入口からは export しない。yanqirenshi/SOGH.next#120)",
                     "アイテムが無いとき、名前が name のフィールドの値が無いときは null。",
                     "projectItems を取得していないときも、null。",
                     "アイテムに fieldValues が無いとき、field の無い値が混ざっているときも、落ちずに null か、名前の合う値を返す。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)",
@@ -9152,6 +9155,7 @@
                     "description": [
                         "{ project, item, field_item, value } の形のデータ。(Issue の fieldValueContents(name) と同じ形)",
                         "project はこのアイテムの core の project (ProjectV2 のノード)、item はこのアイテムの core (ノード)、field_item はフィールドの値のノード。",
+                        "value は、フィールドの型ごとの値。知らない型のときは null。",
                         "見つからないときは null。"
                     ]
                 },
@@ -9167,8 +9171,10 @@
                 "description": [
                     "このアイテムの、名前が name のフィールドの値を探し、値を書き換えるときに利用側へ渡すデータにして返す。(0.5.0 から。yanqirenshi/SOGH.next#114)",
                     "返すデータの中身は、モデルではなく JSON のまま。(yanqirenshi/SOGH.next#29)",
-                    "value の形は、フィールドの型 (dataType) で変わる。(ASSIGNEES は { users }、REPOSITORY は { repository }、LABELS は { labels }、TITLE は { text }、SINGLE_SELECT は { optionId }、DATE は { date })",
-                    "それ以外の型 (TEXT・NUMBER など) のフィールドのときは、Error を投げる。(Issue のものと同じ)",
+                    "value の形は、フィールドの型 (dataType) で変わる。(ASSIGNEES は { users }、REPOSITORY は { repository }、LABELS は { labels }、TITLE は { text }、SINGLE_SELECT は { optionId }、DATE は { date }、TEXT は { text }、NUMBER は { number }、ITERATION は { iterationId }、MILESTONE は { milestone }、LINKED_PULL_REQUESTS は { pullRequests }、REVIEWERS は { reviewers })",
+                    "value の中の値は、フィールドの値の JSON (field_item) から、そのまま取る。(モデルにはしない。TEXT・NUMBER・ITERATION・MILESTONE・LINKED_PULL_REQUESTS・REVIEWERS は、0.5.0 で足した。yanqirenshi/SOGH.next#120)",
+                    "上の 12 のほかの、知らない型のフィールドのときは、エラーを投げず、value だけを null にして返す。({ project, item, field_item, value: null }。0.5.0 から。それまでは、Error を投げていた。yanqirenshi/SOGH.next#120)",
+                    "値を取り出す処理は、src/js/models/fieldValue.js の fieldValueOf(field_item) の 1 か所にあり、Issue と ProjectV2Item の fieldValueContents(name) の両方が呼ぶ。(パッケージの入口からは export しない。yanqirenshi/SOGH.next#120)",
                     "名前が name のフィールドの値が無いとき・fieldValues が無いときは null。",
                     "Issue の画面の部品 (PanelIssue) が、item を渡されたときに、日付を変えるとき・コメントを送るときに読む。"
                 ],
