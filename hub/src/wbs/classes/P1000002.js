@@ -41,7 +41,10 @@ function Overview ({ data }) {
             <P>{"new Sogh() で作り、connect(token, successed, failed) で token を入れて viewer を取得してから使う。"}</P>
             <P>{"取得のメソッドは、GraphQL のノードを Issue・ProjectV2 などのモデルにして Pool に入れ、モデルではなく id を返す。(モデルは issue(id)・projectV2(id) などで Pool から引く)"}</P>
             <P>{"取得のメソッドは、Promise で id を返す asyncFetch… の形だけ。(コールバックで結果を渡す fetch… の形は、0.5.0 で消した)"}</P>
-            <P>{"asyncFetch… は、取得に失敗しても reject しない。(エラーをそのまま返すか、それまでに取得した id の配列を返す)"}</P>
+            <P>{"asyncFetch… は、取得に失敗したときに、例外 GitHubError を投げる。(0.5.0 から。それまでは、エラーをそのまま返すか、それまでに取得した id の配列を返していた。yanqirenshi/SOGH.next#61)"}</P>
+            <P>{"コールバックを受け取る asyncFetch… は、失敗したとき、failed(error, …) を呼んでから投げる。(コメントの追加・更新・削除は、例外を投げず、failed を呼ぶ)"}</P>
+            <P>{"_queries の値は、クエリの定義 { query, pick }。query(code) はクエリの文字列を、queryDefinition(code) は定義を返す。クエリの値は、GraphQL の variables で渡す。(yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65)"}</P>
+            <P>{"asyncFetch… は、取得の部品 fetchNode(code, variables) (1 回送り、pick で取り出す)・fetchPages(code, variables, onPage) (最後のページまで取る)・connection2ids(connection, make) (一覧をモデルにして id の配列にする) で組み立てる。team の 2 つは、fetchProjectsV2OfTeam(code, team_id, callbacks) を使う。"}</P>
             <Plane>{CODE}</Plane>
           </Section>
 

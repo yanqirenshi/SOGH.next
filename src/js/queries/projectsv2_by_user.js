@@ -1,27 +1,32 @@
 import * as attr from './attributes.js';
 
-const query = `{
-  user(login: "@login") {
-    projectsV2(${attr.page_nation()}) {
+// ユーザー (login) の ProjectV2。(ページ送りする)
+// variables: { login: String!, after: String (1 ページめは null) }
+const query = `query ($login: String!, $after: String) {
+  user(login: $login) {
+    projectsV2(${attr.pagination()}) {
       nodes {
-        ${attr.projectv2()}
+        ${attr.projectV2()}
         fields(first: 10) {
           nodes {
-            ${attr.projectv2Fields()}
+            ${attr.projectV2Fields()}
           }
         }
         creator {
-          ${attr.projectv2Creator()}
+          ${attr.projectV2Creator()}
         }
         owner {
-          ${attr.projectv2Owner()}
+          ${attr.projectV2Owner()}
         }
       }
       pageInfo {
-        ${attr.page_info()}
+        ${attr.pageInfo()}
       }
     }
   }
 }`;
 
-export default query;
+export default {
+    query,
+    pick: (data)=> data.user.projectsV2,
+};

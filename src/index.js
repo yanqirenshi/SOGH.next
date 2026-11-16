@@ -10,6 +10,9 @@ import TableProjectV2Items from './components/common/TableProjectV2Items.js';
 
 import Sogh from './js/Sogh.js';
 
+// 取得に失敗したときに投げる例外のクラス。(利用側が instanceof で受けられるように。yanqirenshi/SOGH.next#61)
+import { GitHubError } from './js/Loader.js';
+
 import {Card}        from './js/models/index.js';
 import {Column}      from './js/models/index.js';
 import {Issue}       from './js/models/index.js';
@@ -48,4 +51,8 @@ export {
 
 export {
     models,
+}
+
+export {
+    GitHubError,
 }

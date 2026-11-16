@@ -63,19 +63,25 @@ test('古い世代の fetch〜 (8 個) と、それだけが使っていた補�
         assert.equal(names.has(name), false, name);
 });
 
-test('取得のメソッドは、asyncFetch〜 の 16 個 (と、Loader の fetch・fetchX)', ()=> {
+test('取得のメソッドは、asyncFetch〜 の 16 個 (と、取得の部品 fetchNode・fetchPages・fetchProjectsV2OfTeam、Loader の fetch・fetchX)', ()=> {
     const names = methodNames(new Sogh());
 
     const fetches = [...names].filter(name=> /^(async)?[Ff]etch/.test(name)).sort();
 
-    assert.deepEqual(fetches, [...ASYNC_FETCHES, 'fetch', 'fetchX'].sort());
+    assert.deepEqual(fetches, [...ASYNC_FETCHES, 'fetchNode', 'fetchPages', 'fetchProjectsV2OfTeam', 'fetch', 'fetchX'].sort());
 });
 
-test('接続とコメントの追加・更新・削除のメソッドは、残っている', ()=> {
+test('接続とコメントの追加・更新・削除のメソッドと、取得の部品は、残っている。makeQuery・node2objs は無い', ()=> {
     const names = methodNames(new Sogh());
 
-    for (const name of ['connect', 'createIssueComment', 'updateIssueComment', 'deleteIssueComment', 'node2objs', 'makeQuery'])
+    for (const name of ['connect', 'createIssueComment', 'updateIssueComment', 'deleteIssueComment', 'request', 'query', 'queryDefinition', 'connection2ids'])
         assert.ok(names.has(name), name);
+
+    // ページ送りの印を書き換える makeQuery は、variables にしたので、消した。(yanqirenshi/SOGH.next#63)
+    assert.equal(names.has('makeQuery'), false);
+
+    // node2objs は、取得の書き直しで使う所が無くなったので、消した。(connection2ids に置き換えた)
+    assert.equal(names.has('node2objs'), false);
 });
 
 test('Sogh のメソッドから使われていないクエリは、無い (yanqirenshi/SOGH.next#66)', ()=> {
@@ -87,14 +93,17 @@ test('Sogh のメソッドから使われていないクエリは、無い (yanq
         'labels_by_repository', 'milestones_by_repository', 'project_by_id', 'projects_by_repository',
         'repository', 'search_issues', 'update_issue_body',
         'user_by_id', 'projects_next_by_id', 'projectsv2_items_by_projects_v2',
+        // 0.5.0 で、名前のつづりを直したクエリの、古い名前。(yanqirenshi/SOGH.next#73)
+        'viwer', 'issues_by_viwer',
     ];
 
     for (const code of removed)
         assert.equal(code in queries, false, code);
 
-    // 残ったクエリは 18 個で、どれも Sogh.js の this.query('…') から使われている。
+    // 残ったクエリは 18 個で、どれも Sogh.js から、名前で使われている。
+    // (this.query('…')・this.queryDefinition('…')・this.fetchNode('…')・this.fetchPages('…')・this.fetchProjectsV2OfTeam('…'))
     const source = fs.readFileSync(new URL('../src/js/Sogh.js', import.meta.url), 'utf8');
-    const used = new Set([...source.matchAll(/this\.query\('([a-z0-9_]+)'\)/g)].map(m=> m[1]));
+    const used = new Set([...source.matchAll(/this\.(?:query|queryDefinition|fetchNode|fetchPages|fetchProjectsV2OfTeam)\('([a-z0-9_]+)'/g)].map(m=> m[1]));
 
     assert.equal(Object.keys(queries).length, 18);
     assert.deepEqual(Object.keys(queries).sort(), [...used].sort());

@@ -1,3 +1,19 @@
+// GitHub への問い合わせが失敗したときに投げる例外。(yanqirenshi/SOGH.next#61)
+//   status   … HTTP の状態コード。(つながらなかったときは null)
+//   errors   … GraphQL のエラー (GitHub の応答の errors の配列)。無いときは null。
+//   response … fetch の Response。(つながらなかったときは null)
+//   cause    … 元の例外。(つながらなかったとき)
+export class GitHubError extends Error {
+    constructor (message, { status=null, errors=null, response=null, cause } = {}) {
+        super(message, cause===undefined ? undefined : { cause });
+
+        this.name = 'GitHubError';
+        this.status = status;
+        this.errors = errors;
+        this.response = response;
+    }
+}
+
 export default class Loader {
     constructor () {
         this._token = null;
@@ -34,17 +50,36 @@ export default class Loader {
         return this.viewer() !== null;
     }
     /** *************************************************************** *
-     *  Query
-     * **************************************************************** */
-    makeQuery (query, endCursor) {
-        if (endCursor)
-            return query.replace('after: "",', `after: "${endCursor}",`);
-
-        return query.replace('after: "",', '');
-    }
-    /** *************************************************************** *
      *  Api
      * **************************************************************** */
+    // クエリを 1 回送り、応答の data を返す。(yanqirenshi/SOGH.next#61)
+    // 失敗したときは、GitHubError を投げる。
+    //   つながらない           … status は null。cause に、元の例外。
+    //   HTTP のエラー          … status に HTTP の状態コード。response に、fetch の Response。
+    //   GraphQL のエラー       … errors に、GitHub の errors (配列)。status は HTTP の状態コード (ふつう 200)。
+    async request (query, variables) {
+        let response;
+
+        try {
+            response = await fetch(this.endpoint(), this.postData(query, variables));
+        } catch (e) {
+            throw new GitHubError(`GitHub につながりませんでした: ${e && e.message}`, { cause: e });
+        }
+
+        if (!response.ok)
+            throw new GitHubError(`GitHub が HTTP ${response.status} を返しました`, { status: response.status, response });
+
+        const json = await response.json();
+
+        if (json.errors) {
+            // GraphQL の errors は配列なので、message を連結して読める形にする。
+            const messages = json.errors.map(e=> (e && e.message) || JSON.stringify(e));
+
+            throw new GitHubError(messages.join('\n'), { status: response.status, errors: json.errors, response });
+        }
+
+        return json.data;
+    }
     makeHeader () {
         return {
             'Authorization': `bearer ${this.token()}`,

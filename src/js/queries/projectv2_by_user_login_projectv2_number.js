@@ -1,22 +1,27 @@
 import * as attr from './attributes.js';
 
-const query = `{
-  user (login: "@user-login") {
-    projectV2 (number: @projectv2-number) {
-      ${attr.projectv2()}
+// ユーザー (login) の、番号 (number) の ProjectV2 を 1 つ。(Item は取らない)
+// variables: { login: String!, number: Int! }
+const query = `query ($login: String!, $number: Int!) {
+  user(login: $login) {
+    projectV2(number: $number) {
+      ${attr.projectV2()}
       fields(first: 100) {
         nodes {
-          ${attr.projectv2Fields()}
+          ${attr.projectV2Fields()}
         }
       }
       creator {
-        ${attr.projectv2Creator()}
+        ${attr.projectV2Creator()}
       }
       owner {
-        ${attr.projectv2Owner()}
+        ${attr.projectV2Owner()}
       }
     }
   }
 }`;
 
-export default query;
+export default {
+    query,
+    pick: (data)=> data.user.projectV2,
+};

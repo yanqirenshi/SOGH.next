@@ -145,10 +145,10 @@ function assertEmptyFields (issue, label) {
     assert.equal(issue.fieldValueContents('Due.Date'), null, label);
 }
 
-test('projectItems を取っていない Issue (issue_by_id・issues_by_viwer の形) では、落ちずに [] か null を返す', ()=> {
+test('projectItems を取っていない Issue (issue_by_id・issues_by_viewer の形) では、落ちずに [] か null を返す', ()=> {
     const sogh = new Sogh();
 
-    // issue_by_id・issues_by_viwer は、projectItems を取らない。
+    // issue_by_id・issues_by_viewer は、projectItems を取らない。
     const issue = sogh.node2issue({
         __typename: 'Issue', id: 'I_1', number: 1, title: 't', updatedAt: T1,
         assignees: { nodes: [] }, labels: { nodes: [] },

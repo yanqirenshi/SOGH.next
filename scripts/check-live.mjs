@@ -60,22 +60,18 @@ function record (code, state, note='') {
 }
 
 // クエリを 1 回送る。
-//   marks … 値の印の置き換え。({ '@id': 'xxx' })
-//   count … 応答から、取れた件数を数える関数。(表示用)
+//   variables … クエリの変数。({ id: 'xxx' } など。yanqirenshi/SOGH.next#63)
+//   count     … 応答から、取れた件数を数える関数。(表示用)
+// ページ送りするクエリ ($after を宣言しているもの) は、1 ページめだけを取る。(after は null)
 // 成功したら応答の data を、失敗したら null を返す。
-async function send (sogh, code, marks, count) {
-    let query = sogh.query(code);
-
-    for (const [mark, value] of Object.entries(marks || {}))
-        query = query.replace(mark, value);
-
-    // ページ送りの印を外す。(1 ページ目だけを取る)
-    query = sogh.makeQuery(query, null);
+async function send (sogh, code, variables, count) {
+    const query = sogh.query(code);
+    const vars = /\$after\b/.test(query) ? { ...variables, after: null } : (variables || undefined);
 
     let response;
 
     try {
-        response = await fetch(sogh.endpoint(), sogh.postData(query));
+        response = await fetch(sogh.endpoint(), sogh.postData(query, vars));
     } catch (e) {
         record(code, 'NG', `つながらない: ${e.message}`);
         return null;
@@ -110,7 +106,7 @@ async function checkQueries (sogh, conf) {
     console.log('== A. クエリの確認 ==');
 
     // viewer
-    const viewer_data = await send(sogh, 'viwer');
+    const viewer_data = await send(sogh, 'viewer');
 
     if (!viewer_data)
         return false;
@@ -121,31 +117,31 @@ async function checkQueries (sogh, conf) {
     await send(sogh, 'repositories_by_viewer', null, d=> n('リポジトリ', d.viewer.repositories.nodes));
 
     // Issue
-    const issues_data = await send(sogh, 'issues_by_viwer', null, d=> n('Issue', d.viewer.issues.nodes));
+    const issues_data = await send(sogh, 'issues_by_viewer', null, d=> n('Issue', d.viewer.issues.nodes));
     const issue = issues_data && issues_data.viewer.issues.nodes[0];
 
     if (issue) {
-        await send(sogh, 'issue_by_id', { '@id': issue.id });
-        await send(sogh, 'issue_comments_by_issue_id', { '@id': issue.id }, d=> n('コメント', d.node.comments.nodes));
+        await send(sogh, 'issue_by_id', { id: issue.id });
+        await send(sogh, 'issue_comments_by_issue_id', { id: issue.id }, d=> n('コメント', d.node.comments.nodes));
     } else {
         skip('issue_by_id', 'viewer が作った OPEN の Issue が無い');
         skip('issue_comments_by_issue_id', 'viewer が作った OPEN の Issue が無い');
     }
 
     // ProjectV2 (viewer)
-    const projects_data = await send(sogh, 'projectsv2_by_user', { '@login': viewer.login }, d=> n('ProjectV2', d.user.projectsV2.nodes));
+    const projects_data = await send(sogh, 'projectsv2_by_user', { login: viewer.login }, d=> n('ProjectV2', d.user.projectsV2.nodes));
     const project = projects_data && projects_data.user.projectsV2.nodes[0];
 
     if (project) {
-        await send(sogh, 'projectv2_by_user_login_projectv2_number', { '@user-login': viewer.login, '@projectv2-number': project.number });
+        await send(sogh, 'projectv2_by_user_login_projectv2_number', { login: viewer.login, number: project.number });
 
         const items_data = await send(sogh, 'projectv2items_by_user_login_projectv2_number',
-                                      { '@user-login': viewer.login, '@projectv2-number': project.number },
+                                      { login: viewer.login, number: project.number },
                                       d=> n('Item', d.user.projectV2.items.nodes));
         const item = items_data && items_data.user.projectV2.items.nodes[0];
 
         if (item)
-            await send(sogh, 'projectv2item_by_id', { '@id': item.id });
+            await send(sogh, 'projectv2item_by_id', { id: item.id });
         else
             skip('projectv2item_by_id', 'ProjectV2 に Item が無い');
     } else {
@@ -155,10 +151,10 @@ async function checkQueries (sogh, conf) {
 
     // org の Issue
     if (conf.org && conf.repo && conf.issue_number) {
-        const marks = { '@login': conf.org, '@name': conf.repo, '@number': conf.issue_number };
+        const variables = { org: conf.org, repo: conf.repo, number: Number(conf.issue_number) };
 
-        await send(sogh, 'issue_by_org_repo_issue_number', marks);
-        await send(sogh, 'issue_comments_by_org_repo_issue_number', marks, d=> n('コメント', d.organization.repository.issue.comments.nodes));
+        await send(sogh, 'issue_by_org_repo_issue_number', variables);
+        await send(sogh, 'issue_comments_by_org_repo_issue_number', variables, d=> n('コメント', d.organization.repository.issue.comments.nodes));
     } else {
         skip('issue_by_org_repo_issue_number', 'CHECK_ORG・CHECK_REPO・CHECK_ISSUE_NUMBER が無い');
         skip('issue_comments_by_org_repo_issue_number', 'CHECK_ORG・CHECK_REPO・CHECK_ISSUE_NUMBER が無い');
@@ -166,10 +162,10 @@ async function checkQueries (sogh, conf) {
 
     // org の ProjectV2
     if (conf.org && conf.project_number) {
-        const marks = { '@user-login': conf.org, '@projectv2-number': conf.project_number };
+        const variables = { org: conf.org, number: Number(conf.project_number) };
 
-        await send(sogh, 'projectv2_by_org_login_projectv2_number', marks);
-        await send(sogh, 'projectv2items_by_org_login_projectv2_number', marks, d=> n('Item', d.organization.projectV2.items.nodes));
+        await send(sogh, 'projectv2_by_org_login_projectv2_number', variables);
+        await send(sogh, 'projectv2items_by_org_login_projectv2_number', variables, d=> n('Item', d.organization.projectV2.items.nodes));
     } else {
         skip('projectv2_by_org_login_projectv2_number', 'CHECK_ORG・CHECK_PROJECT_NUMBER が無い');
         skip('projectv2items_by_org_login_projectv2_number', 'CHECK_ORG・CHECK_PROJECT_NUMBER が無い');
@@ -177,8 +173,8 @@ async function checkQueries (sogh, conf) {
 
     // team の ProjectV2
     if (conf.team_id) {
-        await send(sogh, 'projectsv2_by_team', { '@team-id': conf.team_id }, d=> n('ProjectV2', d.node.projectsV2.edges));
-        await send(sogh, 'projectsv2_with_items_by_team', { '@team-id': conf.team_id }, d=> n('ProjectV2', d.node.projectsV2.edges));
+        await send(sogh, 'projectsv2_by_team', { teamId: conf.team_id }, d=> n('ProjectV2', d.node.projectsV2.edges));
+        await send(sogh, 'projectsv2_with_items_by_team', { teamId: conf.team_id }, d=> n('ProjectV2', d.node.projectsV2.edges));
     } else {
         skip('projectsv2_by_team', 'CHECK_TEAM_ID が無い');
         skip('projectsv2_with_items_by_team', 'CHECK_TEAM_ID が無い');
@@ -388,8 +384,15 @@ async function main () {
 
     const connected = await checkQueries(sogh, conf);
 
-    if (connected)
-        await checkMerge(conf.token);
+    // asyncFetch〜 は、失敗したときに例外 (GitHubError) を投げる。(yanqirenshi/SOGH.next#61)
+    // B・C の途中で失敗したときは、NG として数えて、続きは飛ばす。
+    if (connected) {
+        try {
+            await checkMerge(conf.token);
+        } catch (e) {
+            check('B・C の取得が、失敗せずに終わる', false, `${e.name}: ${e.message}${e.status ? ` (HTTP ${e.status})` : ''}`);
+        }
+    }
 
     const ng = results.filter(r=> r.state === 'NG').length;
     const ok = results.filter(r=> r.state === 'OK').length;

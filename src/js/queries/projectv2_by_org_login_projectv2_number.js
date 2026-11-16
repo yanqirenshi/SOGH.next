@@ -1,30 +1,31 @@
 import * as attr from './attributes.js';
 
-const MAX_FIELD_NUM = 20;
-const MAX_LABEL_NUM = 20;
-const MAX_PR_NUM = 20;
-
-const query = `{
-  organization (login: "@user-login") {
+// 組織 (org) の、番号 (number) の ProjectV2 を 1 つ。(Item は、最初の 100 個まで。ページ送りしない)
+// variables: { org: String!, number: Int! }
+const query = `query ($org: String!, $number: Int!) {
+  organization(login: $org) {
     ${attr.organizationRef()}
-    projectV2 (number: @projectv2-number) {
-      ${attr.projectv2()}
+    projectV2(number: $number) {
+      ${attr.projectV2()}
       fields(first: 20) {
         nodes {
-          ${attr.projectv2Fields()}
+          ${attr.projectV2Fields()}
         }
       }
       creator {
-        ${attr.projectv2Creator()}
+        ${attr.projectV2Creator()}
       }
       owner {
-        ${attr.projectv2Owner()}
+        ${attr.projectV2Owner()}
       }
-      items (first:100) {
-        ${attr.projectV2Items(MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM)}
+      items(first: 100) {
+        ${attr.projectV2Items()}
       }
     }
   }
 }`;
 
-export default query;
+export default {
+    query,
+    pick: (data)=> data.organization.projectV2,
+};

@@ -37,6 +37,7 @@ function Overview ({ data }) {
             <P>{"GraphQLNode を継承する。"}</P>
             <P>{"Pooler の node2pullRequest(node) が作り、Pool に入れる。"}</P>
             <P>{"今の Sogh の取得メソッドには、node2pullRequest(node) を直に呼ぶものは無い。(Matchmaker が、IssueComment の pullRequest や ProjectV2Item の content・Linked pull requests を Pool に入れるときに呼ぶ)"}</P>
+            <P>{"ProjectV2Item の content の PullRequest は、state を別名 pullRequestState で取るが、node2pullRequest(node) が Pool に入れる前に state に戻すので、core は、取り方によらず state になる。(0.5.0 から。yanqirenshi/SOGH.next#68。ProjectV2Item の core に残る content の JSON も、node2projectV2Item(node) が state に戻す)"}</P>
             <P>{"body()・bodyHTML() は、ほかのモデルと違い、無いときに null ではなく '' を返す。"}</P>
             <P>{"assignees() は、core の assignees の id で Pool から User を引いて、配列で返す。(取得していないときは [])"}</P>
             <P>{"repository()・author() も、core の id で Pool からモデル (Repository と、人のモデル) を引いて返す。(取得していないときは null。0.4.2 から。それまでは JSON (ノード) のまま返していた)"}</P>

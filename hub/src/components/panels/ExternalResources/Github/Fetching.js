@@ -9,12 +9,12 @@ import { C, TABLE_IDS, SX_AFTER_TABLE, SX_PLANE } from './utils.js';
 
 // クエリの例。(queries/issue_comments_by_issue_id.js に、項目の部品を埋め込んだあとの形)
 const QUERY_EXAMPLE = [
-    '{',
-    '  node(id: "@id") {                             ← 値の印',
+    'query ($id: ID!, $after: String) {              ← 変数の宣言 (値は、variables で渡す)',
+    '  node(id: $id) {                               ← 変数 $id を使う',
     '    ... on Issue {',
-    '      comments(after: "", first: 100) {         ← ページ送りの印 (page_nation)',
+    '      comments(after: $after, first: 100) {     ← ページ送り (pagination)',
     '        nodes {                                 ← ここから下の nodes の中は、項目の部品 (issueCommentNode)',
-    '          __typename id url body updatedAt ...  ← IssueComment の項目 (issue_comment)',
+    '          __typename id url body updatedAt ...  ← IssueComment の項目 (issueComment)',
     '          pullRequest {',
     '            __typename id number updatedAt ...  ← PullRequest の参照の組 (pullRequestRef)',
     '          }',
@@ -24,7 +24,7 @@ const QUERY_EXAMPLE = [
     '            ... on Bot { id updatedAt ... }',
     '          }',
     '        }',
-    '        pageInfo { endCursor hasNextPage ... }  ← 項目の部品 (page_info)',
+    '        pageInfo { endCursor hasNextPage ... }  ← 項目の部品 (pageInfo)',
     '      }',
     '    }',
     '  }',
@@ -39,12 +39,9 @@ const VALUE_COLUMNS = [
 ];
 
 const VALUES = [
-    { how: '印を、文字列で置き換える',
-      queries: '取得のクエリ',
-      syntax: ['node(id: "@id")', ".replace('@id', id)"] },
     { how: 'GraphQL の variables で渡す',
-      queries: 'コメントの追加・更新・削除 (3 個)',
-      syntax: ['mutation ($id: ID!, $body: String!)', 'postData(query, { id, body })'] },
+      queries: '取得のクエリ (15 個。viewer は、変数が無い) と、コメントの追加・更新・削除 (3 個)',
+      syntax: ['query ($id: ID!, $after: String)', 'request(query, { id, after })', 'mutation ($id: ID!, $body: String!)', 'postData(query, { id, body })'] },
     { how: 'オブジェクトを文字列にして、埋め込む',
       queries: '無い (Issue の作成・本文の更新のクエリ 2 個は、0.5.0 で消した。makeGraphQLData は、Loader に残っている)',
       syntax: ['createIssue(input:@issue-data)', 'makeGraphQLData(data)'] },
@@ -80,15 +77,9 @@ const CHECKS = [
       queries: [],
       note: '使われていないクエリは、無い。(0.5.0 で消した)' },
     { kind: '注意',
-      count: 5,
-      queries: [
-          'projectsv2_with_items_by_team',
-          'projectv2_by_org_login_projectv2_number',
-          'projectv2item_by_id',
-          'projectv2items_by_org_login_projectv2_number',
-          'projectv2items_by_user_login_projectv2_number',
-      ],
-      note: 'ProjectV2Item の content で、Issue の state と PullRequest の state を取っている。型が違う (IssueState と PullRequestState) ので、GraphQL の決まりでは正しくない。GitHub は受け付ける (「3.8 GitHub につないで確かめる」を見る)' },
+      count: 0,
+      queries: [],
+      note: 'ProjectV2Item の content で、Issue の state と PullRequest の state (型が IssueState と PullRequestState で違う) を同じ場所で取っていた 5 個は、0.5.0 で、PullRequest の state を別名 pullRequestState で取るようにした。(yanqirenshi/SOGH.next#68。Pool に入れる前に、Pooler の node2projectV2Item(node) が Item の content を、node2pullRequest(node) が PullRequest を、state に戻す)' },
     { kind: 'キー (使用中)',
       count: 0,
       queries: [],
@@ -190,25 +181,30 @@ const COLUMNS = [
     { code: 'style',   label: '形式',         key: 'style' },
     { code: 'paging',  label: 'ページング',   key: 'paging' },
     { code: 'returns', label: '戻り値',       key: 'returns' },
+    { code: 'failed',  label: '失敗したとき', key: 'failed' },
 ];
 
 const CALLBACK = 'コールバック';
 const ASYNC = 'async';
 
+const THROW = 'GitHubError を投げる';
+const THROW_AFTER_FAILED = 'failed を呼んでから、GitHubError を投げる';
+const FAILED = 'failed を呼ぶ';
+
 const METHODS = [
-    { target: 'viewer',                     methods: ['connect'],                                                                                                  style: CALLBACK, paging: '-',        returns: 'User' },
-    { target: 'viewer',                     methods: ['asyncFetchViewer'],                                                                                         style: ASYNC,    paging: '-',        returns: 'User' },
-    { target: 'viewer のリポジトリ',        methods: ['asyncFetchRepositoriesByViewer'],                                                                           style: ASYNC,    paging: '全件',     returns: 'id の配列' },
-    { target: 'Issue (id)',                 methods: ['asyncFetchIssueByID', 'asyncFetchItemByID'],                                                                style: ASYNC,    paging: '-',        returns: 'id' },
-    { target: 'Issue (org・repo・番号)',    methods: ['asyncFetchIssueByOrgRepoIssueNumber'],                                                                      style: ASYNC,    paging: '-',        returns: 'id' },
-    { target: 'viewer の Issue (OPEN)',     methods: ['asyncFetchIssueByViewer'],                                                                                  style: ASYNC,    paging: '全件',     returns: 'id の配列' },
-    { target: 'Issue のコメント',           methods: ['asyncFetchIssueCommentsByID', 'asyncFetchIssueCommentsByOrgRepoIssueNumber'],                               style: ASYNC,    paging: '全件',     returns: 'id の配列' },
-    { target: 'コメントの追加・更新・削除', methods: ['createIssueComment', 'updateIssueComment', 'deleteIssueComment'],                                           style: CALLBACK, paging: '-',        returns: '-' },
-    { target: 'ProjectV2 (viewer)',         methods: ['asyncFetchProjectsV2ByViewer'],                                                                             style: ASYNC,    paging: '全件',     returns: 'id の配列' },
-    { target: 'ProjectV2 (team)',           methods: ['asyncFetchProjectsV2ByTeam', 'asyncFetchProjectsV2WithItemsByTeam'],                                        style: ASYNC,    paging: '全件',     returns: 'id の配列' },
-    { target: 'ProjectV2 (1 件)',           methods: ['asyncFetchProjectV2ByUserLoginProjectV2Number', 'asyncFetchProjectV2ByOrgLoginProjectV2Number'],            style: ASYNC,    paging: '-',        returns: 'id' },
-    { target: 'ProjectV2 の Item',          methods: ['asyncFetchProjectV2ItemsByUserLoginProjectV2Number', 'asyncFetchProjectV2ItemsByOrgLoginProjectV2Number'],  style: ASYNC,    paging: '全件',     returns: 'id の配列' },
-    { target: 'ProjectV2 の Item (1 件)',   methods: ['asyncFetchProjectV2ItemByID'],                                                                              style: ASYNC,    paging: '-',        returns: 'id' },
+    { target: 'viewer',                     methods: ['connect'],                                                                                                  style: CALLBACK, paging: '-',        returns: 'User',      failed: FAILED },
+    { target: 'viewer',                     methods: ['asyncFetchViewer'],                                                                                         style: ASYNC,    paging: '-',        returns: 'User',      failed: THROW },
+    { target: 'viewer のリポジトリ',        methods: ['asyncFetchRepositoriesByViewer'],                                                                           style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW },
+    { target: 'Issue (id)',                 methods: ['asyncFetchIssueByID', 'asyncFetchItemByID'],                                                                style: ASYNC,    paging: '-',        returns: 'id',        failed: THROW },
+    { target: 'Issue (org・repo・番号)',    methods: ['asyncFetchIssueByOrgRepoIssueNumber'],                                                                      style: ASYNC,    paging: '-',        returns: 'id',        failed: THROW },
+    { target: 'viewer の Issue (OPEN)',     methods: ['asyncFetchIssueByViewer'],                                                                                  style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW },
+    { target: 'Issue のコメント',           methods: ['asyncFetchIssueCommentsByID', 'asyncFetchIssueCommentsByOrgRepoIssueNumber'],                               style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW },
+    { target: 'コメントの追加・更新・削除', methods: ['createIssueComment', 'updateIssueComment', 'deleteIssueComment'],                                           style: CALLBACK, paging: '-',        returns: '-',         failed: FAILED },
+    { target: 'ProjectV2 (viewer)',         methods: ['asyncFetchProjectsV2ByViewer'],                                                                             style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW },
+    { target: 'ProjectV2 (team)',           methods: ['asyncFetchProjectsV2ByTeam', 'asyncFetchProjectsV2WithItemsByTeam'],                                        style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW_AFTER_FAILED },
+    { target: 'ProjectV2 (1 件)',           methods: ['asyncFetchProjectV2ByUserLoginProjectV2Number', 'asyncFetchProjectV2ByOrgLoginProjectV2Number'],            style: ASYNC,    paging: '-',        returns: 'id',        failed: THROW_AFTER_FAILED },
+    { target: 'ProjectV2 の Item',          methods: ['asyncFetchProjectV2ItemsByUserLoginProjectV2Number', 'asyncFetchProjectV2ItemsByOrgLoginProjectV2Number'],  style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW },
+    { target: 'ProjectV2 の Item (1 件)',   methods: ['asyncFetchProjectV2ItemByID'],                                                                              style: ASYNC,    paging: '-',        returns: 'id',        failed: THROW },
 ];
 
 export default function Fetching () {
@@ -220,20 +216,22 @@ export default function Fetching () {
             <OL>
               <LI>項目の部品。(<C>queries/attributes.js</C>)
                 <UL>
-                  <LI>「この型からは、この項目を取る」という文字列を返す関数。50 個ある。</LI>
-                  <LI>型ごとの部品と、その決まりは、「5.3 型ごとの、項目の部品」を見る。</LI>
+                  <LI>「この型からは、この項目を取る」という文字列を返す関数。52 個ある。(ほかに、入れ子の件数の上限 <C>NESTED_LIMIT</C>)</LI>
+                  <LI>型ごとの部品と、その決まりは、「5.2 型ごとの、項目の部品」を見る。</LI>
                 </UL>
               </LI>
               <LI>クエリの本体。(src/js/queries/ の 1 ファイルに 1 クエリ)
                 <UL>
                   <LI>GraphQL の形 (どこから、何を入れ子で取るか) を書いた文字列。18 個ある。</LI>
+                  <LI>クエリの頭で、変数 (<C>$id: ID!</C> など) を宣言する。値は、GraphQL の variables で渡す。</LI>
                   <LI>項目のところに、項目の部品を埋め込む。</LI>
+                  <LI>ファイルは、クエリの文字列 <C>query</C> と、応答の data から取り出す値を返す関数 <C>pick</C> を、<C>{'{ query, pick }'}</C> の形で export する。(<C>yanqirenshi/SOGH.next#65</C>)</LI>
                 </UL>
               </LI>
               <LI>取得メソッド。(<C>Sogh.js</C>)
                 <UL>
-                  <LI>クエリに、値とページ送りの位置を入れて送る。</LI>
-                  <LI>応答から、必要な部分を取り出す。</LI>
+                  <LI>クエリに、値とページ送りの位置を variables で渡して送る。(<C>fetchNode(code, variables)</C>・<C>fetchPages(code, variables, onPage)</C>)</LI>
+                  <LI>応答から、クエリの <C>pick</C> で、必要な部分を取り出す。</LI>
                 </UL>
               </LI>
             </OL>
@@ -244,36 +242,40 @@ export default function Fetching () {
             <P>組み立ての流れは、次のとおりです。(<C>asyncFetchIssueCommentsByID(id)</C> の例)</P>
             <OL>
               <LI>読み込んだときに 1 回だけ、クエリのファイルが、項目の部品を埋め込んだ文字列を作る。</LI>
-              <LI>呼んだときに、<C>query('issue_comments_by_issue_id')</C> で、クエリの文字列を名前で引く。</LI>
-              <LI><C>{".replace('@id', id)"}</C> で、値の印を値に置き換える。</LI>
-              <LI><C>makeQuery(query, cursor)</C> で、ページ送りの印を置き換える。</LI>
-              <LI><C>postData(query)</C> で、リクエストの本文にして送る。</LI>
-              <LI>応答から、<C>d.data.node.comments</C> を取り出す。</LI>
-              <LI><C>pageInfo.hasNextPage</C> が true なら、ページ送りの印の置き換えに戻る。</LI>
+              <LI>呼んだときに、<C>{"fetchPages('issue_comments_by_issue_id', { id }, onPage)"}</C> を呼ぶ。</LI>
+              <LI><C>fetchNode</C> が、<C>queryDefinition(code)</C> で、クエリの定義 <C>{'{ query, pick }'}</C> を名前で引く。</LI>
+              <LI><C>{'request(query, { id, after })'}</C> で送る。(1 ページめは、after が null。値は、<C>postData(query, variables)</C> が、リクエストの本文の variables に入れる)</LI>
+              <LI>応答の data から、<C>pick</C> で <C>data.node.comments</C> を取り出す。</LI>
+              <LI><C>onPage(connection)</C> で、<C>connection2ids(connection, make)</C> が、コメントをモデルにして Pool に入れる。</LI>
+              <LI><C>pageInfo.hasNextPage</C> が true なら、after に <C>pageInfo.endCursor</C> を入れて、送るところに戻る。</LI>
             </OL>
 
-            <P>値の渡し方は、3 通りあります。</P>
+            <P>値の渡し方は、2 通りあります。いま使っているのは、variables だけです。</P>
             <Table columns={VALUE_COLUMNS} rows={VALUES} ids={TABLE_IDS}/>
+            <OL sx={SX_AFTER_TABLE}>
+              <LI>取得のクエリの値を、クエリの文字列に置き換えで埋め込む渡し方は、0.5.0 で無くした。(取得のクエリも、variables にした。<C>yanqirenshi/SOGH.next#63</C>)</LI>
+              <LI>番号 (Issue の番号・ProjectV2 の番号) は、数値にしてから送る。(クエリの変数の型は <C>Int!</C>。メソッドには、これまでどおり文字列でも渡せる)</LI>
+            </OL>
           </Section>
 
           <Section title="ページング" num="3.2" lev="5">
             <OL>
-              <LI>一覧のクエリには、<C>{'after: "", first: 100'}</C> という印が入っている。
+              <LI>一覧のクエリは、変数 <C>$after: String</C> を宣言し、一覧の引数に <C>{'after: $after, first: 100'}</C> を入れている。
                 <UL>
-                  <LI><C>attributes.page_nation()</C> で入れているクエリが、8 個。</LI>
-                  <LI>クエリに直に書いているクエリが、1 個。(<C>issues_by_viwer</C>)</LI>
+                  <LI><C>attributes.pagination()</C> で入れているクエリが、9 個。(1 回の件数は、<C>projectsv2_with_items_by_team</C> だけ 10)</LI>
                 </UL>
               </LI>
-              <LI><C>makeQuery(query, cursor)</C> が、<C>{'after: "",'}</C> を書き換える。
+              <LI><C>fetchPages(code, variables, onPage)</C> が、変数 after を入れて送る。
                 <UL>
-                  <LI>cursor があれば、<C>{'after: "<cursor>",'}</C> にする。</LI>
-                  <LI>無ければ、消す。</LI>
+                  <LI>1 ページめは、null。</LI>
+                  <LI>2 ページめからは、前のページの <C>pageInfo.endCursor</C>。</LI>
+                  <LI>クエリの文字列は、書き換えない。(書き換えてページ送りする形は、0.5.0 で無くした。<C>yanqirenshi/SOGH.next#63</C>)</LI>
                 </UL>
               </LI>
-              <LI>書き換えるのは、最初に見つかった 1 か所だけ。
+              <LI>ページ送りできるのは、1 つのクエリにつき 1 か所。
                 <UL>
-                  <LI>ページ送りできるのは、1 つのクエリにつき 1 か所になる。</LI>
-                  <LI>入れ子の一覧 (assignees など) は、件数を直に書いている。(<C>first: 10</C> など)</LI>
+                  <LI>クエリの <C>pick</C> が取り出す一覧の <C>pageInfo</C> で、次のページを決める。</LI>
+                  <LI>入れ子の一覧 (assignees など) は、件数を書いている。(<C>first: 10</C> など。「5.5 件数の上限」を見る)</LI>
                 </UL>
               </LI>
               <LI>asyncFetch〜 は、<C>pageInfo.hasNextPage</C> が false になるまで繰り返して、全件を集める。</LI>
@@ -283,6 +285,7 @@ export default function Fetching () {
           <Section title="取得メソッドの一覧" num="3.3" lev="5">
             <Table columns={COLUMNS} rows={METHODS} ids={TABLE_IDS}/>
             <P sx={SX_AFTER_TABLE}>async のメソッドは、モデルではなく id を返します。モデルは、id で Pool から引きます。(<C>sogh.issue(id)</C> など)</P>
+            <P>async のメソッドは、失敗したときに、例外 <C>GitHubError</C> を投げます。(0.5.0 から。「3.5 エラーの扱い」を見る)</P>
           </Section>
 
           <Section title="コールバックの決まり" num="3.4" lev="5">
@@ -290,22 +293,48 @@ export default function Fetching () {
               <LI>更新と、一部の asyncFetch〜 は、<C>{'callbacks = { start, successed, failed, fetched }'}</C> を受け取る。</LI>
               <LI>はじめに <C>start</C> を呼び、終わったら <C>successed</C> か <C>failed</C> を呼ぶ。</LI>
               <LI><C>fetched</C> は、1 ページ取るたびに呼ぶ。(team の ProjectV2 だけ)</LI>
+              <LI>無い項目や、関数でない項目は、呼ばない。</LI>
+              <LI>asyncFetch〜 の <C>failed</C> は、1 つめの引数が、投げる <C>GitHubError</C>。<C>failed</C> を呼んでから、投げる。
+                <UL>
+                  <LI>team の 2 つは、<C>failed(error, それまでの id の配列)</C>。</LI>
+                  <LI>ProjectV2 の 2 つ (<C>asyncFetchProjectV2By〜LoginProjectV2Number</C>) は、<C>failed(error, login, number)</C>。</LI>
+                </UL>
+              </LI>
+              <LI>コメントの追加・更新・削除の <C>failed</C> は、1 つめの引数が <C>{"{ type: 'error', data: error }"}</C>。(例外は投げない)</LI>
             </OL>
           </Section>
 
           <Section title="エラーの扱い" num="3.5" lev="5">
             <OL>
-              <LI>HTTP のステータスが 2xx でなければ、<C>text2json(r)</C> が失敗 (reject) にする。</LI>
-              <LI>HTTP 200 でも、レスポンスに errors があれば、<C>json2response(r, getData)</C> が Error を投げる。(message を改行でつなぐ)</LI>
-              <LI>投げた Error は、<C>error2response(error)</C> で <C>{"{ type: 'error', data: error }"}</C> にする。</LI>
-              <LI>失敗したときの戻り値は、メソッドごとに違う。(「6. 気づいた点」を見る)</LI>
+              <LI>asyncFetch〜 は、Loader の <C>request(query, variables)</C> で送り、失敗したときは、例外 <C>GitHubError</C> を投げる。(0.5.0 から。<C>yanqirenshi/SOGH.next#61</C>)
+                <UL>
+                  <LI>つながらない … <C>status</C> は null。<C>cause</C> に、元の例外。</LI>
+                  <LI>HTTP のステータスが 2xx でない … <C>status</C> に、HTTP の状態コード。<C>response</C> に、fetch の Response。</LI>
+                  <LI>HTTP 200 でも、レスポンスに errors がある … <C>errors</C> に、GitHub の errors (配列)。message は、errors の message を改行でつないだもの。</LI>
+                  <LI>応答に、取り出す値が無い (<C>pick</C> の値が null など) … <C>fetchNode(code, variables)</C> が投げる。(<C>status</C> は 200)</LI>
+                </UL>
+              </LI>
+              <LI>途中のページで失敗したときも、投げる。途中まで集めた分は、返さない。</LI>
+              <LI>成功したときの戻り値 (id か、id の配列。<C>asyncFetchViewer()</C> は User) は、0.5.0 の前と変わらない。</LI>
+              <LI><C>GitHubError</C> は、パッケージの入口から、名前付きで export している。(<C>{"import { GitHubError } from 'sogh'"}</C>。<C>e instanceof GitHubError</C> で見分ける)</LI>
+              <LI>コメントの追加・更新・削除と <C>connect</C> は、例外を投げない。
+                <UL>
+                  <LI>コメントの追加・更新・削除は、HTTP のステータスが 2xx でなければ <C>text2json(r)</C> が失敗 (reject) にし、HTTP 200 でも errors があれば <C>json2response(r, getData)</C> が Error を投げる。それを <C>error2response(error)</C> で <C>{"{ type: 'error', data: error }"}</C> にして、<C>failed</C> に渡す。</LI>
+                  <LI><C>connect</C> は、<C>fetchX</C> で送り、失敗したときは <C>{"failed({ status: 'error', error })"}</C> を呼ぶ。</LI>
+                </UL>
+              </LI>
             </OL>
           </Section>
 
           <Section title="クエリの使われ方" num="3.6" lev="5">
             <P>クエリは 18 個あり、どれも Sogh のメソッドから使われています。</P>
             <OL>
-              <LI>viewer・リポジトリ・Issue・コメント・ProjectV2・ProjectV2Item のクエリ。</LI>
+              <LI>viewer・リポジトリ・Issue・コメント・ProjectV2・ProjectV2Item のクエリ。
+                <UL>
+                  <LI>Sogh のメソッドは、名前でクエリを引く。(<C>query</C>・<C>queryDefinition</C>・<C>fetchNode</C>・<C>fetchPages</C>・<C>fetchProjectsV2OfTeam</C> に名前を渡す)</LI>
+                  <LI>名前のつづりは、0.5.0 で直した。(<C>viewer</C>・<C>issues_by_viewer</C>。<C>yanqirenshi/SOGH.next#73</C>)</LI>
+                </UL>
+              </LI>
               <LI>使われていなかったクエリ (18 個) は、0.5.0 で消した。(<C>yanqirenshi/SOGH.next#66</C>)
                 <UL>
                   <LI>消したクエリの名前は、<C>CHANGELOG.md</C> の「0.5.0」を見る。</LI>
@@ -337,11 +366,20 @@ export default function Fetching () {
                   <LI>クエリを直したときに、項目が減っていないことを確かめるために使う。</LI>
                 </UL>
               </LI>
+              <LI>クエリは、定義の <C>query</C> を、そのまま GraphQL として読む。(値は variables で渡すので、置き換えずに読める)</LI>
+              <LI>使用中かどうかは、<C>Sogh.js</C> の <C>{"this.query('…')"}</C>・<C>queryDefinition</C>・<C>fetchNode</C>・<C>fetchPages</C>・<C>fetchProjectsV2OfTeam</C> に渡している名前から数える。</LI>
               <LI>スクリプトは、<C>scripts/check-queries.mjs</C>。</LI>
             </OL>
 
             <P>いまのクエリを検査した結果は、次のとおりです。</P>
             <Table columns={CHECK_COLUMNS} rows={CHECKS} ids={TABLE_IDS}/>
+            <OL sx={SX_AFTER_TABLE}>
+              <LI>0.5.0 で、取得のクエリを variables の形に書き直した。<C>--dump</C> で前後を比べると、取っている項目 (道順) は、18 個とも、書き直す前と同じ。
+                <UL>
+                  <LI>PullRequest の state に別名を付けても、道順は、項目の本当の名前で数えるので、変わらない。</LI>
+                </UL>
+              </LI>
+            </OL>
           </Section>
 
           <Section title="GitHub につないで確かめる" num="3.8" lev="5">
@@ -384,6 +422,9 @@ export default function Fetching () {
                 </UL>
               </LI>
               <LI>記録のあとで、OK だった <C>user_by_id</C>・<C>projects_next_by_id</C>・<C>projectsv2_items_by_projects_v2</C> は、0.5.0 で消した。(いまのスクリプトは、残した 18 個のクエリを、すべて送るか、飛ばす)</LI>
+              <LI>記録のあとで、クエリの名前を <C>viewer</C>・<C>issues_by_viewer</C> に直した。(0.5.0。<C>yanqirenshi/SOGH.next#73</C>)</LI>
+              <LI>0.5.0 で、スクリプトは、値を variables で送るようにした。(ページ送りするクエリは、after を null にして、1 ページめだけを取る)</LI>
+              <LI>0.5.0 で、Sogh で取得して確かめる部分の途中で、<C>asyncFetch〜</C> が例外を投げたときは、NG として数えて、続きを飛ばす。</LI>
             </OL>
           </Section>
 

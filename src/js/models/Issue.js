@@ -243,7 +243,7 @@ export default class Issue extends GraphQLNode {
         };
     }
     // 最初の Item の fieldValues の nodes。(JSON のまま)
-    // projectItems を取得していないとき (issue_by_id・issues_by_viwer など)・プロジェクトに入っていないとき・
+    // projectItems を取得していないとき (issue_by_id・issues_by_viewer など)・プロジェクトに入っていないとき・
     // Item に fieldValues が無いときは、空の配列。(yanqirenshi/SOGH.next#59)
     fieldValues () {
         return fieldValuesOf(this.fieldItem());

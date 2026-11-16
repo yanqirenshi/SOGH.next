@@ -1,42 +1,42 @@
 import * as attr from './attributes.js';
 
-const MAX_FIELD_NUM = 20;
-const MAX_LABEL_NUM = 20;
-const MAX_PR_NUM = 20;
-
-const query = `{
-  node (id:"@team-id"){
+// チーム (teamId) の、OPEN の ProjectV2 と、その Item。(ProjectV2 をページ送りする)
+// 入れ子が深いので、ProjectV2 は 1 ページに 10 個、Item は ProjectV2 ごとに 50 個まで。(Item はページ送りしない)
+// variables: { teamId: ID!, after: String (1 ページめは null) }
+const query = `query ($teamId: ID!, $after: String) {
+  node(id: $teamId) {
     ... on Team {
       ${attr.teamRef()}
       name
-      projectsV2 (${attr.page_nation(10)}, query: "is:open") {
+      projectsV2(${attr.pagination(10)}, query: "is:open") {
         edges {
           node {
-            ${attr.projectv2()}
+            ${attr.projectV2()}
             fields(first: 10) {
               nodes {
-                ${attr.projectv2Fields()}
+                ${attr.projectV2Fields()}
               }
             }
             creator {
-              ${attr.projectv2Creator()}
+              ${attr.projectV2Creator()}
             }
             owner {
-              ${attr.projectv2Owner()}
+              ${attr.projectV2Owner()}
             }
-
-            items (first:50) {
-              ${attr.projectV2Items(MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM)}
+            items(first: 50) {
+              ${attr.projectV2Items()}
             }
-
           }
         }
         pageInfo {
-          ${attr.page_info()}
+          ${attr.pageInfo()}
         }
       }
     }
   }
 }`;
 
-export default query;
+export default {
+    query,
+    pick: (data)=> data.node.projectsV2,
+};

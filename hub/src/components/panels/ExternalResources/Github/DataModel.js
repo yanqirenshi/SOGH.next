@@ -97,11 +97,11 @@ const PARTS = [
     { type: 'Issue',         kind: REF,  part: 'issueRef()',       fields: '__typename, id, url, number, title, state, createdAt, updatedAt, closedAt' },
     { type: 'Issue',         kind: FULL, part: 'issue()',          fields: '参照の組 + body, bodyHTML' },
     { type: 'PullRequest',   kind: REF,  part: 'pullRequestRef()', fields: '__typename, id, number, url, title, state, closed, createdAt, updatedAt, closedAt' },
-    { type: 'PullRequest',   kind: FULL, part: 'pull_request()',   fields: '参照の組 + body, bodyHTML' },
+    { type: 'PullRequest',   kind: FULL, part: 'pullRequest()',    fields: '参照の組 + body, bodyHTML' },
     { type: 'ProjectV2',     kind: REF,  part: 'projectV2Ref()',   fields: '__typename, id, number, url, title, closed, createdAt, updatedAt' },
-    { type: 'ProjectV2',     kind: FULL, part: 'projectv2()',      fields: '参照の組 + public, readme, resourcePath, shortDescription, viewerCanUpdate, closedAt' },
-    { type: 'IssueComment',  kind: ONE,  part: 'issue_comment()',  fields: '__typename, id, url, body, bodyHTML, resourcePath, publishedAt, lastEditedAt, minimizedReason, isMinimized, includesCreatedEdit, databaseId, createdViaEmail, authorAssociation, createdAt, updatedAt' },
-    { type: 'ProjectV2Item', kind: ONE,  part: 'ProjectV2Item()',  fields: '__typename, id, type, isArchived, createdAt, updatedAt' },
+    { type: 'ProjectV2',     kind: FULL, part: 'projectV2()',      fields: '参照の組 + public, readme, resourcePath, shortDescription, viewerCanUpdate, closedAt' },
+    { type: 'IssueComment',  kind: ONE,  part: 'issueComment()',   fields: '__typename, id, url, body, bodyHTML, resourcePath, publishedAt, lastEditedAt, minimizedReason, isMinimized, includesCreatedEdit, databaseId, createdViaEmail, authorAssociation, createdAt, updatedAt' },
+    { type: 'ProjectV2Item', kind: ONE,  part: 'projectV2Item()',  fields: '__typename, id, type, isArchived, createdAt, updatedAt' },
     { type: 'Label',         kind: ONE,  part: 'label()',          fields: '__typename, id, name, url, color, createdAt, updatedAt' },
     { type: 'Milestone',     kind: ONE,  part: 'milestone()',      fields: '__typename, id, url, title, state, number, dueOn, createdAt, updatedAt' },
     { type: 'DraftIssue',    kind: ONE,  part: 'draftIssue()',     fields: '__typename, id, title, createdAt, updatedAt' },
@@ -137,7 +137,7 @@ const UNIONS = [
           'User は userRef()',
           'Organization は organizationRef()',
       ] },
-    { part: 'projectv2Owner()',
+    { part: 'projectV2Owner()',
       where: 'ProjectV2 の owner',
       how: [
           '共通: __typename, id',
@@ -145,7 +145,7 @@ const UNIONS = [
           'Organization は organizationRef()',
           'Issue・PullRequest は id, number, updatedAt',
       ] },
-    { part: 'ProjectV2ItemFieldReviewerValue()',
+    { part: 'projectV2ItemFieldReviewerValue()',
       where: 'ProjectV2Item の reviewers',
       how: [
           'User は userRef()',
@@ -153,12 +153,12 @@ const UNIONS = [
           'Mannequin は mannequinRef()',
           'Bot は botRef()',
       ] },
-    { part: 'projectV2ItemContent〜()',
+    { part: 'projectV2ItemContent()',
       where: 'ProjectV2Item の content',
       how: [
           'DraftIssue は draftIssue()',
           'Issue は issueRef() と、repository (repositories())',
-          'PullRequest は pullRequestRef()',
+          'PullRequest は pullRequestRef()。state は、別名 pullRequestState で取る',
       ] },
 ];
 
@@ -269,7 +269,13 @@ export default function DataModel () {
                   </UL>
                 </LI>
                 <LI>項目の少ない型 (Label・Milestone など) は、組が 1 つ。</LI>
-                <LI>部品が返すのは、その型の項目だけ。</LI>
+                <LI>部品が返すのは、その型の項目だけ。
+                  <UL>
+                    <LI><C>{'{ }'}</C> では囲まない。(囲むのは、呼ぶ側。0.5.0 で、返す形をそろえた。<C>yanqirenshi/SOGH.next#74</C>)</LI>
+                  </UL>
+                </LI>
+                <LI>部品の名前は、小文字で始まり、途中が大文字。(例: <C>projectV2ItemFieldValues</C>。0.5.0 でそろえた。<C>yanqirenshi/SOGH.next#74</C>)</LI>
+                <LI>入れ子の件数の上限 (fieldValues と、その中の labels・pullRequests) は、<C>NESTED_LIMIT</C> の 1 か所で決める。(「5.5 件数の上限」を見る)</LI>
               </OL>
             </Section>
 
@@ -293,6 +299,13 @@ export default function DataModel () {
                   </UL>
                 </LI>
                 <LI>Team の name と avatarUrl も、同じ理由で取らない。(User と型が違う)</LI>
+                <LI>ProjectV2Item の content では、Issue の state (<C>IssueState!</C>) と PullRequest の state (<C>PullRequestState!</C>) が、同じ場所に来る。そのため、PullRequest の state は、別名 <C>pullRequestState</C> で取る。(0.5.0 から。<C>yanqirenshi/SOGH.next#68</C>)
+                  <UL>
+                    <LI>部品は <C>{"pullRequestRef('pullRequestState: state')"}</C>。(<C>projectV2ItemContentPullRequest()</C>)</LI>
+                    <LI>Pool に入れる前に、Pooler の <C>node2pullRequest(node)</C> が、state に戻す。(PullRequest の core は、取り方によらず state)</LI>
+                    <LI>ProjectV2Item の core に残る content の JSON も、Pooler の <C>node2projectV2Item(node)</C> が、Pool に入れる前に state に戻す。(Item の core も、取り方によらず state)</LI>
+                  </UL>
+                </LI>
               </OL>
             </Section>
 
@@ -302,10 +315,17 @@ export default function DataModel () {
 
             <Section title="件数の上限" num="5.5" lev="5">
               <OL>
-                <LI>一覧は、1 回に 100 件。(<C>attributes.page_nation()</C>)</LI>
+                <LI>一覧は、1 回に 100 件。(<C>attributes.pagination()</C>。チームの ProjectV2 を Item 付きで取るクエリ (<C>projectsv2_with_items_by_team</C>) だけ、10 件)</LI>
                 <LI>Issue の assignees と labels は、10 件まで。</LI>
-                <LI>ProjectV2 の fields は、クエリによって 10 件まで、20 件まで、30 件まで、100 件まで。</LI>
-                <LI>ProjectV2Item の fieldValues は、クエリによって 20 件まで、または 30 件まで。その中のラベルとプルリクエストも同じ。</LI>
+                <LI>ProjectV2 の fields は、クエリによって 10 件まで、20 件まで、30 件まで、100 件まで。(30 件までの 2 個 (<C>projectv2items_by_〜</C>) は、数を <C>NESTED_LIMIT</C> で書いている)</LI>
+                <LI>ProjectV2Item の fieldValues は、どのクエリも 30 件まで。その中のラベルとプルリクエストも同じ。
+                  <UL>
+                    <LI>上限は、<C>attributes.js</C> の <C>NESTED_LIMIT</C> (30) の 1 か所で決める。(<C>yanqirenshi/SOGH.next#75</C>)</LI>
+                    <LI>0.5.0 の前は、20 件までのクエリがあった。(<C>projectsv2_with_items_by_team</C>・<C>projectv2_by_org_login_projectv2_number</C>)</LI>
+                    <LI>fieldValues の中の reviewers と users は、10 件まで。(<C>NESTED_LIMIT</C> を使っていない)</LI>
+                  </UL>
+                </LI>
+                <LI><C>projectsv2_with_items_by_team</C> の Item は、ProjectV2 ごとに 50 件まで。</LI>
                 <LI>入れ子の上限は、ページングしていない。
                   <UL>
                     <LI>上限を超えた分は、取れない。</LI>

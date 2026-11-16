@@ -1,8 +1,10 @@
 import * as attr from './attributes.js';
 
-const query = `{
+// viewer が作った、OPEN の Issue。(ページ送りする。projectItems は取らない)
+// variables: { after: String (1 ページめは null) }
+const query = `query ($after: String) {
   viewer {
-    issues(after: "", first: 100, states: OPEN) {
+    issues(${attr.pagination()}, states: OPEN) {
       nodes {
         ${attr.issue()}
         author {
@@ -26,10 +28,13 @@ const query = `{
         }
       }
       pageInfo {
-        ${attr.page_info()}
+        ${attr.pageInfo()}
       }
     }
   }
 }`;
 
-export default query;
+export default {
+    query,
+    pick: (data)=> data.viewer.issues,
+};

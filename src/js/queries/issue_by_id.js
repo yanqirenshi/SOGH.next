@@ -1,7 +1,9 @@
 import * as attr from './attributes.js';
 
-const query = `{
-  node(id: "@id") {
+// id で、Issue を 1 つ。(projectItems は取らない)
+// variables: { id: ID! }
+const query = `query ($id: ID!) {
+  node(id: $id) {
     ... on Issue {
       ${attr.issue()}
       author {
@@ -27,4 +29,7 @@ const query = `{
   }
 }`;
 
-export default query;
+export default {
+    query,
+    pick: (data)=> data.node,
+};

@@ -73,7 +73,7 @@
                 "description": [
                     "GraphQL API の URL。",
                     "constructor が入れる。(書き換えるメソッドは無い)",
-                    "endpoint() が返し、fetch(query, success, error) と、Sogh の asyncFetch〜 などが送り先に使う。",
+                    "endpoint() が返し、request(query, variables) (Sogh の asyncFetch〜 が使う)・fetch(query, success, error) と、Sogh のコメントの追加・更新・削除が送り先に使う。",
                     "fetchX(query, response2data, success, error) は、これを使わず、同じ URL を直に書いている。(_endpoint を書き換えても、fetchX の送り先は変わらない)"
                 ],
                 "examples": [
@@ -126,7 +126,7 @@
                 },
                 "description": [
                     "GraphQL API の URL (_endpoint) を返す。",
-                    "fetch(query, success, error) と、Sogh の asyncFetch〜 などが、送り先に使う。"
+                    "request(query, variables) (Sogh の asyncFetch〜 が使う)・fetch(query, success, error) と、Sogh のコメントの追加・更新・削除が、送り先に使う。"
                 ],
                 "examples": [
                     "sogh.endpoint();",
@@ -232,18 +232,19 @@
                 ]
             },
             {
-                "name": "makeQuery",
+                "name": "request",
                 "parameters": [
                     "query",
-                    "endCursor"
+                    "variables"
                 ],
-                "returnType": "any",
+                "returnType": "Promise",
                 "visibility": "public",
                 "returns": {
-                    "name": "query",
-                    "type": "String",
+                    "name": "data",
+                    "type": "Promise<Object>",
                     "description": [
-                        "書き換えたクエリ。"
+                        "応答の data。",
+                        "失敗したときは、GitHubError を投げる。(reject する)"
                     ]
                 },
                 "arguments": [
@@ -251,35 +252,41 @@
                         "name": "query",
                         "type": "String",
                         "description": [
-                            "書き換える前のクエリ。",
-                            "ページ送りのところに after: \"\", を書いておく。(queries の page_nation() が作る)"
+                            "GraphQL のクエリ。"
                         ]
                     },
                     {
-                        "name": "endCursor",
-                        "type": "String | null",
+                        "name": "variables",
+                        "type": "Object | null",
                         "description": [
-                            "次のページの開始位置。(前のページの pageInfo.endCursor)",
-                            "最初のページのときは null。"
+                            "GraphQL の変数。(変数の名前 → 値)"
                         ],
                         "optional": true
                     }
                 ],
                 "description": [
-                    "ページ送りのために、クエリの中の after: \"\", を書き換えて返す。",
-                    "endCursor を渡したときは after: \"endCursor\", にし、渡さないとき (null や \"\") は after: \"\", を消す。",
-                    "書き換えるのは、最初に見つかった 1 か所だけ。",
-                    "after: \"\", が無いクエリは、そのまま返す。",
-                    "Sogh の asyncFetch〜 が、前のページの pageInfo.endCursor を渡して、次のページを取得するのに使う。"
+                    "クエリを endpoint() に 1 回 POST して、応答の data を返す。(0.5.0 で足した。yanqirenshi/SOGH.next#61)",
+                    "リクエストは postData(query, variables) で作る。値は、クエリの文字列に埋め込まず、GraphQL の variables で渡す。",
+                    "失敗したときは、例外 GitHubError を投げる。(GitHubError は、src/js/Loader.js にある Error のクラス)",
+                    "つながらないとき (fetch が例外を投げたとき) は、status と response が null で、cause に元の例外が入る。",
+                    "HTTP のステータスが 2xx でないときは、status に HTTP の状態コード、response に fetch の Response が入る。",
+                    "HTTP 200 でも、応答に errors があるときは、errors に GitHub の errors (配列)、status に HTTP の状態コード、response に fetch の Response が入る。(message は、errors の message を改行でつないだもの)",
+                    "GitHubError の name は 'GitHubError'。パッケージの入口から、名前付きで export している。(import { GitHubError } from 'sogh'。e instanceof GitHubError で見分ける)",
+                    "Sogh の fetchNode(code, variables) が使う。(asyncFetch〜 は、fetchNode・fetchPages を通して、これで送る)"
                 ],
                 "examples": [
-                    "const query = 'repositories(after: \"\", first: 100) { ... }';",
+                    "await sogh.request('query ($id: ID!) { node(id: $id) { id } }', { id: 'I_kwDOAA1' });",
+                    "// => { node: { id: \"I_kwDOAA1\" } }",
                     "",
-                    "sogh.makeQuery(query, null);",
-                    "// => 'repositories( first: 100) { ... }'",
-                    "",
-                    "sogh.makeQuery(query, 'Y3Vyc29yOjEwMA==');",
-                    "// => 'repositories(after: \"Y3Vyc29yOjEwMA==\", first: 100) { ... }'"
+                    "// トークンが正しくないとき (HTTP 401)",
+                    "try {",
+                    "    await sogh.request('query { viewer { login } }');",
+                    "} catch (e) {",
+                    "    e.name;",
+                    "    // => \"GitHubError\"",
+                    "    e.status;",
+                    "    // => 401",
+                    "}"
                 ]
             },
             {
@@ -347,7 +354,7 @@
                     "headers は makeHeader() の値、body は { query, variables } を JSON の文字列にしたもの。",
                     "variables を渡さないとき (null など) は、body に variables を入れない。",
                     "値をクエリの文字列に埋め込まず variables で渡すので、改行や \" を含む値でもクエリが壊れない。",
-                    "Sogh の asyncFetch〜 や updateIssueComment(id, body, callbacks) などが使う。"
+                    "request(query, variables) (Sogh の asyncFetch〜 が使う)・fetch(query, success, error)・fetchX(query, response2data, success, error) (Sogh の connect(token, successed, failed) が使う) と、Sogh のコメントの追加・更新・削除 (updateIssueComment(id, body, callbacks) など) が使う。"
                 ],
                 "examples": [
                     "sogh.postData('mutation($id: ID!, $body: String!) { ... }', { id: 'IC_kwDOAB', body: 'LGTM' });",
@@ -597,7 +604,7 @@
                     "fetch の Response を、JSON にする。",
                     "r.ok が true のときは r.json() を返す。",
                     "HTTP のエラーのときは、Response そのもので reject する Promise を返す。(Error ではない)",
-                    "Sogh の asyncFetch〜 などが、fetch のすぐあとに使う。"
+                    "Sogh のコメントの追加・更新・削除 (createIssueComment・updateIssueComment・deleteIssueComment) が、fetch のすぐあとに使う。(asyncFetch〜 は使わない。request(query, variables) で送る)"
                 ],
                 "examples": [
                     "await fetch(sogh.endpoint(), sogh.postData('{ viewer { login } }'))",
@@ -643,7 +650,7 @@
                     "投げる Error の message は、errors の message を改行でつないだもの。(message が無い要素は、JSON の文字列にする)",
                     "投げる Error の errors には、元の errors の配列が入る。",
                     "fetch(query, success, error) などの { status, data } と違い、キーの名前は type。",
-                    "Sogh の asyncFetch〜 は、投げた Error を catch で受けて error2response(error) にする。"
+                    "Sogh のコメントの追加・更新・削除は、投げた Error を catch で受けて error2response(error) にし、failed に渡す。(asyncFetch〜 は使わない。request(query, variables) が GitHubError を投げる)"
                 ],
                 "examples": [
                     "sogh.json2response({ data: { viewer: { login: 'octocat' } } }, d=> d.data.viewer);",
@@ -679,7 +686,7 @@
                 "description": [
                     "エラーを、{ type: \"error\", data: error } の形にする。",
                     "エラーは error ではなく data のキーに入る。",
-                    "Sogh の asyncFetch〜 が、catch で受けたもの (HTTP のエラーの Response や、json2response(r, getData) が投げた Error) を渡す。"
+                    "Sogh のコメントの追加・更新・削除が、catch で受けたもの (HTTP のエラーの Response や、json2response(r, getData) が投げた Error) を渡す。(asyncFetch〜 は使わない)"
                 ],
                 "examples": [
                     "sogh.error2response(new Error('Bad credentials'));",
@@ -1222,6 +1229,8 @@
                 ],
                 "description": [
                     "ProjectV2 のアイテムのノードを、ProjectV2Item にして Pool に入れて返す。",
+                    "content が PullRequest のときは、state を別名 pullRequestState で取っているので、はじめに content の pullRequestState を state に戻したノードにする。(元のノードは変えない。yanqirenshi/SOGH.next#68。0.5.0 から)",
+                    "そのため、ProjectV2Item の core の content も、取り方によらず state になる。",
                     "先に matchmaker.projectV2Item(node) で、入れ子の project・content・creator と、fieldValues の中の関連をモデルにして Pool に入れる。(core には JSON をそのまま残す)",
                     "同じ id の ProjectV2Item があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
                     "Pool に入れたあとで、もう一度 sogh(v) に自分を入れる。(Pool も入れるので、結果は同じ)",
@@ -1464,6 +1473,9 @@
                 ],
                 "description": [
                     "Pull request のノードを、PullRequest にして Pool に入れて返す。",
+                    "ProjectV2Item の content として来た PullRequest のノードは、state を別名 pullRequestState で取っている。(Issue の state と型が違い、同じ場所で取れないため。yanqirenshi/SOGH.next#68)",
+                    "Pool に入れる前に、pullRequestState を state に戻したノードにする。(元のノードは変えない。別名が無いときは、そのまま。0.5.0 から)",
+                    "そのため、PullRequest の core は、取り方によらず state になる。(ProjectV2Item の core に残る content の JSON も、node2projectV2Item(node) が state に戻す)",
                     "先に matchmaker.pullRequest(node) で、入れ子の assignees・repository・author をモデルにして Pool に入れる。(core には JSON をそのまま残す)",
                     "同じ id の PullRequest があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
                     "Sogh からは呼ばない。Matchmaker の issueComment(node)・projectV2Item(node) と、node2model(node) が使う。"
@@ -2160,16 +2172,20 @@
                 "type": "Object",
                 "initialValue": "QUERIES",
                 "description": [
-                    "GraphQL のクエリの表。(クエリの名前 → クエリの文字列)",
+                    "GraphQL のクエリの表。(クエリの名前 → クエリの定義 { query, pick })",
                     "constructor が、queries/index.js のモジュール (import * as QUERIES) をそのまま入れる。",
+                    "クエリの定義は、query (クエリの文字列) と pick (応答の data から、取り出す値 (node か、ページ送りする一覧) を返す関数) を持つ。(0.5.0 から。yanqirenshi/SOGH.next#65)",
                     "クエリは 18 個ある。どれも Sogh のメソッドが使う。(使われていなかったクエリは、0.5.0 で消した)",
-                    "名前の綴りは、ファイル名のまま。(viewer ではなく viwer、issues_by_viwer など)",
-                    "クエリの中の @id・@login などは、取得のメソッドが値に置き換える。",
+                    "名前は、ファイル名のまま。(viewer・issues_by_viewer など。0.5.0 で、つづりを直した。yanqirenshi/SOGH.next#73)",
+                    "クエリの値は、GraphQL の variables で渡す。(変数の名前は、クエリの頭の宣言を見る。ページ送りは、変数 after。yanqirenshi/SOGH.next#63)",
                     "モジュールの名前空間オブジェクトなので、項目を足したり書き換えたりすると TypeError になる。"
                 ],
                 "examples": [
-                    "sogh._queries.viwer;",
-                    "// => \"{\\n  viewer {\\n    id\\nlogin\\nname\\n...\"",
+                    "sogh._queries.viewer.query;",
+                    "// => \"query {\\n  viewer {\\n    __typename\\nid\\nlogin\\n...\"",
+                    "",
+                    "sogh._queries.viewer.pick({ viewer: { login: 'octocat' } });",
+                    "// => { login: \"octocat\" }",
                     "",
                     "Object.keys(sogh._queries).length;",
                     "// => 18"
@@ -2178,7 +2194,8 @@
                     "constructor"
                 ],
                 "seeAlso": [
-                    "query(code)"
+                    "query(code)",
+                    "queryDefinition(code)"
                 ]
             },
             {
@@ -2252,22 +2269,60 @@
                         "name": "code",
                         "type": "String",
                         "description": [
-                            "クエリの名前。(queries/ のファイル名。例: issue_by_id・viwer)"
+                            "クエリの名前。(queries/ のファイル名。例: issue_by_id・viewer)"
                         ]
                     }
                 ],
                 "description": [
-                    "クエリの名前から、GraphQL のクエリの文字列を返す。(_queries を引く)",
+                    "クエリの名前から、GraphQL のクエリの文字列を返す。(queryDefinition(code) の query)",
                     "無い名前のときは undefined を返す。",
-                    "クエリの中の @id・@login などは、置き換える前のまま。(取得のメソッドが replace で置き換える)",
-                    "ページ送りのあるクエリには after: \"\", があり、Loader の makeQuery が、消すかカーソルに置き換える。"
+                    "クエリの値は、GraphQL の variables で渡す。(クエリの頭で、$id: ID! のように宣言している。0.5.0 から。それまでは、値の印を文字列で置き換えていた。yanqirenshi/SOGH.next#63)",
+                    "ページ送りのあるクエリは、変数 $after: String を宣言している。(1 ページめは null。2 ページめからは、前のページの endCursor)"
                 ],
                 "examples": [
-                    "sogh.query('issue_by_id').includes('node(id: \"@id\")');",
+                    "sogh.query('issue_by_id').startsWith('query ($id: ID!)');",
                     "// => true",
                     "",
-                    "sogh.query('viewer');",
-                    "// => undefined  (名前は viwer)"
+                    "sogh.query('nothing');",
+                    "// => undefined"
+                ]
+            },
+            {
+                "name": "queryDefinition",
+                "parameters": [
+                    "code"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "definition",
+                    "type": "Object | null",
+                    "description": [
+                        "クエリの定義 { query, pick }。",
+                        "無い名前のときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "code",
+                        "type": "String",
+                        "description": [
+                            "クエリの名前。(queries/ のファイル名。例: issue_by_id・viewer)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "クエリの名前から、クエリの定義 { query, pick } を返す。(_queries を引く。0.5.0 で足した。yanqirenshi/SOGH.next#65)",
+                    "query は、GraphQL のクエリの文字列。値は、GraphQL の variables で渡す。",
+                    "pick は、応答の data を受け取り、取り出す値 (node か、ページ送りする一覧) を返す関数。",
+                    "無い名前のときは null を返す。(query(code) は undefined を返す)",
+                    "query(code)・fetchNode(code, variables)・connect(token, successed, failed) が使う。"
+                ],
+                "examples": [
+                    "const { query, pick } = sogh.queryDefinition('issue_by_id');",
+                    "const data = await sogh.request(query, { id: 'I_kwDOAA1' });",
+                    "pick(data).title;",
+                    "// => \"SOGH の整理\""
                 ]
             },
             {
@@ -2403,6 +2458,7 @@
                 ],
                 "description": [
                     "token を入れて viewer (token のユーザー) を取得し、viewer に入れる。",
+                    "クエリは viewer。(queryDefinition('viewer') の query を送り、応答の data から pick で viewer を取り出す)",
                     "viewer は、User にして user の Pool に入れたものになる。(asyncFetchViewer() も同じ)",
                     "成功したときは、successed(viewer) を呼ぶ。",
                     "失敗したときは、viewer を null にして、failed({ status: 'error', error }) を呼ぶ。",
@@ -2496,51 +2552,6 @@
                 ]
             },
             {
-                "name": "node2objs",
-                "parameters": [
-                    "node_or_nodes",
-                    "make"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "ids",
-                    "type": "String | String[]",
-                    "description": [
-                        "モデルの id。",
-                        "配列を渡したときは、id の配列。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "node_or_nodes",
-                        "type": "Object | Object[]",
-                        "description": [
-                            "GraphQL のノード、またはノードの配列。"
-                        ]
-                    },
-                    {
-                        "name": "make",
-                        "type": "Function",
-                        "description": [
-                            "ノードを受け取り、モデル (id() を持つもの) を返す関数。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "ノード (または、ノードの配列) を make でモデルにし、その id を返す。",
-                    "配列のときは id の配列を、1 つのときは id を返す。",
-                    "make には、node2issue(node) など、ノードを Pool に入れてモデルを返す関数を渡す。"
-                ],
-                "examples": [
-                    "sogh.node2objs([{ id: 'I_kwDOAA1' }, { id: 'I_kwDOAA2' }], node=> sogh.node2issue(node));",
-                    "// => [\"I_kwDOAA1\", \"I_kwDOAA2\"]",
-                    "",
-                    "sogh.node2objs({ id: 'I_kwDOAA3' }, node=> sogh.node2issue(node));",
-                    "// => \"I_kwDOAA3\""
-                ]
-            },
-            {
                 "name": "updateIssueComment",
                 "parameters": [
                     "id",
@@ -2584,6 +2595,7 @@
                 "description": [
                     "id のコメントの本文を、body に書き換える。(GraphQL の updateIssueComment)",
                     "id と body は、クエリに埋め込まず、GraphQL の variables で送る。",
+                    "応答から取り出す所は、クエリのファイルの pick を使う。(queryDefinition(code) で取る。yanqirenshi/SOGH.next#65)",
                     "書き換えたコメントは、IssueComment にして Pool に入れる。(同じ id があるときは、core にノードを重ねる)",
                     "始めに、callbacks の start(id, body) を呼ぶ。",
                     "成功したときは、successed(コメントの id, id, body) を呼ぶ。",
@@ -2645,6 +2657,7 @@
                 "description": [
                     "id (Issue など) に、body のコメントを足す。(GraphQL の addComment)",
                     "id と body は、クエリに埋め込まず、GraphQL の variables で送る。",
+                    "応答から取り出す所は、クエリのファイルの pick を使う。(queryDefinition(code) で取る。yanqirenshi/SOGH.next#65)",
                     "足したコメントは、IssueComment にして Pool に入れる。",
                     "始めに、callbacks の start(id, body) を呼ぶ。",
                     "成功したときは、successed(足したコメントの id, id, body) を呼ぶ。",
@@ -2696,6 +2709,7 @@
                 "description": [
                     "id のコメントを消す。(GraphQL の deleteIssueComment)",
                     "id は、クエリに埋め込まず、GraphQL の variables で送る。",
+                    "応答から取り出す所は、クエリのファイルの pick を使う。(queryDefinition(code) で取る。yanqirenshi/SOGH.next#65)",
                     "Pool からは消さない。(消したあとも、issueComment(id) で引ける)",
                     "始めに、callbacks の start(id) を呼ぶ。",
                     "成功したときは、successed(id) を呼ぶ。",
@@ -2712,16 +2726,167 @@
                 ]
             },
             {
+                "name": "fetchNode",
+                "parameters": [
+                    "code",
+                    "variables"
+                ],
+                "returnType": "Promise",
+                "visibility": "public",
+                "returns": {
+                    "name": "picked",
+                    "type": "Promise<Object>",
+                    "description": [
+                        "クエリの pick で取り出した値。(node か、ページ送りする一覧)",
+                        "失敗したときは、GitHubError を投げる。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "code",
+                        "type": "String",
+                        "description": [
+                            "クエリの名前。"
+                        ]
+                    },
+                    {
+                        "name": "variables",
+                        "type": "Object",
+                        "description": [
+                            "GraphQL の変数。(変数の名前 → 値)"
+                        ],
+                        "optional": true
+                    }
+                ],
+                "description": [
+                    "名前が code のクエリを、variables を付けて 1 回送り、クエリの pick で、応答の data から取り出した値を返す。(0.5.0 で足した。yanqirenshi/SOGH.next#65)",
+                    "送るのは、Loader の request(query, variables)。",
+                    "失敗したときは、request が投げた GitHubError を、そのまま投げる。",
+                    "取り出した値が無いとき (null か undefined) も、GitHubError (status は 200) を投げる。",
+                    "無い名前のときは、TypeError を投げる。",
+                    "asyncFetch〜 のうち 1 つを取るもの (asyncFetchIssueByID(id) など) と、fetchPages(code, variables, onPage) が使う。"
+                ],
+                "examples": [
+                    "const node = await sogh.fetchNode('issue_by_id', { id: 'I_kwDOAA1' });",
+                    "node.title;",
+                    "// => \"SOGH の整理\""
+                ]
+            },
+            {
+                "name": "fetchPages",
+                "parameters": [
+                    "code",
+                    "variables",
+                    "onPage"
+                ],
+                "returnType": "Promise",
+                "visibility": "public",
+                "returns": {
+                    "name": "promise",
+                    "type": "Promise<undefined>",
+                    "description": [
+                        "最後のページまで取ると、undefined で resolve する。",
+                        "失敗したときは、GitHubError を投げる。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "code",
+                        "type": "String",
+                        "description": [
+                            "クエリの名前。"
+                        ]
+                    },
+                    {
+                        "name": "variables",
+                        "type": "Object",
+                        "description": [
+                            "GraphQL の変数。(after のほか)"
+                        ]
+                    },
+                    {
+                        "name": "onPage",
+                        "type": "Function",
+                        "description": [
+                            "ページごとに呼ぶ関数。",
+                            "connection (pick で取り出した一覧。nodes か edges と、pageInfo) を受け取る。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "ページ送りする一覧を、pageInfo の hasNextPage が false になるまで、最後のページまで取る。(0.5.0 で足した。yanqirenshi/SOGH.next#63)",
+                    "1 ページごとに、fetchNode(code, { ...variables, after }) で取り、onPage(connection) を呼ぶ。",
+                    "1 ページめは、変数 after を null にして送る。2 ページめからは、前のページの pageInfo.endCursor を after に入れて送る。",
+                    "pageInfo が無いときは、1 ページで終わる。",
+                    "途中で失敗したときは、GitHubError を投げる。(途中まで集めた分は、返さない)",
+                    "ページ送りする asyncFetch〜 と、fetchProjectsV2OfTeam(code, team_id, callbacks) が使う。"
+                ],
+                "examples": [
+                    "let ids = [];",
+                    "",
+                    "await sogh.fetchPages('issue_comments_by_issue_id', { id: 'I_kwDOAA1' }, (connection)=> {",
+                    "    ids = ids.concat(sogh.connection2ids(connection, node=> sogh.node2issueComment(node)));",
+                    "});"
+                ]
+            },
+            {
+                "name": "connection2ids",
+                "parameters": [
+                    "connection",
+                    "make"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "ids",
+                    "type": "String[]",
+                    "description": [
+                        "モデルの id の配列。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "connection",
+                        "type": "Object | Object[]",
+                        "description": [
+                            "一覧。({ nodes } か { edges } の形。node の配列でもよい)"
+                        ]
+                    },
+                    {
+                        "name": "make",
+                        "type": "Function",
+                        "description": [
+                            "ノードを受け取り、モデル (id() を持つもの) を返す関数。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "一覧の node を、make でモデルにして Pool に入れ、その id の配列を返す。(0.5.0 で足した)",
+                    "一覧は、nodes と edges のどちらの形でもよい。(GraphQLNode.js の nodesOf(connection) で、node の配列にする)",
+                    "null の node は、飛ばす。",
+                    "connection が null や undefined のときは、[] を返す。",
+                    "make には、node2issue(node) など、ノードを Pool に入れてモデルを返す関数を渡す。",
+                    "asyncFetch〜 のうち、一覧を取るものが使う。"
+                ],
+                "examples": [
+                    "sogh.connection2ids({ nodes: [{ id: 'I_kwDOAA1' }, { id: 'I_kwDOAA2' }] }, node=> sogh.node2issue(node));",
+                    "// => [\"I_kwDOAA1\", \"I_kwDOAA2\"]",
+                    "",
+                    "sogh.connection2ids({ edges: [{ node: { id: 'PVT_kwDOAA1' } }] }, node=> sogh.node2projectV2(node));",
+                    "// => [\"PVT_kwDOAA1\"]"
+                ]
+            },
+            {
                 "name": "asyncFetchViewer",
                 "parameters": [],
                 "returnType": "Promise",
                 "visibility": "public",
                 "returns": {
                     "name": "viewer",
-                    "type": "Promise<User | Error | Response>",
+                    "type": "Promise<User>",
                     "description": [
                         "取得した viewer の User。(Pool の User)",
-                        "失敗したときは、エラー。"
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "description": [
@@ -2729,7 +2894,7 @@
                     "connect(token, successed, failed) と同じく、viewer は Pool の User になる。",
                     "token は、先に token(v) などで入れておく。",
                     "送り先は endpoint() の値。",
-                    "失敗したときは、viewer を変えずに、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない)"
+                    "失敗したときは、viewer を変えずに、GitHubError を投げる。(0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)"
                 ],
                 "examples": [
                     "sogh.token(token);",
@@ -2749,7 +2914,8 @@
                     "name": "repositoryIds",
                     "type": "Promise<String[]>",
                     "description": [
-                        "Repository の id の配列。"
+                        "Repository の id の配列。",
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "description": [
@@ -2757,7 +2923,7 @@
                     "1 回に 100 件ずつ取得する。",
                     "リポジトリの owner も User にして、user の Pool に入れる。(同じ id の User があるときは、その core に owner のノードを重ねる)",
                     "そのため、connect(token, successed, failed) で入れた viewer (User) の name() などが null になる。",
-                    "途中で失敗したときは、それまでに取得した id の配列を返す。(エラーは返さない)"
+                    "途中で失敗したときは、GitHubError を投げる。(それまでに取得したページのモデルは、Pool に入っている。0.5.0 から。それまでは、それまでに取得した id の配列を返していた。yanqirenshi/SOGH.next#61)"
                 ],
                 "examples": [
                     "const ids = await sogh.asyncFetchRepositoriesByViewer();",
@@ -2774,10 +2940,10 @@
                 "visibility": "public",
                 "returns": {
                     "name": "issueId",
-                    "type": "Promise<String | Error | Response>",
+                    "type": "Promise<String>",
                     "description": [
                         "Issue の id。",
-                        "失敗したときは、エラー。"
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "arguments": [
@@ -2791,8 +2957,8 @@
                 ],
                 "description": [
                     "id の Issue を取得し、Pool に入れて、その id を返す。",
-                    "失敗したときは、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない)",
-                    "GraphQL のエラーが無く、node が null のときは、TypeError で reject する。",
+                    "失敗したときは、GitHubError を投げる。(0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)",
+                    "応答の node が null のときも、GitHubError を投げる。(それまでは、TypeError で reject していた)",
                     "asyncFetchItemByID(id) と同じことをする。"
                 ],
                 "examples": [
@@ -2810,14 +2976,15 @@
                     "name": "issueIds",
                     "type": "Promise<String[]>",
                     "description": [
-                        "Issue の id の配列。"
+                        "Issue の id の配列。",
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "description": [
                     "viewer の Issue のうち open のものを、ページ送りをしながらすべて取得し、Pool に入れる。",
                     "1 回に 100 件ずつ取得する。",
                     "名前は単数 (Issue) だが、id の配列を返す。",
-                    "途中で失敗したときは、それまでに取得した id の配列を返す。(エラーは返さない)"
+                    "途中で失敗したときは、GitHubError を投げる。(それまでに取得したページのモデルは、Pool に入っている。0.5.0 から。それまでは、それまでに取得した id の配列を返していた。yanqirenshi/SOGH.next#61)"
                 ],
                 "examples": [
                     "const ids = await sogh.asyncFetchIssueByViewer();",
@@ -2836,10 +3003,10 @@
                 "visibility": "public",
                 "returns": {
                     "name": "issueId",
-                    "type": "Promise<String | Error | Response>",
+                    "type": "Promise<String>",
                     "description": [
                         "Issue の id。",
-                        "失敗したときは、エラー。"
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "arguments": [
@@ -2869,7 +3036,8 @@
                     "組織 (org_login) のリポジトリ (repo_name) の、番号 (issue_number) の Issue を取得し、Pool に入れて、その id を返す。",
                     "クエリは organization (login: ...) で引くので、組織のリポジトリだけが対象。",
                     "コメント (100 件まで) とプロジェクトのアイテム (1 件) も取得するが、Pool には入れず、Issue の core に残る。",
-                    "失敗したときは、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない)"
+                    "issue_number は、数値にしてから送る。(文字列でも渡せる)",
+                    "失敗したときは、GitHubError を投げる。(0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)"
                 ],
                 "examples": [
                     "const id = await sogh.asyncFetchIssueByOrgRepoIssueNumber('octo-org', 'sogh', 12);",
@@ -2886,10 +3054,10 @@
                 "visibility": "public",
                 "returns": {
                     "name": "issueCommentIds",
-                    "type": "Promise<String[] | Error | Response>",
+                    "type": "Promise<String[]>",
                     "description": [
                         "IssueComment の id の配列。",
-                        "失敗したときは、エラー。"
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "arguments": [
@@ -2905,7 +3073,7 @@
                     "id の Issue のコメントを、ページ送りをしながらすべて取得し、IssueComment にして Pool に入れる。",
                     "コメントは、更新日時の新しい順。",
                     "1 回に 100 件ずつ取得する。",
-                    "失敗したときは、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(それまでに取得した id は返さず、reject もしない)"
+                    "失敗したときは、GitHubError を投げる。(途中のページで失敗したときも、途中まで集めた分は返さない。0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)"
                 ],
                 "examples": [
                     "const ids = await sogh.asyncFetchIssueCommentsByID('I_kwDOAA1');",
@@ -2924,10 +3092,10 @@
                 "visibility": "public",
                 "returns": {
                     "name": "issueCommentIds",
-                    "type": "Promise<String[] | Error | Response>",
+                    "type": "Promise<String[]>",
                     "description": [
                         "IssueComment の id の配列。",
-                        "失敗したときは、エラー。"
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "arguments": [
@@ -2959,7 +3127,8 @@
                     "コメントは、更新日時の新しい順。",
                     "1 回に 100 件ずつ取得する。",
                     "Issue そのものは Pool に入れない。",
-                    "失敗したときは、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(それまでに取得した id は返さず、reject もしない)"
+                    "issue_number は、数値にしてから送る。(文字列でも渡せる)",
+                    "失敗したときは、GitHubError を投げる。(途中のページで失敗したときも、途中まで集めた分は返さない。0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)"
                 ],
                 "examples": [
                     "const ids = await sogh.asyncFetchIssueCommentsByOrgRepoIssueNumber('octo-org', 'sogh', 12);",
@@ -2976,7 +3145,8 @@
                     "name": "projectV2Ids",
                     "type": "Promise<String[]>",
                     "description": [
-                        "ProjectV2 の id の配列。"
+                        "ProjectV2 の id の配列。",
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "description": [
@@ -2984,7 +3154,7 @@
                     "viewer の login() で、user (login: ...) を引く。",
                     "viewer が無い (null の) ときは、取得せずに [] を返す。",
                     "1 回に 100 件ずつ取得する。",
-                    "途中で失敗したときは、それまでに取得した id の配列を返す。(エラーは返さない)"
+                    "途中で失敗したときは、GitHubError を投げる。(それまでに取得したページのモデルは、Pool に入っている。0.5.0 から。それまでは、それまでに取得した id の配列を返していた。yanqirenshi/SOGH.next#61)"
                 ],
                 "examples": [
                     "await sogh.connect(token);",
@@ -3003,10 +3173,10 @@
                 "visibility": "public",
                 "returns": {
                     "name": "projectV2Ids",
-                    "type": "Promise<String[] | Error | Response>",
+                    "type": "Promise<String[]>",
                     "description": [
                         "ProjectV2 の id の配列。",
-                        "失敗したときは、エラー。"
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "arguments": [
@@ -3021,22 +3191,25 @@
                         "name": "callbacks",
                         "type": "Object",
                         "description": [
-                            "start・fetched・successed・failed の関数を持つオブジェクト。"
+                            "start・fetched・successed・failed の関数を持つオブジェクト。",
+                            "無い項目や、関数でない項目は呼ばない。"
                         ]
                     }
                 ],
                 "description": [
                     "チーム (team_id) の open な ProjectV2 を、ページ送りをしながらすべて取得し、Pool に入れる。(クエリに query: \"is:open\" を付けている)",
+                    "fetchProjectsV2OfTeam(code, team_id, callbacks) に、クエリ projectsv2_by_team を渡して取る。",
                     "1 回に 100 件ずつ取得する。",
                     "始めに、callbacks の start() を呼ぶ。",
                     "1 回取得するごとに、fetched(その回の id の配列, それまでの id の配列) を呼ぶ。",
                     "すべて取得したときは、successed(id の配列) を呼び、id の配列を返す。",
-                    "途中で失敗したときは、failed(それまでの id の配列) を呼び、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない)",
-                    "callbacks の項目は、関数かどうかを確かめずに呼ぶ。(関数でないときは TypeError で reject する)"
+                    "途中で失敗したときは、failed(error, それまでの id の配列) を呼んでから、error (GitHubError) を投げる。(0.5.0 から。それまでは、failed(それまでの id の配列) を呼び、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)",
+                    "callbacks の、無い項目や、関数でない項目は呼ばない。(0.5.0 から。それまでは、関数かどうかを確かめずに呼んでいた)"
                 ],
                 "examples": [
                     "const ids = await sogh.asyncFetchProjectsV2ByTeam(team_id, {",
                     "    fetched: (ids, all)=> setCount(all.length),",
+                    "    failed:  (error, all)=> console.error(error.message),",
                     "});",
                     "ids.length;",
                     "// => 24"
@@ -3052,10 +3225,10 @@
                 "visibility": "public",
                 "returns": {
                     "name": "projectV2Ids",
-                    "type": "Promise<String[] | Error | Response>",
+                    "type": "Promise<String[]>",
                     "description": [
                         "ProjectV2 の id の配列。",
-                        "失敗したときは、エラー。"
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "arguments": [
@@ -3070,24 +3243,82 @@
                         "name": "callbacks",
                         "type": "Object",
                         "description": [
-                            "start・fetched・successed・failed の関数を持つオブジェクト。"
+                            "start・fetched・successed・failed の関数を持つオブジェクト。",
+                            "無い項目や、関数でない項目は呼ばない。"
                         ]
                     }
                 ],
                 "description": [
                     "チーム (team_id) の open な ProjectV2 を、アイテム (ProjectV2 ごとに 50 件まで) と一緒に、ページ送りをしながらすべて取得し、Pool に入れる。",
+                    "fetchProjectsV2OfTeam(code, team_id, callbacks) に、クエリ projectsv2_with_items_by_team を渡して取る。",
                     "1 回に 10 件ずつ取得する。",
                     "アイテムは Pool に入れず、ProjectV2 の core に残る。(items()・itemsWith2ProjectV2Item() で読む)",
                     "始めに、callbacks の start() を呼ぶ。",
                     "1 回取得するごとに、fetched(その回の id の配列, それまでの id の配列) を呼ぶ。",
                     "すべて取得したときは、successed(id の配列) を呼び、id の配列を返す。",
-                    "途中で失敗したときは、failed(それまでの id の配列) を呼び、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない)",
-                    "callbacks の項目は、関数かどうかを確かめずに呼ぶ。(関数でないときは TypeError で reject する)"
+                    "途中で失敗したときは、failed(error, それまでの id の配列) を呼んでから、error (GitHubError) を投げる。(0.5.0 から。それまでは、failed(それまでの id の配列) を呼び、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)",
+                    "callbacks の、無い項目や、関数でない項目は呼ばない。(0.5.0 から。それまでは、関数かどうかを確かめずに呼んでいた)"
                 ],
                 "examples": [
                     "const ids = await sogh.asyncFetchProjectsV2WithItemsByTeam(team_id);",
                     "sogh.projectV2(ids[0]).itemsWith2ProjectV2Item().map(item=> item.title());",
                     "// => [\"クラス図を描く\", ...]"
+                ]
+            },
+            {
+                "name": "fetchProjectsV2OfTeam",
+                "parameters": [
+                    "code",
+                    "team_id",
+                    "callbacks"
+                ],
+                "returnType": "Promise",
+                "visibility": "public",
+                "returns": {
+                    "name": "projectV2Ids",
+                    "type": "Promise<String[]>",
+                    "description": [
+                        "ProjectV2 の id の配列。",
+                        "失敗したときは、GitHubError を投げる。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "code",
+                        "type": "String",
+                        "description": [
+                            "クエリの名前。(projectsv2_by_team か projectsv2_with_items_by_team)"
+                        ]
+                    },
+                    {
+                        "name": "team_id",
+                        "type": "String",
+                        "description": [
+                            "チームの node id。"
+                        ]
+                    },
+                    {
+                        "name": "callbacks",
+                        "type": "Object",
+                        "description": [
+                            "start・fetched・successed・failed の関数を持つオブジェクト。",
+                            "無い項目や、関数でない項目は呼ばない。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "チーム (team_id) の ProjectV2 を、code のクエリで、ページ送りをしながらすべて取得し、ProjectV2 にして Pool に入れる。(0.5.0 で足した)",
+                    "クエリには、変数 teamId に team_id を入れて送る。(fetchPages(code, variables, onPage) で取る)",
+                    "始めに、callbacks の start() を呼ぶ。",
+                    "1 ページ取るごとに、fetched(そのページの id の配列, それまでの id の配列) を呼ぶ。",
+                    "すべて取得したときは、successed(id の配列) を呼び、id の配列を返す。",
+                    "途中で失敗したときは、failed(error, それまでの id の配列) を呼んでから、error (GitHubError) を投げる。",
+                    "asyncFetchProjectsV2ByTeam(team_id, callbacks)・asyncFetchProjectsV2WithItemsByTeam(team_id, callbacks) が使う。"
+                ],
+                "examples": [
+                    "const ids = await sogh.fetchProjectsV2OfTeam('projectsv2_by_team', team_id, {",
+                    "    failed: (error, ids)=> console.error(error.message),",
+                    "});"
                 ]
             },
             {
@@ -3101,10 +3332,10 @@
                 "visibility": "public",
                 "returns": {
                     "name": "projectV2Id",
-                    "type": "Promise<String | Error | Response>",
+                    "type": "Promise<String>",
                     "description": [
                         "ProjectV2 の id。",
-                        "失敗したときは、エラー。"
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "arguments": [
@@ -3136,7 +3367,8 @@
                     "フィールド (100 件まで) も取得する。(アイテムは取得しない)",
                     "始めに、callbacks の start() を引数なしで呼ぶ。",
                     "成功したときは、successed(ノード) を呼ぶ。(ProjectV2 ではなく GraphQL のノードのままで、Pool に入れる前に呼ぶ)",
-                    "失敗したときは、failed() を引数なしで呼び、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない)"
+                    "失敗したときは、failed(error, login, number) を呼んでから、error (GitHubError) を投げる。(0.5.0 から。それまでは、failed() を引数なしで呼び、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)",
+                    "number は、数値にしてから送る。(文字列でも渡せる)"
                 ],
                 "examples": [
                     "const id = await sogh.asyncFetchProjectV2ByUserLoginProjectV2Number('octocat', 3);",
@@ -3155,10 +3387,10 @@
                 "visibility": "public",
                 "returns": {
                     "name": "projectV2Id",
-                    "type": "Promise<String | Error | Response>",
+                    "type": "Promise<String>",
                     "description": [
                         "ProjectV2 の id。",
-                        "失敗したときは、エラー。"
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "arguments": [
@@ -3190,8 +3422,9 @@
                     "アイテムは Pool に入れず、ProjectV2 の core に残る。(items()・itemsWith2ProjectV2Item() で読む)",
                     "始めに、callbacks の start(login, number) を呼ぶ。",
                     "成功したときは、successed(ノード, login, number) を呼ぶ。(ProjectV2 ではなく GraphQL のノードのままで、Pool に入れる前に呼ぶ)",
-                    "失敗したときは、failed(エラー, login, number) を呼び、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない)",
-                    "asyncFetchProjectV2ByUserLoginProjectV2Number(login, number, callbacks) とは、コールバックの引数が違う。"
+                    "失敗したときは、failed(error, login, number) を呼んでから、error (GitHubError) を投げる。(0.5.0 から。それまでは、failed に渡したエラーを戻り値として返していた。yanqirenshi/SOGH.next#61)",
+                    "number は、数値にしてから送る。(文字列でも渡せる)",
+                    "asyncFetchProjectV2ByUserLoginProjectV2Number(login, number, callbacks) とは、start と successed の引数が違う。(failed の引数は、0.5.0 から同じ)"
                 ],
                 "examples": [
                     "const id = await sogh.asyncFetchProjectV2ByOrgLoginProjectV2Number('octo-org', 4, {",
@@ -3211,10 +3444,10 @@
                 "visibility": "public",
                 "returns": {
                     "name": "projectV2ItemIds",
-                    "type": "Promise<String[] | Error | Response>",
+                    "type": "Promise<String[]>",
                     "description": [
                         "ProjectV2Item の id の配列。(全ページ分)",
-                        "失敗したときは、エラー。(途中まで集めた分は返さない)"
+                        "失敗したときは、GitHubError を投げる。(途中まで集めた分は返さない)"
                     ]
                 },
                 "arguments": [
@@ -3236,10 +3469,11 @@
                 "description": [
                     "ユーザー (login) の、番号 (number) の ProjectV2 のアイテムを取得し、ProjectV2Item にして Pool に入れる。",
                     "pageInfo の hasNextPage が false になるまで、100 件ずつ繰り返して、すべてのアイテムを取得する。(0.4.2 から。yanqirenshi/SOGH.next#64。それまでは、先頭の 100 件だけだった)",
-                    "ページ送りの印 (クエリの items の after: \"\",) は、makeQuery で、1 回めは消し、2 回め以降は前の回の endCursor にする。",
+                    "ページ送りは、クエリの変数 after で行う。(1 回めは null、2 回め以降は前の回の endCursor。0.5.0 から。yanqirenshi/SOGH.next#63)",
                     "2 回め以降も、ProjectV2 の項目 (fields など) を毎回取り直す。",
                     "応答の ProjectV2 そのもの (fields を含む) は、Pool に入れない。(アイテムの project は、Matchmaker が Pool に入れる)",
-                    "失敗したときは、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない。途中のページで失敗したときも、途中まで集めた分は返さない)"
+                    "number は、数値にしてから送る。(文字列でも渡せる)",
+                    "失敗したときは、GitHubError を投げる。(途中のページで失敗したときも、途中まで集めた分は返さない。0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)"
                 ],
                 "examples": [
                     "const ids = await sogh.asyncFetchProjectV2ItemsByUserLoginProjectV2Number('octocat', 3);",
@@ -3257,10 +3491,10 @@
                 "visibility": "public",
                 "returns": {
                     "name": "projectV2ItemIds",
-                    "type": "Promise<String[] | Error | Response>",
+                    "type": "Promise<String[]>",
                     "description": [
                         "ProjectV2Item の id の配列。(全ページ分)",
-                        "失敗したときは、エラー。(途中まで集めた分は返さない)"
+                        "失敗したときは、GitHubError を投げる。(途中まで集めた分は返さない)"
                     ]
                 },
                 "arguments": [
@@ -3282,10 +3516,11 @@
                 "description": [
                     "組織 (login) の、番号 (number) の ProjectV2 のアイテムを取得し、ProjectV2Item にして Pool に入れる。",
                     "pageInfo の hasNextPage が false になるまで、100 件ずつ繰り返して、すべてのアイテムを取得する。(0.4.2 から。yanqirenshi/SOGH.next#64。それまでは、先頭の 100 件だけだった)",
-                    "ページ送りの印 (クエリの items の after: \"\",) は、makeQuery で、1 回めは消し、2 回め以降は前の回の endCursor にする。",
+                    "ページ送りは、クエリの変数 after で行う。(1 回めは null、2 回め以降は前の回の endCursor。0.5.0 から。yanqirenshi/SOGH.next#63)",
                     "2 回め以降も、ProjectV2 の項目 (fields など) を毎回取り直す。",
                     "応答の ProjectV2 そのもの (fields を含む) は、Pool に入れない。(アイテムの project は、Matchmaker が Pool に入れる)",
-                    "失敗したときは、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない。途中のページで失敗したときも、途中まで集めた分は返さない)"
+                    "number は、数値にしてから送る。(文字列でも渡せる)",
+                    "失敗したときは、GitHubError を投げる。(途中のページで失敗したときも、途中まで集めた分は返さない。0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)"
                 ],
                 "examples": [
                     "const ids = await sogh.asyncFetchProjectV2ItemsByOrgLoginProjectV2Number('octo-org', 4);",
@@ -3302,10 +3537,10 @@
                 "visibility": "public",
                 "returns": {
                     "name": "projectV2ItemId",
-                    "type": "Promise<String | Error | Response>",
+                    "type": "Promise<String>",
                     "description": [
                         "ProjectV2Item の id。",
-                        "失敗したときは、エラー。"
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "arguments": [
@@ -3320,8 +3555,8 @@
                 "description": [
                     "id の ProjectV2Item を取得し、Pool に入れて、その id を返す。",
                     "フィールドの値 (30 件まで)・作成者・中身 (Issue・Pull request・Draft issue) も取得する。",
-                    "失敗したときは、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない)",
-                    "GraphQL のエラーが無く、node が null のときは、TypeError で reject する。"
+                    "失敗したときは、GitHubError を投げる。(0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)",
+                    "応答の node が null のときも、GitHubError を投げる。(それまでは、TypeError で reject していた)"
                 ],
                 "examples": [
                     "const id = await sogh.asyncFetchProjectV2ItemByID('PVTI_lAHOAA1');",
@@ -3338,10 +3573,10 @@
                 "visibility": "public",
                 "returns": {
                     "name": "issueId",
-                    "type": "Promise<String | Error | Response>",
+                    "type": "Promise<String>",
                     "description": [
                         "Issue の id。",
-                        "失敗したときは、エラー。"
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "arguments": [
@@ -3357,8 +3592,8 @@
                     "id の Issue を取得し、Pool に入れて、その id を返す。",
                     "asyncFetchIssueByID(id) と同じクエリ (issue_by_id) で、同じことをする。",
                     "名前は Item だが、ProjectV2Item ではなく Issue として扱う。",
-                    "失敗したときは、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない)",
-                    "GraphQL のエラーが無く、node が null のときは、TypeError で reject する。"
+                    "失敗したときは、GitHubError を投げる。(0.5.0 から。それまでは、エラーを戻り値として返していた。yanqirenshi/SOGH.next#61)",
+                    "応答の node が null のときも、GitHubError を投げる。(それまでは、TypeError で reject していた)"
                 ],
                 "examples": [
                     "const id = await sogh.asyncFetchItemByID('I_kwDOAA1');",
@@ -5888,7 +6123,7 @@
                     "最初の ProjectV2 のアイテムの、フィールドの値のノード (fieldValues.nodes) を返す。",
                     "フィールドの値は、モデルにしない。(JSON のまま)",
                     "アイテムが無いときは []。",
-                    "projectItems を取得していないとき (issue_by_id・issues_by_viwer など)・アイテムに fieldValues が無いときも、[]。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)"
+                    "projectItems を取得していないとき (issue_by_id・issues_by_viewer など)・アイテムに fieldValues が無いときも、[]。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)"
                 ],
                 "examples": [
                     "issue.fieldValues().map(field_value=> field_value.field.name);",
@@ -9306,7 +9541,7 @@
                     "画面でこのアイテムを開くためのパスを返す。",
                     "Sogh の href(to, data) に 'project-v2-items' とこのアイテムを渡して作る。(既定の形は /scrum/users/:login/projects/:project-number/items/:id)",
                     "Sogh を持っていないとき (Pool を通さずに作ったとき) や、project を取得していないときは、エラーになる。",
-                    "持ち主が組織のプロジェクトでは、projectOwnerLogin() が undefined なので、パスの login が \"undefined\" になる。"
+                    "持ち主が組織のプロジェクトでは、パスの login に組織の login が入る。(既定の形は /scrum/users/... のまま)"
                 ],
                 "examples": [
                     "projectV2Item.path();",
@@ -9435,7 +9670,8 @@
                 },
                 "description": [
                     "アイテムが入っているプロジェクトの、持ち主の login を返す。",
-                    "クエリは持ち主が User のときだけ login を取得するので、持ち主が組織のときは undefined。",
+                    "持ち主が User でも Organization でも、login を返す。(どのクエリも、project の owner を projectV2Owner() で取り、User・Organization の login を取る)",
+                    "持ち主が Issue・PullRequest のときは、login が無いので undefined。",
                     "project を取得していないときは、エラーになる。"
                 ],
                 "examples": [

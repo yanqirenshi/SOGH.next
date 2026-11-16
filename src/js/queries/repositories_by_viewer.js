@@ -1,21 +1,21 @@
 import * as attr from './attributes.js';
 
-const query = `
-{
+// viewer のリポジトリ。(ページ送りする)
+// variables: { after: String (1 ページめは null) }
+const query = `query ($after: String) {
   viewer {
-    repositories(${attr.page_nation()}) {
+    repositories(${attr.pagination()}) {
       nodes {
         ${attr.repositories()}
-        owner {
-          ${attr.owner()}
-        }
       }
       pageInfo {
-        ${attr.page_info()}
+        ${attr.pageInfo()}
       }
     }
   }
-}
-`;
+}`;
 
-export default query;
+export default {
+    query,
+    pick: (data)=> data.viewer.repositories,
+};

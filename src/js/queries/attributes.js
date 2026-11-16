@@ -10,18 +10,29 @@
 //        〜Ref … 参照の組。ほかの型の入れ子として取るときに使う。
 //        無印  … 全部の組。その型を主に取るときに使う。参照の組を含む。
 //      項目の少ない型 (Label・Milestone など) は、組が 1 つ。
-//   4. 部品が返すのは、その型の項目だけ。{ } では囲まない。
-//      (下のほうの「ProjectV2Item の中身」には、{ } で囲んで返す古い形の部品が残っている)
+//   4. 部品が返すのは、その型の項目だけ。{ } では囲まない。(囲むのは、呼ぶ側) (yanqirenshi/SOGH.next#74)
+//   5. 部品の名前は、小文字で始まり、途中が大文字。(例: projectV2ItemFieldValues) (yanqirenshi/SOGH.next#74)
+//   6. 入れ子の件数の上限 (fieldValues・その中の labels と pullRequests) は、NESTED_LIMIT の 1 か所で決める。(yanqirenshi/SOGH.next#75)
+
+/* ****************************************************************
+ * 件数
+ * **************************************************************** */
+
+// 入れ子の件数の上限。(ProjectV2Item の fieldValues と、その中の labels・pullRequests)
+// どのクエリも、この値を使う。上限を超えた分は、取れない。(取れた分だけをモデルにする。yanqirenshi/SOGH.next#30)
+export const NESTED_LIMIT = 30;
 
 /* ****************************************************************
  * ページ送り
  * **************************************************************** */
 
-export function page_nation (count=100) {
-    return `after: "", first: ${count}`;
+// ページ送りする一覧の引数。
+// クエリは、変数 $after: String を宣言する。(1 ページめは null。2 ページめからは、前のページの endCursor)
+export function pagination (count=100) {
+    return `after: $after, first: ${count}`;
 }
 
-export function page_info () {
+export function pageInfo () {
     return `endCursor
 hasNextPage
 hasPreviousPage
@@ -130,11 +141,6 @@ resourcePath
 ... on Organization { ${organizationRef()} }`;
 }
 
-// repositoryOwner の古い名前。
-export function owner () {
-    return repositoryOwner();
-}
-
 /* ****************************************************************
  * Repository
  * **************************************************************** */
@@ -180,7 +186,7 @@ body
 bodyHTML`;
 }
 
-export function issue_comment (){
+export function issueComment () {
     return `__typename
 id
 url
@@ -201,7 +207,7 @@ updatedAt`;
 
 // IssueComment と、その関連 (pullRequest・author・editor)。
 export function issueCommentNode () {
-    return `${issue_comment()}
+    return `${issueComment()}
 pullRequest {
   ${pullRequestRef()}
 }
@@ -240,20 +246,24 @@ updatedAt`;
  * PullRequest
  * **************************************************************** */
 
-export function pullRequestRef () {
+// state には、別名を付けられる。(state_field に 'pullRequestState: state' のように渡す)
+// ProjectV2Item の content では、Issue の state (IssueState!) と PullRequest の state (PullRequestState!) が
+// 同じ場所に来て、GraphQL の決まりに合わないので、PullRequest のほうを別名で取る。(yanqirenshi/SOGH.next#68)
+// 別名で取った値は、Pooler の node2projectV2Item(node) と node2pullRequest(node) が、Pool に入れる前に state に戻す。
+export function pullRequestRef (state_field='state') {
     return `__typename
 id
 number
 url
 title
-state
+${state_field}
 closed
 createdAt
 updatedAt
 closedAt`;
 }
 
-export function pull_request () {
+export function pullRequest () {
     return `${pullRequestRef()}
 body
 bodyHTML`;
@@ -274,7 +284,7 @@ createdAt
 updatedAt`;
 }
 
-export function projectv2 () {
+export function projectV2 () {
     return `${projectV2Ref()}
 public
 readme
@@ -284,51 +294,49 @@ viewerCanUpdate
 closedAt`;
 }
 
-export function projectv2Fields () {
-    return `
- ... on ProjectV2Field {
-   ${projectv2Field()}
- }
- ... on ProjectV2SingleSelectField {
-   ${projectv2FieldSelect()}
-   options {
-     id
-     name
-     nameHTML
-   }
- }
- ... on ProjectV2IterationField {
-   ${projectv2FieldIteration()}
-   configuration {
-     startDay
-     duration
-     iterations {
-       duration
-       id
-       startDate
-       title
-       titleHTML
-     }
-     completedIterations {
-       duration
-       id
-       startDate
-       title
-       titleHTML
-     }
-   }
- }
-`;
+export function projectV2Fields () {
+    return `... on ProjectV2Field {
+  ${projectV2Field()}
+}
+... on ProjectV2SingleSelectField {
+  ${projectV2FieldSelect()}
+  options {
+    id
+    name
+    nameHTML
+  }
+}
+... on ProjectV2IterationField {
+  ${projectV2FieldIteration()}
+  configuration {
+    startDay
+    duration
+    iterations {
+      duration
+      id
+      startDate
+      title
+      titleHTML
+    }
+    completedIterations {
+      duration
+      id
+      startDate
+      title
+      titleHTML
+    }
+  }
+}`;
 }
 
 // ProjectV2 の creator。型は Actor。
-export function projectv2Creator () {
+export function projectV2Creator () {
     return actor();
 }
 
 // 型が ProjectV2Owner の場所で使う。(ProjectV2 の owner)
 // ProjectV2Owner は、User・Organization のほかに、Issue・PullRequest のこともある。
-export function projectv2Owner () {
+export function projectV2Owner () {
     return `__typename
 id
 ... on User { ${userRef()} }
@@ -337,7 +345,7 @@ id
 ... on PullRequest { id number updatedAt }`;
 }
 
-export function projectv2FieldIteration () {
+export function projectV2FieldIteration () {
     return `id
 name
 dataType
@@ -345,7 +353,7 @@ createdAt
 updatedAt`;
 }
 
-export function projectv2FieldSelect () {
+export function projectV2FieldSelect () {
     return `id
 name
 dataType
@@ -353,7 +361,7 @@ createdAt
 updatedAt`;
 }
 
-export function projectv2Field () {
+export function projectV2Field () {
     return `id
 name
 dataType
@@ -365,7 +373,7 @@ updatedAt`;
  * Project V2 Item
  * **************************************************************** */
 
-export function ProjectV2Item () {
+export function projectV2Item () {
     return `__typename
 id
 type
@@ -379,7 +387,7 @@ export function projectV2ItemProject () {
     return `project {
   ${projectV2Ref()}
   owner {
-    ${projectv2Owner()}
+    ${projectV2Owner()}
   }
 }`;
 }
@@ -404,244 +412,190 @@ updatedAt`;
 
 /* ****************************************************************
  * ProjectV2Item の中身 (creator・fieldValues・content)
- * ここの部品には、{ } で囲んで返すものがある。
  * **************************************************************** */
 
 // ProjectV2Item と、フィールドの値の creator。型は Actor。
-export function projectV2FieldValue_Creator () {
-    return `{
-${actor()}
+export function projectV2FieldValueCreator () {
+    return actor();
+}
+
+// フィールドの値の field。(どのフィールドの値か)
+export function projectV2FieldValueField () {
+    return `... on ProjectV2Field { id name dataType }
+... on ProjectV2IterationField { id name dataType }
+... on ProjectV2SingleSelectField { id name dataType }`;
+}
+
+export function projectV2ItemFieldDateValue () {
+    return `__typename
+id
+date
+field { ${projectV2FieldValueField()} }
+creator { ${projectV2FieldValueCreator()} }`;
+}
+
+export function projectV2ItemFieldIterationValue () {
+    return `__typename
+id
+title
+titleHTML
+duration
+iterationId
+startDate
+createdAt
+updatedAt
+field { ${projectV2FieldValueField()} }
+creator { ${projectV2FieldValueCreator()} }`;
+}
+
+export function projectV2ItemFieldLabelValue () {
+    return `__typename
+field { ${projectV2FieldValueField()} }
+labels(first: ${NESTED_LIMIT}) {
+  nodes {
+    ${label()}
+  }
 }`;
 }
 
-const field = `
- {
-   ... on ProjectV2Field { id name dataType }
-   ... on ProjectV2IterationField { id name dataType }
-   ... on ProjectV2SingleSelectField { id name dataType }
- } `;
-
-export function ProjectV2ItemFieldDateValue () {
-    return `
- __typename
- id
- date
- field ${field}
- creator ${projectV2FieldValue_Creator()}
-`;
+export function projectV2ItemFieldMilestoneValue () {
+    return `__typename
+field { ${projectV2FieldValueField()} }
+milestone {
+  ${milestone()}
+}`;
 }
 
-export function ProjectV2ItemFieldIterationValue () {
-    return `
- __typename
- id
- title
- titleHTML
- duration
- iterationId
- startDate
- createdAt
- updatedAt
- field ${field}
- creator ${projectV2FieldValue_Creator()}
-`;
+export function projectV2ItemFieldNumberValue () {
+    return `__typename
+id
+number
+createdAt
+updatedAt
+field { ${projectV2FieldValueField()} }
+creator { ${projectV2FieldValueCreator()} }`;
 }
 
-export function ProjectV2ItemFieldLabelValue (MAX_LABEL_NUM) {
-    return `
- __typename
- field ${field}
- labels(first: ${MAX_LABEL_NUM}) {
-   nodes {
-     ${label()}
-   }
- }
-`;
+export function projectV2ItemFieldPullRequestValue () {
+    return `__typename
+field { ${projectV2FieldValueField()} }
+pullRequests(first: ${NESTED_LIMIT}) {
+  nodes {
+    ${pullRequestRef()}
+  }
+}`;
 }
 
-export function ProjectV2ItemFieldMilestoneValue () {
-    return `
- __typename
- field ${field}
- milestone {
-   ${milestone()}
- }
-`;
+export function projectV2ItemFieldRepositoryValue () {
+    return `__typename
+field { ${projectV2FieldValueField()} }
+repository {
+  ${repositoryRef()}
+}`;
 }
 
-export function ProjectV2ItemFieldNumberValue () {
-    return `
- __typename
- id
- number
- createdAt
- updatedAt
- field ${field}
- creator ${projectV2FieldValue_Creator()}
-`;
+export function projectV2ItemFieldReviewerValue () {
+    return `__typename
+field { ${projectV2FieldValueField()} }
+reviewers(first: 10) {
+  nodes {
+    ... on User { ${userRef()} }
+    ... on Team { ${teamRef()} }
+    ... on Mannequin { ${mannequinRef()} }
+    ... on Bot { ${botRef()} }
+  }
+}`;
 }
 
-export function ProjectV2ItemFieldPullRequestValue (MAX_PR_NUM) {
-    return `
- __typename
- field ${field}
- pullRequests(first: ${MAX_PR_NUM}) {
-   nodes {
-     ${pullRequestRef()}
-   }
- }
-`;
+export function projectV2ItemFieldSingleSelectValue () {
+    return `__typename
+id
+name
+nameHTML
+optionId
+createdAt
+updatedAt
+field { ${projectV2FieldValueField()} }
+creator { ${projectV2FieldValueCreator()} }`;
 }
 
-export function ProjectV2ItemFieldRepositoryValue () {
-    return `
- __typename
- field ${field}
- repository {
-   ${repositoryRef()}
- }
-`;
+export function projectV2ItemFieldTextValue () {
+    return `__typename
+id
+text
+createdAt
+updatedAt
+field { ${projectV2FieldValueField()} }
+creator { ${projectV2FieldValueCreator()} }`;
 }
 
-export function ProjectV2ItemFieldReviewerValue () {
-    return `
- __typename
- field ${field}
- reviewers(first: 10) {
-   nodes {
-     ... on User { ${userRef()} }
-     ... on Team { ${teamRef()} }
-     ... on Mannequin { ${mannequinRef()} }
-     ... on Bot { ${botRef()} }
-   }
- }
-`;
-}
-
-export function ProjectV2ItemFieldSingleSelectValue () {
-    return `
- __typename
- id
- name
- nameHTML
- optionId
- createdAt
- updatedAt
- field ${field}
- creator ${projectV2FieldValue_Creator()}
-
-`;
-}
-
-export function ProjectV2ItemFieldTextValue () {
-    return `
- __typename
- id
- text
- createdAt
- updatedAt
- field ${field}
- creator ${projectV2FieldValue_Creator()}
-`;
-}
-
-export function ProjectV2ItemFieldUserValue () {
-    return `
- __typename
- field ${field}
- users(first: 10) {
-   nodes {
-     ${user()}
-   }
- }
-`;
+export function projectV2ItemFieldUserValue () {
+    return `__typename
+field { ${projectV2FieldValueField()} }
+users(first: 10) {
+  nodes {
+    ${user()}
+  }
+}`;
 }
 
 export function projectV2ItemContentDraftIssue () {
-    return `
-{
-  ${draftIssue()}
-}`;
+    return draftIssue();
 }
 
 export function projectV2ItemContentIssue () {
-    return `
- {
-   ${issueRef()}
-   repository {
-     ${repositories()}
-   }
- }`;
-}
-
-export function projectV2ItemContentPullRequest () {
-    return `
-{
-  ${pullRequestRef()}
+    return `${issueRef()}
+repository {
+  ${repositories()}
 }`;
 }
 
-export function projectV2ItemFieldValues (MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM) {
-    return `
- fieldValues(first: ${MAX_FIELD_NUM}) {
-   nodes {
-     ... on ProjectV2ItemFieldDateValue {
-       ${ProjectV2ItemFieldDateValue()}
-     }
-     ... on ProjectV2ItemFieldIterationValue {
-       ${ProjectV2ItemFieldIterationValue()}
-     }
-     ... on ProjectV2ItemFieldLabelValue {
-       ${ProjectV2ItemFieldLabelValue(MAX_LABEL_NUM)}
-     }
-     ... on ProjectV2ItemFieldMilestoneValue {
-       ${ProjectV2ItemFieldMilestoneValue()}
-     }
-     ... on ProjectV2ItemFieldNumberValue {
-       ${ProjectV2ItemFieldNumberValue()}
-     }
-     ... on ProjectV2ItemFieldPullRequestValue {
-       ${ProjectV2ItemFieldPullRequestValue(MAX_PR_NUM)}
-     }
-     ... on ProjectV2ItemFieldRepositoryValue {
-       ${ProjectV2ItemFieldRepositoryValue()}
-     }
-     ... on ProjectV2ItemFieldReviewerValue {
-       ${ProjectV2ItemFieldReviewerValue()}
-     }
-     ... on ProjectV2ItemFieldSingleSelectValue {
-       ${ProjectV2ItemFieldSingleSelectValue()}
-     }
-     ... on ProjectV2ItemFieldTextValue {
-       ${ProjectV2ItemFieldTextValue()}
-     }
-     ... on ProjectV2ItemFieldUserValue {
-       ${ProjectV2ItemFieldUserValue()}
-     }
-   }
- }
-`;
+// PullRequest の state は、別名 pullRequestState で取る。(pullRequestRef を見る)
+export function projectV2ItemContentPullRequest () {
+    return pullRequestRef('pullRequestState: state');
 }
 
-export function projectV2Items (MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM) {
-    return `
- edges {
-   node {
+// ProjectV2Item の content。(Issue・PullRequest・DraftIssue のどれか)
+export function projectV2ItemContent () {
+    return `content {
+  ... on DraftIssue { ${projectV2ItemContentDraftIssue()} }
+  ... on Issue { ${projectV2ItemContentIssue()} }
+  ... on PullRequest { ${projectV2ItemContentPullRequest()} }
+}`;
+}
 
-     ${ProjectV2Item()}
+export function projectV2ItemFieldValues () {
+    return `fieldValues(first: ${NESTED_LIMIT}) {
+  nodes {
+    ... on ProjectV2ItemFieldDateValue { ${projectV2ItemFieldDateValue()} }
+    ... on ProjectV2ItemFieldIterationValue { ${projectV2ItemFieldIterationValue()} }
+    ... on ProjectV2ItemFieldLabelValue { ${projectV2ItemFieldLabelValue()} }
+    ... on ProjectV2ItemFieldMilestoneValue { ${projectV2ItemFieldMilestoneValue()} }
+    ... on ProjectV2ItemFieldNumberValue { ${projectV2ItemFieldNumberValue()} }
+    ... on ProjectV2ItemFieldPullRequestValue { ${projectV2ItemFieldPullRequestValue()} }
+    ... on ProjectV2ItemFieldRepositoryValue { ${projectV2ItemFieldRepositoryValue()} }
+    ... on ProjectV2ItemFieldReviewerValue { ${projectV2ItemFieldReviewerValue()} }
+    ... on ProjectV2ItemFieldSingleSelectValue { ${projectV2ItemFieldSingleSelectValue()} }
+    ... on ProjectV2ItemFieldTextValue { ${projectV2ItemFieldTextValue()} }
+    ... on ProjectV2ItemFieldUserValue { ${projectV2ItemFieldUserValue()} }
+  }
+}`;
+}
 
-     ${projectV2ItemProject()}
+// ProjectV2Item の全部の組。(項目と、project・fieldValues・creator・content)
+export function projectV2ItemNode () {
+    return `${projectV2Item()}
+${projectV2ItemProject()}
+${projectV2ItemFieldValues()}
+creator { ${projectV2FieldValueCreator()} }
+${projectV2ItemContent()}`;
+}
 
-     ${projectV2ItemFieldValues(MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM)}
-
-     creator ${projectV2FieldValue_Creator()}
-
-     content {
-       ... on DraftIssue  ${projectV2ItemContentDraftIssue()}
-       ... on Issue       ${projectV2ItemContentIssue()}
-       ... on PullRequest ${projectV2ItemContentPullRequest()}
-     }
-   }
- }
-`;
+// ProjectV2 の items の中身。(edges の形)
+export function projectV2Items () {
+    return `edges {
+  node {
+    ${projectV2ItemNode()}
+  }
+}`;
 }
