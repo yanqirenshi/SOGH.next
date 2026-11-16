@@ -7,7 +7,7 @@ ProjectV2 の Item の表で、Item の content が無いときに落ちる場�
 入口からモデルを export し、モデルの型の名前を返す `typename()` を足しました。
 PullRequest の `repository()`・`author()` も、モデルを返すようにしました。
 Issue を取り直したときに、プロジェクトへの出し入れと、Item のフィールドの値の変更が、反映されない場合があったのを、直しました。
-(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#38・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45・yanqirenshi/SOGH.next#49・yanqirenshi/SOGH.next#51・yanqirenshi/SOGH.next#54)
+(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#38・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45・yanqirenshi/SOGH.next#49・yanqirenshi/SOGH.next#51・yanqirenshi/SOGH.next#54・yanqirenshi/SOGH.next#59・yanqirenshi/SOGH.next#60)
 
 ### 直したもの
 
@@ -31,6 +31,14 @@ Issue を取り直したときに、プロジェクトへの出し入れと、It
   - Issue の `projectItems` だけは、日時が同じときも、来た値と手元の値の中身を比べて、違えば重ねるようにした。(ほかのモデル・ほかの項目の重ね方は、変わらない)
   - GraphQLNode の `merge(node)` は、このときに `'refreshed'` を返す。モデルごとに、この扱いをする項目を `sameTimeKeys()` で指定する。(Issue は `projectItems`)
   - 0.4.0 (node を重ねるようにした版) からあった不具合です。
+- Issue の `fieldValues()`・`getFieldValueByName(name)`・`dueDate()`・`nextActionDate()` が、`projectItems` を取っていない Issue (`asyncFetchIssueByID()` などで取ったもの) で、TypeError で落ちていた。(#59)
+  - `projectItems` が無いとき・プロジェクトに入っていないとき・Item に `fieldValues` が無いときは、`fieldValues()` は空の配列を、ほかの 3 つは null を返すようにした。
+  - `fieldValueContents(name)` も、Item に `fieldValues` が無いときに、落ちずに null を返すようにした。
+  - フィールドの値に、`field` の無いもの (null など) が混ざっていても、落ちない。
+  - 0.3.0 からあった不具合です。
+- Issue の部品 (`PanelIssue`) の再取得のボタンが、`actions.issue.refresh` の 1 つめの引数に、Issue の id の値ではなく、メソッド (`issue.id`) そのものを渡していた。(#60)
+  - id の値 (`issue.id()`) を渡すようにした。
+  - 0.3.0 からあった不具合です。
 
 ### 変わった動き
 

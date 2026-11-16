@@ -6374,7 +6374,8 @@
                     "value の形は、フィールドの型 (dataType) で変わる。(ASSIGNEES は { users }、REPOSITORY は { repository }、LABELS は { labels }、TITLE は { text }、SINGLE_SELECT は { optionId }、DATE は { date })",
                     "それ以外の型 (TEXT・NUMBER など) のフィールドのときは、Error を投げる。",
                     "アイテムが無いとき、名前が name のフィールドの値が無いときは null。",
-                    "projectItems を取得していないときも、null。"
+                    "projectItems を取得していないときも、null。",
+                    "アイテムに fieldValues が無いとき、field の無い値が混ざっているときも、落ちずに null か、名前の合う値を返す。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)"
                 ],
                 "examples": [
                     "const contents = issue.fieldValueContents('Due.Date');",
@@ -6401,7 +6402,7 @@
                     "最初の ProjectV2 のアイテムの、フィールドの値のノード (fieldValues.nodes) を返す。",
                     "フィールドの値は、モデルにしない。(JSON のまま)",
                     "アイテムが無いときは []。",
-                    "projectItems を取得していないときは、エラーになる。"
+                    "projectItems を取得していないとき (issue_by_id・issues_by_viwer など)・アイテムに fieldValues が無いときも、[]。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)"
                 ],
                 "examples": [
                     "issue.fieldValues().map(field_value=> field_value.field.name);",
@@ -6435,7 +6436,8 @@
                     "fieldValues() から、フィールドの名前が name の値のノードを探して返す。",
                     "返す値は、モデルではなく JSON のまま。",
                     "見つからないとき、name が空のときは null。",
-                    "projectItems を取得していないときは、エラーになる。(name が空のときを除く)"
+                    "projectItems を取得していないときも、null。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)",
+                    "field の無い値 (null のノードなど) が混ざっていても、読み飛ばす。"
                 ],
                 "examples": [
                     "issue.getFieldValueByName('Due.Date').date;",
@@ -6471,7 +6473,7 @@
                     "本文の $Date.Due ではない。(本文の値は _due_date に入るが、それを返すメソッドは無い)",
                     "フィールドの値が無いときは null。",
                     "引数 v は使わない。(値は変えられない)",
-                    "projectItems を取得していないときは、エラーになる。"
+                    "projectItems を取得していないときも、null。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)"
                 ],
                 "examples": [
                     "issue.dueDate();",
@@ -6507,7 +6509,7 @@
                     "本文の $Date.Next ではない。(本文の値は _date_next_action に入るが、それを返すメソッドは無い)",
                     "フィールドの値が無いときは null。",
                     "引数 v は使わない。(値は変えられない)",
-                    "projectItems を取得していないときは、エラーになる。"
+                    "projectItems を取得していないときも、null。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)"
                 ],
                 "examples": [
                     "issue.nextActionDate();",

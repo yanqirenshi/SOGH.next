@@ -132,6 +132,99 @@ test('Issue の fieldValueContents() は、JSON のまま返す', ()=> {
     assert.equal(plain.fieldValueContents('NextAction.Date'), null);
 });
 
+/* ****************************************************************
+ * Issue の、projectItems の JSON を直に読むメソッド (yanqirenshi/SOGH.next#59)
+ * **************************************************************** */
+
+// 4 つのメソッドが、落ちずに、空の配列か null を返すことを確かめる。
+function assertEmptyFields (issue, label) {
+    assert.deepEqual(issue.fieldValues(), [], label);
+    assert.equal(issue.getFieldValueByName('Due.Date'), null, label);
+    assert.equal(issue.dueDate(), null, label);
+    assert.equal(issue.nextActionDate(), null, label);
+    assert.equal(issue.fieldValueContents('Due.Date'), null, label);
+}
+
+test('projectItems を取っていない Issue (issue_by_id・issues_by_viwer の形) では、落ちずに [] か null を返す', ()=> {
+    const sogh = new Sogh();
+
+    // issue_by_id・issues_by_viwer は、projectItems を取らない。
+    const issue = sogh.node2issue({
+        __typename: 'Issue', id: 'I_1', number: 1, title: 't', updatedAt: T1,
+        assignees: { nodes: [] }, labels: { nodes: [] },
+    });
+
+    assertEmptyFields(issue, 'projectItems が無い');
+});
+
+test('プロジェクトに入っていない Issue (projectItems の edges が空) では、落ちずに [] か null を返す', ()=> {
+    const sogh = new Sogh();
+
+    const issue = sogh.node2issue({ __typename: 'Issue', id: 'I_1', updatedAt: T1, projectItems: { edges: [] } });
+
+    assertEmptyFields(issue, 'edges が空');
+});
+
+test('projectItems の形が欠けていても、落ちずに [] か null を返す', ()=> {
+    const cases = [
+        ['projectItems が null',         null],
+        ['edges が無い',                 {}],
+        ['最初の edge の node が無い',   { edges: [{}] }],
+        ['Item に fieldValues が無い',   { edges: [{ node: { __typename: 'ProjectV2Item', id: 'PVTI_1', updatedAt: T1 } }] }],
+        ['fieldValues の nodes が無い',  { edges: [{ node: { __typename: 'ProjectV2Item', id: 'PVTI_2', updatedAt: T1, fieldValues: {} } }] }],
+    ];
+
+    cases.forEach(([label, project_items], i)=> {
+        const sogh = new Sogh();
+
+        const issue = sogh.node2issue({ __typename: 'Issue', id: `I_${i}`, updatedAt: T1, projectItems: project_items });
+
+        assertEmptyFields(issue, label);
+    });
+});
+
+test('fieldValues に field の無い値 (null の node・空の node) が混ざっていても、落ちずに、名前の合う値を返す', ()=> {
+    const sogh = new Sogh();
+
+    const issue = sogh.node2issue({
+        __typename: 'Issue', id: 'I_1', updatedAt: T1,
+        projectItems: {
+            edges: [{
+                node: {
+                    __typename: 'ProjectV2Item', id: 'PVTI_1', updatedAt: T1,
+                    fieldValues: {
+                        nodes: [
+                            null,
+                            {},
+                            { __typename: 'ProjectV2ItemFieldDateValue', date: '2026-12-01', field: { name: 'Due.Date', dataType: 'DATE' } },
+                        ],
+                    },
+                },
+            }],
+        },
+    });
+
+    assert.equal(issue.fieldValues().length, 3, 'nodes は、そのまま返す');
+    assert.equal(issue.dueDate(), '2026-12-01');
+    assert.equal(issue.nextActionDate(), null);
+    assert.equal(issue.getFieldValueByName('Status'), null);
+    assert.deepEqual(issue.fieldValueContents('Due.Date').value, { date: '2026-12-01' });
+    assert.equal(issue.fieldValueContents('Status'), null);
+});
+
+test('projectItems があるときは、これまでどおりの値を返す', ()=> {
+    const sogh = new Sogh();
+
+    const issue = sogh.node2issue(issueNode());
+
+    assert.equal(issue.fieldValues().length, 1);
+    assert.equal(issue.fieldValues()[0].date, '2026-11-20');
+    assert.equal(issue.getFieldValueByName('NextAction.Date').date, '2026-11-20');
+    assert.equal(issue.nextActionDate(), '2026-11-20');
+    assert.equal(issue.dueDate(), null);
+    assert.equal(issue.fieldValueContents('NextAction.Date').item.id, 'PVTI_1');
+});
+
 test('Issue の issueData2requestData() は、モデルの id も読める', ()=> {
     const sogh = new Sogh();
 

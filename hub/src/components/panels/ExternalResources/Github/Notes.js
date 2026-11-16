@@ -14,27 +14,12 @@ export default function Notes () {
 
           <Section title="動きが食い違っているもの" num="6.1" lev="5">
             <OL>
-              <LI>Issue の <C>dueDate()</C>・<C>nextActionDate()</C>・<C>fieldValues()</C> は、取り方によって TypeError になる。
-                <UL>
-                  <LI>これらは、core に projectItems があることを前提にしている。</LI>
-                  <LI>projectItems を取るクエリは、<C>issue_by_org_repo_issue_number</C> と <C>search_issues</C> だけ。</LI>
-                  <LI><C>issue_by_id</C> と <C>issues_by_viwer</C> は、projectItems を取らない。</LI>
-                  <LI><C>fieldItem()</C>・<C>project()</C>・<C>projectV2Items()</C> は、projectItems が無ければ、null か空の配列を返す。同じクラスの中で、扱いがそろっていない。</LI>
-                  <LI><C>fieldItem()</C> と <C>project()</C> は、0.4.0 で、TypeError にならないように直った。</LI>
-                </UL>
-              </LI>
               <LI>親の updatedAt が動かない変更は、取り直しても、反映されない場合があった。(0.4.2 で直した)
                 <UL>
                   <LI>Pool は、同じ id の node が来ると、updatedAt を比べて、重ねるかどうかを決めるため。</LI>
                   <LI>GitHub で調べると、動かないのは、Issue をプロジェクトに足す・外す、の 1 種類だけだった。(Issue の projectItems。Item の Status を変えたときも、Issue の updatedAt は動かない)</LI>
                   <LI>0.4.2 で、Issue の projectItems だけは、日時が同じときも、中身が違えば重ねるようにした。(Issue 51。くわしくは「7.5 (1) updatedAt が動かない変更」を見る)</LI>
                   <LI>項目の少ない node が先に来て、古い項目が残る場合は、0.4.1 で直した。(Issue 34)</LI>
-                </UL>
-              </LI>
-              <LI>Issue の部品の、再取得のボタンが、id の値ではなく、メソッドそのものを渡している。
-                <UL>
-                  <LI><C>src/components/Issue/Operators.js</C> が、<C>issue.id()</C> ではなく、<C>issue.id</C> を渡している。</LI>
-                  <LI>関連をモデルにする前から、ある。</LI>
                 </UL>
               </LI>
               <LI>失敗したときの戻り値が、メソッドごとに違う。
