@@ -776,49 +776,79 @@ export default class Sogh extends Pooler {
     /////
     ///// ProjectV2 Item
     /////
+    // ProjectV2 の Item を、最後のページまで取る。(yanqirenshi/SOGH.next#64)
+    // 失敗したときは、エラーを返す。(途中まで集めた分は返さない)
     async asyncFetchProjectV2ItemsByUserLoginProjectV2Number (login, number) {
         const query = this.query('projectv2items_by_user_login_projectv2_number')
               .replace('@user-login', login)
               .replace('@projectv2-number', number);
 
-        const post_data = this.postData(query);
+        let out = [];
+        let loop = true, cursor = null;
 
-        // fetch
-        const response = await fetch(this.endpoint(), post_data)
-              .then(res  => this.text2json(res))
-              .then(res  => this.json2response(res, d=> {
-                  return d.data.user.projectV2.items.nodes;
-              }))
-              .catch(err => this.error2response(err));
+        while (loop) {
+            const query_pageing = this.makeQuery(query, cursor);
+            const post_data = this.postData(query_pageing);
 
-        // case of error
-        if ('error'===response.type)
-            return response.data;
+            // fetch
+            const response = await fetch(this.endpoint(), post_data)
+                  .then(res  => this.text2json(res))
+                  .then(res  => this.json2response(res, d=> {
+                      return d.data.user.projectV2.items;
+                  }))
+                  .catch(err => this.error2response(err));
 
-        // nodes 2 objs and pooling
-        return response.data.map(d=> this.node2projectV2Item(d).id());
+            // case of error
+            if ('error'===response.type)
+                return response.data;
+
+            // nodes 2 objs and pooling
+            out = out.concat(response.data.nodes.map(d=> this.node2projectV2Item(d).id()));
+
+            // paging
+            const page_info = response.data.pageInfo;
+            cursor = page_info.endCursor;
+            loop   = page_info.hasNextPage;
+        }
+
+        return out;
     }
+    // ProjectV2 の Item を、最後のページまで取る。(yanqirenshi/SOGH.next#64)
+    // 失敗したときは、エラーを返す。(途中まで集めた分は返さない)
     async asyncFetchProjectV2ItemsByOrgLoginProjectV2Number (login, number) {
         const query = this.query('projectv2items_by_org_login_projectv2_number')
               .replace('@user-login', login)
               .replace('@projectv2-number', number);
 
-        const post_data = this.postData(query);
+        let out = [];
+        let loop = true, cursor = null;
 
-        // fetch
-        const response = await fetch(this.endpoint(), post_data)
-              .then(res  => this.text2json(res))
-              .then(res  => this.json2response(res, d=> {
-                  return d.data.organization.projectV2.items.nodes;
-              }))
-              .catch(err => this.error2response(err));
+        while (loop) {
+            const query_pageing = this.makeQuery(query, cursor);
+            const post_data = this.postData(query_pageing);
 
-        // case of error
-        if ('error'===response.type)
-            return response.data;
+            // fetch
+            const response = await fetch(this.endpoint(), post_data)
+                  .then(res  => this.text2json(res))
+                  .then(res  => this.json2response(res, d=> {
+                      return d.data.organization.projectV2.items;
+                  }))
+                  .catch(err => this.error2response(err));
 
-        // nodes 2 objs and pooling
-        return response.data.map(d=> this.node2projectV2Item(d).id());
+            // case of error
+            if ('error'===response.type)
+                return response.data;
+
+            // nodes 2 objs and pooling
+            out = out.concat(response.data.nodes.map(d=> this.node2projectV2Item(d).id()));
+
+            // paging
+            const page_info = response.data.pageInfo;
+            cursor = page_info.endCursor;
+            loop   = page_info.hasNextPage;
+        }
+
+        return out;
     }
     async asyncFetchProjectV2ItemByID (id) {
         const query = this.query('projectv2item_by_id')

@@ -27,6 +27,9 @@ const query = `{
             ... on PullRequest ${attr.projectV2ItemContentPullRequest()}
           }
         }
+        pageInfo {
+          ${attr.page_info()}
+        }
       }
     }
   }
