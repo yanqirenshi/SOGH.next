@@ -299,11 +299,14 @@ test('Item の表の map で作る要素には、key が付いている (担当�
 
     assert.deepEqual(labelBoxes.map(b=> b.props.key), ['L_1']);
 
-    // ソースの中の map が、どれも key を付けていること。(Item の表と、一覧の表)
+    // ソースの中の、要素を作る map ({…map(…)} の形) が、どれも key を付けていること。(Item の表と、一覧の表)
+    // (値だけを作る map は、数えない。例: Table.js の makeHeaderRows の中の map)
     for (const file of ['projectsV2/TableTasks.js', 'projectsV2/Table.js', 'projectsV2/TableBodyRowProject.js']) {
         const src = fs.readFileSync(new URL(file, SRC), 'utf8');
 
-        const maps = src.split('.map(').length - 1;
+        const maps = (src.match(/\{\s*[\w.()]+\.map\(/g) || []).length;
+
+        assert.ok(maps > 0, `${file}: 要素を作る map が見つからない`);
         const keys = (src.match(/\bkey=\{/g) || []).length;
 
         assert.ok(keys >= maps, `${file}: map ${maps} 個・key ${keys} 個`);
@@ -486,11 +489,66 @@ test('既定に無い名前 (組も、組の中の名前も) は、そのまま�
         const project = makeProject(sogh);
 
         let seen = null;
-        // group を付ける。(group の付いた列が 1 つも無いと、表の見出しを作る所 (makeHeaderRows) が落ちる。前からの動き)
-        const columns = [{ code: 'probe', group: 'G', label: 'Probe', sx: null, val: (column, p, actions)=> { seen = actions; return null; } }];
+        // group の無い列だけ。(前は、見出しを作る所 (makeHeaderRows) が落ちたので group を付けていた。yanqirenshi/SOGH.next#105 で直した)
+        const columns = [{ code: 'probe', label: 'Probe', sx: null, val: (_column, _p, actions)=> { seen = actions; return null; } }];
 
         draw(ReactStub.default.createElement(ProjectsV2, { data: [project], sogh, columns, actions: given }));
 
         check(seen);
     }
+});
+
+/* ****************************************************************
+ * 見出し (yanqirenshi/SOGH.next#105)
+ * **************************************************************** */
+
+// 表の見出し (TableHead) の行ごとの、セルの [文字, rowSpan, colSpan]。
+function headRows (tree) {
+    const head = walk(tree).find(n=> n.type === 'TableHead');
+
+    return head.children.flat().filter(n=> n && n.type === 'TableRow').map(row=> {
+        return row.children.flat().filter(n=> n && n.type === 'Cell').map(c=> [text(c), c.props.rowSpan, c.props.colSpan]);
+    });
+}
+
+const plainColumn = (code, label, group)=> ({ code, label, group, sx: null, val: ()=> code });
+
+test('グループの無い列だけでも、表は落ちずに、見出しを 1 行で描く', ()=> {
+    ReactStub.__clear();
+
+    const sogh = new Sogh();
+    const project = makeProject(sogh);
+
+    const columns = [plainColumn('a', 'A'), plainColumn('b', 'B')];
+
+    const tree = draw(ReactStub.default.createElement(ProjectsV2, { data: [project], sogh, columns }));
+
+    assert.deepEqual(headRows(tree), [[['A', 1, 1], ['B', 1, 1]]]);
+});
+
+test('最後の列がグループの中でも、表は、そのグループを見出しに描く', ()=> {
+    ReactStub.__clear();
+
+    const sogh = new Sogh();
+    const project = makeProject(sogh);
+
+    const columns = [plainColumn('a', 'A'), plainColumn('p.s', 'Start', 'Plan'), plainColumn('p.e', 'End', 'Plan')];
+
+    const tree = draw(ReactStub.default.createElement(ProjectsV2, { data: [project], sogh, columns }));
+
+    assert.deepEqual(headRows(tree), [
+        [['A', 2, 1], ['Plan', 1, 2]],
+        [['Start', 1, 1], ['End', 1, 1]],
+    ]);
+});
+
+test('列が 0 個でも、表は落ちない (見出しの行は無い)', ()=> {
+    ReactStub.__clear();
+
+    const sogh = new Sogh();
+    const project = makeProject(sogh);
+
+    const tree = draw(ReactStub.default.createElement(ProjectsV2, { data: [project], sogh, columns: [] }));
+
+    assert.deepEqual(headRows(tree), []);
 });

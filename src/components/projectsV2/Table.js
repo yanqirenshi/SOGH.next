@@ -84,6 +84,10 @@ function notifyTasksOpen (actions, project_id) {
         tasks.open(project_id);
 }
 
+// 見出しの行の配列を返す。([行, …]。行は [{ label, row_span, col_span }, …])
+//   - グループ (group) の付いた列があるときは、2 行。(1 行目: グループと、グループの無い列。2 行目: グループの中の列)
+//   - グループの付いた列が無いときは、1 行。(yanqirenshi/SOGH.next#105)
+//   - 列が 0 個のときは、行も 0 個。
 function makeHeaderRows (columns) {
     const tmp = columns.reduce((out, column)=> {
         const group = column.group || null;
@@ -119,8 +123,16 @@ function makeHeaderRows (columns) {
         list: [],
     });
 
+    // 最後の列がグループの中にあるときは、そのグループが残っているので、足す。(yanqirenshi/SOGH.next#105)
+    if (tmp.group)
+        tmp.list.push(tmp.group);
+
+    if (tmp.list.length===0)
+        return [];
+
+    // グループの付いた列が無いときは、行を 1 つ返す。(前は、列の配列をそのまま返していて、表が落ちた。yanqirenshi/SOGH.next#105)
     if (!tmp.is_double_row)
-        return tmp.list;
+        return [tmp.list.map(column=> ({ label: column.label, row_span: 1, col_span: 1 }))];
 
     return tmp.list.reduce((out, data)=> {
         if ('group'===data.__type) {
