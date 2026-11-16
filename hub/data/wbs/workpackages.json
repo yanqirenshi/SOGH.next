@@ -112,13 +112,6 @@
         "type": "classes"
     },
     {
-        "id": 1000017,
-        "parent": 1030,
-        "name": "Relationship",
-        "description": "src/js/models/Relationship.js (extends GraphQLNode)",
-        "type": "classes"
-    },
-    {
         "id": 1000018,
         "parent": 1030,
         "name": "Repository",
