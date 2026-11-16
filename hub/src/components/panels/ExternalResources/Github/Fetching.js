@@ -144,6 +144,15 @@ const UPDATED_AT_COMMAND = [
     'npm run check:updated-at -- --reset',
 ].join('\n');
 
+// パッケージに入るファイルを確かめるコマンド。
+const PACK_COMMAND = [
+    '# 先にビルドする (dist/ を空にしてから作る)',
+    'npm run transpile',
+    '',
+    '# パッケージに入るファイルを確かめる (パッケージは作らない)',
+    'npm run check:pack',
+].join('\n');
+
 // GitHub につないで確かめた結果。(2026-11-15)
 const LIVE_COLUMNS = [
     { code: 'kind',    label: '結果',   key: 'kind' },
@@ -450,6 +459,24 @@ export default function Fetching () {
                 </UL>
               </LI>
               <LI>スクリプトは、<C>scripts/check-updated-at.mjs</C>。比べる部分は <C>scripts/updated-at.mjs</C> にあり、テストで、にせのスナップショットを使って確かめている。</LI>
+            </OL>
+          </Section>
+
+          <Section title="パッケージに入るファイルを確かめる" num="3.10" lev="5">
+            <P>npm に公開するパッケージに、入れるつもりの無いファイルが入っていないかを確かめるスクリプトです。(<C>yanqirenshi/SOGH.next#54</C>)</P>
+            <Plane sx={SX_PLANE}>{PACK_COMMAND}</Plane>
+            <OL>
+              <LI>パッケージに入れるものは、<C>package.json</C> の <C>files</C> に書いてある。(<C>dist</C> と <C>CHANGELOG.md</C>。<C>package.json</C>・<C>README.org</C>・<C>LICENSE</C> は、npm がいつも入れる)</LI>
+              <LI>確かめること。(どれかがあれば、失敗にする)
+                <UL>
+                  <LI>入ってよいもの (<C>dist/</C> の下・<C>package.json</C>・<C>README.org</C>・<C>LICENSE</C>・<C>CHANGELOG.md</C>) のほかが、入っている。</LI>
+                  <LI>名前に <C>.env</C> を含むファイルが、入っている。(<C>dist/</C> の下でも)</LI>
+                  <LI><C>dist/index.js</C> が、入っていない。(ビルドしていない)</LI>
+                </UL>
+              </LI>
+              <LI>いつ動くか: <C>npm publish</C> のとき、<C>prepublishOnly</C> が「ビルド → check:pack」の順に動かす。失敗したら、公開は止まる。</LI>
+              <LI><C>npm pack --dry-run --json</C> の結果を読むだけで、パッケージは作らず、ファイルの中身も読まない。表示するのは、入るファイルの数と、問題のあったファイルの名前だけ。</LI>
+              <LI>スクリプトは、<C>scripts/check-pack.mjs</C>。入ってよいかを決める部分は <C>scripts/pack-files.mjs</C> にあり、テストで、にせのファイルの一覧を使って確かめている。</LI>
             </OL>
           </Section>
 

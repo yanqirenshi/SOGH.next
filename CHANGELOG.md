@@ -6,7 +6,7 @@ ProjectV2 の Item の表で、Item の content が無いときに落ちる場�
 また、使われていなかったファイルを 20 個 (部品 19 個・モデル 1 個) 消しました。
 入口からモデルを export し、モデルの型の名前を返す `typename()` を足しました。
 PullRequest の `repository()`・`author()` も、モデルを返すようにしました。
-(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#38・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45・yanqirenshi/SOGH.next#49・yanqirenshi/SOGH.next#51)
+(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#38・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45・yanqirenshi/SOGH.next#49・yanqirenshi/SOGH.next#51・yanqirenshi/SOGH.next#54)
 
 ### 直したもの
 
@@ -20,6 +20,10 @@ PullRequest の `repository()`・`author()` も、モデルを返すようにし
 - `TableProjectV2Items` の Closed の列が、閉じた日を `年-日-分` の書式で出していた。(#42)
   - `年-月-日` (例: `2026-03-09`) で出すようにした。
   - 0.3.0 からあった不具合です。
+- npm のパッケージに、入れるつもりの無いファイルが入っていた。(#54)
+  - パッケージに入るファイルを、`dist/` (ビルドしたもの)・`CHANGELOG.md` と、npm がいつも入れる `package.json`・`README.org`・`LICENSE` だけにした。(`package.json` の `files` に書いた。`.npmignore` は消した)
+  - これまでは、`hub/`・`scripts/`・`test/` なども入っていた。
+  - ビルド (`npm run transpile`) の前に、`dist/` を空にするようにした。(消したファイルの、古いビルドが残らないように)
 
 ### 変わった動き
 
@@ -70,6 +74,7 @@ PullRequest の `repository()`・`author()` も、モデルを返すようにし
   - core に `__typename` が無いときは、null を返す。
   - 型が複数ある関連 (`issue.author()`・`item.content()`・`item.reviewers()` など) が返したモデルを、見分けるのに使う。`instanceof models.Bot` のように、クラスでも見分けられる。
 - 開発用のスクリプト `npm run check:updated-at` を足した。GitHub に実際につないで、Issue・ProjectV2Item・ProjectV2 の `updatedAt` が、どの変更で動くか (関連が変わったのに、動かない変更があるか) を確かめる。(#51。読むだけ。sogh の動きは変わらない)
+- 開発用のスクリプト `npm run check:pack` を足した。npm のパッケージに入るファイルを確かめ、入れるつもりの無いファイルがあれば、失敗にする。公開の前 (`prepublishOnly`) に、ビルドのあとで動く。(#54)
 
 ## 0.4.1
 
