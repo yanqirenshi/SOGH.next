@@ -116,7 +116,7 @@ export default class ProjectV2 extends GraphQLNode {
 
             switch (k) {
             case 'priority': this.priority(this.parseReadmeItem(readme, regex)); break;
-            case 'owner':    this.owner(this.parseReadmeItem(readme, regex));    break;
+            case 'owner':    this.readmeOwner(this.parseReadmeItem(readme, regex)); break;
             case 'type':     this.type(this.parseReadmeItem(readme, regex));     break;
             case 'release':  this.release(this.parseReadmeItem(readme, regex));  break;
             case 'plan':     this.parseReadmeItemPlan (readme, regex);           break;
@@ -155,17 +155,17 @@ export default class ProjectV2 extends GraphQLNode {
     public () {
         return this._core.public;
     }
-    // README の $Owner の値 (文字列)。GitHub の owner は ownerNode() で引く。
-    owner (v) {
+    // GitHub の owner のモデル。User・Organization・Issue・PullRequest のどれか。(取得していないときは null)
+    // Repository の owner() と同じ意味。(0.5.0 から。それまでは README の $Owner の値を返していた。yanqirenshi/SOGH.next#71)
+    owner () {
+        return this.relation(this._core.owner);
+    }
+    // README の $Owner の値 (文字列)。README に $Owner が無いときは null。(0.5.0 で owner() から名前を変えた。yanqirenshi/SOGH.next#71)
+    readmeOwner (v) {
         if (arguments.length===1)
             this._owner = v;
 
         return this._owner;
-    }
-    // GitHub の owner。User・Organization・Issue・PullRequest のどれか。
-    // (owner() は README の $Owner を返すので、別の名前にしてある)
-    ownerNode () {
-        return this.relation(this._core.owner);
     }
     // 人 (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか)。
     creator () {
@@ -198,12 +198,6 @@ export default class ProjectV2 extends GraphQLNode {
             label: 'なぞ',
             label_short: '謎',
         };
-    }
-    maneger (v) {
-        if (arguments.length===1)
-            this._owner = v;
-
-        return this._owner;
     }
     type (v) {
         if (arguments.length===1)

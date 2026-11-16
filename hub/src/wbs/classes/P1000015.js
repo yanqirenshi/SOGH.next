@@ -40,6 +40,8 @@ function Overview ({ data }) {
             <P>{"GraphQLNode を継承する。"}</P>
             <P>{"Sogh の node2projectV2Item(node) が作り、Pool に入れる。(asyncFetchProjectV2ItemByID(id) や、Matchmaker が ProjectV2 の items・Issue の projectItems を Pool に入れるときなど)"}</P>
             <P>{"node2projectV2Item(node) は、Pool に入れる前に、Matchmaker の projectV2Item(node) で、入れ子で来た project・content・creator と、フィールドの値の中の関連 (担当者・ラベル・マイルストーン・リポジトリ・Pull request・レビューする人) もモデルにして Pool に入れる。"}</P>
+            <P>{"content の PullRequest は、state を別名 pullRequestState で取る。node2projectV2Item(node) は、Pool に入れる前に、content の pullRequestState を state に戻したノードにする。(元のノードは変えない。0.5.0 から。yanqirenshi/SOGH.next#68)"}</P>
+            <P>{"そのため、core().content の PullRequest の state は、取り方によらず state の名前になる。(content() が返す PullRequest のモデルの core も、state)"}</P>
             <P>{"project()・content()・creator() と、関連のフィールドを読むメソッド (assignees()・labels()・milestone()・repository()・linkedPullRequests()・reviewers()) は、JSON の id で Pool からモデルを引いて返す。"}</P>
             <P>{"content() は Issue・PullRequest・DraftIssue のどれか、creator() は User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか、reviewers() の要素は User・Team・Mannequin・Bot のどれかのモデルになる。"}</P>
             <P>{"フィールドの値は、フィールドの名前で fieldValues() から探して読む。(getFieldValueByName(name))"}</P>

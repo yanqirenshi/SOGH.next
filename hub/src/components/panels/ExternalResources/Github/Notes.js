@@ -22,11 +22,12 @@ export default function Notes () {
                   <LI>項目の少ない node が先に来て、古い項目が残る場合は、0.4.1 で直した。(Issue 34)</LI>
                 </UL>
               </LI>
-              <LI>失敗したときの戻り値が、メソッドごとに違う。
+              <LI>失敗したときの戻り値が、メソッドごとに違っていた。(0.5.0 で直した)
                 <UL>
                   <LI>途中まで集めた配列を返すもの。(<C>asyncFetchRepositoriesByViewer</C> など)</LI>
                   <LI>Error をそのまま返すもの。(<C>asyncFetchIssueByID</C> など)</LI>
-                  <LI>呼ぶ側は、戻り値の型を見ないと、成功か失敗かを区別できない。</LI>
+                  <LI>呼ぶ側は、戻り値の型を見ないと、成功か失敗かを区別できなかった。</LI>
+                  <LI>0.5.0 で、asyncFetch〜 は、失敗したときに例外 <C>GitHubError</C> を投げるようにした。(Issue 61。「3.5 エラーの扱い」を見る)</LI>
                 </UL>
               </LI>
             </OL>
@@ -34,36 +35,38 @@ export default function Notes () {
 
           <Section title="決めたほうがよいもの" num="6.2" lev="5">
             <OL>
-              <LI>取得のクエリは、値を文字列の置き換えで埋め込んでいる。
+              <LI>取得のクエリは、値を文字列の置き換えで埋め込んでいた。(0.5.0 で直した)
                 <UL>
-                  <LI>値に <C>"</C> や改行が入ると、クエリが壊れる。</LI>
-                  <LI>更新は variables を使っているので、取得もそろえたい。</LI>
+                  <LI>値に <C>"</C> や改行が入ると、クエリが壊れた。</LI>
+                  <LI>0.5.0 で、取得も、更新と同じく variables で渡すようにした。(Issue 63。「3.1 クエリの作り方」を見る)</LI>
                 </UL>
               </LI>
-              <LI>クエリと、応答の取り出し (<C>d.data.node.comments</C> など) が、別の場所にある。
+              <LI>クエリと、応答の取り出し (<C>d.data.node.comments</C> など) が、別の場所にあった。(0.5.0 で直した)
                 <UL>
-                  <LI>片方を変えると、もう片方も直すことになる。</LI>
+                  <LI>片方を変えると、もう片方も直すことになった。</LI>
+                  <LI>0.5.0 で、クエリのファイルが、応答から取り出す関数 <C>pick</C> も持つようにした。(Issue 65)</LI>
                 </UL>
               </LI>
-              <LI>値の印の置き換えは、最初の 1 か所だけ。(同じ印を、1 つのクエリで 2 回使えない)</LI>
-              <LI>projectCards (Projects classic) を取るクエリは、いまの GitHub では動かない。
+              <LI>値の印の置き換えは、最初の 1 か所だけだった。(同じ印を、1 つのクエリで 2 回使えなかった。0.5.0 で、variables にして、値の印は無くなった)</LI>
+              <LI>ProjectV2Item の content で、Issue の state と PullRequest の state を、同じ場所で取っていた。(5 個のクエリ。0.5.0 で直した)
                 <UL>
-                  <LI>GitHub がエラーを返し、Issue が丸ごと取れない。(projectCards だけが抜けるのではない)</LI>
-                  <LI>使用中のクエリからは、外してある。(<C>issue_by_id</C> は、GitHub に送って確かめたときに見つけて、外した)</LI>
-                  <LI>使われていないクエリには、残っている。(9 個)</LI>
+                  <LI>型が違う (IssueState と PullRequestState) ので、GraphQL の決まりでは正しくなかった。</LI>
+                  <LI>0.5.0 で、PullRequest の state を、別名 <C>pullRequestState</C> で取るようにした。(Issue 68)</LI>
+                  <LI>Pool に入れる前に、<C>node2pullRequest(node)</C> が state に戻すので、PullRequest のモデルの core は、state のまま。</LI>
+                  <LI>ProjectV2Item の core に残る content の JSON も、Pool に入れる前に <C>node2projectV2Item(node)</C> が state に戻す。</LI>
                 </UL>
               </LI>
-              <LI>ProjectV2Item の content で、Issue の state と PullRequest の state を、同じ場所で取っている。(7 個のクエリ)
+              <LI>Pool に、消す操作と期限が無かった。(取り直しは、重ねるだけ。0.5.0 で直した)
                 <UL>
-                  <LI>型が違う (IssueState と PullRequestState) ので、GraphQL の決まりでは正しくない。</LI>
-                  <LI>直すには、別名を付けることになり、応答の形が変わる。(<C>content.state</C> で読んでいる利用側が壊れる)</LI>
+                  <LI>0.5.0 で、Pool に <C>remove(id)</C> と <C>clear()</C> を足した。(Issue 69)</LI>
+                  <LI><C>deleteIssueComment</C> は、GitHub で消せたら、<C>issue-comment</C> の Pool からも消す。(<C>successed</C> を呼ぶ前に)</LI>
+                  <LI>期限は、付けていない。</LI>
                 </UL>
               </LI>
-              <LI>Pool に、消す操作と期限が無い。(取り直しは、重ねるだけ)</LI>
-              <LI>個人用アクセストークンを、REACT_APP_ の環境変数で渡している。
+              <LI>個人用アクセストークンを、REACT_APP_ の環境変数で渡している。(0.5.0 で、このままにすると決めた)
                 <UL>
                   <LI>ビルドした JS に埋め込まれる。</LI>
-                  <LI>公開するビルドには含めない、という使い方が前提になる。</LI>
+                  <LI>ビルドは、自分の PC のほかには置かない。(<C>hub/.env.local.template</C> にも書いた。Issue 70)</LI>
                 </UL>
               </LI>
             </OL>
@@ -71,17 +74,26 @@ export default function Notes () {
 
           <Section title="小さな不ぞろい" num="6.3" lev="5">
             <OL>
-              <LI>ProjectV2 の <C>owner()</C> は、GitHub の owner ではなく、README の <C>$Owner</C> の値を返す。(GitHub の owner は、<C>ownerNode()</C>)</LI>
+              <LI>ProjectV2 の <C>owner()</C> は、GitHub の owner ではなく、README の <C>$Owner</C> の値を返していた。(0.5.0 で直した)
+                <UL>
+                  <LI>0.5.0 で、<C>owner()</C> は、GitHub の owner のモデルを返すようにした。(Repository の <C>owner()</C> と同じ意味。Issue 71)</LI>
+                  <LI>README の <C>$Owner</C> の値は、<C>readmeOwner()</C> で読む。GitHub の owner を読んでいた <C>ownerNode()</C> は、消した。</LI>
+                </UL>
+              </LI>
               <LI>環境変数の名前が <C>REACT_APP_GITHU_PARSONAL_TOKEN</C>。(GITHU・PARSONAL のつづり)</LI>
-              <LI>クエリの名前に <C>viwer</C> がある。(<C>viwer</C>・<C>issues_by_viwer</C>)</LI>
-              <LI>項目の部品の名前の付け方が、3 通りある。(<C>issue_comment</C>・<C>projectv2Fields</C>・<C>ProjectV2ItemFieldDateValue</C>)</LI>
-              <LI>項目の部品が返す形が、2 通りある。(項目だけを返すものと、{'{ }'} で囲んで返すもの)</LI>
-              <LI>使われていないクエリには、項目を、部品を使わずに直に書いているものが残っている。</LI>
-              <LI>入れ子の件数の上限が、クエリごとに違う。(20 と 30。定数を宣言しているが、使っていないクエリもある)</LI>
-              <LI>組織 (org) のクエリでも、値の印の名前が <C>@user-login</C> になっている。</LI>
-              <LI>Sogh のメソッドから使われていないクエリが、18 個ある。(「3.6 クエリの使われ方」を見る)</LI>
-              <LI><C>fetchX</C> は、エンドポイントを直に書いている。(<C>endpoint()</C> を使っていない)</LI>
-              <LI>src/js/models/README.markdown が、古い。</LI>
+              <LI>クエリの名前に <C>viwer</C> があった。(0.5.0 で、<C>viewer</C>・<C>issues_by_viewer</C> に直した。Issue 73)</LI>
+              <LI>項目の部品の名前の付け方が、3 通りあった。(下線でつなぐもの・小文字で始まるもの・大文字で始まるもの。0.5.0 で、小文字で始まり途中が大文字、にそろえた。Issue 74)</LI>
+              <LI>項目の部品が返す形が、2 通りあった。(項目だけを返すものと、{'{ }'} で囲んで返すもの。0.5.0 で、項目だけを返す形にそろえた。Issue 74)</LI>
+              <LI>入れ子の件数の上限が、クエリごとに違っていた。(0.5.0 で直した)
+                <UL>
+                  <LI>ProjectV2Item の fieldValues は、20 件まで (<C>projectsv2_with_items_by_team</C>・<C>projectv2_by_org_login_projectv2_number</C>) と、30 件まで (<C>projectv2item_by_id</C>・<C>projectv2items_by_org_login_projectv2_number</C>・<C>projectv2items_by_user_login_projectv2_number</C>・<C>issue_by_org_repo_issue_number</C>) だった。</LI>
+                  <LI>上限は、クエリごとの定数か、直に書いた数で決めていた。</LI>
+                  <LI>0.5.0 で、<C>attributes.js</C> の <C>NESTED_LIMIT</C> (30) の 1 か所で決めるようにした。クエリごとの定数は、消した。(Issue 75)</LI>
+                </UL>
+              </LI>
+              <LI>組織 (org) のクエリでも、値の印の名前が、ユーザーの login の印になっていた。(0.5.0 で、値の印は無くなった。組織のクエリの変数は <C>$org</C>)</LI>
+              <LI><C>fetchX</C> は、エンドポイントを直に書いていた。(<C>endpoint()</C> を使っていなかった。0.5.0 で、<C>endpoint()</C> に送るようにした。Issue 76)</LI>
+              <LI>src/js/README.md と src/js/models/README.markdown が、古かった。(0.5.0 で、どちらも消した。Issue 77)</LI>
             </OL>
             <P>どれから手を付けるかは、まだ決めていません。</P>
           </Section>

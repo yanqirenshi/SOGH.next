@@ -105,7 +105,7 @@ const COLUMNS = [
         sx: {whiteSpace: 'nowrap'},
         val: (column, project, actions)=> {
             return (
-                project.maneger()
+                project.readmeOwner()
             );
         },
     },

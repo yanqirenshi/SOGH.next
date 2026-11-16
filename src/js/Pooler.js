@@ -123,8 +123,12 @@ export default class Pooler extends Loader {
     /* **************************************************************** *
      *  ProjectNext Item                                                *
      * **************************************************************** */
+    // content の PullRequest は、state を別名 pullRequestState で取っている。(yanqirenshi/SOGH.next#68)
+    // Pool に入れる前に、state の名前に戻す。(Item の core に残る content も、取り方で変わらないように)
     node2projectV2Item (node) {
         const pool = this.pool('project-v2-item');
+
+        node = restoreContentPullRequestState(node);
 
         this.matchmaker.projectV2Item(node);
 
@@ -175,8 +179,13 @@ export default class Pooler extends Loader {
     /* **************************************************************** *
      *  Issue                                                           *
      * **************************************************************** */
+    // ProjectV2Item の content として来た PullRequest は、state を別名 pullRequestState で取っている。
+    // (Issue の state と型が違い、同じ場所で取れないため。yanqirenshi/SOGH.next#68)
+    // Pool に入れる前に、state の名前に戻す。(PullRequest の core が、取り方で変わらないように)
     node2pullRequest (node) {
         const pool = this.pool('pull-request');
+
+        node = restorePullRequestState(node);
 
         this.matchmaker.pullRequest(node);
 
@@ -290,3 +299,23 @@ const NODE2MODEL = {
     Label:                 'node2label',
     Milestone:             'node2milestone',
 };
+
+// 別名 pullRequestState で取った state を、state に戻した node を返す。(元の node は変えない)
+// 別名が無いときは、そのまま返す。
+function restorePullRequestState (node) {
+    if (!node || node.pullRequestState===undefined)
+        return node;
+
+    const { pullRequestState, ...rest } = node;
+
+    return { ...rest, state: pullRequestState };
+}
+
+// ProjectV2Item の node の content を、state に戻した node を返す。(元の node は変えない)
+// content に別名が無いときは、そのまま返す。
+function restoreContentPullRequestState (node) {
+    if (!node || !node.content || node.content.pullRequestState===undefined)
+        return node;
+
+    return { ...node, content: restorePullRequestState(node.content) };
+}

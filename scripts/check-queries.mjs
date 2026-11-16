@@ -20,7 +20,7 @@
 // 使用中 (Sogh のメソッドが使っている) のクエリに、2 の NG か 3 の抜けがあると、終了コードが 1 になる。
 //
 // GitHub には、つながない。
-// 値の印 (@id など) は、検査できる形に置き換えてから読む。(下の prepare を見る)
+// クエリの値は GraphQL の variables で渡す形なので、クエリの文字列を、そのまま読む。(yanqirenshi/SOGH.next#63)
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -42,16 +42,6 @@ function parseArgs (argv) {
     }
 
     return args;
-}
-
-// 値の印を、検査できる形に置き換える。
-//   "@id" のように " で囲まれた印 … そのままで文字列として読めるので、触らない。
-//   @number・@projectv2-number … 数値を書く場所にあるので、1 にする。
-//   @issue-data                … 入力のオブジェクトを書く場所にあるので、{} にする。
-function prepare (query) {
-    return query
-        .replace(/(?<!")@[\w-]*number\b/g, '1')
-        .replace(/(?<!")@issue-data\b/g, '{}');
 }
 
 // クエリが取っている項目を、道順の一覧にする。
@@ -89,8 +79,8 @@ function fieldPaths (document) {
 //
 // 型の違う項目を、同じ名前で、同じ場所に取っているとき。
 //   例: ProjectV2Item の content で、Issue の state (IssueState!) と PullRequest の state (PullRequestState!) を取る。
-// GraphQL の決まりでは正しくないが、いまのクエリにもあり、GitHub は受け付けている。
-// (別名を付けて直すと、応答の形が変わり、利用側が壊れる)
+// GraphQL の決まりでは正しくないが、GitHub は受け付けている。
+// いまのクエリには無い。(content の PullRequest の state は、別名 pullRequestState で取る。yanqirenshi/SOGH.next#68)
 // 新しく増やさないように、見えるようにしておく。
 function isCaution (message) {
     return /^Fields ".+" conflict because they return conflicting types/.test(message);
@@ -147,10 +137,11 @@ function missingKeys (schema, document) {
 }
 
 // Sogh のメソッドが使っているクエリの名前。
+// (Sogh.js の this.query('…')・this.queryDefinition('…')・this.fetchNode('…')・this.fetchPages('…')・this.fetchProjectsV2OfTeam('…'))
 function usedQueries () {
     const src = fs.readFileSync(SOGH, 'utf8');
 
-    return new Set([...src.matchAll(/this\.query\('([^']+)'\)/g)].map(m=> m[1]));
+    return new Set([...src.matchAll(/this\.(?:query|queryDefinition|fetchNode|fetchPages|fetchProjectsV2OfTeam)\('([^']+)'/g)].map(m=> m[1]));
 }
 
 function compare (before, after) {
@@ -210,7 +201,7 @@ async function main () {
         let errors, missing = [];
 
         try {
-            const document = parse(prepare(queries[code]));
+            const document = parse(queries[code].query);
 
             paths[code] = fieldPaths(document);
             errors = validate(schema, document).map(e=> e.message);

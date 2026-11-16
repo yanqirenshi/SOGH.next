@@ -1,5 +1,4 @@
-import * as attr from './attributes.js';
-
+// コメント (id) を、消す。(書き込み)
 // variables: { id: ID! }
 const query = `mutation ($id: ID!) {
   deleteIssueComment(input: {id: $id}) {
@@ -7,4 +6,7 @@ const query = `mutation ($id: ID!) {
   }
 }`;
 
-export default query;
+export default {
+    query,
+    pick: (data)=> data.deleteIssueComment,
+};

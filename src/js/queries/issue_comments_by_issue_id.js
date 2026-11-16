@@ -1,19 +1,24 @@
 import * as attr from './attributes.js';
 
-const query = `{
-  node(id: "@id") {
+// id の Issue の、コメント。(ページ送りする)
+// variables: { id: ID!, after: String (1 ページめは null) }
+const query = `query ($id: ID!, $after: String) {
+  node(id: $id) {
     ... on Issue {
-      comments(orderBy: {field: UPDATED_AT, direction: DESC}, ${attr.page_nation()}) {
+      comments(orderBy: {field: UPDATED_AT, direction: DESC}, ${attr.pagination()}) {
         totalCount
         nodes {
           ${attr.issueCommentNode()}
         }
         pageInfo {
-          ${attr.page_info()}
+          ${attr.pageInfo()}
         }
       }
     }
   }
 }`;
 
-export default query;
+export default {
+    query,
+    pick: (data)=> data.node.comments,
+};

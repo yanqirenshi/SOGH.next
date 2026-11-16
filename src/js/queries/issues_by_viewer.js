@@ -1,12 +1,10 @@
 import * as attr from './attributes.js';
 
-const query = `{
-  repository(name: "@name", owner: "@owner") {
-    issues(after: "", first: 100, states: OPEN) {
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
+// viewer が作った、OPEN の Issue。(ページ送りする。projectItems は取らない)
+// variables: { after: String (1 ページめは null) }
+const query = `query ($after: String) {
+  viewer {
+    issues(${attr.pagination()}, states: OPEN) {
       nodes {
         ${attr.issue()}
         author {
@@ -14,17 +12,6 @@ const query = `{
         }
         repository {
           ${attr.repositories()}
-        }
-        projectCards(first: 10) {
-          nodes {
-            ${attr.project_card()}
-            column {
-              ${attr.project_column()}
-              project {
-                ${attr.project()}
-              }
-            }
-          }
         }
         milestone {
           ${attr.milestone()}
@@ -40,9 +27,14 @@ const query = `{
           }
         }
       }
+      pageInfo {
+        ${attr.pageInfo()}
+      }
     }
   }
-}
-`;
+}`;
 
-export default query;
+export default {
+    query,
+    pick: (data)=> data.viewer.issues,
+};

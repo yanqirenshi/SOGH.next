@@ -1,38 +1,32 @@
 import * as attr from './attributes.js';
 
-const MAX_FIELD_NUM = 30;
-const MAX_LABEL_NUM = 30;
-const MAX_PR_NUM = 30;
-
-const query = `{
-  user (login: "@user-login") {
-    projectV2 (number: @projectv2-number) {
-      ${attr.projectv2()}
-      fields(first: ${MAX_FIELD_NUM}) {
+// ユーザー (login) の、番号 (number) の ProjectV2 の Item。(Item をページ送りする)
+// 2 ページめからも、ProjectV2 の項目 (fields など) を取り直す。
+// variables: { login: String!, number: Int!, after: String (1 ページめは null) }
+const query = `query ($login: String!, $number: Int!, $after: String) {
+  user(login: $login) {
+    projectV2(number: $number) {
+      ${attr.projectV2()}
+      fields(first: ${attr.NESTED_LIMIT}) {
         nodes {
-          ... on ProjectV2Field { ${attr.projectv2Field()} }
-          ... on ProjectV2IterationField { ${attr.projectv2FieldIteration()} }
-          ... on ProjectV2SingleSelectField { ${attr.projectv2FieldSelect()} }
+          ... on ProjectV2Field { ${attr.projectV2Field()} }
+          ... on ProjectV2IterationField { ${attr.projectV2FieldIteration()} }
+          ... on ProjectV2SingleSelectField { ${attr.projectV2FieldSelect()} }
         }
       }
-      items(${attr.page_nation()}) {
+      items(${attr.pagination()}) {
         nodes {
-          ${attr.ProjectV2Item()}
-          ${attr.projectV2ItemProject()}
-          ${attr.projectV2ItemFieldValues(MAX_FIELD_NUM, MAX_LABEL_NUM, MAX_PR_NUM)}
-          creator ${attr.projectV2FieldValue_Creator()}
-          content {
-            ... on DraftIssue  ${attr.projectV2ItemContentDraftIssue()}
-            ... on Issue       ${attr.projectV2ItemContentIssue()}
-            ... on PullRequest ${attr.projectV2ItemContentPullRequest()}
-          }
+          ${attr.projectV2ItemNode()}
         }
         pageInfo {
-          ${attr.page_info()}
+          ${attr.pageInfo()}
         }
       }
     }
   }
 }`;
 
-export default query;
+export default {
+    query,
+    pick: (data)=> data.user.projectV2.items,
+};

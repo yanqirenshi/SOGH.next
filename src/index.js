@@ -10,12 +10,12 @@ import TableProjectV2Items from './components/common/TableProjectV2Items.js';
 
 import Sogh from './js/Sogh.js';
 
-import {Card}        from './js/models/index.js';
-import {Column}      from './js/models/index.js';
+// 取得に失敗したときに投げる例外のクラス。(利用側が instanceof で受けられるように。yanqirenshi/SOGH.next#61)
+import { GitHubError } from './js/Loader.js';
+
 import {Issue}       from './js/models/index.js';
 import {Label}       from './js/models/index.js';
 import {Milestone}   from './js/models/index.js';
-import {Project}     from './js/models/index.js';
 import {Repository}  from './js/models/index.js';
 
 // モデルを、まとめて 1 つの名前で export する。(yanqirenshi/SOGH.next#38)
@@ -37,15 +37,16 @@ export {
 }
 
 export {
-    Card,
-    Column,
     Issue,
     Label,
     Milestone,
-    Project,
     Repository,
 }
 
 export {
     models,
+}
+
+export {
+    GitHubError,
 }

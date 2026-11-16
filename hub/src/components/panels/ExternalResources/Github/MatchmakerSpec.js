@@ -45,7 +45,7 @@ const RELATIONS = [
     { parent: 'IssueComment',  relation: 'editor',                      type: PERSON_TYPES,                                model: PERSON_MODEL,                          method: 'editor()' },
     { parent: 'IssueComment',  relation: 'pullRequest',                 type: 'PullRequest',                               model: 'PullRequest',                         method: 'pullRequest()' },
     { parent: 'ProjectV2',     relation: 'creator',                     type: PERSON_TYPES,                                model: PERSON_MODEL,                          method: 'creator()' },
-    { parent: 'ProjectV2',     relation: 'owner',                       type: 'User / Organization / Issue / PullRequest', model: 'User / Organization / Issue / PullRequest', method: 'ownerNode()' },
+    { parent: 'ProjectV2',     relation: 'owner',                       type: 'User / Organization / Issue / PullRequest', model: 'User / Organization / Issue / PullRequest', method: 'owner()' },
     { parent: 'ProjectV2',     relation: 'items',                       type: 'ProjectV2Item',                             model: 'ProjectV2Item',                       method: 'items()' },
     { parent: 'ProjectV2Item', relation: 'project',                     type: 'ProjectV2',                                 model: 'ProjectV2',                           method: 'project()' },
     { parent: 'ProjectV2Item', relation: 'content',                     type: 'Issue / PullRequest / DraftIssue',          model: 'Issue / PullRequest / DraftIssue',    method: 'content()' },
@@ -223,9 +223,11 @@ export default function MatchmakerSpec () {
               <LI>クエリが入れ子で取っている、23 の関連。(「7.4 (6) 対象の範囲」を見る)</LI>
               <LI>「人」は、型ごとのモデル。(「7.4 (4) 型が複数ある関連」を見る)</LI>
               <LI>「読むメソッド」は、親のモデルのメソッド。モデル (またはモデルの配列) を返す。(「7.4 (5) 読み方」を見る)</LI>
-              <LI>ProjectV2 の owner は、<C>ownerNode()</C> で読む。
+              <LI>ProjectV2 の owner は、<C>owner()</C> で読む。(0.5.0 から。<C>yanqirenshi/SOGH.next#71</C>)
                 <UL>
-                  <LI><C>owner()</C> は、README の <C>$Owner</C> の値 (文字列) を返すメソッドとして、もとからあるため。</LI>
+                  <LI>0.4.0 では、<C>ownerNode()</C> という名前にしていた。<C>owner()</C> は、README の <C>$Owner</C> の値 (文字列) を返すメソッドとして、もとからあったため。</LI>
+                  <LI>0.5.0 で、名前を変えた。<C>owner()</C> は、GitHub の owner のモデルを返す。(Repository の <C>owner()</C> と同じ意味)</LI>
+                  <LI>README の <C>$Owner</C> の値は、<C>readmeOwner()</C> で読む。<C>ownerNode()</C> は、消した。</LI>
                 </UL>
               </LI>
               <LI>クエリによって、取っていない関連がある。(「5.4 入れ子で取るもの」を見る)
@@ -448,6 +450,8 @@ export default function MatchmakerSpec () {
                   <UL>
                     <LI>GitHub で廃止されていて、取ろうとすると、エラーが返る。</LI>
                     <LI>クエリと、モデルのクラス (<C>Project</C>・<C>Card</C>・<C>Column</C>) は、今回は触らずに残す。</LI>
+                    <LI>そのあと、Projects (classic) を取るクエリは、Sogh のメソッドから使われていなかったので、0.5.0 で消した。(<IssueLink num="66"/>)</LI>
+                    <LI>モデルのクラス (<C>Project</C>・<C>Card</C>・<C>Column</C>) も、0.5.0 で消した。(<IssueLink num="81"/>)</LI>
                   </UL>
                 </LI>
                 <LI>ProjectV2Item の fieldValues そのものは、モデルにしない。(値を入れる箱なので)</LI>

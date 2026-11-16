@@ -3,7 +3,10 @@
 ## 0.5.0
 
 古い世代の取得のメソッド (`fetch〜`) を消して、`asyncFetch〜` にそろえました。
-(yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#67)
+また、Sogh のメソッドから使われていないクエリを、すべて消しました。
+取得のクエリを、値を GraphQL の variables で渡す形に書き直し、`asyncFetch〜` が失敗したときは例外を投げるようにしました。
+あわせて、Projects (classic) のモデルや、Issue を作るための部品など、使われていない古いものを消しました。
+(yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87)
 
 ### 利用側への影響 (破壊的な変更です)
 
@@ -22,15 +25,90 @@
   - `fetch〜` は、コールバックか、`{ status, data }` (失敗したときは `{ status: 'error', error }`) を返す Promise で結果を渡した。`data` は `{ contents, pageInfo }` の形 (`contents` は id か、id の配列)。
   - `asyncFetch〜` は、async 関数で、id か、id の配列を返す。(コールバックは取らない)
   - `fetch〜` は、最初のページ (100 件) だけを取った。`asyncFetch〜` は、最後のページまで取る。(`asyncFetchIssueByID(id)` は 1 件)
-  - `fetch〜` は、GraphQL のエラー (`errors`) を見なかった。(`data` が null のときは、取り出しで TypeError になり、それがエラーとして渡った) `asyncFetch〜` は、`errors` を見て、エラー (Error。HTTP のエラーのときは fetch の Response) を返す。
-  - ただし、`asyncFetchRepositoriesByViewer()` と `asyncFetchProjectsV2ByViewer()` は、途中のページで失敗したときに、エラーではなく、それまでに集めた id の配列を返す。(失敗したときの戻り値をそろえるかは、yanqirenshi/SOGH.next#61 で決める)
+  - `fetch〜` は、GraphQL のエラー (`errors`) を見なかった。(`data` が null のときは、取り出しで TypeError になり、それがエラーとして渡った) `asyncFetch〜` は、`errors` を見て、失敗したときは例外を投げる。(下を見る)
   - コールバックを取る 5 つの `fetch〜` は、成功したときに `success` のあとで `fail` も呼び、失敗したときは `fail` を呼んでいなかった。(内部の `fetchX` に、引数を 1 つずれて渡していたため)
+
+- `asyncFetch〜` (16 個) は、失敗したときに、例外 `GitHubError` を投げるようになりました。(yanqirenshi/SOGH.next#61) `try { … } catch (e) { … }` (または、Promise の `catch`) で受けてください。
+  - これまでは、失敗したときに、エラー (Error。HTTP のエラーのときは fetch の Response) を戻り値として返していました。`asyncFetchRepositoriesByViewer()`・`asyncFetchIssueByViewer()`・`asyncFetchProjectsV2ByViewer()` は、途中のページで失敗すると、それまでに集めた id の配列を返していました。
+  - 成功したときの戻り値 (id、または id の配列。`asyncFetchViewer()` は User のモデル) は、変わりません。
+  - `GitHubError` は、パッケージの入口から読めます。(`import { GitHubError } from 'sogh'`。`e instanceof GitHubError` で見分けられます)
+  - `GitHubError` は Error で、次の値を持ちます。
+    - `name` … `'GitHubError'`
+    - `status` … HTTP の状態コード。(GraphQL のエラーのときは、ふつう 200。つながらなかったときは null)
+    - `errors` … GitHub の応答の `errors` (配列)。GraphQL のエラーでないときは null。
+    - `response` … fetch の Response。(つながらなかったときは null)
+    - `cause` … つながらなかったときの、元の例外。
+  - 応答に、取り出す値が無いとき (たとえば、`node` が null) も、`GitHubError` を投げます。
+  - コールバックを受け取るメソッドは、失敗したとき、`failed(error, …)` を呼んでから、例外を投げます。`failed` の 1 つめの引数は、投げる `GitHubError` です。
+    - `asyncFetchProjectsV2ByTeam`・`asyncFetchProjectsV2WithItemsByTeam`: `failed(error, それまでの id の配列)`。(これまでは `failed(それまでの id の配列)`)
+    - `asyncFetchProjectV2ByUserLoginProjectV2Number`: `failed(error, login, number)`。(これまでは `failed()`)
+    - `asyncFetchProjectV2ByOrgLoginProjectV2Number`: `failed(error, login, number)`。(これまでと同じ形。error が `GitHubError` になる)
+  - コメントの追加・更新・削除 (`createIssueComment`・`updateIssueComment`・`deleteIssueComment`) の動きは、変わりません。(例外は投げず、`failed` を呼ぶ)
+- クエリの名前のつづりを直しました。`sogh.query(code)` で、名前で取っていた場合は、新しい名前にしてください。(yanqirenshi/SOGH.next#73)
+  - `viwer` → `viewer`
+  - `issues_by_viwer` → `issues_by_viewer`
+- 取得のクエリも、値を GraphQL の variables で渡す形になりました。(yanqirenshi/SOGH.next#63)
+  - クエリの文字列に、値の印 (`@id`・`@login`・`@user-login` など) と、ページ送りの印 (`after: ""`) は、もうありません。`sogh.query(code)` で取ったクエリに、文字列の置き換えで値を入れていた場合は、variables で渡してください。(変数の名前は、クエリの頭の宣言を見てください。ページ送りは、変数 `after`。1 ページめは null)
+  - `sogh.query(code)` は、これまでどおり、クエリの文字列を返します。
+  - 新しく、`sogh.queryDefinition(code)` で、`{ query, pick }` を取れます。(`pick` は、応答の `data` から、取り出す値を返す関数。yanqirenshi/SOGH.next#65)
+  - 番号の引数 (Issue の番号・ProjectV2 の番号) は、数値にしてから送ります。(これまでどおり、文字列でも渡せます)
+- `Loader` の `makeQuery(query, endCursor)` を消しました。(ページ送りの印を書き換える部品。variables にしたので、使わなくなった)
+- ProjectV2Item の content の PullRequest は、`state` を別名 `pullRequestState` で取ります。(yanqirenshi/SOGH.next#68)
+  - Pool に入れる前に `state` に戻すので、これまでと同じく `state` の名前で読めます。
+    - PullRequest のモデル (Pool の PullRequest) の core
+    - ProjectV2Item の core に残る content の JSON (`item.core().content`)
+- ProjectV2 の `owner()` は、GitHub の owner のモデル (User・Organization・Issue・PullRequest のどれか) を返すようになりました。(Repository の `owner()` と同じ意味。yanqirenshi/SOGH.next#71)
+  - これまでの `owner()` は、README の `$Owner` の値 (文字列) を返していました。README の `$Owner` は、`readmeOwner()` で読んでください。(値を入れるときも `readmeOwner(v)`)
+  - `ownerNode()` は、消しました。`owner()` を使ってください。
+- `Issue` の `owner()` を、`bodyOwner()` に変えました。(本文の `$Owner` の値 (文字列) を返す。無いときは null。yanqirenshi/SOGH.next#85)
+  - GitHub の Issue には owner が無いので、`owner()` は無くしました。(代わりのものは、ありません)
+  - 本文から読む、ほかの値 (`points()`・`dueDate()`・`nextActionDate()`) の名前は、変わりません。
+- `ProjectV2` の `maneger(v)` を消しました。README の `$Owner` は、`readmeOwner(v)` で読んでください。(同じ値を読み書きしていた。yanqirenshi/SOGH.next#86)
+- `Issue` の `addAnotetionValue(issue)` を消しました。(どこからも呼ばれず、渡したモデルの `owner()` をプロパティで隠してしまっていた。`addAnotetionValueNew(issue)` は、残しています。yanqirenshi/SOGH.next#87)
+- パッケージの入口から、Projects (classic) のモデル `Project`・`Card`・`Column` を消しました。`models` の中からも消しました。(yanqirenshi/SOGH.next#81)
+- `Issue` のメソッドを 9 個、消しました。
+  - Projects (classic) 用 (6 個): `projectCards()`・`getColumnFirst()`・`getFirstColumnProject()`・`getFirstColumnProjectID()`・`projects()`・`projectIds()`。(yanqirenshi/SOGH.next#82。同じ所にあった `milestoneId()` は、残しています)
+  - Issue を作るための部品 (3 個): `makeIssueData()`・`issueData2requestDataDescription(data)`・`issueData2requestData(data)`。(yanqirenshi/SOGH.next#83)
+- `Loader` のメソッドを 3 個、消しました。
+  - `fetch(query, success, error)`。(yanqirenshi/SOGH.next#84。取得は `asyncFetch〜` か、`request(query, variables)` を使ってください)
+  - `makeGraphQLData(data)`・`makeGraphQLDataItem(v)`。(Issue を作るための部品。yanqirenshi/SOGH.next#83)
 
 ### 消したもの
 
 - `Sogh` の補助のメソッド `data2data(data, make, appender)`・`zzz(data, make)` と、`Loader` の `ensureEndCursor(query, endCursor)`。(`fetch〜` だけが使っていた)
+- `Sogh` の補助のメソッド `node2objs(node_or_nodes, make)`。(取得の書き直しで、使う所が無くなった。`asyncFetch〜` は `connection2ids(connection, make)` を使う)
 - クエリ `projects_next_items_by_id`。(いまの GitHub には、`ProjectNextItem` という型が無く、動かなかった。yanqirenshi/SOGH.next#67)
-- `fetch〜` だけが使っていたほかのクエリ (`user_by_id`・`projects_next_by_id`・`projectsv2_items_by_projects_v2`) は、残しています。(Sogh のメソッドからは使われなくなりました)
+- Sogh のメソッドから使われていないクエリを、18 個消した。(yanqirenshi/SOGH.next#66)
+  - `sogh.query(code)` で、名前で取っていた場合は、取れなくなります。(`undefined` が返ります)
+  - 前から使われていなかったもの (15 個): `assignees_by_repository`・`create_issue`・`issues_by_milestone`・`issues_by_report_label`・`issues_by_repository`・`issues_open_by_label`・`issues_open_by_project_column`・`issues_open_by_repository`・`labels_by_repository`・`milestones_by_repository`・`project_by_id`・`projects_by_repository`・`repository`・`search_issues`・`update_issue_body`
+  - `fetch〜` を消して、使われなくなったもの (3 個): `user_by_id`・`projects_next_by_id`・`projectsv2_items_by_projects_v2`
+  - 残ったクエリは 18 個で、どれも Sogh のメソッドが使っている。
+- Projects (classic) のモデルのファイル `src/js/models/Project.js`・`Card.js`・`Column.js`。(yanqirenshi/SOGH.next#81)
+- 古い文書 `src/js/README.md`・`src/js/models/README.markdown`。(いまのコードと合っていなかった。パッケージにも、入らなくなります。yanqirenshi/SOGH.next#77)
+- `Issue.js` の `moment` の import。(Issue を作るための部品だけが使っていた。package.json の依存は、そのまま)
+- クエリの項目の部品 (`src/js/queries/attributes.js`) のうち、どのクエリからも使われなくなった 7 個。(`project`・`project_card`・`project_column` (Projects (classic) 用) と、`project_next`・`project_next_fields`・`project_next_item`・`project_next_item_field_value` (古い Projects 用))
+
+### 変わった動き
+
+- ProjectV2Item の fieldValues と、その中の labels・pullRequests の件数の上限を、どのクエリも 30 にそろえました。(yanqirenshi/SOGH.next#75)
+  - これまでは、クエリによって 20 か 30 でした。20 だったのは `asyncFetchProjectsV2WithItemsByTeam` と `asyncFetchProjectV2ByOrgLoginProjectV2Number` のクエリです。
+  - チームの ProjectV2 を Item 付きで取るクエリの「ProjectV2 が 1 ページに 10 個・Item が 50 個」は、変わりません。
+- クエリの項目の部品 (`src/js/queries/attributes.js`) の名前を、小文字で始まり途中が大文字、にそろえ、返す形を「項目だけを返す」にそろえました。上限の値 (`NESTED_LIMIT`) も、ここの 1 か所で決めます。(yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75。パッケージの外には、影響しません)
+- `deleteIssueComment` は、成功したら、`successed` を呼ぶ前に、消したコメントを Pool からも消します。(yanqirenshi/SOGH.next#69)
+- `Loader` の `fetchX` も、送り先を `endpoint()` から取ります。(これまでは URL を直に書いていた。yanqirenshi/SOGH.next#76)
+- hub のひな形 (`hub/.env.local.template`) の、個人用アクセストークンの所に、注意を書きました。(この値はビルドした JS に埋め込まれるので、ビルドは手元以外に置かない。yanqirenshi/SOGH.next#70。パッケージには入りません)
+
+### 足したもの
+
+- `Loader` の `request(query, variables)`: クエリを 1 回送り、応答の `data` を返す。失敗したときは `GitHubError` を投げる。
+- `Sogh` の `queryDefinition(code)`: クエリの定義 `{ query, pick }` を返す。
+- `Sogh` の取得の部品 `fetchNode(code, variables)`・`fetchPages(code, variables, onPage)`・`connection2ids(connection, make)`・`fetchProjectsV2OfTeam(code, team_id, callbacks)`。(`asyncFetch〜` が使う)
+- 例外のクラス `GitHubError`。(`src/js/Loader.js`。パッケージの入口から、名前付きで export している。`import { GitHubError } from 'sogh'`)
+- `Pool` の `remove(id)` と `clear()`。(yanqirenshi/SOGH.next#69)
+  - `remove(id)`: id のモデルを、表と一覧の両方から消し、消したモデルを返す。無いときは null。
+  - `clear()`: すべて消す。
+  - 古いものを、自動で消す仕組み (期限) は、持ちません。
+- `ProjectV2` の `readmeOwner(v)`: README の `$Owner` の値を読む・入れる。(これまでの `owner()`。yanqirenshi/SOGH.next#71)
 
 ## 0.4.2
 

@@ -1,9 +1,11 @@
 import * as attr from './attributes.js';
 
-const query = `{
-  organization (login:"@login") {
-    repository (name:"@name") {
-      issue (number:@number){
+// 組織 (org) の、リポジトリ (repo) の、番号 (number) の Issue を 1 つ。(projectItems とコメントも取る)
+// variables: { org: String!, repo: String!, number: Int! }
+const query = `query ($org: String!, $repo: String!, $number: Int!) {
+  organization(login: $org) {
+    repository(name: $repo) {
+      issue(number: $number) {
         ${attr.issue()}
         author {
           ${attr.actor()}
@@ -24,15 +26,15 @@ const query = `{
             ${attr.label()}
           }
         }
-        projectItems (first:1) {
+        projectItems(first: 1) {
           edges {
             node {
-              ${attr.ProjectV2Item()}
-              ${attr.projectV2ItemFieldValues(30, 30, 30)}
+              ${attr.projectV2Item()}
+              ${attr.projectV2ItemFieldValues()}
               project {
-                ${attr.projectv2()}
+                ${attr.projectV2()}
                 owner {
-                  ${attr.projectv2Owner()}
+                  ${attr.projectV2Owner()}
                 }
               }
             }
@@ -49,4 +51,7 @@ const query = `{
   }
 }`;
 
-export default query;
+export default {
+    query,
+    pick: (data)=> data.organization.repository.issue,
+};

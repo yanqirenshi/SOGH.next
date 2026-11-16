@@ -52,7 +52,9 @@ function Overview ({ data }) {
             <P>node2projectV2(node) は、Pool に入れる前に、Matchmaker の projectV2(node) で、入れ子で来た creator・owner・items もモデルにして Pool に入れる。</P>
             <P>アイテムは、items() で ProjectV2Item のモデルの配列を得る。(itemsWith2ProjectV2Item() は、items() と同じものを返す古い名前)</P>
             <P>creator() は、作った人を、__typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) で返す。</P>
-            <P>owner(v) は README の $Owner の値 (文字列) を読み書きする。GitHub の owner (持ち主) は、ownerNode() で、User・Organization・Issue・PullRequest のどれかのモデルを得る。</P>
+            <P>owner() は、GitHub の owner (持ち主) を、User・Organization・Issue・PullRequest のどれかのモデルで返す。(Repository の owner() と同じ意味。0.5.0 から。yanqirenshi/SOGH.next#71)</P>
+            <P>README の $Owner の値 (文字列) は、readmeOwner(v) で読み書きする。(0.5.0 で、owner(v) から名前を変えた。README に $Owner が無いときは null)</P>
+            <P>readmeOwner(v) と同じ値を読み書きしていた maneger(v) は、0.5.0 で消した。(yanqirenshi/SOGH.next#86)</P>
           </Section>
 
           <Section title="属性" lev="4" sx={SX_MEMBER_TITLE}>

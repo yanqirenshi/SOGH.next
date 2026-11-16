@@ -16,8 +16,8 @@ export default function SubTitle (props) {
     const project = issue.projectV2();
 
     const clickProject = ()=> {
-        // owner は User か Organization。(ProjectV2 の owner() は README の $Owner なので、ownerNode() を使う)
-        const owner = project.ownerNode();
+        // owner は User か Organization のモデル。
+        const owner = project.owner();
 
         actions.project.click(owner ? owner.login() : null, project.number());
     };

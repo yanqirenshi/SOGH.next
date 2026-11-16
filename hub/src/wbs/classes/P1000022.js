@@ -37,7 +37,7 @@ function Overview ({ data }) {
             <P>{"GraphQLNode を継承する。"}</P>
             <P>{"Pooler の node2organization(node) が作り、organization の Pool に入れる。"}</P>
             <P>{"Matchmaker が、入れ子で来た人のうち __typename が Organization のもの (リポジトリの持ち主 (owner)・ProjectV2 の owner・Issue の author など) を、node2model(node) で Organization にする。"}</P>
-            <P>{"Repository の owner() と ProjectV2 の ownerNode() は、持ち主が組織のときに Organization を返す。"}</P>
+            <P>{"Repository の owner() と ProjectV2 の owner() は、持ち主が組織のときに Organization を返す。"}</P>
             <P>{"node2organization(node) は Matchmaker を呼ばないので、Organization の入れ子の関連はモデルにしない。"}</P>
             <P>{"どのメソッドも「core の値 || null」を返すので、空文字 ('') も null になる。"}</P>
           </Section>

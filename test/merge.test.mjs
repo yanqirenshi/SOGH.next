@@ -186,7 +186,7 @@ test('本文の無い Issue を重ねても、本文と注釈は消えない', (
     sogh.node2issue({ id: 'I_1', title: 't', number: 1, updatedAt: T1 });
 
     assert.equal(issue.body(), '$Owner foo\n$Point.Plan 3');
-    assert.equal(issue.owner(), 'foo');
+    assert.equal(issue.bodyOwner(), 'foo');
     assert.equal(issue.pointPlansTotal(), 3);
     assert.equal(issue.number(), 1, '手元に無い項目は、足す');
 });
@@ -202,7 +202,7 @@ test('Issue は、新しい本文を重ねると、注釈を読み取り直す',
 
     sogh.node2issue({ id: 'I_1', body: '$Owner bar\n$Point.Plan 5', updatedAt: T2 });
 
-    assert.equal(issue.owner(), 'bar');
+    assert.equal(issue.bodyOwner(), 'bar');
     assert.equal(issue.pointPlansTotal(), 5);
     assert.match(issue.reload(), ISO);
 });
@@ -213,12 +213,12 @@ test('ProjectV2 は、新しい README を重ねると、注釈を読み取り�
     const project = sogh.node2projectV2({ id: 'PVT_1', number: 1, readme: '$Priority: h\n$Owner: foo', updatedAt: T1 });
 
     assert.equal(project.priority(), 'h');
-    assert.equal(project.owner(), 'foo');
+    assert.equal(project.readmeOwner(), 'foo');
 
     sogh.node2projectV2({ id: 'PVT_1', number: 1, readme: '$Priority: l\n$Owner: bar', updatedAt: T2 });
 
     assert.equal(project.priority(), 'l');
-    assert.equal(project.owner(), 'bar');
+    assert.equal(project.readmeOwner(), 'bar');
 });
 
 test('ProjectV2 は、README の無い node (参照の組) を重ねても、注釈は消えない', ()=> {

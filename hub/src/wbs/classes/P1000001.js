@@ -44,6 +44,8 @@ function Overview ({ data }) {
             <P>{"Matchmaker (matchmaker) を持ち、node2repository(node)・node2issue(node)・node2projectV2Item(node) などで、親を Pool に入れる前に、入れ子で来た関連 (リポジトリの owner、Issue の assignees など) もモデルにして Pool に入れる。"}</P>
             <P>{"node2viewer(d) は、viewer を User にして user の Pool に入れる。(viewer の Pool は無い)"}</P>
             <P>{"Sogh の asyncFetch〜 が、取得したノードを node2〜(node) に渡す。"}</P>
+            <P>{"node2pullRequest(node) は、ProjectV2Item の content として別名 pullRequestState で来た state を、Pool に入れる前に state に戻す。(0.5.0 から。yanqirenshi/SOGH.next#68)"}</P>
+            <P>{"node2projectV2Item(node) も、Pool に入れる前に、content の pullRequestState を state に戻す。(ProjectV2Item の core に残る content も、取り方によらず state になる)"}</P>
             <Plane>{CODE}</Plane>
           </Section>
 

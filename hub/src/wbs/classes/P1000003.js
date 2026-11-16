@@ -42,7 +42,9 @@ function Overview ({ data }) {
             <P>{"重ねるかどうかは、最終更新日時 (updatedAt) を比べて決める。(GraphQLNode の merge(node) を見る)"}</P>
             <P>{"入れ子で来たノードで、新しく作ったとき (isNesting() が true のとき) は、オブジェクトの reload(v) に、そのときの日時を入れる。"}</P>
             <P>{"ensure で返すオブジェクトには、sogh(v) で Sogh を入れる。"}</P>
-            <P>{"オブジェクトを消すメソッドは無い。"}</P>
+            <P>{"remove(id) は、id のオブジェクトを、表と配列の両方から消して返す。(無ければ null。0.5.0 から。yanqirenshi/SOGH.next#69)"}</P>
+            <P>{"clear() は、すべて消す。(0.5.0 から)"}</P>
+            <P>{"期限で消す仕組みは無い。sogh が自分で消すのは、Sogh の deleteIssueComment で、コメントを GitHub から消せたときだけ。"}</P>
             <Plane>{CODE}</Plane>
           </Section>
 
