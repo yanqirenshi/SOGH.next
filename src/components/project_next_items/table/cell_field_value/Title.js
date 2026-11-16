@@ -10,9 +10,11 @@ export default function Title (props) {
     const row = props.row;
     const sogh = props.sogh;
 
-    if ('ISSUE'===row.type()) {
-        const issue = row.content();
+    // content() は、Item の content を取得していないとき (issue_by_org_repo_issue_number の
+    // projectItems から Pool に入った Item など) は null。そのときは、下の Title フィールドの値を出す。
+    const issue = row.content();
 
+    if ('ISSUE'===row.type() && issue) {
         return (
             <TableCell>
               <span>

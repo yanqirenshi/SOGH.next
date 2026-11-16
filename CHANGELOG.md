@@ -1,5 +1,16 @@
 # 更新履歴
 
+## 0.4.2
+
+ProjectV2 の Item の表の Title の列が、落ちる場合があったのを、直しました。
+(yanqirenshi/SOGH.next#36)
+
+### 直したもの
+
+- ProjectV2 の Item の表 (`ProjectV2Items`) の Title の列が、Item の `type()` が ISSUE で、`content()` が null のときに、TypeError で落ちていた。
+  - Title フィールドの値を出すようにした。(`type()` が DRAFT_ISSUE のときと同じ表示)
+  - 0.3.0 からあった不具合です。
+
 ## 0.4.1
 
 取り直しても、GitHub 側の変更が反映されない場合があったのを、直しました。
