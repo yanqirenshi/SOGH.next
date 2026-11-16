@@ -1,5 +1,5 @@
 import GraphQLNode from './GraphQLNode.js';
-import { fieldValueOf } from './fieldValue.js';
+import { fieldValueOf, fieldValuesOf } from './fieldValue.js';
 
 export default class Issue extends GraphQLNode {
     constructor (data) {
@@ -291,13 +291,4 @@ export default class Issue extends GraphQLNode {
         const m = this.milestone();
         return m ? m.id() : null;
     }
-}
-
-// ProjectV2Item の JSON から、fieldValues の nodes を取り出す。
-// Item が無いとき・fieldValues が無いとき・nodes が配列でないときは、空の配列。(yanqirenshi/SOGH.next#59)
-function fieldValuesOf (item) {
-    if (!item || !item.fieldValues || !Array.isArray(item.fieldValues.nodes))
-        return [];
-
-    return item.fieldValues.nodes;
 }

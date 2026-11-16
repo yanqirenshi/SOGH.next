@@ -182,6 +182,7 @@
   - いまは、`value` だけを null にして、`{ project, item, field_item, value: null }` を返します。
   - その名前のフィールドの値が無いときは、いままでどおり、全体が null です。
   - フィールドの値を取り出す処理は、`src/js/models/fieldValue.js` の `fieldValueOf(field_item)` の 1 か所にまとめ、Issue と ProjectV2Item の両方から呼びます。(これまでは、同じ switch が 2 か所にありました。パッケージの入口からは、export しません)
+  - Item の JSON から fieldValues の nodes を取り出す処理 `fieldValuesOf(item)` も、同じファイルにまとめ、Issue と ProjectV2Item の両方から呼びます。(これまでは、同じ関数が 2 か所にありました。動きは変わりません。Item・fieldValues が無いとき・nodes が配列でないときは、空の配列です。パッケージの入口からは、export しません)
   - いままでの 6 つの種類 (DATE・TITLE・SINGLE_SELECT・ASSIGNEES・LABELS・REPOSITORY) の `value` の形と、Issue の `fieldValueContents(name)` が最初の Item だけを読むことは、変わりません。
 - `PanelIssueComments` (コメントの一覧の部品) に `comments` だけを渡しても、落ちなくなりました。(yanqirenshi/SOGH.next#124)
   - これまでは、`edit_contents` か `actions` (`actions.issue.comment`) が渡されていないと、コメントが 1 個でもあるときに、描いただけで落ちていました。

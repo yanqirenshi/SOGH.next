@@ -2,6 +2,16 @@
 // Issue と ProjectV2Item の fieldValueContents(name) が、同じものを呼ぶ。(yanqirenshi/SOGH.next#120)
 // モデルの入口 (src/index.js) からは、出さない。
 
+// ProjectV2Item の JSON (core) から、fieldValues の nodes を取り出す。(写しは作らず、nodes をそのまま返す)
+// Item が無いとき・fieldValues が無いとき・nodes が配列でないときは、空の配列。
+// (Issue と ProjectV2Item の 2 か所にあったものを、ここにまとめた。yanqirenshi/SOGH.next#59・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#120)
+export function fieldValuesOf (item) {
+    if (!item || !item.fieldValues || !Array.isArray(item.fieldValues.nodes))
+        return [];
+
+    return item.fieldValues.nodes;
+}
+
 // フィールドの値 (JSON) から、フィールドの種類 (field.dataType) ごとの値を取り出す。
 // 値は、フィールドの値の JSON から、そのまま取る。(モデルにはしない。yanqirenshi/SOGH.next#29)
 // 知らない種類のときは、null。(エラーは投げない)

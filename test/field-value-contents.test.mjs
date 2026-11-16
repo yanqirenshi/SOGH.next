@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 import Sogh from '../src/js/Sogh.js';
-import { fieldValueOf } from '../src/js/models/fieldValue.js';
+import { fieldValueOf, fieldValuesOf } from '../src/js/models/fieldValue.js';
 
 /* ****************************************************************
  * データ
@@ -241,4 +241,65 @@ test('fieldValueOf(field_item): 種類が読めないときも、エラーを投
 test('fieldValueOf(field_item) は、パッケージの入口 (src/index.js)・モデルの index からは出さない', ()=> {
     for (const path of ['../src/index.js', '../src/js/models/index.js'])
         assert.equal(/fieldValue/.test(fs.readFileSync(new URL(path, import.meta.url), 'utf8')), false, path);
+});
+
+/* ****************************************************************
+ * fieldValuesOf(item) (yanqirenshi/SOGH.next#120 の決定 4)
+ * **************************************************************** */
+
+test('fieldValuesOf(item) は、fieldValue.js の 1 か所だけにある。(Issue.js・ProjectV2Item.js に、同じ関数の定義が無い)', ()=> {
+    const read = (path)=> fs.readFileSync(new URL(path, import.meta.url), 'utf8');
+
+    assert.match(read('../src/js/models/fieldValue.js'), /export function fieldValuesOf\s*\(/);
+
+    for (const path of ['../src/js/models/Issue.js', '../src/js/models/ProjectV2Item.js']) {
+        const src = read(path);
+
+        assert.equal(/function\s+fieldValuesOf\s*\(/.test(src), false, `${path}: 定義が無い`);
+        assert.equal(/(const|let|var)\s+fieldValuesOf\s*=/.test(src), false, `${path}: 定義が無い`);
+        assert.match(src, /import \{[^}]*\bfieldValuesOf\b[^}]*\} from '\.\/fieldValue\.js';/, `${path}: fieldValue.js から読む`);
+    }
+});
+
+test('fieldValuesOf(item): Item が無いとき・fieldValues が無いとき・nodes が配列でないときは、空の配列', ()=> {
+    // Item が無い
+    for (const item of [null, undefined])
+        assert.deepEqual(fieldValuesOf(item), [], String(item));
+
+    // fieldValues が無い
+    for (const item of [{}, { fieldValues: null }, { fieldValues: undefined }])
+        assert.deepEqual(fieldValuesOf(item), [], JSON.stringify(item));
+
+    // nodes が配列でない
+    for (const nodes of [undefined, null, {}, 'x', 1])
+        assert.deepEqual(fieldValuesOf({ fieldValues: { nodes } }), [], JSON.stringify(nodes));
+});
+
+test('fieldValuesOf(item) は、nodes をそのまま返す (写しを作らない)', ()=> {
+    const item = itemNode();
+    const nodes = item.fieldValues.nodes;
+
+    assert.equal(fieldValuesOf(item), nodes);
+    assert.equal(fieldValuesOf(item)[0], nodes[0]);
+
+    // 空の配列・null が混ざる配列も、そのまま。
+    const empty = [];
+    assert.equal(fieldValuesOf({ fieldValues: { nodes: empty } }), empty);
+
+    const mixed = [null, {}, nodes[0]];
+    assert.equal(fieldValuesOf({ fieldValues: { nodes: mixed } }), mixed);
+});
+
+test('Issue の fieldValues()・ProjectV2Item の fieldValues() は、いままでどおり、Item の JSON の nodes を返す', ()=> {
+    const { issue, item } = models();
+
+    assert.equal(issue.fieldValues().length, KINDS.length + 1);
+    assert.equal(item.fieldValues(), item.core().fieldValues.nodes);
+    assert.equal(issue.fieldValues(), issue.fieldItem().fieldValues.nodes);
+
+    // Item の無い Issue・fieldValues の無い Item は、空の配列。
+    const sogh = new Sogh();
+
+    assert.deepEqual(sogh.node2issue({ ...issueNode(), id: 'I_3', number: 9, projectItems: undefined }).fieldValues(), []);
+    assert.deepEqual(sogh.node2projectV2Item({ __typename: 'ProjectV2Item', id: 'PVTI_Y', updatedAt: T1 }).fieldValues(), []);
 });
