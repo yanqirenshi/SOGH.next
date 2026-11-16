@@ -5299,60 +5299,6 @@
                 ]
             },
             {
-                "name": "_date_next_action",
-                "visibility": "private",
-                "type": "String | null",
-                "initialValue": "null",
-                "description": [
-                    "本文の $Date.Next の値 (次のアクションの日)。",
-                    "parseBody(issue) が、getNextActionFromBody(body) の値を入れる。",
-                    "本文に $Date.Next が無いときは null になる。",
-                    "この値を返すメソッドは無い。(nextActionDate(v) は、ProjectV2 のフィールド NextAction.Date の値を返す)"
-                ],
-                "examples": [
-                    "// 本文: $Date.Next 2026-11-20",
-                    "issue._date_next_action;",
-                    "// => \"2026-11-20\""
-                ],
-                "affectedBy": [
-                    "parseBody(issue)",
-                    "constructor",
-                    "core(v)",
-                    "body(v)"
-                ],
-                "seeAlso": [
-                    "getNextActionFromBody(body)",
-                    "nextActionDate(v)"
-                ]
-            },
-            {
-                "name": "_due_date",
-                "visibility": "private",
-                "type": "String | null",
-                "initialValue": "null",
-                "description": [
-                    "本文の $Date.Due (または $Due.Date) の値 (期日)。",
-                    "parseBody(issue) が、getDueDateFromBody(body) の値を入れる。",
-                    "本文に無いときは null になる。",
-                    "この値を返すメソッドは無い。(dueDate(v) は、ProjectV2 のフィールド Due.Date の値を返す)"
-                ],
-                "examples": [
-                    "// 本文: $Date.Due 2026-11-30",
-                    "issue._due_date;",
-                    "// => \"2026-11-30\""
-                ],
-                "affectedBy": [
-                    "parseBody(issue)",
-                    "constructor",
-                    "core(v)",
-                    "body(v)"
-                ],
-                "seeAlso": [
-                    "getDueDateFromBody(body)",
-                    "dueDate(v)"
-                ]
-            },
-            {
                 "name": "_points",
                 "visibility": "private",
                 "type": "Object",
@@ -6060,7 +6006,8 @@
                     "それ以外の型 (TEXT・NUMBER など) のフィールドのときは、Error を投げる。",
                     "アイテムが無いとき、名前が name のフィールドの値が無いときは null。",
                     "projectItems を取得していないときも、null。",
-                    "アイテムに fieldValues が無いとき、field の無い値が混ざっているときも、落ちずに null か、名前の合う値を返す。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)"
+                    "アイテムに fieldValues が無いとき、field の無い値が混ざっているときも、落ちずに null か、名前の合う値を返す。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)",
+                    "ProjectV2Item の fieldValueContents(name) も、同じ形を返す。(Issue の画面の部品は、item を渡されたときは、そちらを読む。yanqirenshi/SOGH.next#114)"
                 ],
                 "examples": [
                     "const contents = issue.fieldValueContents('Due.Date');",
@@ -6131,9 +6078,7 @@
             },
             {
                 "name": "dueDate",
-                "parameters": [
-                    "v"
-                ],
+                "parameters": [],
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
@@ -6143,22 +6088,13 @@
                         "期日 (YYYY-MM-DD)。"
                     ]
                 },
-                "arguments": [
-                    {
-                        "name": "v",
-                        "type": "any",
-                        "description": [
-                            "使わない。"
-                        ],
-                        "optional": true
-                    }
-                ],
                 "description": [
                     "ProjectV2 のフィールド Due.Date の値 (期日) を返す。",
-                    "本文の $Date.Due ではない。(本文の値は _due_date に入るが、それを返すメソッドは無い)",
+                    "本文の $Date.Due は読まない。(0.5.0 で、本文から日付を読む所 (getDueDateFromBody・getNextActionFromBody・_due_date・_date_next_action) を消した。(yanqirenshi/SOGH.next#114))",
                     "フィールドの値が無いときは null。",
-                    "引数 v は使わない。(値は変えられない)",
-                    "projectItems を取得していないときも、null。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)"
+                    "値は変えられない。(0.5.0 で、使っていなかった引数 v を外した)",
+                    "projectItems を取得していないときも、null。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)",
+                    "Issue の画面の部品 (PanelIssue) に item を渡したときは、部品は、その Item の dueDate() を読む。(Issue のこのメソッドの動きは変わらない。yanqirenshi/SOGH.next#114)"
                 ],
                 "examples": [
                     "issue.dueDate();",
@@ -6167,9 +6103,7 @@
             },
             {
                 "name": "nextActionDate",
-                "parameters": [
-                    "v"
-                ],
+                "parameters": [],
                 "returnType": "any",
                 "visibility": "public",
                 "returns": {
@@ -6179,98 +6113,16 @@
                         "次のアクションの日 (YYYY-MM-DD)。"
                     ]
                 },
-                "arguments": [
-                    {
-                        "name": "v",
-                        "type": "any",
-                        "description": [
-                            "使わない。"
-                        ],
-                        "optional": true
-                    }
-                ],
                 "description": [
                     "ProjectV2 のフィールド NextAction.Date の値 (次のアクションの日) を返す。",
-                    "本文の $Date.Next ではない。(本文の値は _date_next_action に入るが、それを返すメソッドは無い)",
+                    "本文の $Date.Next は読まない。(0.5.0 で、本文から日付を読む所 (getDueDateFromBody・getNextActionFromBody・_due_date・_date_next_action) を消した。(yanqirenshi/SOGH.next#114))",
                     "フィールドの値が無いときは null。",
-                    "引数 v は使わない。(値は変えられない)",
-                    "projectItems を取得していないときも、null。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)"
+                    "値は変えられない。(0.5.0 で、使っていなかった引数 v を外した)",
+                    "projectItems を取得していないときも、null。(0.4.2 から。yanqirenshi/SOGH.next#59。それまでは TypeError になっていた)",
+                    "Issue の画面の部品 (PanelIssue) に item を渡したときは、部品は、その Item の nextActionDate() を読む。(Issue のこのメソッドの動きは変わらない。yanqirenshi/SOGH.next#114)"
                 ],
                 "examples": [
                     "issue.nextActionDate();",
-                    "// => \"2026-11-20\""
-                ]
-            },
-            {
-                "name": "getDueDateFromBody",
-                "parameters": [
-                    "body"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "dueDate",
-                    "type": "String | null",
-                    "description": [
-                        "期日。",
-                        "無いときは null。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "body",
-                        "type": "String",
-                        "description": [
-                            "Issue の本文。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "本文から期日 ($Date.Due または $Due.Date の値) を読み出して返す。",
-                    "両方あるときは、行の順番によらず $Date.Due の値を使う。",
-                    "「@Date.Due」のように @ でもよく、名前のあとの「:」はあってもなくてもよい。",
-                    "名前の大文字・小文字は区別する。",
-                    "日付は「数字-数字-数字」の形で、そのままの文字列を返す。(日付として正しいかは確かめない)",
-                    "無いときは null。"
-                ],
-                "examples": [
-                    "issue.getDueDateFromBody('$Due.Date 2026-11-30');",
-                    "// => \"2026-11-30\""
-                ]
-            },
-            {
-                "name": "getNextActionFromBody",
-                "parameters": [
-                    "body"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "nextActionDate",
-                    "type": "String | null",
-                    "description": [
-                        "次のアクションの日。",
-                        "無いときは null。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "body",
-                        "type": "String",
-                        "description": [
-                            "Issue の本文。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "本文から次のアクションの日 ($Date.Next の値) を読み出して返す。",
-                    "「@Date.Next」のように @ でもよく、名前のあとの「:」はあってもなくてもよい。",
-                    "名前の大文字・小文字は区別する。",
-                    "日付は「数字-数字-数字」の形で、そのままの文字列を返す。(日付として正しいかは確かめない)",
-                    "無いときは null。"
-                ],
-                "examples": [
-                    "issue.getNextActionFromBody('$Date.Next 2026-11-20');",
                     "// => \"2026-11-20\""
                 ]
             },
@@ -6298,7 +6150,8 @@
                     }
                 ],
                 "description": [
-                    "ノードの body から注釈を読み出し、_points・_due_date・_date_next_action・_owner に入れる。",
+                    "ノードの body から注釈 ($Point.Plan・$Point.Result・$Owner) を読み出し、_points・_owner に入れる。",
+                    "本文の $Date.Due・$Date.Next は、読まない。(0.5.0 で、本文から日付を読む所 (getDueDateFromBody・getNextActionFromBody・_due_date・_date_next_action) を消した。(yanqirenshi/SOGH.next#114))",
                     "body が無いノード (ProjectV2Item の content など) は、空文字として読む。(注釈はすべて無しになる)",
                     "constructor・core(v)・body(v) が呼ぶ。",
                     "引数のノードは変えない。",
@@ -9284,6 +9137,48 @@
                 "examples": [
                     "projectV2Item.dueDate();",
                     "// => \"2026-11-30\""
+                ]
+            },
+            {
+                "name": "fieldValueContents",
+                "parameters": [
+                    "name"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "contents",
+                    "type": "Object | null",
+                    "description": [
+                        "{ project, item, field_item, value } の形のデータ。(Issue の fieldValueContents(name) と同じ形)",
+                        "project はこのアイテムの core の project (ProjectV2 のノード)、item はこのアイテムの core (ノード)、field_item はフィールドの値のノード。",
+                        "見つからないときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "name",
+                        "type": "String",
+                        "description": [
+                            "フィールドの名前。(Due.Date など)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "このアイテムの、名前が name のフィールドの値を探し、値を書き換えるときに利用側へ渡すデータにして返す。(0.5.0 から。yanqirenshi/SOGH.next#114)",
+                    "返すデータの中身は、モデルではなく JSON のまま。(yanqirenshi/SOGH.next#29)",
+                    "value の形は、フィールドの型 (dataType) で変わる。(ASSIGNEES は { users }、REPOSITORY は { repository }、LABELS は { labels }、TITLE は { text }、SINGLE_SELECT は { optionId }、DATE は { date })",
+                    "それ以外の型 (TEXT・NUMBER など) のフィールドのときは、Error を投げる。(Issue のものと同じ)",
+                    "名前が name のフィールドの値が無いとき・fieldValues が無いときは null。",
+                    "Issue の画面の部品 (PanelIssue) が、item を渡されたときに、日付を変えるとき・コメントを送るときに読む。"
+                ],
+                "examples": [
+                    "const contents = projectV2Item.fieldValueContents('NextAction.Date');",
+                    "",
+                    "contents.value;",
+                    "// => { date: \"2026-11-20\" }",
+                    "contents.item.id;",
+                    "// => \"PVTI_lAHOAB\""
                 ]
             }
         ],

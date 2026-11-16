@@ -49,6 +49,7 @@ function Overview ({ data }) {
             <P>{"フィールドの値は、フィールドの名前で fieldValues() から探して読む。(getFieldValueByName(name))"}</P>
             <P>{"fieldValues を取得していないとき・nodes が配列でないときは、fieldValues() は [] を返し、getFieldValueByName(name) は null と field の無いノードを飛ばす。そのため、値を読むメソッドは null、関連を読むメソッドは [] を返し、落ちない。(0.5.0 から。Issue と同じ守り。yanqirenshi/SOGH.next#103)"}</P>
             <P>{"フィールドの値 (fieldValues() の箱) と、箱に付いている creator は、モデルにせず、JSON のまま返す。"}</P>
+            <P>{"fieldValueContents(name) は、名前が name のフィールドの値を書き換えるときに利用側へ渡す値 { project, item, field_item, value } を、Issue の fieldValueContents(name) と同じ形 (JSON のまま) で返す。(値が無いときは null。Issue の画面の部品 (PanelIssue) に item として渡したときに、部品が読む。0.5.0 から。yanqirenshi/SOGH.next#114)"}</P>
             <P>{"contentTypename()・projectNumber()・projectOwnerLogin()・projectPath() は、モデルではなく、core の JSON を読む。"}</P>
             <P>{"値が無いときは null (配列を返すメソッドは []) を返すが、同じ名前で種類の違うフィールド (例: テキストの Archived) のときは undefined を返す。(関連を返すメソッドは、そのときも null か [] を返す)"}</P>
             <P>{"path() と projectPath() は Sogh の href(to, data) を使うので、Sogh を持っていないとき (Pool を通さずに作ったとき) はエラーになる。"}</P>

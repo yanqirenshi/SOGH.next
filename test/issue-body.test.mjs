@@ -52,11 +52,20 @@ test('$Point.Plan <人> <日付> <点> の行も、小数を読める (getPointP
     assert.deepEqual(plans.details.map(d=> d.point), [0.5, 1]);
 });
 
-test('本文の日付と $Owner は、いままでどおり読める', ()=> {
-    const issue = issueOf('$Owner alice\n$Date.Due 2026-11-30\n$Date.Next 2026-11-05');
+test('本文の $Owner は、いままでどおり読める。本文の日付 ($Date.Due・$Date.Next) は、読まない (yanqirenshi/SOGH.next#114)', ()=> {
+    const issue = issueOf('$Owner alice\n$Date.Due 2026-11-30\n$Date.Next 2026-11-05\n$Point.Plan 3');
 
     assert.equal(issue.bodyOwner(), 'alice');
-    assert.equal(issue.getDueDateFromBody(issue.body()), '2026-11-30');
-    assert.equal(issue.getNextActionFromBody(issue.body()), '2026-11-05');
-    assert.equal(issue.getDueDateFromBody('$Due.Date 2026-12-01'), '2026-12-01');
+    assert.equal(issue.pointPlansTotal(), 3);
+
+    // 期限と次の行動の日は、Item のフィールドの値だけ。(この Issue は Item が無いので null)
+    assert.equal(issue.dueDate(), null);
+    assert.equal(issue.nextActionDate(), null);
+
+    // 本文から日付を読むメソッドと、モデルの中の値は、消した。
+    for (const name of ['getDueDateFromBody', 'getNextActionFromBody'])
+        assert.equal(typeof issue[name], 'undefined', name);
+
+    for (const name of ['_due_date', '_date_next_action'])
+        assert.equal(name in issue, false, name);
 });

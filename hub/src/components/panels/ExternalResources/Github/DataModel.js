@@ -62,8 +62,8 @@ const ANNOTATION_COLUMNS = [
 
 const ANNOTATIONS = [
     { place: 'Issue の本文',
-      keys: ['$Owner', '$Point.Plan', '$Point.Result', '$Date.Due', '$Due.Date', '$Date.Next'],
-      note: '点数は「$Point.Result <人> <日付> <点>」の行を合計する。$Owner の値は bodyOwner() で読む (0.5.0 から。Issue に owner() は無い)' },
+      keys: ['$Owner', '$Point.Plan', '$Point.Result'],
+      note: '点数は「$Point.Result <人> <日付> <点>」の行を合計する。$Owner の値は bodyOwner() で読む (0.5.0 から。Issue に owner() は無い)。$Date.Due・$Due.Date・$Date.Next は、0.5.0 から読まない (期限と次の行動の日は、Item のフィールド Due.Date・NextAction.Date)' },
     { place: 'ProjectV2 の README',
       keys: ['$Priority', '$Owner', '$Type', '$Release', '$Plan', '$Result', '$Action', '$Backlog', '$Customer', '$Agency', '$Systems', '$Scenario', '$Progress'],
       note: '$Priority は s (緊急)・h (高い)・n (普通)・l (低い)。$Owner の値は readmeOwner() で読む (0.5.0 から。owner() は GitHub の owner のモデル)。書いていない属性は、初めの値 (\'?\'・\'\'・[]) のまま (0.5.0 から。それまでは null)' },

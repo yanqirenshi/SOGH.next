@@ -6,7 +6,7 @@
 また、Sogh のメソッドから使われていないクエリを、すべて消しました。
 取得のクエリを、値を GraphQL の variables で渡す形に書き直し、`asyncFetch〜` が失敗したときは例外を投げるようにしました。
 あわせて、Projects (classic) のモデルや、Issue を作るための部品など、使われていない古いものを消しました。
-(yanqirenshi/SOGH.next#39・yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100・yanqirenshi/SOGH.next#101・yanqirenshi/SOGH.next#102・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#104・yanqirenshi/SOGH.next#105・yanqirenshi/SOGH.next#108・yanqirenshi/SOGH.next#111)
+(yanqirenshi/SOGH.next#39・yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100・yanqirenshi/SOGH.next#101・yanqirenshi/SOGH.next#102・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#104・yanqirenshi/SOGH.next#105・yanqirenshi/SOGH.next#108・yanqirenshi/SOGH.next#111・yanqirenshi/SOGH.next#114)
 
 ### 利用側への影響 (破壊的な変更です)
 
@@ -67,6 +67,14 @@
 - `ProjectV2` の `maneger(v)` を消しました。README の `$Owner` は、`readmeOwner(v)` で読んでください。(同じ値を読み書きしていた。yanqirenshi/SOGH.next#86)
 - `Issue` の `addAnotetionValue(issue)` を消しました。(どこからも呼ばれず、渡したモデルの `owner()` をプロパティで隠してしまっていた。本文の注釈は、`parseBody(issue)` が読みます。yanqirenshi/SOGH.next#87)
 - `Issue` の `addAnotetionValueNew(issue)` を、`parseBody(issue)` に名前を変えました。(引数と、することは同じ。古い名前は残していません。yanqirenshi/SOGH.next#91)
+- `Issue` の、本文から日付を読むメソッド `getDueDateFromBody(body)`・`getNextActionFromBody(body)` を消しました。本文の `$Date.Due`・`$Due.Date`・`$Date.Next` は、もう読みません。(yanqirenshi/SOGH.next#114)
+  - 期限と次の行動の日は、Item のフィールド (`Due.Date`・`NextAction.Date`) の値です。(`dueDate()`・`nextActionDate()`。2023-12 から、そうなっています)
+  - `parseBody(issue)` は、点数 (`$Point.Plan`・`$Point.Result`) と `$Owner` だけを読みます。
+  - `dueDate()`・`nextActionDate()` の、使っていなかった引数 `v` を外しました。(渡しても、何も変わりませんでした)
+- `PanelIssue` (Issue の画面の部品) に、`item` (ProjectV2Item のモデル) を渡せるようになりました。(`<PanelIssue data={issue} item={item} actions={…}/>`。yanqirenshi/SOGH.next#114)
+  - 渡したときは、副題のプロジェクト (名前・番号のリンク・押したときの owner と番号)、期限と次の行動の日、日付を変えるとき・コメントを送るときに `actions` へ渡す値 (project・item・field_item・value) を、その Item から読みます。
+  - 渡さないときは、いままでどおり、Issue (最初の Item) から読みます。
+  - `actions` へ渡す値の形は、いままでと同じです。(JSON のまま。ProjectV2Item の `fieldValueContents(name)` が、Issue のものと同じ形を返します)
 - `ProjectV2` の README に書いていない属性は、null ではなく、初めの値を返すようになりました。(yanqirenshi/SOGH.next#90)
   - `priority()`・`readmeOwner()`・`type()`・`release()` は `'?'`。`action()`・`backlog()`・`customer()`・`agency()`・`scenario()`・`progress()` は `''`。`systems()` は `[]`。
   - これまでは、README を読むときに null で上書きしていました。null かどうかで「書いていない」を見分けていた場合は、初めの値で見分けてください。
@@ -107,6 +115,7 @@
 - `Issue` の属性 `regex` (本文の注釈を読む正規表現の表)。どこからも使われていなかった。(yanqirenshi/SOGH.next#95)
   - 点数の 4 つは、整数だけを読む古い書き方で、本文を読むメソッド (小数も読む) とは違っていました。`issue.regex` を読んでいた場合は、本文を読むメソッド (`points()`・`getPointFromBody(body)` など) を使ってください。
   - 本文を読むメソッドの中の正規表現は、変わりません。
+- `Issue` の、本文の日付を読む所。(`getDueDateFromBody(body)`・`getNextActionFromBody(body)` と、モデルの中の値 `_due_date`・`_date_next_action`。どこからも読まれていなかった。yanqirenshi/SOGH.next#114)
 - `ProjectsV2` の表の行の部品の、使っていなかった計算 (期間の中か・過ぎたか) と、そのための「いまの日時」の受け渡し。(画面は変わりません。yanqirenshi/SOGH.next#98)
 - クエリの項目の部品 (`src/js/queries/attributes.js`) のうち、どのクエリからも使われなくなった 7 個。(`project`・`project_card`・`project_column` (Projects (classic) 用) と、`project_next`・`project_next_fields`・`project_next_item`・`project_next_item_field_value` (古い Projects 用))
 
@@ -157,6 +166,11 @@
   - そのため、`Team` の core も、ProjectV2Item の core の fieldValues の中の Team も、取り方によらず `name`・`avatarUrl` です。(`teamName`・`teamAvatarUrl` は、残りません)
   - チームの ProjectV2 を取るクエリの根の Team (`teamRef()`) は、変わりません。
   - 企業のチーム (EnterpriseTeam) は、いまも取らず、`reviewers()` に入りません。(yanqirenshi/SOGH.next#112)
+- `PanelIssue` (Issue の画面の部品) は、プロジェクトの情報が無いときも、落ちずに描くようになりました。(yanqirenshi/SOGH.next#114)
+  - これまでは、プロジェクトの Item を取っていない Issue (`asyncFetchIssueByID` で取ったものなど) や、Item を Pool から消したあと (yanqirenshi/SOGH.next#108) の Issue で、副題がプロジェクトの名前を読むところで落ちていました。
+  - いまは、副題のプロジェクトの所 (名前・番号のリンク) を出しません。
+  - 日付を変えるときに `actions` へ渡す値が作れないとき (Item が無い・その日付の値がまだ無い) は、`actions.issue.due_date.change`・`actions.issue.next_action_date.change` を呼びません。(これまでは落ちていました。日付が入っていない Item に日付を入れられるようにするのは、yanqirenshi/SOGH.next#115)
+  - コメントを送るとき (次の行動の日を付けるタブ) も、値が作れないときは、次の行動の日の情報 (`project`・`item`・`field_item`・`next_action_date`) を付けずに送ります。(これまでは落ちていました)
 
 ### 足したもの
 
@@ -170,6 +184,8 @@
   - `clear()`: すべて消す。
   - 古いものを、自動で消す仕組み (期限) は、持ちません。
 - `ProjectV2` の `readmeOwner(v)`: README の `$Owner` の値を読む・入れる。(これまでの `owner()`。yanqirenshi/SOGH.next#71)
+- `ProjectV2Item` の `fieldValueContents(name)`: 名前が name のフィールドの値を書き換えるときに、利用側へ渡す値 `{ project, item, field_item, value }` を返す。(Issue の `fieldValueContents(name)` と同じ形。JSON のまま。値が無いときは null。yanqirenshi/SOGH.next#114)
+- `PanelIssue` の `item` (ProjectV2Item のモデル)。(上の「利用側への影響」を見る。yanqirenshi/SOGH.next#114)
 - `ProjectV2` の `itemsInPool()`: Pool にある、この ProjectV2 の Item の配列を返す。(yanqirenshi/SOGH.next#102)
   - 並び順は、`items()` (中身に入っている Item) をその順に、そのあとに、別に取って Pool に入った Item (core の project の id が、この ProjectV2 のもの) を、Pool に入った順に。同じ Item は、1 回だけ。
   - 取得はしません。sogh が入っていないモデルでは、`items()` と同じです。

@@ -5,8 +5,6 @@ export default class Issue extends GraphQLNode {
         super(data);
 
         this._owner = null;
-        this._date_next_action = null;
-        this._due_date = null;
         this._points = { plan: null, result: null, results: null };
 
         if (arguments.length===1)
@@ -253,43 +251,29 @@ export default class Issue extends GraphQLNode {
     /* **************************************************************** *
      *  Dates
      * **************************************************************** */
-    dueDate (v) {
+    // 期限と次の行動の日は、Item のフィールド (Due.Date・NextAction.Date) の値。(最初の Item の JSON を読む)
+    // 本文の $Date.Due・$Date.Next は、読まない。(0.5.0 で、本文から日付を読む所を消した。yanqirenshi/SOGH.next#114)
+    dueDate () {
         const field_value = this.getFieldValueByName('Due.Date');
 
         return field_value ? field_value.date : null;
     }
-    nextActionDate (v) {
+    nextActionDate () {
         const field_value = this.getFieldValueByName('NextAction.Date');
 
         return field_value ? field_value.date : null;
     }
-    getDueDateFromBody (body) {
-        const a = /.*[@|$]Date\.Due:*\s+(\d+-\d+-\d+).*/.exec(body);
-
-        if (a) return a[1];
-
-        const b = /.*[@|$]Due\.Date:*\s+(\d+-\d+-\d+).*/.exec(body);
-
-        if (b) return b[1];
-
-        return null;
-    };
-    getNextActionFromBody (body) {
-        const next_action = /.*[@|$]Date\.Next:*\s+(\d+-\d+-\d+).*/.exec(body);
-        return next_action ? next_action[1] : null;;
-    }
     /* **************************************************************** *
      * 本文の注釈
      * **************************************************************** */
-    // 本文の注釈 ($Point・$Date.Due・$Date.Next・$Owner) を読み出して持つ。
+    // 本文の注釈 ($Point・$Owner) を読み出して持つ。
+    // (本文の $Date.Due・$Date.Next は、0.5.0 で読まなくした。yanqirenshi/SOGH.next#114)
     // (0.5.0 で addAnotetionValueNew(issue) から名前を変えた。yanqirenshi/SOGH.next#91)
     parseBody (issue) {
         // body を取得していないノード (ProjectV2Item の content など) もあるので空文字で扱う。
         const body = issue.body || '';
 
         this._points = this.getPointFromBody(body);
-        this._due_date = this.getDueDateFromBody(body);
-        this._date_next_action = this.getNextActionFromBody(body);
         this._owner = this.getOwnerFromBody(body);
 
         return issue;

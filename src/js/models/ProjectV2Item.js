@@ -201,12 +201,50 @@ export default class ProjectV2Item extends GraphQLNode {
         const field_value = this.getFieldValueByName('Due.Date');
         return field_value ? field_value.date : null;
     }
+    // 名前が name のフィールドの値を書き換えるときに、利用側へ渡す値。(JSON のまま。yanqirenshi/SOGH.next#29)
+    // 形は、Issue の fieldValueContents(name) と同じ。{ project, item, field_item, value }
+    //   project    … この Item の core の project (JSON)
+    //   item       … この Item の core (JSON)
+    //   field_item … フィールドの値 (JSON。field の id・name・dataType を持つ)
+    //   value      … フィールドの種類ごとの値。(DATE なら { date })
+    // 名前の合う値が無いときは、null。(Issue の画面の部品が、Item を渡されたときに読む。yanqirenshi/SOGH.next#114)
+    fieldValueContents (name) {
+        const field_item = this.getFieldValueByName(name);
+
+        if (!field_item)
+            return null;
+
+        const core = this.core();
+
+        return {
+            project:    core.project,
+            item:       core,
+            field_item: field_item,
+            value:      fieldValueOf(field_item),
+        };
+    }
     // before () {
     //     return [];
     // }
     // after () {
     //     return [];
     // }
+}
+
+// フィールドの値 (JSON) から、種類ごとの値を取り出す。(Issue の fieldValueContents(name) と同じ)
+function fieldValueOf (field_item) {
+    const type = field_item.field.dataType;
+
+    switch (type) {
+    case 'ASSIGNEES':     return { users:      field_item.users };
+    case 'REPOSITORY':    return { repository: field_item.repository };
+    case 'LABELS':        return { labels:     field_item.labels };
+    case 'TITLE':         return { text:       field_item.text };
+    case 'SINGLE_SELECT': return { optionId:   field_item.optionId };
+    case 'DATE':          return { date:       field_item.date };
+    default:
+        throw new Error('Not Supported yet. dataType=' + type);
+    }
 }
 
 // ProjectV2Item の JSON (core) から、fieldValues の nodes を取り出す。
