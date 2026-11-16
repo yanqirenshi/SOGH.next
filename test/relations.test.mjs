@@ -197,6 +197,29 @@ test('PullRequest の assignees() は、User の配列を返す。無いとき�
     assert.deepEqual(b.assignees(), []);
 });
 
+test('PullRequest の repository()・author() は、モデルを返す。無いときは null (yanqirenshi/SOGH.next#49)', ()=> {
+    const sogh = new Sogh();
+
+    const a = sogh.node2pullRequest({
+        __typename: 'PullRequest', id: 'PR_1', updatedAt: T1,
+        repository: { __typename: 'Repository', id: 'R_1', name: 'repo', updatedAt: T1 },
+        author: { __typename: 'Mannequin', id: 'M_1', login: 'old', updatedAt: T1 },
+    });
+    const b = sogh.node2pullRequest({ __typename: 'PullRequest', id: 'PR_2', updatedAt: T1 });
+    const c = sogh.node2pullRequest({ __typename: 'PullRequest', id: 'PR_3', updatedAt: T1, repository: null, author: null });
+
+    assert.equal(a.repository(), sogh.repository('R_1'));
+    assert.equal(a.repository().name(), 'repo');
+    assert.ok(a.author() instanceof model.Mannequin);
+    assert.equal(a.author(), sogh.mannequin('M_1'));
+    assert.equal(a.author().login(), 'old');
+
+    assert.equal(b.repository(), null);
+    assert.equal(b.author(), null);
+    assert.equal(c.repository(), null);
+    assert.equal(c.author(), null);
+});
+
 /* ****************************************************************
  * ProjectV2
  * **************************************************************** */

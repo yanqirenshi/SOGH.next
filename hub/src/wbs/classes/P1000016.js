@@ -39,8 +39,8 @@ function Overview ({ data }) {
             <P>{"今の Sogh の取得メソッドには、node2pullRequest(node) を直に呼ぶものは無い。(Matchmaker が、IssueComment の pullRequest や ProjectV2Item の content・Linked pull requests を Pool に入れるときに呼ぶ)"}</P>
             <P>{"body()・bodyHTML() は、ほかのモデルと違い、無いときに null ではなく '' を返す。"}</P>
             <P>{"assignees() は、core の assignees の id で Pool から User を引いて、配列で返す。(取得していないときは [])"}</P>
-            <P>{"いまは、どのクエリも PullRequest の assignees を取得しないので、assignees() は [] になる。"}</P>
-            <P>{"repository()・author() は、モデルにする範囲に入っていないので、JSON (ノード) のまま返す。"}</P>
+            <P>{"repository()・author() も、core の id で Pool からモデル (Repository と、人のモデル) を引いて返す。(取得していないときは null。0.4.2 から。それまでは JSON (ノード) のまま返していた)"}</P>
+            <P>{"いまは、どのクエリも PullRequest の assignees・repository・author を取得しないので、assignees() は []、repository()・author() は null になる。"}</P>
           </Section>
 
           <Section title="属性" lev="4" sx={SX_MEMBER_TITLE}>

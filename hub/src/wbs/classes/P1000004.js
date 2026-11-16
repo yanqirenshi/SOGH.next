@@ -47,7 +47,7 @@ function Overview ({ data }) {
             <P>{"件数の上限で切れた関連は、取れた分だけをモデルにする。"}</P>
             <P>{"逆向きの関連 (User から、その人の Issue など) は持たない。"}</P>
             <P>{"一周する関連 (Issue → ProjectV2Item → ProjectV2 → owner の Issue など) は、特別に扱わない。(JSON は木なので、辿りは必ず終わる)"}</P>
-            <P>{"ProjectV2Item の fieldValues の箱と、箱に付いている creator はモデルにしない。PullRequest の関連は、assignees だけをモデルにする。"}</P>
+            <P>{"ProjectV2Item の fieldValues の箱と、箱に付いている creator はモデルにしない。PullRequest の関連は、assignees・repository・author をモデルにする。(repository・author は 0.4.2 から)"}</P>
             <P>{"同じ id のモデルがあるときは、core に node を重ねるだけなので、Sogh の connect(token, successed, failed) で viewer にした User の name()・email() などは、自分のリポジトリを取得しても残る。"}</P>
             <P>{"決まりの元は、GitHub の Issue yanqirenshi/SOGH.next#25〜30。"}</P>
             <Plane>{CODE}</Plane>
