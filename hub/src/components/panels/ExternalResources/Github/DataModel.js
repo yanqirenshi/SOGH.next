@@ -174,7 +174,7 @@ const NESTED = [
     { type: 'Issue',         nested: 'author, repository, milestone, assignees (10 件まで), labels (10 件まで)', some: 'projectItems (1 件), comments (100 件まで)' },
     { type: 'IssueComment',  nested: 'author, editor, pullRequest',                                some: '-' },
     { type: 'ProjectV2',     nested: 'fields, creator, owner',                                     some: 'items' },
-    { type: 'ProjectV2Item', nested: 'fieldValues, creator, content',                              some: 'project' },
+    { type: 'ProjectV2Item', nested: 'fieldValues, creator, content, project',                     some: '-' },
 ];
 
 export default function DataModel () {

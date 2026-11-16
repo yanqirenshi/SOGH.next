@@ -2162,7 +2162,7 @@
                 "description": [
                     "GraphQL のクエリの表。(クエリの名前 → クエリの文字列)",
                     "constructor が、queries/index.js のモジュール (import * as QUERIES) をそのまま入れる。",
-                    "クエリは 36 個ある。",
+                    "クエリは 18 個ある。どれも Sogh のメソッドが使う。(使われていなかったクエリは、0.5.0 で消した)",
                     "名前の綴りは、ファイル名のまま。(viewer ではなく viwer、issues_by_viwer など)",
                     "クエリの中の @id・@login などは、取得のメソッドが値に置き換える。",
                     "モジュールの名前空間オブジェクトなので、項目を足したり書き換えたりすると TypeError になる。"
@@ -2172,7 +2172,7 @@
                     "// => \"{\\n  viewer {\\n    id\\nlogin\\nname\\n...\"",
                     "",
                     "Object.keys(sogh._queries).length;",
-                    "// => 36"
+                    "// => 18"
                 ],
                 "affectedBy": [
                     "constructor"
@@ -2263,7 +2263,7 @@
                     "ページ送りのあるクエリには after: \"\", があり、Loader の makeQuery が、消すかカーソルに置き換える。"
                 ],
                 "examples": [
-                    "sogh.query('user_by_id').includes('node(id: \"@id\")');",
+                    "sogh.query('issue_by_id').includes('node(id: \"@id\")');",
                     "// => true",
                     "",
                     "sogh.query('viewer');",
@@ -9392,7 +9392,7 @@
                 },
                 "description": [
                     "アイテムが入っているプロジェクトを、ProjectV2 のモデルで返す。(core の project の id で、Pool から引く)",
-                    "project を取得しないクエリ (projectsv2_items_by_projects_v2) で取得したときは null。",
+                    "core に project が無いとき (project を取得しないクエリで取得したとき) は null。(いまの Item を取るクエリは、どれも project を取得する)",
                     "projectNumber()・projectOwnerLogin()・projectPath() は、このモデルではなく、core の project の JSON を読む。"
                 ],
                 "examples": [

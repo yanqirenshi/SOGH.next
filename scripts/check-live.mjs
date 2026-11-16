@@ -117,8 +117,6 @@ async function checkQueries (sogh, conf) {
 
     const viewer = viewer_data.viewer;
 
-    await send(sogh, 'user_by_id', { '@id': viewer.id });
-
     // リポジトリ
     await send(sogh, 'repositories_by_viewer', null, d=> n('リポジトリ', d.viewer.repositories.nodes));
 
@@ -139,22 +137,19 @@ async function checkQueries (sogh, conf) {
     const project = projects_data && projects_data.user.projectsV2.nodes[0];
 
     if (project) {
-        await send(sogh, 'projects_next_by_id', { '@id': project.id });
         await send(sogh, 'projectv2_by_user_login_projectv2_number', { '@user-login': viewer.login, '@projectv2-number': project.number });
 
-        const items_data = await send(sogh, 'projectsv2_items_by_projects_v2', { '@id': project.id }, d=> n('Item', d.node.items.nodes));
-        const item = items_data && items_data.node.items.nodes[0];
-
-        await send(sogh, 'projectv2items_by_user_login_projectv2_number',
-                   { '@user-login': viewer.login, '@projectv2-number': project.number },
-                   d=> n('Item', d.user.projectV2.items.nodes));
+        const items_data = await send(sogh, 'projectv2items_by_user_login_projectv2_number',
+                                      { '@user-login': viewer.login, '@projectv2-number': project.number },
+                                      d=> n('Item', d.user.projectV2.items.nodes));
+        const item = items_data && items_data.user.projectV2.items.nodes[0];
 
         if (item)
             await send(sogh, 'projectv2item_by_id', { '@id': item.id });
         else
             skip('projectv2item_by_id', 'ProjectV2 に Item が無い');
     } else {
-        for (const code of ['projects_next_by_id', 'projectv2_by_user_login_projectv2_number', 'projectsv2_items_by_projects_v2', 'projectv2items_by_user_login_projectv2_number', 'projectv2item_by_id'])
+        for (const code of ['projectv2_by_user_login_projectv2_number', 'projectv2items_by_user_login_projectv2_number', 'projectv2item_by_id'])
             skip(code, 'viewer の ProjectV2 が無い');
     }
 

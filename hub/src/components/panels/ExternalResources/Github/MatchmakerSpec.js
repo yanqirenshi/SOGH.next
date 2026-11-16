@@ -448,6 +448,7 @@ export default function MatchmakerSpec () {
                   <UL>
                     <LI>GitHub で廃止されていて、取ろうとすると、エラーが返る。</LI>
                     <LI>クエリと、モデルのクラス (<C>Project</C>・<C>Card</C>・<C>Column</C>) は、今回は触らずに残す。</LI>
+                    <LI>そのあと、Projects (classic) を取るクエリは、Sogh のメソッドから使われていなかったので、0.5.0 で消した。(<IssueLink num="66"/>。モデルのクラスは、残っている)</LI>
                   </UL>
                 </LI>
                 <LI>ProjectV2Item の fieldValues そのものは、モデルにしない。(値を入れる箱なので)</LI>

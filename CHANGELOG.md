@@ -3,7 +3,8 @@
 ## 0.5.0
 
 古い世代の取得のメソッド (`fetch〜`) を消して、`asyncFetch〜` にそろえました。
-(yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#67)
+また、Sogh のメソッドから使われていないクエリを、すべて消しました。
+(yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67)
 
 ### 利用側への影響 (破壊的な変更です)
 
@@ -30,7 +31,12 @@
 
 - `Sogh` の補助のメソッド `data2data(data, make, appender)`・`zzz(data, make)` と、`Loader` の `ensureEndCursor(query, endCursor)`。(`fetch〜` だけが使っていた)
 - クエリ `projects_next_items_by_id`。(いまの GitHub には、`ProjectNextItem` という型が無く、動かなかった。yanqirenshi/SOGH.next#67)
-- `fetch〜` だけが使っていたほかのクエリ (`user_by_id`・`projects_next_by_id`・`projectsv2_items_by_projects_v2`) は、残しています。(Sogh のメソッドからは使われなくなりました)
+- Sogh のメソッドから使われていないクエリを、18 個消した。(yanqirenshi/SOGH.next#66)
+  - `sogh.query(code)` で、名前で取っていた場合は、取れなくなります。(`undefined` が返ります)
+  - 前から使われていなかったもの (15 個): `assignees_by_repository`・`create_issue`・`issues_by_milestone`・`issues_by_report_label`・`issues_by_repository`・`issues_open_by_label`・`issues_open_by_project_column`・`issues_open_by_repository`・`labels_by_repository`・`milestones_by_repository`・`project_by_id`・`projects_by_repository`・`repository`・`search_issues`・`update_issue_body`
+  - `fetch〜` を消して、使われなくなったもの (3 個): `user_by_id`・`projects_next_by_id`・`projectsv2_items_by_projects_v2`
+  - 残ったクエリは 18 個で、どれも Sogh のメソッドが使っている。
+- クエリの項目の部品 (`src/js/queries/attributes.js`) のうち、どのクエリからも使われなくなった 7 個。(`project`・`project_card`・`project_column` (Projects (classic) 用) と、`project_next`・`project_next_fields`・`project_next_item`・`project_next_item_field_value` (古い Projects 用))
 
 ## 0.4.2
 

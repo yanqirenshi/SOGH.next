@@ -46,14 +46,7 @@ export default function Notes () {
                 </UL>
               </LI>
               <LI>値の印の置き換えは、最初の 1 か所だけ。(同じ印を、1 つのクエリで 2 回使えない)</LI>
-              <LI>projectCards (Projects classic) を取るクエリは、いまの GitHub では動かない。
-                <UL>
-                  <LI>GitHub がエラーを返し、Issue が丸ごと取れない。(projectCards だけが抜けるのではない)</LI>
-                  <LI>使用中のクエリからは、外してある。(<C>issue_by_id</C> は、GitHub に送って確かめたときに見つけて、外した)</LI>
-                  <LI>使われていないクエリには、残っている。(9 個)</LI>
-                </UL>
-              </LI>
-              <LI>ProjectV2Item の content で、Issue の state と PullRequest の state を、同じ場所で取っている。(7 個のクエリ)
+              <LI>ProjectV2Item の content で、Issue の state と PullRequest の state を、同じ場所で取っている。(5 個のクエリ)
                 <UL>
                   <LI>型が違う (IssueState と PullRequestState) ので、GraphQL の決まりでは正しくない。</LI>
                   <LI>直すには、別名を付けることになり、応答の形が変わる。(<C>content.state</C> で読んでいる利用側が壊れる)</LI>
@@ -76,10 +69,14 @@ export default function Notes () {
               <LI>クエリの名前に <C>viwer</C> がある。(<C>viwer</C>・<C>issues_by_viwer</C>)</LI>
               <LI>項目の部品の名前の付け方が、3 通りある。(<C>issue_comment</C>・<C>projectv2Fields</C>・<C>ProjectV2ItemFieldDateValue</C>)</LI>
               <LI>項目の部品が返す形が、2 通りある。(項目だけを返すものと、{'{ }'} で囲んで返すもの)</LI>
-              <LI>使われていないクエリには、項目を、部品を使わずに直に書いているものが残っている。</LI>
-              <LI>入れ子の件数の上限が、クエリごとに違う。(20 と 30。定数を宣言しているが、使っていないクエリもある)</LI>
+              <LI>入れ子の件数の上限が、クエリごとに違う。
+                <UL>
+                  <LI>ProjectV2Item の fieldValues は、20 件まで (<C>projectsv2_with_items_by_team</C>・<C>projectv2_by_org_login_projectv2_number</C>) と、30 件まで (<C>projectv2item_by_id</C>・<C>projectv2items_by_org_login_projectv2_number</C>・<C>projectv2items_by_user_login_projectv2_number</C>・<C>issue_by_org_repo_issue_number</C>)。</LI>
+                  <LI>上限の定数 (<C>MAX_FIELD_NUM</C> など) を宣言しているが、使っていないクエリがある。(<C>projectsv2_by_team</C>)</LI>
+                  <LI><C>issue_by_org_repo_issue_number</C> は、定数を使わずに、数を直に書いている。</LI>
+                </UL>
+              </LI>
               <LI>組織 (org) のクエリでも、値の印の名前が <C>@user-login</C> になっている。</LI>
-              <LI>Sogh のメソッドから使われていないクエリが、18 個ある。(「3.6 クエリの使われ方」を見る)</LI>
               <LI><C>fetchX</C> は、エンドポイントを直に書いている。(<C>endpoint()</C> を使っていない)</LI>
               <LI>src/js/models/README.markdown が、古い。</LI>
             </OL>

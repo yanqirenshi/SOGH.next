@@ -46,30 +46,8 @@ const VALUES = [
       queries: 'コメントの追加・更新・削除 (3 個)',
       syntax: ['mutation ($id: ID!, $body: String!)', 'postData(query, { id, body })'] },
     { how: 'オブジェクトを文字列にして、埋め込む',
-      queries: 'Issue の作成・本文の更新 (2 個。いまは使われていない)',
+      queries: '無い (Issue の作成・本文の更新のクエリ 2 個は、0.5.0 で消した。makeGraphQLData は、Loader に残っている)',
       syntax: ['createIssue(input:@issue-data)', 'makeGraphQLData(data)'] },
-];
-
-// Sogh のメソッドから使われていないクエリ。
-const UNUSED_QUERIES = [
-    'assignees_by_repository',
-    'labels_by_repository',
-    'milestones_by_repository',
-    'projects_by_repository',
-    'project_by_id',
-    'repository',
-    'issues_by_repository',
-    'issues_by_milestone',
-    'issues_by_report_label',
-    'issues_open_by_label',
-    'issues_open_by_project_column',
-    'issues_open_by_repository',
-    'search_issues',
-    'create_issue',
-    'update_issue_body',
-    'user_by_id',
-    'projects_next_by_id',
-    'projectsv2_items_by_projects_v2',
 ];
 
 // クエリを検査するコマンド。
@@ -84,7 +62,7 @@ const CHECK_COMMAND = [
     'npm run check:queries -- --schema <...> --compare before.json',
 ].join('\n');
 
-// いまのクエリを検査した結果。(36 個)
+// いまのクエリを検査した結果。(18 個)
 const CHECK_COLUMNS = [
     { code: 'kind',    label: '種類',   key: 'kind' },
     { code: 'count',   label: '個数',   key: 'count' },
@@ -98,19 +76,17 @@ const CHECKS = [
       queries: [],
       note: 'ProjectNextItem という型が GitHub のスキーマから無くなっていて NG だった projects_next_items_by_id は、0.5.0 で消した。検査は、終了コード 0 で終わる' },
     { kind: 'NG (未使用)',
-      count: 2,
-      queries: ['create_issue', 'update_issue_body'],
-      note: '入力の印 (@issue-data) を、検査のために空のオブジェクトに置き換えているため。クエリの間違いではない' },
+      count: 0,
+      queries: [],
+      note: '使われていないクエリは、無い。(0.5.0 で消した)' },
     { kind: '注意',
-      count: 7,
+      count: 5,
       queries: [
-          'projectsv2_items_by_projects_v2',
           'projectsv2_with_items_by_team',
           'projectv2_by_org_login_projectv2_number',
           'projectv2item_by_id',
           'projectv2items_by_org_login_projectv2_number',
           'projectv2items_by_user_login_projectv2_number',
-          'search_issues',
       ],
       note: 'ProjectV2Item の content で、Issue の state と PullRequest の state を取っている。型が違う (IssueState と PullRequestState) ので、GraphQL の決まりでは正しくない。GitHub は受け付ける (「3.8 GitHub につないで確かめる」を見る)' },
     { kind: 'キー (使用中)',
@@ -118,9 +94,9 @@ const CHECKS = [
       queries: [],
       note: '使用中のクエリは、データモデルになる型のすべてで、id と updatedAt を取っている' },
     { kind: 'キー (未使用)',
-      count: 2,
-      queries: ['issues_by_milestone', 'issues_by_report_label'],
-      note: '項目を直に書いていて、updatedAt を取っていない所がある' },
+      count: 0,
+      queries: [],
+      note: '使われていないクエリは、無い。(0.5.0 で消した)' },
 ];
 
 // GitHub につないで確かめるコマンド。
@@ -244,13 +220,13 @@ export default function Fetching () {
             <OL>
               <LI>項目の部品。(<C>queries/attributes.js</C>)
                 <UL>
-                  <LI>「この型からは、この項目を取る」という文字列を返す関数。57 個ある。</LI>
+                  <LI>「この型からは、この項目を取る」という文字列を返す関数。50 個ある。</LI>
                   <LI>型ごとの部品と、その決まりは、「5.3 型ごとの、項目の部品」を見る。</LI>
                 </UL>
               </LI>
               <LI>クエリの本体。(src/js/queries/ の 1 ファイルに 1 クエリ)
                 <UL>
-                  <LI>GraphQL の形 (どこから、何を入れ子で取るか) を書いた文字列。36 個ある。</LI>
+                  <LI>GraphQL の形 (どこから、何を入れ子で取るか) を書いた文字列。18 個ある。</LI>
                   <LI>項目のところに、項目の部品を埋め込む。</LI>
                 </UL>
               </LI>
@@ -284,8 +260,8 @@ export default function Fetching () {
             <OL>
               <LI>一覧のクエリには、<C>{'after: "", first: 100'}</C> という印が入っている。
                 <UL>
-                  <LI><C>attributes.page_nation()</C> で入れているクエリが、9 個。</LI>
-                  <LI>クエリに直に書いているクエリが、11 個。</LI>
+                  <LI><C>attributes.page_nation()</C> で入れているクエリが、8 個。</LI>
+                  <LI>クエリに直に書いているクエリが、1 個。(<C>issues_by_viwer</C>)</LI>
                 </UL>
               </LI>
               <LI><C>makeQuery(query, cursor)</C> が、<C>{'after: "",'}</C> を書き換える。
@@ -327,18 +303,13 @@ export default function Fetching () {
           </Section>
 
           <Section title="クエリの使われ方" num="3.6" lev="5">
-            <P>クエリは 36 個あり、Sogh のメソッドから使われているのは 18 個です。</P>
+            <P>クエリは 18 個あり、どれも Sogh のメソッドから使われています。</P>
             <OL>
-              <LI>使われているもの。(18 個)
+              <LI>viewer・リポジトリ・Issue・コメント・ProjectV2・ProjectV2Item のクエリ。</LI>
+              <LI>使われていなかったクエリ (18 個) は、0.5.0 で消した。(<C>yanqirenshi/SOGH.next#66</C>)
                 <UL>
-                  <LI>viewer・リポジトリ・Issue・コメント・ProjectV2・ProjectV2Item のクエリ。</LI>
-                </UL>
-              </LI>
-              <LI>使われていないもの。(18 個)
-                <UL>
-                  <LI>{UNUSED_QUERIES.map(q=> <span key={q}><C>{q}</C>{' '}</span>)}</LI>
-                  <LI>iHub のコア (ihub.core) からも、名前で引いている場所は無い。</LI>
-                  <LI>多くは Projects (classic) のころのもので、項目を、部品を使わずに直に書いている。</LI>
+                  <LI>消したクエリの名前は、<C>CHANGELOG.md</C> の「0.5.0」を見る。</LI>
+                  <LI>項目の部品のうち、どのクエリからも使われなくなった 7 個も、消した。(Projects (classic) 用と、古い Projects 用)</LI>
                 </UL>
               </LI>
             </OL>
@@ -412,6 +383,7 @@ export default function Fetching () {
                   <LI>GitHub 側で値を変えてから取り直す確認は、していない。(読むだけのため。テストで、にせの node を使って確かめている)</LI>
                 </UL>
               </LI>
+              <LI>記録のあとで、OK だった <C>user_by_id</C>・<C>projects_next_by_id</C>・<C>projectsv2_items_by_projects_v2</C> は、0.5.0 で消した。(いまのスクリプトは、残した 18 個のクエリを、すべて送るか、飛ばす)</LI>
             </OL>
           </Section>
 
