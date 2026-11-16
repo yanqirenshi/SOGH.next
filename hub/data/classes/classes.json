@@ -73,7 +73,7 @@
                 "description": [
                     "GraphQL API の URL。",
                     "constructor が入れる。(書き換えるメソッドは無い)",
-                    "endpoint() が返し、request(query, variables) (Sogh の asyncFetch〜 が使う)・fetchX(query, response2data, success, error) (Sogh の connect(token, successed, failed) が使う) と、Sogh のコメントの追加・更新・削除が送り先に使う。",
+                    "endpoint() が返し、request(query, variables) (Sogh の asyncFetch〜・asyncUpdateIssueBody・asyncCreateIssueComment・asyncUpdateIssueComment・asyncDeleteIssueComment が使う)・fetchX(query, response2data, success, error) (Sogh の connect(token, successed, failed) が使う) が使う。",
                     "fetchX(query, response2data, success, error) も、0.5.0 から、endpoint() に送る。(それまでは、同じ URL を直に書いていた。yanqirenshi/SOGH.next#76)"
                 ],
                 "examples": [
@@ -125,7 +125,7 @@
                 },
                 "description": [
                     "GraphQL API の URL (_endpoint) を返す。",
-                    "request(query, variables) (Sogh の asyncFetch〜 が使う)・fetchX(query, response2data, success, error) (Sogh の connect(token, successed, failed) が使う) と、Sogh のコメントの追加・更新・削除が、送り先に使う。"
+                    "request(query, variables) (Sogh の asyncFetch〜・asyncUpdateIssueBody・asyncCreateIssueComment・asyncUpdateIssueComment・asyncDeleteIssueComment が使う)・fetchX(query, response2data, success, error) (Sogh の connect(token, successed, failed) が使う) が使う。"
                 ],
                 "examples": [
                     "sogh.endpoint();",
@@ -271,7 +271,7 @@
                     "HTTP のステータスが 2xx でないときは、status に HTTP の状態コード、response に fetch の Response が入る。",
                     "HTTP 200 でも、応答に errors があるときは、errors に GitHub の errors (配列)、status に HTTP の状態コード、response に fetch の Response が入る。(message は、errors の message を改行でつないだもの)",
                     "GitHubError の name は 'GitHubError'。パッケージの入口から、名前付きで export している。(import { GitHubError } from 'sogh'。e instanceof GitHubError で見分ける)",
-                    "Sogh の fetchNode(code, variables) が使う。(asyncFetch〜 は、fetchNode・fetchPages を通して、これで送る)"
+                    "Sogh の fetchNode(code, variables) が使う。(asyncFetch〜・asyncUpdateIssueBody・asyncCreateIssueComment・asyncUpdateIssueComment・asyncDeleteIssueComment は、fetchNode・fetchPages を通して、これで送る)"
                 ],
                 "examples": [
                     "await sogh.request('query ($id: ID!) { node(id: $id) { id } }', { id: 'I_kwDOAA1' });",
@@ -353,7 +353,7 @@
                     "headers は makeHeader() の値、body は { query, variables } を JSON の文字列にしたもの。",
                     "variables を渡さないとき (null など) は、body に variables を入れない。",
                     "値をクエリの文字列に埋め込まず variables で渡すので、改行や \" を含む値でもクエリが壊れない。",
-                    "request(query, variables) (Sogh の asyncFetch〜 が使う)・fetchX(query, response2data, success, error) (Sogh の connect(token, successed, failed) が使う) と、Sogh のコメントの追加・更新・削除 (updateIssueComment(id, body, callbacks) など) が使う。"
+                    "request(query, variables) (Sogh の asyncFetch〜・asyncUpdateIssueBody・asyncCreateIssueComment・asyncUpdateIssueComment・asyncDeleteIssueComment が使う)・fetchX(query, response2data, success, error) (Sogh の connect(token, successed, failed) が使う) が使う。"
                 ],
                 "examples": [
                     "sogh.postData('mutation($id: ID!, $body: String!) { ... }', { id: 'IC_kwDOAB', body: 'LGTM' });",
@@ -434,123 +434,6 @@
                     "",
                     "await sogh.fetchX('{ viewer { login } }');",
                     "// => { status: \"success\", data: { data: { viewer: { login: \"octocat\" } } } }"
-                ]
-            },
-            {
-                "name": "text2json",
-                "parameters": [
-                    "r"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "promise",
-                    "type": "Promise",
-                    "description": [
-                        "レスポンスの JSON で resolve する Promise。",
-                        "HTTP のエラーのときは、Response で reject する。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "r",
-                        "type": "Response",
-                        "description": [
-                            "fetch が返した Response。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "fetch の Response を、JSON にする。",
-                    "r.ok が true のときは r.json() を返す。",
-                    "HTTP のエラーのときは、Response そのもので reject する Promise を返す。(Error ではない)",
-                    "Sogh のコメントの追加・更新・削除 (createIssueComment・updateIssueComment・deleteIssueComment) が、fetch のすぐあとに使う。(asyncFetch〜 は使わない。request(query, variables) で送る)"
-                ],
-                "examples": [
-                    "await fetch(sogh.endpoint(), sogh.postData('{ viewer { login } }'))",
-                    "      .then(r=> sogh.text2json(r));",
-                    "// => { data: { viewer: { login: \"octocat\" } } }"
-                ]
-            },
-            {
-                "name": "json2response",
-                "parameters": [
-                    "r",
-                    "getData"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "response",
-                    "type": "Object",
-                    "description": [
-                        "{ type: \"success\", data } の形のオブジェクト。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "r",
-                        "type": "Object",
-                        "description": [
-                            "GraphQL のレスポンス (JSON)。({ data, errors })"
-                        ]
-                    },
-                    {
-                        "name": "getData",
-                        "type": "Function",
-                        "description": [
-                            "レスポンス全体を受け取り、data にするものを返す関数。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "GraphQL のレスポンス (JSON) を、{ type: \"success\", data } の形にする。",
-                    "data は getData(r) の値。(getData にはレスポンス全体を渡す)",
-                    "レスポンスに errors があるときは、data があっても Error を投げる。",
-                    "投げる Error の message は、errors の message を改行でつないだもの。(message が無い要素は、JSON の文字列にする)",
-                    "投げる Error の errors には、元の errors の配列が入る。",
-                    "fetchX(query, response2data, success, error) の { status, data } と違い、キーの名前は type。",
-                    "Sogh のコメントの追加・更新・削除は、投げた Error を catch で受けて error2response(error) にし、failed に渡す。(asyncFetch〜 は使わない。request(query, variables) が GitHubError を投げる)"
-                ],
-                "examples": [
-                    "sogh.json2response({ data: { viewer: { login: 'octocat' } } }, d=> d.data.viewer);",
-                    "// => { type: \"success\", data: { login: \"octocat\" } }",
-                    "",
-                    "sogh.json2response({ data: null, errors: [{ message: 'Could not resolve to a node' }] }, d=> d.data.node);",
-                    "// => Error (message: \"Could not resolve to a node\") を投げる"
-                ]
-            },
-            {
-                "name": "error2response",
-                "parameters": [
-                    "error"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "response",
-                    "type": "Object",
-                    "description": [
-                        "{ type: \"error\", data: error } の形のオブジェクト。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "error",
-                        "type": "Error | Response",
-                        "description": [
-                            "エラー。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "エラーを、{ type: \"error\", data: error } の形にする。",
-                    "エラーは error ではなく data のキーに入る。",
-                    "Sogh のコメントの追加・更新・削除が、catch で受けたもの (HTTP のエラーの Response や、json2response(r, getData) が投げた Error) を渡す。(asyncFetch〜 は使わない)"
-                ],
-                "examples": [
-                    "sogh.error2response(new Error('Bad credentials'));",
-                    "// => { type: \"error\", data: Error: Bad credentials }"
                 ]
             }
         ],
@@ -1343,7 +1226,7 @@
                     "Issue のコメントのノードを、IssueComment にして Pool に入れて返す。",
                     "先に matchmaker.issueComment(node) で、入れ子の author・editor・pullRequest をモデルにして Pool に入れる。(core には JSON をそのまま残す)",
                     "同じ id の IssueComment があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
-                    "Sogh の asyncFetchIssueCommentsByID(id) や updateIssueComment(id, body, callbacks)、Matchmaker の issue(node) などが使う。"
+                    "Sogh の asyncFetchIssueCommentsByID(id) や asyncUpdateIssueComment(id, body)、Matchmaker の issue(node) などが使う。"
                 ],
                 "examples": [
                     "const comment = sogh.node2issueComment({ id: 'IC_kwDOAB', body: 'LGTM' });",
@@ -2491,81 +2374,19 @@
                 ]
             },
             {
-                "name": "updateIssueComment",
+                "name": "asyncCreateIssueComment",
                 "parameters": [
                     "id",
-                    "body",
-                    "callbacks={}"
+                    "body"
                 ],
-                "returnType": "any",
+                "returnType": "Promise",
                 "visibility": "public",
                 "returns": {
-                    "name": "emptyArray",
-                    "type": "Array",
+                    "name": "commentId",
+                    "type": "Promise<String>",
                     "description": [
-                        "空の配列 []。",
-                        "結果は入らない。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "id",
-                        "type": "String",
-                        "description": [
-                            "コメントの node id。"
-                        ]
-                    },
-                    {
-                        "name": "body",
-                        "type": "String",
-                        "description": [
-                            "新しい本文。"
-                        ]
-                    },
-                    {
-                        "name": "callbacks",
-                        "type": "Object",
-                        "description": [
-                            "start・successed・failed の関数を持つオブジェクト。",
-                            "無い項目や、関数でない項目は呼ばない。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "id のコメントの本文を、body に書き換える。(GraphQL の updateIssueComment)",
-                    "id と body は、クエリに埋め込まず、GraphQL の variables で送る。",
-                    "応答から取り出す所は、クエリのファイルの pick を使う。(queryDefinition(code) で取る。yanqirenshi/SOGH.next#65)",
-                    "書き換えたコメントは、IssueComment にして Pool に入れる。(同じ id があるときは、core にノードを重ねる)",
-                    "始めに、callbacks の start(id, body) を呼ぶ。",
-                    "成功したときは、successed(コメントの id, id, body) を呼ぶ。",
-                    "失敗したときは、failed({ type: 'error', data: error }, id, body) を呼ぶ。",
-                    "error は、GraphQL のエラーのときは Error (errors に元の配列を持つ)、HTTP のエラーのときは fetch の Response。",
-                    "successed の中で例外が起きたときも、failed を呼ぶ。",
-                    "結果を待たずに、すぐ空の配列を返す。(Promise は返さない)"
-                ],
-                "examples": [
-                    "sogh.updateIssueComment(comment.id(), '本文を直した。', {",
-                    "    successed: (comment_id)=> refresh(comment_id),",
-                    "    failed:    (response)=> console.error(response.data),",
-                    "});",
-                    "// => []"
-                ]
-            },
-            {
-                "name": "createIssueComment",
-                "parameters": [
-                    "id",
-                    "body",
-                    "callbacks={}"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "emptyArray",
-                    "type": "Array",
-                    "description": [
-                        "空の配列 []。",
-                        "結果は入らない。"
+                        "作ったコメントの id。",
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "arguments": [
@@ -2583,49 +2404,37 @@
                         "description": [
                             "コメントの本文。"
                         ]
-                    },
-                    {
-                        "name": "callbacks",
-                        "type": "Object",
-                        "description": [
-                            "start・successed・failed の関数を持つオブジェクト。",
-                            "無い項目や、関数でない項目は呼ばない。"
-                        ]
                     }
                 ],
                 "description": [
                     "id (Issue など) に、body のコメントを足す。(GraphQL の addComment)",
-                    "id と body は、クエリに埋め込まず、GraphQL の variables で送る。",
-                    "応答から取り出す所は、クエリのファイルの pick を使う。(queryDefinition(code) で取る。yanqirenshi/SOGH.next#65)",
-                    "足したコメントは、IssueComment にして Pool に入れる。",
-                    "始めに、callbacks の start(id, body) を呼ぶ。",
-                    "成功したときは、successed(足したコメントの id, id, body) を呼ぶ。",
-                    "失敗したときは、failed({ type: 'error', data: error }, id, body) を呼ぶ。",
-                    "error は、GraphQL のエラーのときは Error (errors に元の配列を持つ)、HTTP のエラーのときは fetch の Response。",
-                    "successed の中で例外が起きたときも、failed を呼ぶ。",
-                    "結果を待たずに、すぐ空の配列を返す。(Promise は返さない)"
+                    "作ったコメントは、node2issueComment(node) で IssueComment にして Pool に入れ、その id を返す。",
+                    "通信は、取得 (asyncFetch〜) や asyncUpdateIssueBody と同じ fetchNode(code, variables) を通す。(request(query, variables) で送り、クエリのファイルの pick で取り出す。yanqirenshi/SOGH.next#65)",
+                    "値は、クエリに埋め込まず、GraphQL の variables で送る。",
+                    "失敗したとき (GraphQL のエラー・HTTP のエラー・つながらない・応答に取り出す値が無い) は、GitHubError を投げる。",
+                    "Promise の形。(0.5.0 から。callbacks の形の createIssueComment は、消した。yanqirenshi/SOGH.next#122)"
                 ],
                 "examples": [
-                    "sogh.createIssueComment(issue.id(), 'クラス図を描いた。', {",
-                    "    successed: (comment_id)=> console.log(sogh.issueComment(comment_id).body()),",
-                    "});",
-                    "// => クラス図を描いた。"
+                    "const comment_id = await sogh.asyncCreateIssueComment(issue.id(), 'クラス図を描いた。');",
+                    "",
+                    "sogh.issueComment(comment_id).body();",
+                    "// => \"クラス図を描いた。\""
                 ]
             },
             {
-                "name": "deleteIssueComment",
+                "name": "asyncUpdateIssueComment",
                 "parameters": [
                     "id",
-                    "callbacks={}"
+                    "body"
                 ],
-                "returnType": "any",
+                "returnType": "Promise",
                 "visibility": "public",
                 "returns": {
-                    "name": "emptyArray",
-                    "type": "Array",
+                    "name": "commentId",
+                    "type": "Promise<String>",
                     "description": [
-                        "空の配列 []。",
-                        "結果は入らない。"
+                        "書き換えたコメントの id。",
+                        "失敗したときは、GitHubError を投げる。"
                     ]
                 },
                 "arguments": [
@@ -2637,32 +2446,67 @@
                         ]
                     },
                     {
-                        "name": "callbacks",
-                        "type": "Object",
+                        "name": "body",
+                        "type": "String",
                         "description": [
-                            "start・successed・failed の関数を持つオブジェクト。",
-                            "無い項目や、関数でない項目は呼ばない。"
+                            "新しい本文。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "id のコメントの本文を、body に書き換える。(GraphQL の updateIssueComment)",
+                    "書き換えたコメントは、node2issueComment(node) で IssueComment にして Pool に入れ、その id を返す。(同じ id があるときは、core にノードを重ねる)",
+                    "通信は、取得 (asyncFetch〜) や asyncUpdateIssueBody と同じ fetchNode(code, variables) を通す。(request(query, variables) で送り、クエリのファイルの pick で取り出す。yanqirenshi/SOGH.next#65)",
+                    "値は、クエリに埋め込まず、GraphQL の variables で送る。",
+                    "失敗したとき (GraphQL のエラー・HTTP のエラー・つながらない・応答に取り出す値が無い) は、GitHubError を投げる。",
+                    "Promise の形。(0.5.0 から。callbacks の形の updateIssueComment は、消した。yanqirenshi/SOGH.next#122)"
+                ],
+                "examples": [
+                    "const comment_id = await sogh.asyncUpdateIssueComment(comment.id(), '本文を直した。');",
+                    "",
+                    "sogh.issueComment(comment_id).body();",
+                    "// => \"本文を直した。\""
+                ]
+            },
+            {
+                "name": "asyncDeleteIssueComment",
+                "parameters": [
+                    "id"
+                ],
+                "returnType": "Promise",
+                "visibility": "public",
+                "returns": {
+                    "name": "commentId",
+                    "type": "Promise<String>",
+                    "description": [
+                        "消したコメントの id。",
+                        "失敗したときは、GitHubError を投げる。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "id",
+                        "type": "String",
+                        "description": [
+                            "コメントの node id。"
                         ]
                     }
                 ],
                 "description": [
                     "id のコメントを消す。(GraphQL の deleteIssueComment)",
-                    "id は、クエリに埋め込まず、GraphQL の variables で送る。",
-                    "応答から取り出す所は、クエリのファイルの pick を使う。(queryDefinition(code) で取る。yanqirenshi/SOGH.next#65)",
-                    "GitHub で消せたときは、issue-comment の Pool からも消す。(pool('issue-comment').remove(id)。0.5.0 から。yanqirenshi/SOGH.next#69)",
-                    "始めに、callbacks の start(id) を呼ぶ。",
-                    "成功したときは、Pool から消してから、successed(id) を呼ぶ。(successed の中では、issueComment(id) は null)",
-                    "失敗したときは、failed({ type: 'error', data: error }, id) を呼ぶ。",
-                    "HTTP 200 でも GraphQL の errors が返ったときは、失敗として failed を呼ぶ。",
+                    "GitHub で消せたときは、issue-comment の Pool からも消し、消したコメントの id を返す。(pool('issue-comment').remove(id)。0.5.0 から。yanqirenshi/SOGH.next#69)",
                     "失敗したときは、Pool から消さない。",
-                    "結果を待たずに、すぐ空の配列を返す。(Promise は返さない)"
+                    "応答の clientMutationId は null のことがあるが、値が無いことは、失敗ではない。",
+                    "通信は、取得 (asyncFetch〜) や asyncUpdateIssueBody と同じ fetchNode(code, variables) を通す。(request(query, variables) で送り、クエリのファイルの pick で取り出す。yanqirenshi/SOGH.next#65)",
+                    "値は、クエリに埋め込まず、GraphQL の variables で送る。",
+                    "失敗したとき (GraphQL のエラー・HTTP のエラー・つながらない・応答に取り出す値が無い) は、GitHubError を投げる。",
+                    "Promise の形。(0.5.0 から。callbacks の形の deleteIssueComment は、消した。yanqirenshi/SOGH.next#122)"
                 ],
                 "examples": [
-                    "sogh.deleteIssueComment(comment.id(), {",
-                    "    successed: (id)=> removeFromList(id),",
-                    "    failed:    (response, id)=> console.error(response.data),",
-                    "});",
-                    "// => []"
+                    "const id = await sogh.asyncDeleteIssueComment(comment.id());",
+                    "",
+                    "sogh.issueComment(id);",
+                    "// => null"
                 ]
             },
             {
@@ -3034,7 +2878,7 @@
                     "Pool に projectItems を持つ同じ Issue があるときも、重なるのは来た項目だけなので、projectItems (と、そこから引く projectV2Items()・dueDate() など) は、消えない。",
                     "失敗したとき (GraphQL のエラー・HTTP のエラー・つながらない・応答に issue が無い) は、GitHubError を投げる。Pool の本文は、変わらない。",
                     "Issue の画面 (PanelIssue) の本文の所は、利用側の actions.issue.description.update(id, 本文) から、これを呼ぶ想定。(0.5.0 から。yanqirenshi/SOGH.next#119)",
-                    "コメントの書き換え (updateIssueComment) は、callbacks の形のまま、変わらない。"
+                    "コメントの追加・更新・削除 (asyncCreateIssueComment・asyncUpdateIssueComment・asyncDeleteIssueComment) も、同じ Promise の形。(yanqirenshi/SOGH.next#122)"
                 ],
                 "examples": [
                     "const id = await sogh.asyncUpdateIssueBody('I_kwDOAB', '新しい本文');",
@@ -3893,7 +3737,7 @@
                     "その id のオブジェクトが無いときは、何もせずに null を返す。",
                     "_list は、消したものを除いた、新しい配列に置き換える。(前に list() で受け取った配列は、変わらない)",
                     "関連を引くメソッド (GraphQLNode の relation(node)・relations(connection)) は、Pool に無いものを null にするか外すので、消しても壊れない。",
-                    "Sogh の deleteIssueComment(id, callbacks) が、GitHub でコメントを消せたときに使う。",
+                    "Sogh の asyncDeleteIssueComment(id) が、GitHub でコメントを消せたときに使う。",
                     "0.5.0 で足した。(yanqirenshi/SOGH.next#69)"
                 ],
                 "examples": [

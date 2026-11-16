@@ -59,7 +59,7 @@ export default function Notes () {
               <LI>Pool に、消す操作と期限が無かった。(取り直しは、重ねるだけ。0.5.0 で直した)
                 <UL>
                   <LI>0.5.0 で、Pool に <C>remove(id)</C> と <C>clear()</C> を足した。(Issue 69)</LI>
-                  <LI><C>deleteIssueComment</C> は、GitHub で消せたら、<C>issue-comment</C> の Pool からも消す。(<C>successed</C> を呼ぶ前に)</LI>
+                  <LI><C>asyncDeleteIssueComment</C> は、GitHub で消せたら、<C>issue-comment</C> の Pool からも消す。(消したコメントの id を返す前に。失敗したときは、消さない)</LI>
                   <LI>期限は、付けていない。</LI>
                 </UL>
               </LI>

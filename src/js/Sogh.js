@@ -112,84 +112,31 @@ export default class Sogh extends Pooler {
     /** **************************************************************** *
      * コメントの追加・更新・削除
      * **************************************************************** */
-    updateIssueComment (id, body, callbacks={}) {
-        callback('start', callbacks, [id, body]);
+    // 3 個とも、Promise の形。(asyncFetch〜・asyncUpdateIssueBody と同じ。yanqirenshi/SOGH.next#122)
+    // 通信は、取得と同じ部品 (fetchNode) を通す。失敗したときは、GitHubError を投げる。
+    // 0.5.0 で、callbacks の形の createIssueComment・updateIssueComment・deleteIssueComment から、名前と形を変えた。
+    //
+    // Issue (id) に、コメントを足す。作ったコメントを Pool に入れ、その id を返す。
+    async asyncCreateIssueComment (id, body) {
+        const node = await this.fetchNode('create_issue_comment', { id, body });
 
-        let out = [];
-
-        const { query, pick } = this.queryDefinition('update_issue_comment');
-
-        const post_data = this.postData(query, { id: id, body: body });
-
-        fetch(this.endpoint(), post_data)
-            .then(response  => this.text2json(response))
-            .then(response  => {
-                // GraphQL のエラーは json2response が throw して catch に回る。
-                const r = this.json2response(response, d=> {
-                    const issue_comment_node = pick(d.data);
-                    return this.node2issueComment(issue_comment_node);
-                });
-
-                callback('successed', callbacks, [r.data.id(), id, body]);
-            })
-            .catch(err => {
-                callback('failed', callbacks, [this.error2response(err), id, body]);
-            });
-
-        return out;
+        return this.node2issueComment(node).id();
     }
-    createIssueComment (id, body, callbacks={}) {
-        callback('start', callbacks, [id, body]);
+    // コメント (id) の本文を、body に書き換える。書き換えたコメントを Pool に入れ、その id を返す。
+    async asyncUpdateIssueComment (id, body) {
+        const node = await this.fetchNode('update_issue_comment', { id, body });
 
-        let out = [];
-
-        const { query, pick } = this.queryDefinition('create_issue_comment');
-
-        const post_data = this.postData(query, { id: id, body: body });
-
-        fetch(this.endpoint(), post_data)
-            .then(response  => this.text2json(response))
-            .then(response  => {
-                // GraphQL のエラーは json2response が throw して catch に回る。
-                const r = this.json2response(response, d=> {
-                    const issue_comment_node = pick(d.data);
-                    return this.node2issueComment(issue_comment_node);
-                });
-
-                callback('successed', callbacks, [r.data.id(), id, body]);
-            })
-            .catch(err => {
-                callback('failed', callbacks, [this.error2response(err), id, body]);
-            });
-
-        return out;
+        return this.node2issueComment(node).id();
     }
-    deleteIssueComment (id, callbacks={}) {
-        callback('start', callbacks, [id]);
+    // コメント (id) を消す。GitHub で消せたら、Pool からも消し、消したコメントの id を返す。(yanqirenshi/SOGH.next#69)
+    // 失敗したときは、Pool から消さない。
+    // 応答の clientMutationId は、null のことがある。(値が無いことは、失敗ではない)
+    async asyncDeleteIssueComment (id) {
+        await this.fetchNode('delete_issue_comment', { id });
 
-        let out = [];
+        this.pool('issue-comment').remove(id);
 
-        const { query, pick } = this.queryDefinition('delete_issue_comment');
-
-        const post_data = this.postData(query, { id: id });
-
-        fetch(this.endpoint(), post_data)
-            .then(response  => this.text2json(response))
-            .then(response  => {
-                // HTTP 200 でも GraphQL の errors が返ることがある。
-                // json2response が throw して catch (failed) に回る。
-                this.json2response(response, d=> pick(d.data));
-
-                // GitHub から消せたので、Pool からも消す。(successed の前に。yanqirenshi/SOGH.next#69)
-                this.pool('issue-comment').remove(id);
-
-                callback('successed', callbacks, [id]);
-            })
-            .catch(err => {
-                callback('failed', callbacks, [this.error2response(err), id]);
-            });
-
-        return out;
+        return id;
     }
     /** **************************************************************** *
      * 取得の部品 (yanqirenshi/SOGH.next#61・#63・#65)

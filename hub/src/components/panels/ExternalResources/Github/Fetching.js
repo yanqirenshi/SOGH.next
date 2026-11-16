@@ -198,7 +198,7 @@ const METHODS = [
     { target: 'viewer の Issue (OPEN)',     methods: ['asyncFetchIssueByViewer'],                                                                                  style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW },
     { target: 'Issue のコメント',           methods: ['asyncFetchIssueCommentsByID', 'asyncFetchIssueCommentsByOrgRepoIssueNumber'],                               style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW },
     { target: 'Issue の本文の書き換え',    methods: ['asyncUpdateIssueBody'],                                                                                     style: ASYNC,    paging: '-',        returns: 'id',        failed: THROW },
-    { target: 'コメントの追加・更新・削除', methods: ['createIssueComment', 'updateIssueComment', 'deleteIssueComment'],                                           style: CALLBACK, paging: '-',        returns: '-',         failed: FAILED },
+    { target: 'コメントの追加・更新・削除', methods: ['asyncCreateIssueComment', 'asyncUpdateIssueComment', 'asyncDeleteIssueComment'],                                           style: ASYNC,    paging: '-',        returns: 'id',        failed: THROW },
     { target: 'ProjectV2 (viewer)',         methods: ['asyncFetchProjectsV2ByViewer'],                                                                             style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW },
     { target: 'ProjectV2 (team)',           methods: ['asyncFetchProjectsV2ByTeam', 'asyncFetchProjectsV2WithItemsByTeam'],                                        style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW_AFTER_FAILED },
     { target: 'ProjectV2 (1 件)',           methods: ['asyncFetchProjectV2ByUserLoginProjectV2Number', 'asyncFetchProjectV2ByOrgLoginProjectV2Number'],            style: ASYNC,    paging: '-',        returns: 'id',        failed: THROW_AFTER_FAILED },
@@ -308,7 +308,6 @@ export default function Fetching () {
                   <LI>ProjectV2 の 2 つ (<C>asyncFetchProjectV2By〜LoginProjectV2Number</C>) は、<C>failed(error, login, number)</C>。</LI>
                 </UL>
               </LI>
-              <LI>コメントの追加・更新・削除の <C>failed</C> は、1 つめの引数が <C>{"{ type: 'error', data: error }"}</C>。(例外は投げない)</LI>
             </OL>
           </Section>
 
@@ -325,9 +324,9 @@ export default function Fetching () {
               <LI>途中のページで失敗したときも、投げる。途中まで集めた分は、返さない。</LI>
               <LI>成功したときの戻り値 (id か、id の配列。<C>asyncFetchViewer()</C> は User) は、0.5.0 の前と変わらない。</LI>
               <LI><C>GitHubError</C> は、パッケージの入口から、名前付きで export している。(<C>{"import { GitHubError } from 'sogh'"}</C>。<C>e instanceof GitHubError</C> で見分ける)</LI>
-              <LI>コメントの追加・更新・削除と <C>connect</C> は、例外を投げない。
+              <LI>コメントの追加・更新・削除は、Promise の形 (<C>asyncCreateIssueComment</C>・<C>asyncUpdateIssueComment</C>・<C>asyncDeleteIssueComment</C>)。失敗したときは、<C>GitHubError</C> を投げる。(0.5.0 から。callbacks の形の <C>createIssueComment</C> などは、消した。<C>yanqirenshi/SOGH.next#122</C>)</LI>
+              <LI><C>connect</C> は、例外を投げない。
                 <UL>
-                  <LI>コメントの追加・更新・削除は、HTTP のステータスが 2xx でなければ <C>text2json(r)</C> が失敗 (reject) にし、HTTP 200 でも errors があれば <C>json2response(r, getData)</C> が Error を投げる。それを <C>error2response(error)</C> で <C>{"{ type: 'error', data: error }"}</C> にして、<C>failed</C> に渡す。</LI>
                   <LI><C>connect</C> は、<C>fetchX</C> で送り、失敗したときは <C>{"failed({ status: 'error', error })"}</C> を呼ぶ。</LI>
                 </UL>
               </LI>

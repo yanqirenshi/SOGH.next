@@ -201,16 +201,17 @@ test('asyncUpdateIssueBody: 応答に issue が無い (null) ときも、GitHubE
     assert.equal(issue.body(), 'もとの本文');
 });
 
-test('本文を書き換えるメソッドは Promise の形。コメントの書き換え (updateIssueComment など) は、変わらない', ()=> {
+test('本文を書き換えるメソッドは Promise の形で、コメントの追加・更新・削除 (asyncCreateIssueComment など) も、同じ形', ()=> {
     const sogh = new Sogh();
 
-    assert.equal(typeof sogh.asyncUpdateIssueBody, 'function');
-    assert.equal(sogh.asyncUpdateIssueBody.constructor.name, 'AsyncFunction');
-
-    for (const name of ['updateIssueComment', 'createIssueComment', 'deleteIssueComment']) {
+    for (const name of ['asyncUpdateIssueBody', 'asyncCreateIssueComment', 'asyncUpdateIssueComment', 'asyncDeleteIssueComment']) {
         assert.equal(typeof sogh[name], 'function', name);
-        assert.equal(sogh[name].constructor.name, 'Function', name);
+        assert.equal(sogh[name].constructor.name, 'AsyncFunction', name);
     }
+
+    // callbacks の形の古い名前は、無い。(yanqirenshi/SOGH.next#122)
+    for (const name of ['updateIssueComment', 'createIssueComment', 'deleteIssueComment'])
+        assert.equal(name in sogh, false, name);
 });
 
 /* ****************************************************************

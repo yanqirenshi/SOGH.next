@@ -75,10 +75,44 @@ test('取得のメソッドは、asyncFetch〜 の 16 個 (と、取得の部品
     assert.deepEqual(fetches, [...ASYNC_FETCHES, 'fetchNode', 'fetchPages', 'fetchProjectsV2OfTeam', 'fetchX'].sort());
 });
 
-test('接続とコメントの追加・更新・削除のメソッドと、取得の部品は、残っている。makeQuery・node2objs は無い', ()=> {
+test('コメントの追加・更新・削除は Promise の形で、callbacks の形の古い名前 3 個は無い (yanqirenshi/SOGH.next#122)', ()=> {
+    const sogh = new Sogh();
+
+    for (const name of ['asyncCreateIssueComment', 'asyncUpdateIssueComment', 'asyncDeleteIssueComment', 'asyncUpdateIssueBody']) {
+        assert.equal(typeof sogh[name], 'function', name);
+        assert.equal(sogh[name].constructor.name, 'AsyncFunction', name);
+    }
+
+    // 引数は、callbacks を持たない。
+    assert.equal(sogh.asyncCreateIssueComment.length, 2);
+    assert.equal(sogh.asyncUpdateIssueComment.length, 2);
+    assert.equal(sogh.asyncDeleteIssueComment.length, 1);
+
+    const names = methodNames(sogh);
+
+    for (const name of ['createIssueComment', 'updateIssueComment', 'deleteIssueComment'])
+        assert.equal(names.has(name), false, name);
+});
+
+test('Loader の text2json・json2response・error2response は無い (callbacks の形のコメントの 3 個だけが使っていた。yanqirenshi/SOGH.next#122)', ()=> {
+    const sogh = new Sogh();
+
+    const names = methodNames(sogh);
+
+    for (const name of ['text2json', 'json2response', 'error2response']) {
+        assert.equal(names.has(name), false, name);
+        assert.equal(name in sogh, false, name);
+    }
+
+    // 残っている Loader のメソッド。
+    for (const name of ['endpoint', 'token', 'viewer', 'isConnected', 'request', 'makeHeader', 'postData', 'fetchX'])
+        assert.equal(typeof sogh[name], 'function', name);
+});
+
+test('接続とコメントの追加・更新・削除のメソッド (Promise の形)・本文の書き換えと、取得の部品は、残っている。makeQuery・node2objs は無い', ()=> {
     const names = methodNames(new Sogh());
 
-    for (const name of ['connect', 'createIssueComment', 'updateIssueComment', 'deleteIssueComment', 'request', 'query', 'queryDefinition', 'connection2ids'])
+    for (const name of ['connect', 'asyncCreateIssueComment', 'asyncUpdateIssueComment', 'asyncDeleteIssueComment', 'asyncUpdateIssueBody', 'request', 'query', 'queryDefinition', 'connection2ids'])
         assert.ok(names.has(name), name);
 
     // ページ送りの印を書き換える makeQuery は、variables にしたので、消した。(yanqirenshi/SOGH.next#63)
