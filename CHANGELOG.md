@@ -6,7 +6,7 @@
 また、Sogh のメソッドから使われていないクエリを、すべて消しました。
 取得のクエリを、値を GraphQL の variables で渡す形に書き直し、`asyncFetch〜` が失敗したときは例外を投げるようにしました。
 あわせて、Projects (classic) のモデルや、Issue を作るための部品など、使われていない古いものを消しました。
-(yanqirenshi/SOGH.next#39・yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100・yanqirenshi/SOGH.next#101・yanqirenshi/SOGH.next#102・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#104・yanqirenshi/SOGH.next#105・yanqirenshi/SOGH.next#108・yanqirenshi/SOGH.next#111・yanqirenshi/SOGH.next#114・yanqirenshi/SOGH.next#117・yanqirenshi/SOGH.next#118・yanqirenshi/SOGH.next#120)
+(yanqirenshi/SOGH.next#39・yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100・yanqirenshi/SOGH.next#101・yanqirenshi/SOGH.next#102・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#104・yanqirenshi/SOGH.next#105・yanqirenshi/SOGH.next#108・yanqirenshi/SOGH.next#111・yanqirenshi/SOGH.next#114・yanqirenshi/SOGH.next#117・yanqirenshi/SOGH.next#118・yanqirenshi/SOGH.next#120・yanqirenshi/SOGH.next#123・yanqirenshi/SOGH.next#124)
 
 ### 利用側への影響 (破壊的な変更です)
 
@@ -183,6 +183,20 @@
   - その名前のフィールドの値が無いときは、いままでどおり、全体が null です。
   - フィールドの値を取り出す処理は、`src/js/models/fieldValue.js` の `fieldValueOf(field_item)` の 1 か所にまとめ、Issue と ProjectV2Item の両方から呼びます。(これまでは、同じ switch が 2 か所にありました。パッケージの入口からは、export しません)
   - いままでの 6 つの種類 (DATE・TITLE・SINGLE_SELECT・ASSIGNEES・LABELS・REPOSITORY) の `value` の形と、Issue の `fieldValueContents(name)` が最初の Item だけを読むことは、変わりません。
+- `PanelIssueComments` (コメントの一覧の部品) に `comments` だけを渡しても、落ちなくなりました。(yanqirenshi/SOGH.next#124)
+  - これまでは、`edit_contents` か `actions` (`actions.issue.comment`) が渡されていないと、コメントが 1 個でもあるときに、描いただけで落ちていました。
+  - いまは、`edit_contents` が無いときは、空 (`{}`) として扱います。`actions`・`actions.issue`・`actions.issue.comment` のどの段が無くても、落ちません。
+  - 利用側の関数が無いときは、その関数が要るボタンを出しません。(関数でないもの (null など) が入っているときも、無いとして扱います)
+    - Edit (と、編集中の Cancel・Commit) は、`actions.issue.comment.change` と `actions.issue.comment.update` があるときだけ出します。
+    - Delete (と、確かめの Delete・Cancel) は、`actions.issue.comment.change` と `actions.issue.comment.delete` があるときだけ出します。
+    - 何も渡さないときは、ボタンの無い、読むだけの一覧になります。(本文・書いた人・日時は、いままでどおり出ます)
+    - `edit_contents` の mode が edit・delete でも、そのボタンが出せないときは、ふつうの表示 (view) で描きます。(編集の欄や、確かめのボタンだけが出ることはありません)
+  - 3 つの関数をすべて渡したときの、見た目と動き (ボタンの並び・呼ぶ関数と引数) は、変わりません。
+- `PanelIssueComments` (コメントの一覧の部品) の Edit を押したときに、いまのコメントの本文で、編集の欄の中身を作り直すようにしました。(yanqirenshi/SOGH.next#123)
+  - これまでは、2 回目からの Edit で、前の中身 (`edit_contents` の value) を、そのまま使っていました。そのため、書きかけて Cancel したあとの Edit で書きかけが出て、コメントを取り直して本文が変わったあとの Edit で古い本文が出ていました。
+  - いまは、Edit を押すと、`edit_contents` の写しの、そのコメントの中身を `{ id, value: comment.body(), mode: 'edit' }` に作り直してから、`actions.issue.comment.change(新しい edit_contents)` を呼びます。(本文が null のときは、value は空の文字です)
+  - 利用側は、何も変えなくて済みます。(`edit_contents` の形・呼ぶ関数と引数は、変わりません)
+  - 編集中に書いた文字が `change` で利用側に渡ること、Commit で `actions.issue.comment.update(コメントの id, 書いた本文)` を呼ぶこと、Delete の確かめと Cancel の動き、渡した `edit_contents` を書き換えないこと、ほかのコメントの中身を変えないことは、変わりません。
 
 ### 足したもの
 
