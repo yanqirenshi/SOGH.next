@@ -129,6 +129,21 @@ const LIVE_COMMAND = [
     'npm run check:live',
 ].join('\n');
 
+// updatedAt が、どの変更で動くかを確かめるコマンド。
+const UPDATED_AT_COMMAND = [
+    '# 対象の Issue を、.env.local に書く (owner/repo#番号)',
+    '# CHECK_UPDATED_AT_ISSUE=octocat/hello-world#1',
+    '',
+    '# いまの状態を覚える',
+    'npm run check:updated-at',
+    '',
+    '# GitHub の画面で、操作を 1 つ行ってから、前との違いを見る (操作ごとに繰り返す)',
+    'npm run check:updated-at',
+    '',
+    '# 比べずに、覚え直す',
+    'npm run check:updated-at -- --reset',
+].join('\n');
+
 // GitHub につないで確かめた結果。(2026-11-15)
 const LIVE_COLUMNS = [
     { code: 'kind',    label: '結果',   key: 'kind' },
@@ -391,6 +406,50 @@ export default function Fetching () {
                   <LI>GitHub 側で値を変えてから取り直す確認は、していない。(読むだけのため。テストで、にせの node を使って確かめている)</LI>
                 </UL>
               </LI>
+            </OL>
+          </Section>
+
+          <Section title="updatedAt が動く変更を確かめる" num="3.9" lev="5">
+            <P>Pool は、同じ id の node が来たとき、updatedAt を比べて、重ねるかどうかを決めます。関連は、親の core の JSON に持っているので、「関連が変わったのに、親の updatedAt が動かない」変更があると、取り直しても、反映されません。そういう変更があるかどうかを、GitHub で実際に確かめるスクリプトです。(<C>yanqirenshi/SOGH.next#51</C>)</P>
+            <Plane sx={SX_PLANE}>{UPDATED_AT_COMMAND}</Plane>
+            <OL>
+              <LI>進め方。
+                <UL>
+                  <LI>試す Issue を 1 つ決めて、<C>CHECK_UPDATED_AT_ISSUE</C> に <C>owner/repo#番号</C> の形で書く。(owner は、ユーザーでも組織でもよい)</LI>
+                  <LI>スクリプトを動かして、いまの状態を覚える。</LI>
+                  <LI>GitHub の画面で、操作を 1 つ行う。(ラベルを付ける、担当者を変える、コメントを足す、プロジェクトに足す、Item のフィールドの値を変える、など)</LI>
+                  <LI>スクリプトを動かして、前との違いを見る。操作ごとに、これを繰り返す。</LI>
+                  <LI>プロジェクトに足したときの ProjectV2 の動きを見るには、プロジェクトに入っている Issue で、先に外してから、足す。(足す前の ProjectV2 は、Issue から見えないので、比べられない。外した回に覚えた ProjectV2 なら、足したときに比べられる)</LI>
+                </UL>
+              </LI>
+              <LI>確かめること。対象ごとに、updatedAt が動いたかと、関連が変わったかを出す。
+                <UL>
+                  <LI>Issue … 関連は assignees・labels・milestone・comments・projectItems。</LI>
+                  <LI>Issue の ProjectV2Item … 関連は fieldValues (フィールドごとの値)。</LI>
+                  <LI>その ProjectV2 … 関連は items。</LI>
+                  <LI>Repository・Milestone・新しい順のコメント (5 件) … updatedAt だけ。</LI>
+                  <LI>関連が変わったのに、updatedAt が動いていない対象には、印を付ける。(これが、見つけたいもの)</LI>
+                  <LI>Item・ProjectV2 が増えた・減ったこと、コメントの数の増減、Milestone が付いた・外れたことも出す。</LI>
+                </UL>
+              </LI>
+              <LI>覚えるもの。
+                <UL>
+                  <LI>対象ごとの updatedAt と、関連の中身のダイジェスト (SHA-256)。id は、SHA-256 にした鍵にする。</LI>
+                  <LI>ProjectV2 の id だけは、そのまま覚える。Issue をプロジェクトから外すと、Issue から辿れなくなるので、次の回に、id で読み直すため。</LI>
+                  <LI>置き場所は、OS の一時フォルダの <C>sogh-check-updated-at.json</C>。(リポジトリの中には作らない)</LI>
+                  <LI>対象の Issue が前の回と違うときは、比べずに、覚え直す。</LI>
+                </UL>
+              </LI>
+              <LI>トークンと対象は、<C>check:live</C> と同じく、環境変数か <C>.env.local</C> から読む。環境変数 <C>CHECK_ENV_FILE</C> で、別の設定ファイルも指せる。</LI>
+              <LI>安全のための決まり。
+                <UL>
+                  <LI>読むだけ。書き込みのクエリ (mutation) は、送らない。</LI>
+                  <LI>トークンは、表示しない。</LI>
+                  <LI>取得した値そのもの (id・題名・login・日時・本文など) は、表示しない。表示するのは、種類の名前・件数・順番の番号・「動いた／動かない」「変わった／変わらない」・エラーの文だけ。</LI>
+                  <LI>GitHub のエラーは、type があるもの (NOT_FOUND・FORBIDDEN など) は、type だけを出す。(message には、対象の owner/repo や番号が入るため)</LI>
+                </UL>
+              </LI>
+              <LI>スクリプトは、<C>scripts/check-updated-at.mjs</C>。比べる部分は <C>scripts/updated-at.mjs</C> にあり、テストで、にせのスナップショットを使って確かめている。</LI>
             </OL>
           </Section>
 
