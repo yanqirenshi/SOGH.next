@@ -38,6 +38,12 @@ export default class Issue extends GraphQLNode {
 
         return super.core();
     }
+    // 日時が同じときも、中身を比べて、違えば重ねる項目。(GraphQLNode の merge(node) を見る)
+    // Issue をプロジェクトに足す・外すときや、Item のフィールドの値を変えたとき、
+    // Issue の updatedAt は動かないが、projectItems は変わるため。(yanqirenshi/SOGH.next#51)
+    sameTimeKeys () {
+        return ['projectItems'];
+    }
     number () {
         return this._core.number || null;
     }

@@ -6,6 +6,7 @@ ProjectV2 の Item の表で、Item の content が無いときに落ちる場�
 また、使われていなかったファイルを 20 個 (部品 19 個・モデル 1 個) 消しました。
 入口からモデルを export し、モデルの型の名前を返す `typename()` を足しました。
 PullRequest の `repository()`・`author()` も、モデルを返すようにしました。
+Issue を取り直したときに、プロジェクトへの出し入れと、Item のフィールドの値の変更が、反映されない場合があったのを、直しました。
 (yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#38・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45・yanqirenshi/SOGH.next#49・yanqirenshi/SOGH.next#51・yanqirenshi/SOGH.next#54)
 
 ### 直したもの
@@ -24,6 +25,12 @@ PullRequest の `repository()`・`author()` も、モデルを返すようにし
   - パッケージに入るファイルを、`dist/` (ビルドしたもの)・`CHANGELOG.md` と、npm がいつも入れる `package.json`・`README.org`・`LICENSE` だけにした。(`package.json` の `files` に書いた。`.npmignore` は消した)
   - これまでは、`hub/`・`scripts/`・`test/` なども入っていた。
   - ビルド (`npm run transpile`) の前に、`dist/` を空にするようにした。(消したファイルの、古いビルドが残らないように)
+- Issue を取り直しても、プロジェクトへの出し入れと、Item のフィールドの値の変更が、反映されない場合があった。(#51)
+  - Issue をプロジェクトに足す・外すときや、Item のフィールドの値 (Status・日付など) を変えたとき、GitHub は Issue の `updatedAt` を動かさない。(`npm run check:updated-at` で調べた)
+  - そのため、日時が同じとみなされ、Issue の core の `projectItems` が、古いままだった。`projectV2Items()` と、`projectItems` を直に読むメソッド (`fieldValues()`・`dueDate()`・`nextActionDate()` など) が、古い値を返していた。
+  - Issue の `projectItems` だけは、日時が同じときも、来た値と手元の値の中身を比べて、違えば重ねるようにした。(ほかのモデル・ほかの項目の重ね方は、変わらない)
+  - GraphQLNode の `merge(node)` は、このときに `'refreshed'` を返す。モデルごとに、この扱いをする項目を `sameTimeKeys()` で指定する。(Issue は `projectItems`)
+  - 0.4.0 (node を重ねるようにした版) からあった不具合です。
 
 ### 変わった動き
 

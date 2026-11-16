@@ -23,10 +23,11 @@ export default function Notes () {
                   <LI><C>fieldItem()</C> と <C>project()</C> は、0.4.0 で、TypeError にならないように直った。</LI>
                 </UL>
               </LI>
-              <LI>親の updatedAt が動かない変更は、取り直しても、反映されない場合がある。
+              <LI>親の updatedAt が動かない変更は、取り直しても、反映されない場合があった。(0.4.2 で直した)
                 <UL>
                   <LI>Pool は、同じ id の node が来ると、updatedAt を比べて、重ねるかどうかを決めるため。</LI>
-                  <LI>どんな場合かは、「7.5 (1) updatedAt が動かない変更」を見る。</LI>
+                  <LI>GitHub で調べると、動かないのは、Issue をプロジェクトに足す・外す、の 1 種類だけだった。(Issue の projectItems。Item の Status を変えたときも、Issue の updatedAt は動かない)</LI>
+                  <LI>0.4.2 で、Issue の projectItems だけは、日時が同じときも、中身が違えば重ねるようにした。(Issue 51。くわしくは「7.5 (1) updatedAt が動かない変更」を見る)</LI>
                   <LI>項目の少ない node が先に来て、古い項目が残る場合は、0.4.1 で直した。(Issue 34)</LI>
                 </UL>
               </LI>

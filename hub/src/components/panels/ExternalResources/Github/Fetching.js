@@ -460,6 +460,8 @@ export default function Fetching () {
               </LI>
               <LI>スクリプトは、<C>scripts/check-updated-at.mjs</C>。比べる部分は <C>scripts/updated-at.mjs</C> にあり、テストで、にせのスナップショットを使って確かめている。</LI>
             </OL>
+
+            <P>2026-11-16 に、試すための Issue で、操作を 1 つずつ行って調べた結果、「関連が変わったのに、親の updatedAt が動かない」のは、Issue をプロジェクトに足す・外す (Issue の projectItems) の 1 種類だけでした。0.4.2 で、Issue の projectItems を、日時が同じときも、中身が違えば重ねるようにしました。くわしくは「7.5 (1) updatedAt が動かない変更」を見てください。</P>
           </Section>
 
           <Section title="パッケージに入るファイルを確かめる" num="3.10" lev="5">

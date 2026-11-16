@@ -5446,6 +5446,31 @@
                 ]
             },
             {
+                "name": "sameTimeKeys",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "keys",
+                    "type": "String[]",
+                    "description": [
+                        "日時が同じときも、中身を比べて、違えば重ねる項目の名前。",
+                        "GraphQLNode では []。"
+                    ]
+                },
+                "description": [
+                    "merge(node) が、日時が同じで _reload が入っていないときにも、中身を比べて、違えば重ねる項目の名前を返す。",
+                    "関連が変わっても、親の updatedAt が動かない項目のため。(yanqirenshi/SOGH.next#51)",
+                    "モデルごとに上書きして指定する。いまは、Issue が ['projectItems'] を返す。ほかのモデルは [] のまま。"
+                ],
+                "examples": [
+                    "issue.sameTimeKeys();",
+                    "// => [\"projectItems\"]",
+                    "projectV2.sameTimeKeys();",
+                    "// => []"
+                ]
+            },
+            {
                 "name": "merge",
                 "parameters": [
                     "node"
@@ -5460,6 +5485,7 @@
                         "'newer' … 来たノードのほうが新しく、来た項目を重ねた。",
                         "'same' … 日時が同じで、_reload が入っていたので、来た項目を重ねた。",
                         "'filled' … 手元に無い項目を足した。",
+                        "'refreshed' … 日時が同じで、sameTimeKeys() の項目 (Issue の projectItems) の中身が違ったので、その項目を重ねた。(手元に無い項目も一緒に足したときも、'refreshed')",
                         "'kept' … 何もしなかった。",
                         "'always' … updatedAt を比べられず、来た項目を重ねた。"
                     ]
@@ -5482,6 +5508,8 @@
                     "日時が同じで、_reload が入っているときは、来た項目を重ねる。(_reload は変えない)",
                     "(今の core が、項目の少ないノードで、先に updatedAt だけ進んでいるかもしれないため。yanqirenshi/SOGH.next#34)",
                     "日時が同じで、_reload が入っていないとき、来たノードのほうが古いときは、手元に無い項目だけを足す。(手元の値は上書きしない)",
+                    "ただし、日時が同じで、_reload が入っていないときも、sameTimeKeys() の項目 (Issue の projectItems) は、来た値と手元の値の中身 (JSON。オブジェクトの項目の順番はそろえる) を比べて、違えば、来た値で重ねる。(関連が変わっても、親の updatedAt が動かない項目のため。yanqirenshi/SOGH.next#51)",
+                    "その項目の中身が同じときは、重ねない。(変更の無い取り直しで、core を作り直さないため) 来たノードに、その項目が無いときは、触らない。来たノードのほうが古いときは、上書きしない。",
                     "今の core とノードのどちらかに updatedAt が無いとき (null のときも) は、毎回、来た項目を重ねる。(_reload は入れない)",
                     "重ねる単位は、一番上の項目。(入れ子の中身までは重ねない)",
                     "来た値が null の項目は、null で重ねる。来ていない項目 (undefined) は、触らない。",
@@ -5710,6 +5738,29 @@
                     "issue.core({ ...issue.core(), body: '$Owner octocat' });",
                     "issue.owner();",
                     "// => \"octocat\""
+                ]
+            },
+            {
+                "name": "sameTimeKeys",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "keys",
+                    "type": "String[]",
+                    "description": [
+                        "['projectItems']。"
+                    ]
+                },
+                "description": [
+                    "GraphQLNode の sameTimeKeys() を上書きして、projectItems を返す。",
+                    "Issue をプロジェクトに足す・外すときや、Item のフィールドの値 (Status・日付など) を変えたとき、GitHub は Issue の updatedAt を動かさない。(npm run check:updated-at で調べた。yanqirenshi/SOGH.next#51)",
+                    "そのため、merge(node) は、日時が同じときも、projectItems の中身を比べて、違えば重ねる。projectV2Items() と、projectItems を直に読むメソッド (fieldItem()・fieldValues()・getFieldValueByName(name)・fieldValueContents(name)・dueDate()・nextActionDate()) が、新しい値を返すようになる。",
+                    "ほかの項目 (title など) は、日時が同じなら、これまでどおり上書きしない。"
+                ],
+                "examples": [
+                    "issue.sameTimeKeys();",
+                    "// => [\"projectItems\"]"
                 ]
             },
             {

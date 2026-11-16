@@ -70,6 +70,12 @@ export default class GraphQLNode {
 
         return this._reload;
     }
+    // 日時が同じときも、中身を比べて、違えば重ねる項目の名前。(モデルごとに、上書きして指定する)
+    // 関連が変わっても、親の updatedAt が動かない項目のため。(yanqirenshi/SOGH.next#51)
+    // いまは、Issue の projectItems だけ。(Issue をプロジェクトに足す・外すとき、Issue の updatedAt が動かない)
+    sameTimeKeys () {
+        return [];
+    }
     // 同じ id の node を、いまの core に重ねる。
     // core を丸ごと差し替えずに、来た項目だけを重ねる。
     // (入れ子で取った node は項目が少ないので、差し替えると、いまある値が消えるため)
@@ -79,8 +85,14 @@ export default class GraphQLNode {
     //   来たほうが新しい              … 来た項目を重ねる。reload に、いまの日時を入れる。  ⇒ 'newer'
     //   日時が同じで、reload がある   … 来た項目を重ねる。reload は変えない。              ⇒ 'same'
     //   日時が同じで、reload が無い   … 手元に無い項目だけ足す。                          ⇒ 'filled' (足した) / 'kept' (何もしなかった)
+    //                                    ただし sameTimeKeys() の項目は、中身が違えば重ねる。 ⇒ 'refreshed'
     //   来たほうが古い                … 手元に無い項目だけ足す。                          ⇒ 'filled' (足した) / 'kept' (何もしなかった)
     //   どちらかに updatedAt が無い   … 毎回、来た項目を重ねる。reload は入れない。        ⇒ 'always'
+    //
+    // sameTimeKeys() の項目 (Issue の projectItems) は、関連が変わっても、親の updatedAt が動かない。
+    // そのため、日時が同じでも、来た値と手元の値の中身 (JSON) を比べて、違えば、来た値で重ねる。(yanqirenshi/SOGH.next#51)
+    // 中身が同じときは、重ねない。(変更の無い取り直しで、core を作り直さないため)
+    // 'refreshed' は、手元にある項目を、日時が同じなのに上書きしたことを表す。('filled' は、手元に無い項目を足しただけ)
     //
     // 「日時が同じで、reload がある」ときに重ねるのは、手元の core が、項目の少ない node で
     // 先に updatedAt だけ進んでいるかもしれないため。(yanqirenshi/SOGH.next#34)
@@ -115,17 +127,33 @@ export default class GraphQLNode {
         // 来た項目を、そのまま重ねてよいか。
         const overlay = !comparable || newer || same;
 
+        // 日時が同じ (reload は無い)。sameTimeKeys() の項目だけ、中身を比べる。
+        const same_time = comparable && came === held && !same;
+        const same_time_keys = same_time ? this.sameTimeKeys() : [];
+
+        // 日時が同じなのに、中身が違うので重ねる項目。
+        const refreshed = [];
+
         // 重ねる項目。
         const keys = Object.keys(node).filter(key=> {
             // 来ていない項目は、触らない。
             if (node[key]===undefined)
                 return false;
 
-            // 重ねてよくないときは、手元に無い項目だけ。
-            if (!overlay)
-                return core[key]===undefined;
+            if (overlay)
+                return true;
 
-            return true;
+            // 重ねてよくないときは、手元に無い項目だけ。
+            if (core[key]===undefined)
+                return true;
+
+            // ただし、日時が同じときの sameTimeKeys() の項目は、中身が違えば重ねる。
+            if (same_time_keys.includes(key) && stableJson(core[key])!==stableJson(node[key])) {
+                refreshed.push(key);
+                return true;
+            }
+
+            return false;
         });
 
         if (keys.length===0)
@@ -143,8 +171,9 @@ export default class GraphQLNode {
 
         if (!comparable) return 'always';
         if (newer) return 'newer';
+        if (same) return 'same';
 
-        return same ? 'same' : 'filled';
+        return refreshed.length > 0 ? 'refreshed' : 'filled';
     }
 }
 
@@ -164,6 +193,20 @@ export function nodesOf (connection) {
         return connection.edges.map(edge=> edge ? edge.node : null);
 
     return [];
+}
+
+// 中身を比べるための JSON の文字列。(オブジェクトの項目の順番は、そろえる)
+// 同じ中身なら、項目を取った順番が違っても (クエリが違っても)、同じ文字列になる。
+function stableJson (value) {
+    return JSON.stringify(value, (key, v)=> {
+        if (!v || typeof v!=='object' || Array.isArray(v))
+            return v;
+
+        return Object.keys(v).sort().reduce((out, k)=> {
+            out[k] = v[k];
+            return out;
+        }, {});
+    });
 }
 
 // 日時の文字列 (ISO 8601) を、比べられる数値にする。読めないときは null。

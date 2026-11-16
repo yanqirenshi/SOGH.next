@@ -138,6 +138,22 @@ const CASES = [
     { when: 'updatedAt が無い、または null',        merge: '毎回、来た項目を重ねる',   reload: '変えない' },
 ];
 
+// どの操作で updatedAt が動くか。(2026-11-16 に npm run check:updated-at で調べた。yanqirenshi/SOGH.next#51)
+const MOVED_COLUMNS = [
+    { code: 'op',      label: '操作',                    key: 'op' },
+    { code: 'issue',   label: 'Issue の updatedAt',      key: 'issue' },
+    { code: 'item',    label: 'Item の updatedAt',       key: 'item' },
+    { code: 'project', label: 'ProjectV2 の updatedAt',  key: 'project' },
+];
+
+const MOVED = [
+    { op: 'ラベルを付ける・担当者を足す・マイルストーンを設定する', issue: '動いた',   item: '動いた',               project: '動いた' },
+    { op: 'コメントを足す',                                         issue: '動いた',   item: '動かない',             project: '動かない' },
+    { op: 'コメントを編集する',                                     issue: '動いた',   item: '動いた',               project: '動いた' },
+    { op: 'Item の Status を変える',                                issue: '動かない', item: '動いた',               project: '動いた' },
+    { op: 'プロジェクトから外す・足す',                             issue: '動かない', item: '(無くなる・増える)',   project: '動いた' },
+];
+
 // updatedAt を持つかどうか。(GitHub の GraphQL のリファレンスで確かめた)
 const UPDATED_AT_COLUMNS = [
     { code: 'has',   label: 'updatedAt', key: 'has' },
@@ -255,6 +271,10 @@ export default function MatchmakerSpec () {
                   <UL>
                     <LI>GitHub 側の変更が無いのに、取るたびに core を作り直すことを、避けるため。</LI>
                     <LI>例: <C>issue_by_id</C> で取った Issue を、<C>issue_by_org_repo_issue_number</C> で取り直すと、projectItems が足される。</LI>
+                    <LI>ただし、Issue の <C>projectItems</C> だけは、来た値と手元の値の中身 (JSON) を比べて、違えば、来た値で重ねる。(0.4.2 から。<IssueLink num="51"/>)</LI>
+                    <LI>Issue をプロジェクトに足す・外すときや、Item のフィールドの値を変えたとき、GitHub は Issue の updatedAt を動かさないため。(「7.5 (1) updatedAt が動かない変更」を見る)</LI>
+                    <LI>中身が同じときは、重ねない。来た node に <C>projectItems</C> が無いときは、触らない。来たほうが古いときは、上書きしない。</LI>
+                    <LI>この扱いをする項目は、モデルごとに <C>sameTimeKeys()</C> で指定する。(Issue は <C>projectItems</C>。ほかのモデルは無い)</LI>
                   </UL>
                 </LI>
                 <LI>来たほうが古いときは、手元の値を上書きしない。
@@ -275,13 +295,13 @@ export default function MatchmakerSpec () {
                 <LI>「updatedAt が無い、または null」は、手元と来た node の、どちらかに無いとき。</LI>
                 <LI>実装は、<C>GraphQLNode</C> の <C>merge(node)</C>。Pool の <C>ensure(node, makeInstance, updater)</C> が呼ぶ。
                   <UL>
-                    <LI><C>merge(node)</C> は、何をしたかを返す。(<C>newer</C>・<C>same</C>・<C>filled</C>・<C>kept</C>・<C>always</C>)</LI>
+                    <LI><C>merge(node)</C> は、何をしたかを返す。(<C>newer</C>・<C>same</C>・<C>refreshed</C>・<C>filled</C>・<C>kept</C>・<C>always</C>。<C>refreshed</C> は、日時が同じで、Issue の <C>projectItems</C> を重ねたとき)</LI>
                     <LI>core を変えるときは <C>core(v)</C> を通すので、Issue と ProjectV2 は、注釈を読み取り直す。</LI>
                   </UL>
                 </LI>
               </OL>
 
-              <Panel kind="note">0.4.0 では、取り直しても、GitHub 側の変更が反映されない場合がありました。0.4.1 で、reload を使って直しました。親の updatedAt が動かない変更は、いまも、反映されない場合があります。(「7.5 (1) updatedAt が動かない変更」を見る)</Panel>
+              <Panel kind="note">0.4.0 では、取り直しても、GitHub 側の変更が反映されない場合がありました。0.4.1 で、reload を使って直しました。親の updatedAt が動かない変更 (Issue の projectItems) は、0.4.2 で直しました。(「7.5 (1) updatedAt が動かない変更」を見る)</Panel>
             </Section>
 
             <Section title="reload 属性" num="(2)" lev="6">
@@ -468,17 +488,19 @@ export default function MatchmakerSpec () {
           <Section title="まだ決めていないこと・残っていること" num="7.5" lev="5">
 
             <Section title="updatedAt が動かない変更" num="(1)" lev="6">
-              <P>親の updatedAt が動かない変更は、取り直しても、反映されない場合があります。解き方は、まだ決めていません。</P>
-              <OL>
-                <LI>親の updatedAt が動かない変更のうち、関連の増減は、反映されないことがある。
+              <P>どの node が関連しているかは、親の core の JSON に持っているので、親の updatedAt が動かない変更は、取り直しても、反映されない場合がありました。どの操作で updatedAt が動くかを、GitHub で調べました。(2026-11-16。<C>npm run check:updated-at</C>。<IssueLink num="51"/>)</P>
+              <Table columns={MOVED_COLUMNS} rows={MOVED} ids={TABLE_IDS}/>
+              <OL sx={SX_AFTER_TABLE}>
+                <LI>「関連が変わったのに、親の updatedAt が動かない」のは、Issue をプロジェクトに足す・外す、の 1 種類だけだった。(Issue の projectItems)
                   <UL>
-                    <LI>どの node が関連しているか (id の並び) は、親の core の中に、JSON のまま持っている。</LI>
-                    <LI>親の updatedAt が同じで、親に reload が入っていなければ、取り直しても、親の core の JSON は重ねない。</LI>
-                    <LI>親に reload が入っていれば、重ねるので、反映される。(「7.4 (2) reload 属性」)</LI>
-                    <LI>例: Issue をプロジェクトに足しても、Issue の updatedAt が動かず、reload も入っていなければ、<C>issue.projectV2Items()</C> は増えない。</LI>
-                    <LI>関連先の値の変更は、反映される。(関連先のモデルは、自分の updatedAt で、Pool の中で重なるため)</LI>
-                    <LI>例: プロジェクトのフィールドの値を変えて、ProjectV2Item の updatedAt が動けば、<C>issue.projectV2Items()</C> が返すモデルは、新しい値になる。</LI>
-                    <LI>どの変更で updatedAt が動くかは、確かめていない。(「(2) まだ確かめていないこと」を見る)</LI>
+                    <LI>ほかの操作では、関連が変わった親の updatedAt は、動いた。(ラベル・担当者・マイルストーンでは Issue と Item、コメントでは Issue、Status では Item と ProjectV2)</LI>
+                    <LI>Item の Status を変えても、Issue の updatedAt は動かない。そのため、Issue の core の projectItems の中の JSON (fieldValues) も、取り直しても、古いまま残っていたことになる。</LI>
+                  </UL>
+                </LI>
+                <LI>0.4.2 で、Issue の projectItems を、日時が同じときも、中身が違えば重ねるようにした。(「7.4 (1) node の重ね方」を見る)
+                  <UL>
+                    <LI><C>issue.projectV2Items()</C> が、プロジェクトへの出し入れに合わせて、増減する。</LI>
+                    <LI>projectItems を直に読むメソッド (<C>fieldValues()</C>・<C>dueDate()</C>・<C>nextActionDate()</C> など) も、新しい値を返す。</LI>
                   </UL>
                 </LI>
                 <LI>reload の、ほかの使い道は、決めていない。(利用側が、取り直すきっかけにする、など)</LI>
@@ -488,11 +510,12 @@ export default function MatchmakerSpec () {
 
             <Section title="まだ確かめていないこと" num="(2)" lev="6">
               <OL>
-                <LI><C>updatedAt</C> が、どの変更で動くか。
+                <LI><C>updatedAt</C> が、どの変更で動くかは、調べた。(「(1) updatedAt が動かない変更」を見る) 次のものは、まだ調べていない。
                   <UL>
-                    <LI>GitHub のリファレンスには「最後に更新された日時」としか書かれていない。</LI>
-                    <LI>例: Issue にラベルを付けたとき、プロジェクトに足したときに、Issue の <C>updatedAt</C> が動くか。</LI>
-                    <LI>動かない変更があると、その変更は、取り直しても反映されない。</LI>
+                    <LI>逆向きの操作。(ラベルを外す・担当者を外す・マイルストーンを外す・コメントを消す)</LI>
+                    <LI>PullRequest と DraftIssue の Item。(調べたのは、Issue の Item だけ)</LI>
+                    <LI>組織 (org) のプロジェクト。</LI>
+                    <LI>Status のほかの型のフィールド。(日付・数値・テキスト・イテレーション)</LI>
                   </UL>
                 </LI>
                 <LI>ProjectV2Item の関連を、GitHub につないで確かめること。
