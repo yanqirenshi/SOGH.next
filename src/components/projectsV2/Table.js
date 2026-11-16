@@ -1,5 +1,4 @@
 import React from 'react';
-import moment from 'moment';
 
 import TableContainer from '@mui/material/TableContainer';
 import MTable from '@mui/material/Table';
@@ -33,8 +32,6 @@ export default function Table (props) {
 
     const header_rows = makeHeaderRows(columns);
 
-    const now = moment();
-
     return (
         <TableContainer component={Paper}>
           <MTable aria-label="simple table" size="small">
@@ -66,7 +63,6 @@ export default function Table (props) {
                       <TableBodyRow key={project_id}
                                     project={project}
                                     columns={columns}
-                                    now={now}
                                     actions={actions}
                                     is_opened={is_opened}
                                     onChange={onChangeOpenTaskProject}/>
