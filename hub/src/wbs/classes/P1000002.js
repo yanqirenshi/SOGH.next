@@ -43,6 +43,8 @@ function Overview ({ data }) {
             <P>{"取得のメソッドは、Promise で id を返す asyncFetch… の形だけ。(コールバックで結果を渡す fetch… の形は、0.5.0 で消した)"}</P>
             <P>{"asyncFetch… は、取得に失敗したときに、例外 GitHubError を投げる。(0.5.0 から。それまでは、エラーをそのまま返すか、それまでに取得した id の配列を返していた。yanqirenshi/SOGH.next#61)"}</P>
             <P>{"コールバックを受け取る asyncFetch… は、失敗したとき、failed(error, …) を呼んでから投げる。(コメントの追加・更新・削除は、例外を投げず、failed を呼ぶ)"}</P>
+            <P>{"asyncUpdateIssueBody(id, body) は、Issue の本文だけを書き換え、Issue の id を返す。(asyncFetchIssueByID と同じ。モデルは issue(id) で Pool から引く。Promise の形。失敗したときは GitHubError を投げる。0.5.0 から。yanqirenshi/SOGH.next#119)"}</P>
+            <P>{"asyncUpdateIssueBody の戻りの Issue は projectItems を持たないが、Pool の Issue に重なるのは来た項目だけなので、Pool の Issue の projectItems は消えない。"}</P>
             <P>{"deleteIssueComment は、GitHub でコメントを消せたら、issue-comment の Pool からも消してから、successed を呼ぶ。(Pool の remove(id) を使う。0.5.0 から。yanqirenshi/SOGH.next#69)"}</P>
             <P>{"_queries の値は、クエリの定義 { query, pick }。query(code) はクエリの文字列を、queryDefinition(code) は定義を返す。クエリの値は、GraphQL の variables で渡す。(yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65)"}</P>
             <P>{"asyncFetch… は、取得の部品 fetchNode(code, variables) (1 回送り、pick で取り出す)・fetchPages(code, variables, onPage, connectionOf) (最後のページまで取る)・connection2ids(connection, make) (一覧をモデルにして id の配列にする) で組み立てる。team の 2 つは、fetchProjectsV2OfTeam(code, team_id, callbacks) を使う。"}</P>

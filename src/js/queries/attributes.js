@@ -186,6 +186,31 @@ body
 bodyHTML`;
 }
 
+// Issue と、その関連 (author・repository・milestone・assignees・labels)。projectItems は、含めない。
+// (issue_by_id と、本文を書き換える update_issue_body が、同じ項目を取るための部品。yanqirenshi/SOGH.next#119)
+export function issueNode () {
+    return `${issue()}
+author {
+  ${actor()}
+}
+repository {
+  ${repositories()}
+}
+milestone {
+  ${milestone()}
+}
+assignees(first: 10) {
+  nodes {
+    ${user()}
+  }
+}
+labels(first: 10) {
+  nodes {
+    ${label()}
+  }
+}`;
+}
+
 export function issueComment () {
     return `__typename
 id

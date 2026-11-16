@@ -95,7 +95,7 @@ test('Sogh のメソッドから使われていないクエリは、無い (yanq
         'assignees_by_repository', 'create_issue', 'issues_by_milestone', 'issues_by_report_label',
         'issues_by_repository', 'issues_open_by_label', 'issues_open_by_project_column', 'issues_open_by_repository',
         'labels_by_repository', 'milestones_by_repository', 'project_by_id', 'projects_by_repository',
-        'repository', 'search_issues', 'update_issue_body',
+        'repository', 'search_issues',
         'user_by_id', 'projects_next_by_id', 'projectsv2_items_by_projects_v2',
         // 0.5.0 で、名前のつづりを直したクエリの、古い名前。(yanqirenshi/SOGH.next#73)
         'viwer', 'issues_by_viwer',
@@ -104,12 +104,13 @@ test('Sogh のメソッドから使われていないクエリは、無い (yanq
     for (const code of removed)
         assert.equal(code in queries, false, code);
 
-    // 残ったクエリは 18 個で、どれも Sogh.js から、名前で使われている。
+    // 残ったクエリは 19 個で、どれも Sogh.js から、名前で使われている。
+    // (update_issue_body は、残る。中身を、値を variables で渡す形に作り直し、Issue の本文を書き換える asyncUpdateIssueBody が使う。yanqirenshi/SOGH.next#119)
     // (this.query('…')・this.queryDefinition('…')・this.fetchNode('…')・this.fetchPages('…')・this.fetchProjectsV2OfTeam('…'))
     const source = fs.readFileSync(new URL('../src/js/Sogh.js', import.meta.url), 'utf8');
     const used = new Set([...source.matchAll(/this\.(?:query|queryDefinition|fetchNode|fetchPages|fetchProjectsV2OfTeam)\('([a-z0-9_]+)'/g)].map(m=> m[1]));
 
-    assert.equal(Object.keys(queries).length, 18);
+    assert.equal(Object.keys(queries).length, 19);
     assert.deepEqual(Object.keys(queries).sort(), [...used].sort());
 
     // query(code) は、残ったクエリを返し、消したクエリは返さない。

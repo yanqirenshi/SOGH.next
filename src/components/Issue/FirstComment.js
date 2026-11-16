@@ -5,24 +5,28 @@ import MDEditor from '@uiw/react-md-editor';
 
 import BodyHtml from '../common/BodyHtml.js';
 import OperatorEdit from '../IssueComment/OperatorEdit.js';
-import OperatorDelete from '../IssueComment/OperatorDelete.js';
 
+// Issue の本文の所。更新 (Edit・Commit・Cancel) だけで、削除のボタンは無い。(yanqirenshi/SOGH.next#119)
+// Commit は、actions.issue.description.update(Issue の id, 本文) を呼ぶ。
 export default function FirstComment (props) {
     const issue = props.issue;
     const actions = props.actions;
 
     const [mode, setMode] = React.useState('view');
-    const [edit_contents, setEditContents] = React.useState(issue.body());
+    const [edit_contents, setEditContents] = React.useState(issue.body() || '');
 
-    const changeMode = (m)=> setMode(m);
+    // Edit を押したときに、いまの本文を、編集の欄に入れ直す。
+    // (Issue を取り直して本文が変わったあと・書きかけて Cancel したあとでも、いまの本文が出る)
+    const changeMode = (m)=> {
+        if ('edit'===m)
+            setEditContents(issue.body() || '');
+
+        setMode(m);
+    };
 
     const clickUpdate = ()=> {
         setMode('view');
-        actions.issue.comment.update(issue.id(), edit_contents);
-    };
-    const clickDelete = ()=> {
-        setMode('view');
-        actions.issue.comment.delete(issue.id());
+        actions.issue.description.update(issue.id(), edit_contents || '');
     };
 
     return (
@@ -38,24 +42,11 @@ export default function FirstComment (props) {
                        onChange={(v)=> setEditContents(v)}/>
            </Box>}
 
-          <Box sx={{display:'flex',
-                    justifyContent: 'space-between',
-                    mt:1}}>
-
-            <Box>
-              <OperatorEdit mode={mode}
-                            onChange={changeMode}
-                            onClick={clickUpdate}
-                            actions={actions}/>
-            </Box>
-
-            <Box>
-              <OperatorDelete mode={mode}
-                              onChange={changeMode}
-                              onClick={clickDelete}
-                              actions={actions}/>
-            </Box>
-
+          <Box sx={{mt:1}}>
+            <OperatorEdit mode={mode}
+                          onChange={changeMode}
+                          onClick={clickUpdate}
+                          actions={actions}/>
           </Box>
         </Box>
     );

@@ -6,7 +6,7 @@
 また、Sogh のメソッドから使われていないクエリを、すべて消しました。
 取得のクエリを、値を GraphQL の variables で渡す形に書き直し、`asyncFetch〜` が失敗したときは例外を投げるようにしました。
 あわせて、Projects (classic) のモデルや、Issue を作るための部品など、使われていない古いものを消しました。
-(yanqirenshi/SOGH.next#39・yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100・yanqirenshi/SOGH.next#101・yanqirenshi/SOGH.next#102・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#104・yanqirenshi/SOGH.next#105・yanqirenshi/SOGH.next#108・yanqirenshi/SOGH.next#111・yanqirenshi/SOGH.next#114)
+(yanqirenshi/SOGH.next#39・yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100・yanqirenshi/SOGH.next#101・yanqirenshi/SOGH.next#102・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#104・yanqirenshi/SOGH.next#105・yanqirenshi/SOGH.next#108・yanqirenshi/SOGH.next#111・yanqirenshi/SOGH.next#114・yanqirenshi/SOGH.next#119)
 
 ### 利用側への影響 (破壊的な変更です)
 
@@ -98,17 +98,21 @@
   - これまでは、`actions` を渡すと、既定の actions がまるごと使われなくなり、一部だけを渡すと、渡していない関数を呼んだときに落ちました。(例: `tasks.open` だけを渡すと、題を押したときに落ちた)
   - いまは、渡していない関数 (関数でないものも) は、既定の関数を使います。`title`・`tasks` の組の中も、関数ごとに合わせます。(例: `{ tasks: { open } }` だけを渡しても、`title.click` は既定)
   - 渡した関数は、そのまま使います。既定に無い名前は、そのまま列の `val` に渡ります。
+- `PanelIssue` (Issue の画面の部品) の本文の所が呼ぶ関数が、変わりました。(yanqirenshi/SOGH.next#119)
+  - 本文の更新 (Commit) は、`actions.issue.description.update(Issue の id, 本文)` を呼びます。利用側で、この関数を渡してください。(これまでは `actions.issue.comment.update(issue.id(), 本文)` を呼んでいました)
+  - 本文の所の削除のボタンを、消しました。本文の所から `actions.issue.comment.delete` は呼びません。(コメントの所の削除のボタンは、変わりません)
+  - 本文の書き換えには、`Sogh` の `asyncUpdateIssueBody(id, body)` を使えます。(「足したもの」を見る)
 
 ### 消したもの
 
 - `Sogh` の補助のメソッド `data2data(data, make, appender)`・`zzz(data, make)` と、`Loader` の `ensureEndCursor(query, endCursor)`。(`fetch〜` だけが使っていた)
 - `Sogh` の補助のメソッド `node2objs(node_or_nodes, make)`。(取得の書き直しで、使う所が無くなった。`asyncFetch〜` は `connection2ids(connection, make)` を使う)
 - クエリ `projects_next_items_by_id`。(いまの GitHub には、`ProjectNextItem` という型が無く、動かなかった。yanqirenshi/SOGH.next#67)
-- Sogh のメソッドから使われていないクエリを、18 個消した。(yanqirenshi/SOGH.next#66)
+- Sogh のメソッドから使われていないクエリを、17 個消した。(yanqirenshi/SOGH.next#66)
   - `sogh.query(code)` で、名前で取っていた場合は、取れなくなります。(`undefined` が返ります)
-  - 前から使われていなかったもの (15 個): `assignees_by_repository`・`create_issue`・`issues_by_milestone`・`issues_by_report_label`・`issues_by_repository`・`issues_open_by_label`・`issues_open_by_project_column`・`issues_open_by_repository`・`labels_by_repository`・`milestones_by_repository`・`project_by_id`・`projects_by_repository`・`repository`・`search_issues`・`update_issue_body`
+  - 前から使われていなかったもの (14 個): `assignees_by_repository`・`create_issue`・`issues_by_milestone`・`issues_by_report_label`・`issues_by_repository`・`issues_open_by_label`・`issues_open_by_project_column`・`issues_open_by_repository`・`labels_by_repository`・`milestones_by_repository`・`project_by_id`・`projects_by_repository`・`repository`・`search_issues`
   - `fetch〜` を消して、使われなくなったもの (3 個): `user_by_id`・`projects_next_by_id`・`projectsv2_items_by_projects_v2`
-  - 残ったクエリは 18 個で、どれも Sogh のメソッドが使っている。
+  - 残ったクエリは 19 個で、どれも Sogh のメソッドが使っている。(`update_issue_body` は、消さずに、中身を作り直しました。「変わった動き」を見る)
 - Projects (classic) のモデルのファイル `src/js/models/Project.js`・`Card.js`・`Column.js`。(yanqirenshi/SOGH.next#81)
 - 古い文書 `src/js/README.md`・`src/js/models/README.markdown`。(いまのコードと合っていなかった。パッケージにも、入らなくなります。yanqirenshi/SOGH.next#77)
 - `Issue.js` の `moment` の import。(Issue を作るための部品だけが使っていた。package.json の依存は、そのまま)
@@ -171,6 +175,14 @@
   - いまは、副題のプロジェクトの所 (名前・番号のリンク) を出しません。
   - 日付を変えるときに `actions` へ渡す値が作れないとき (Item が無い・その日付の値がまだ無い) は、`actions.issue.due_date.change`・`actions.issue.next_action_date.change` を呼びません。(これまでは落ちていました。日付が入っていない Item に日付を入れられるようにするのは、yanqirenshi/SOGH.next#115)
   - コメントを送るとき (次の行動の日を付けるタブ) も、値が作れないときは、次の行動の日の情報 (`project`・`item`・`field_item`・`next_action_date`) を付けずに送ります。(これまでは落ちていました)
+- Issue の画面 (`PanelIssue`) の本文の所の編集の欄は、Edit を押したときに、いまの本文 (`issue.body()`) を入れ直します。(yanqirenshi/SOGH.next#119)
+  - Issue を取り直して本文が変わったあとに Edit を押すと、新しい本文が出ます。
+  - 書きかけて Cancel を押したあと、もう一度 Edit を押すと、書きかけは残らず、いまの本文が出ます。(これまでは、古い本文や書きかけが残っていました)
+  - 本文の所は、更新 (Edit・Commit・Cancel) だけになりました。(呼ぶ関数と、削除のボタンについては、「利用側への影響」を見る)
+- クエリ `update_issue_body` の中身を、作り直しました。(yanqirenshi/SOGH.next#119)
+  - `sogh.query('update_issue_body')` で取っていた場合は、中身が変わります。(これまでは、Sogh のメソッドから使われていませんでした)
+  - 値を、文字の置き換え (`@issue-data`) ではなく、GraphQL の variables (`$id: ID!`・`$body: String!`) で渡します。
+  - Projects (classic) の項目 (`projectCards`) を取りません。戻りの Issue の項目は、`issue_by_id` と同じです。
 
 ### 足したもの
 
@@ -193,6 +205,10 @@
 - `Team` の `name()`・`url()`・`avatarUrl()`。(yanqirenshi/SOGH.next#39)
   - `avatarUrl()` は、アイコンが無いチームでは null です。
   - `login()` は、ありません。(Team には login が無い。名前は、`name()` と `slug()` で読みます)
+- `Sogh` の `asyncUpdateIssueBody(id, body)`: Issue の本文だけを書き換え、書き換えたあとの Issue の id を返す。(yanqirenshi/SOGH.next#119)
+  - 形は、`asyncFetch〜` と同じ Promise で、`asyncFetchIssueByID` と同じく Issue の id を返します。(モデルは `issue(id)` で Pool から引きます)。失敗したときは、`GitHubError` を投げます。(コメントの書き換え (`updateIssueComment` など) は、callbacks の形のまま、変わりません)
+  - 戻りの Issue は `projectItems` を持ちませんが、Pool の Issue の `projectItems` は、消えません。
+  - 使うクエリは `update_issue_body` (GitHub の `updateIssue`) です。(中身は、0.5.0 で作り直しました。「変わった動き」を見る)
 
 ## 0.4.2
 

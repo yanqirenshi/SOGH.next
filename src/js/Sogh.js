@@ -285,6 +285,16 @@ export default class Sogh extends Pooler {
 
         return this.node2issue(node).id();
     }
+    // Issue (id) の本文を、body に書き換える。(本文だけを変える。yanqirenshi/SOGH.next#119)
+    // 書き換えたあとの Issue の id を返す。(asyncFetchIssueByID と同じ。モデルは issue(id) で Pool から引く)
+    // 失敗したときは GitHubError を投げる。
+    // 戻りの Issue は projectItems を持たないが、node2issue が重ねるのは来た項目だけなので、
+    // Pool にある Issue の projectItems は、消えない。
+    async asyncUpdateIssueBody (id, body) {
+        const node = await this.fetchNode('update_issue_body', { id, body });
+
+        return this.node2issue(node).id();
+    }
     /////
     ///// Issue Comments
     /////

@@ -2114,7 +2114,7 @@
                     "GraphQL のクエリの表。(クエリの名前 → クエリの定義 { query, pick })",
                     "constructor が、queries/index.js のモジュール (import * as QUERIES) をそのまま入れる。",
                     "クエリの定義は、query (クエリの文字列) と pick (応答の data から、取り出す値 (node か、ページ送りする一覧) を返す関数) を持つ。(0.5.0 から。yanqirenshi/SOGH.next#65)",
-                    "クエリは 18 個ある。どれも Sogh のメソッドが使う。(使われていなかったクエリは、0.5.0 で消した)",
+                    "クエリは 19 個ある。どれも Sogh のメソッドが使う。(使われていなかったクエリは、0.5.0 で消した。update_issue_body は、Issue の本文を書き換える asyncUpdateIssueBody が使う。中身は、0.5.0 で作り直した)",
                     "名前は、ファイル名のまま。(viewer・issues_by_viewer など。0.5.0 で、つづりを直した。yanqirenshi/SOGH.next#73)",
                     "クエリの値は、GraphQL の variables で渡す。(変数の名前は、クエリの頭の宣言を見る。ページ送りは、変数 after。yanqirenshi/SOGH.next#63)",
                     "モジュールの名前空間オブジェクトなので、項目を足したり書き換えたりすると TypeError になる。"
@@ -2993,6 +2993,54 @@
                     "const id = await sogh.asyncFetchIssueByOrgRepoIssueNumber('octo-org', 'sogh', 12);",
                     "sogh.issue(id).title();",
                     "// => \"SOGH の整理\""
+                ]
+            },
+            {
+                "name": "asyncUpdateIssueBody",
+                "parameters": [
+                    "id",
+                    "body"
+                ],
+                "returnType": "Promise",
+                "visibility": "public",
+                "returns": {
+                    "name": "issueId",
+                    "type": "Promise<String>",
+                    "description": [
+                        "Issue の id。(asyncFetchIssueByID と同じ)",
+                        "失敗したときは、GitHubError を投げる。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "id",
+                        "type": "String",
+                        "description": [
+                            "Issue の node id。"
+                        ]
+                    },
+                    {
+                        "name": "body",
+                        "type": "String",
+                        "description": [
+                            "新しい本文。(空文字 '' も、書き込める)"
+                        ]
+                    }
+                ],
+                "description": [
+                    "Issue (id) の本文を、body に書き換える。(GraphQL の updateIssue。本文だけを変える。題名などは変えない)",
+                    "書き換えたあとの Issue のノードを node2issue(node) で Pool に入れ、その id を返す。(asyncFetchIssueByID と同じ。Issue のモデルは、issue(id) で Pool から引く)",
+                    "戻りの Issue のクエリが取る項目は、issue_by_id と同じ。projectItems は取らない。",
+                    "Pool に projectItems を持つ同じ Issue があるときも、重なるのは来た項目だけなので、projectItems (と、そこから引く projectV2Items()・dueDate() など) は、消えない。",
+                    "失敗したとき (GraphQL のエラー・HTTP のエラー・つながらない・応答に issue が無い) は、GitHubError を投げる。Pool の本文は、変わらない。",
+                    "Issue の画面 (PanelIssue) の本文の所は、利用側の actions.issue.description.update(id, 本文) から、これを呼ぶ想定。(0.5.0 から。yanqirenshi/SOGH.next#119)",
+                    "コメントの書き換え (updateIssueComment) は、callbacks の形のまま、変わらない。"
+                ],
+                "examples": [
+                    "const id = await sogh.asyncUpdateIssueBody('I_kwDOAB', '新しい本文');",
+                    "",
+                    "sogh.issue(id).body();",
+                    "// => \"新しい本文\""
                 ]
             },
             {
