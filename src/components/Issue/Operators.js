@@ -91,10 +91,10 @@ export default function Operators (props) {
                          type="date"
                          label="Next Action Date"
                          variant="outlined"
-                         InputLabelProps={{
-                             shrink: true,
+                         slotProps={{
+                             inputLabel: { shrink: true },
                          }}
-                         value={source.nextActionDate()}
+                         value={source.nextActionDate() || ''}
                          onChange={changeNextActionDate} />
             </Box>
 
@@ -108,10 +108,10 @@ export default function Operators (props) {
                          type="date"
                          label="Due Date"
                          variant="outlined"
-                         InputLabelProps={{
-                             shrink: true,
+                         slotProps={{
+                             inputLabel: { shrink: true },
                          }}
-                         value={source.dueDate()}
+                         value={source.dueDate() || ''}
                          onChange={changeDueDate} />
             </Box>
 

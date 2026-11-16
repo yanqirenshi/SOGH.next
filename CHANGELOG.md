@@ -6,7 +6,7 @@
 また、Sogh のメソッドから使われていないクエリを、すべて消しました。
 取得のクエリを、値を GraphQL の variables で渡す形に書き直し、`asyncFetch〜` が失敗したときは例外を投げるようにしました。
 あわせて、Projects (classic) のモデルや、Issue を作るための部品など、使われていない古いものを消しました。
-(yanqirenshi/SOGH.next#39・yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100・yanqirenshi/SOGH.next#101・yanqirenshi/SOGH.next#102・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#104・yanqirenshi/SOGH.next#105・yanqirenshi/SOGH.next#108・yanqirenshi/SOGH.next#111・yanqirenshi/SOGH.next#114)
+(yanqirenshi/SOGH.next#39・yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100・yanqirenshi/SOGH.next#101・yanqirenshi/SOGH.next#102・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#104・yanqirenshi/SOGH.next#105・yanqirenshi/SOGH.next#108・yanqirenshi/SOGH.next#111・yanqirenshi/SOGH.next#114・yanqirenshi/SOGH.next#117・yanqirenshi/SOGH.next#118)
 
 ### 利用側への影響 (破壊的な変更です)
 
@@ -171,6 +171,12 @@
   - いまは、副題のプロジェクトの所 (名前・番号のリンク) を出しません。
   - 日付を変えるときに `actions` へ渡す値が作れないとき (Item が無い・その日付の値がまだ無い) は、`actions.issue.due_date.change`・`actions.issue.next_action_date.change` を呼びません。(これまでは落ちていました。日付が入っていない Item に日付を入れられるようにするのは、yanqirenshi/SOGH.next#115)
   - コメントを送るとき (次の行動の日を付けるタブ) も、値が作れないときは、次の行動の日の情報 (`project`・`item`・`field_item`・`next_action_date`) を付けずに送ります。(これまでは落ちていました)
+- `PanelIssue` の日付の欄 2 か所 (Next Action Date・Due Date) の、ラベルを上に寄せる指定を、MUI 9 向けの書き方 `slotProps={{ inputLabel: { shrink: true } }}` にしました。(yanqirenshi/SOGH.next#117)
+  - これまでの `InputLabelProps={{ shrink: true }}` は、MUI 9 の TextField では効かず、DOM に渡って React の警告が出ていました。
+  - 古い書き方は、渡しません。(両方は渡しません)
+  - sogh が受け付ける MUI の範囲 (`peerDependencies`) は、変えていません。(見直しは yanqirenshi/SOGH.next#121)
+- `PanelIssue` の日付の欄 2 か所は、日付が無いとき、欄の value に空の文字を渡すようにしました。(これまでは null を渡して、React の警告が出ていました。yanqirenshi/SOGH.next#118)
+  - モデルの `dueDate()`・`nextActionDate()` の戻り値は、変わりません。(日付が無いときは、いまも null です)
 
 ### 足したもの
 
