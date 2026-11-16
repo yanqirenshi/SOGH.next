@@ -277,3 +277,156 @@ test('来たほうが古いときは、reload が入っていても、手元に�
     assert.equal(node.core().name, 'Held');
     assert.equal(node.core().email, 'came@example.com');
 });
+
+/* ****************************************************************
+ * 日時が同じでも、Issue の projectItems は、中身が違えば重ねる (yanqirenshi/SOGH.next#51)
+ * **************************************************************** */
+
+// Issue の projectItems の JSON を作る。(edges の形。Issue のクエリと同じ)
+//   items … [[Item の id, Due.Date の値], ...]
+function projectItems (items) {
+    return {
+        edges: items.map(([id, due])=> ({
+            node: {
+                __typename: 'ProjectV2Item',
+                id,
+                updatedAt: T1,
+                fieldValues: {
+                    nodes: [
+                        { __typename: 'ProjectV2ItemFieldDateValue', date: due, field: { name: 'Due.Date', dataType: 'DATE' } },
+                    ],
+                },
+            },
+        })),
+    };
+}
+
+const issueNode = (patch = {})=> ({
+    __typename: 'Issue',
+    id: 'I_1',
+    title: 'もとの題名',
+    updatedAt: T1,
+    projectItems: projectItems([['PVTI_1', '2026-11-20']]),
+    ...patch,
+});
+
+test('日時が同じで、projectItems の Item が増えたときは、重ねる', ()=> {
+    const sogh = new Sogh();
+    const issue = sogh.node2issue(issueNode());
+
+    sogh.node2issue(issueNode({ projectItems: projectItems([['PVTI_1', '2026-11-20'], ['PVTI_2', '2026-12-01']]) }));
+
+    assert.deepEqual(issue.projectV2Items().map(item=> item.id()), ['PVTI_1', 'PVTI_2']);
+    assert.equal(issue.reload(), null, 'reload は変えない');
+});
+
+test('日時が同じで、projectItems の Item が減った (プロジェクトから外した) ときは、重ねる', ()=> {
+    const sogh = new Sogh();
+    const issue = sogh.node2issue(issueNode());
+
+    sogh.node2issue(issueNode({ projectItems: projectItems([]) }));
+
+    assert.deepEqual(issue.projectV2Items(), []);
+    assert.equal(issue.projectV2(), null);
+});
+
+test('日時が同じで、projectItems の入れ子の fieldValues の値が変わったときは、重ねる。JSON を直に読むメソッドも新しい値を返す', ()=> {
+    const sogh = new Sogh();
+    const issue = sogh.node2issue(issueNode());
+
+    assert.equal(issue.dueDate(), '2026-11-20');
+
+    sogh.node2issue(issueNode({ projectItems: projectItems([['PVTI_1', '2026-12-24']]) }));
+
+    assert.equal(issue.dueDate(), '2026-12-24');
+    assert.equal(issue.getFieldValueByName('Due.Date').date, '2026-12-24');
+    assert.equal(issue.fieldValueContents('Due.Date').value.date, '2026-12-24');
+});
+
+test('日時が同じで、projectItems を重ねたときは、merge が refreshed を返す', ()=> {
+    const sogh = new Sogh();
+    const issue = sogh.node2issue(issueNode());
+
+    assert.equal(issue.merge(issueNode({ projectItems: projectItems([]) })), 'refreshed');
+
+    // 手元に無い項目も一緒に来たときも、上書きしたことを優先して refreshed。
+    assert.equal(issue.merge(issueNode({ body: '本文', projectItems: projectItems([['PVTI_3', null]]) })), 'refreshed');
+    assert.equal(issue.body(), '本文');
+});
+
+test('日時が同じで、projectItems の中身が同じときは、重ねない。core を作り直さない', ()=> {
+    const sogh = new Sogh();
+    const issue = sogh.node2issue(issueNode());
+
+    const core = issue.core();
+
+    // 中身が同じ。(項目を取った順番が違っても、同じとみなす)
+    const same = issueNode();
+    const node = same.projectItems.edges[0].node;
+
+    same.projectItems.edges[0].node = { fieldValues: node.fieldValues, updatedAt: node.updatedAt, id: node.id, __typename: node.__typename };
+
+    assert.equal(issue.merge(same), 'kept');
+    assert.equal(issue.core(), core);
+});
+
+test('日時が同じで、来た node に projectItems が無いときは、手元の projectItems が残る', ()=> {
+    const sogh = new Sogh();
+    const issue = sogh.node2issue(issueNode());
+
+    const came = issueNode();
+
+    delete came.projectItems;
+
+    assert.equal(issue.merge(came), 'kept');
+    assert.deepEqual(issue.projectV2Items().map(item=> item.id()), ['PVTI_1']);
+    assert.equal(issue.dueDate(), '2026-11-20');
+});
+
+test('来たほうが古いときは、projectItems の中身が違っても、重ねない', ()=> {
+    const sogh = new Sogh();
+    const issue = sogh.node2issue(issueNode({ updatedAt: T2 }));
+
+    assert.equal(issue.merge(issueNode({ updatedAt: T1, projectItems: projectItems([]) })), 'kept');
+    assert.deepEqual(issue.projectV2Items().map(item=> item.id()), ['PVTI_1']);
+});
+
+test('日時が同じなら、Issue のほかの項目 (title など) は、これまでどおり上書きしない', ()=> {
+    const sogh = new Sogh();
+    const issue = sogh.node2issue(issueNode());
+
+    sogh.node2issue(issueNode({ title: '新しい題名', projectItems: projectItems([]) }));
+
+    assert.equal(issue.title(), 'もとの題名');
+    assert.deepEqual(issue.projectV2Items(), [], 'projectItems だけは重なる');
+});
+
+test('Issue でないモデル (ProjectV2 の items) は、日時が同じなら、これまでどおり上書きしない', ()=> {
+    const sogh = new Sogh();
+
+    const items = (ids)=> ({ edges: ids.map(id=> ({ node: { __typename: 'ProjectV2Item', id, updatedAt: T1 } })) });
+
+    const project = sogh.node2projectV2({ __typename: 'ProjectV2', id: 'PVT_1', updatedAt: T1, items: items(['PVTI_1']) });
+
+    assert.equal(project.merge({ __typename: 'ProjectV2', id: 'PVT_1', updatedAt: T1, items: items(['PVTI_1', 'PVTI_2']) }), 'kept');
+    assert.deepEqual(project.items().map(item=> item.id()), ['PVTI_1']);
+    assert.deepEqual(project.sameTimeKeys(), []);
+});
+
+test('手元に projectItems が無いときは、これまでどおり、手元に無い項目として足す', ()=> {
+    const sogh = new Sogh();
+
+    const first = issueNode();
+
+    delete first.projectItems;
+
+    const issue = sogh.node2issue(first);
+
+    const came = issueNode();
+
+    // node2issue と同じく、先に Matchmaker で、入れ子の Item を Pool に入れる。
+    sogh.matchmaker.issue(came);
+
+    assert.equal(issue.merge(came), 'filled');
+    assert.deepEqual(issue.projectV2Items().map(item=> item.id()), ['PVTI_1']);
+});

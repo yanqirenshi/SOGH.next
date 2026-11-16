@@ -47,6 +47,7 @@ function Overview ({ data }) {
             <P>{"来たノードのほうが新しくて重ねたときは、そのときの日時を _reload に入れる。(reload(v) で読む)"}</P>
             <P>{"Pool は、入れ子で来たノードで、初めてモデルを作ったときにも、_reload に日時を入れる。"}</P>
             <P>{"_reload は、「同じ日時のノードが来たら、重ねてよい」という印。入っているあいだは、merge(node) が、日時が同じノードでも、来た項目を重ねる。(項目の少ないノードが、先に updatedAt だけを進めていることがあるため)"}</P>
+            <P>{"sameTimeKeys() の項目は、_reload が入っていなくても、日時が同じときに中身を比べて、違えば重ねる。(merge(node) は 'refreshed' を返す) 関連が変わっても、親の updatedAt が動かない項目のため。いまは、Issue の projectItems だけ。(yanqirenshi/SOGH.next#51)"}</P>
             <P>{"値を読むメソッドは「core の値 || null」を返すので、空文字 ('') なども null になる。"}</P>
             <Plane>{CODE}</Plane>
           </Section>

@@ -45,6 +45,7 @@ function Overview ({ data }) {
             <P>{"本文に書いた注釈 ($Owner・$Point.Plan・$Point.Result・$Date.Due・$Date.Next) を読み出して持ち、core や本文を差し替えると読み直す。"}</P>
             <P>{"期日 (dueDate(v)) と次のアクションの日 (nextActionDate(v)) は、本文の注釈ではなく、ProjectV2 のフィールド (Due.Date・NextAction.Date) から読む。"}</P>
             <P>{"ProjectV2 のアイテム (projectItems) を取得していないとき (asyncFetchIssueByID() で取得したときなど) は、fieldValues() などのメソッドがエラーになる。(fieldItem() と fieldValueContents(name) は null を返す)"}</P>
+            <P>{"Issue をプロジェクトに足す・外すときや、Item のフィールドの値を変えたとき、GitHub は Issue の updatedAt を動かさない。そのため、projectItems だけは、取り直したときに日時が同じでも、中身が違えば重ねる。(sameTimeKeys() が ['projectItems'] を返す。yanqirenshi/SOGH.next#51)"}</P>
             <P>{"Projects (classic) 用のメソッド (projectCards() など) も残っているが、Projects (classic) は GitHub で廃止された。"}</P>
             <Plane>{CODE}</Plane>
           </Section>
