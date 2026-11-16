@@ -20,4 +20,5 @@ export { default as viewer } from './viewer.js';
 
 export { default as create_issue_comment } from './create_issue_comment.js';
 export { default as delete_issue_comment } from './delete_issue_comment.js';
+export { default as update_issue_body } from './update_issue_body.js';
 export { default as update_issue_comment } from './update_issue_comment.js';

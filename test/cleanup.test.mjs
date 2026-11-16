@@ -1,5 +1,5 @@
 // 0.5.0 の片付けのテスト。
-//   - Pool の remove(id)・clear()。deleteIssueComment は、成功したら Pool からも消す。(yanqirenshi/SOGH.next#69)
+//   - Pool の remove(id)・clear()。asyncDeleteIssueComment は、成功したら Pool からも消す。(yanqirenshi/SOGH.next#69・#122)
 //   - Loader の fetchX も、endpoint() に送る。(yanqirenshi/SOGH.next#76)
 //   - 古い文書 2 つ・Projects (classic) のモデル 3 つ・Issue の classic 用のメソッド 6 個・
 //     Issue を作るための部品 5 個・Loader の fetch は、無い。(yanqirenshi/SOGH.next#77・#81・#82・#83・#84)
@@ -14,6 +14,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 import Sogh from '../src/js/Sogh.js';
+import { GitHubError } from '../src/js/Loader.js';
 import * as model from '../src/js/models/index.js';
 import { fakeFetch, withFetch } from './fake-fetch.mjs';
 
@@ -87,34 +88,29 @@ test('Pool から消したモデルを指す関連は、null か、外れる', (
     assert.deepEqual(issue.labels(), [sogh.label('L_2')]);
 });
 
-test('deleteIssueComment は、成功したら、successed を呼ぶ前に、Pool からも消す', async ()=> {
+test('asyncDeleteIssueComment は、成功したら、Pool からも消し、消したコメントの id を返す', async ()=> {
     const sogh = new Sogh();
 
     sogh.node2issueComment({ __typename: 'IssueComment', id: 'IC_1', body: 'x', updatedAt: T1 });
+    sogh.node2issueComment({ __typename: 'IssueComment', id: 'IC_2', body: 'y', updatedAt: T1 });
 
     const fake = fakeFetch([{ json: { data: { deleteIssueComment: { clientMutationId: null } } } }]);
 
-    const in_pool_at_successed = await new Promise((resolve, reject)=> {
-        withFetch(fake, async ()=> sogh.deleteIssueComment('IC_1', {
-            successed: ()=> resolve(sogh.issueComment('IC_1')),
-            failed: (e)=> reject(e.data),
-        }));
-    });
+    const id = await withFetch(fake, ()=> sogh.asyncDeleteIssueComment('IC_1'));
 
-    assert.equal(in_pool_at_successed, null);
+    assert.equal(id, 'IC_1');
     assert.equal(sogh.issueComment('IC_1'), null);
+    assert.deepEqual(sogh.pool('issue-comment').list().map(d=> d.id()), ['IC_2']);
 });
 
-test('deleteIssueComment は、失敗したときは、Pool から消さない', async ()=> {
+test('asyncDeleteIssueComment は、失敗したときは、Pool から消さない', async ()=> {
     const sogh = new Sogh();
 
     const comment = sogh.node2issueComment({ __typename: 'IssueComment', id: 'IC_1', body: 'x', updatedAt: T1 });
 
     const fake = fakeFetch([{ json: { data: null, errors: [{ type: 'FORBIDDEN', message: 'no' }] } }]);
 
-    await new Promise((resolve)=> {
-        withFetch(fake, async ()=> sogh.deleteIssueComment('IC_1', { successed: resolve, failed: resolve }));
-    });
+    await assert.rejects(withFetch(fake, ()=> sogh.asyncDeleteIssueComment('IC_1')), GitHubError);
 
     assert.equal(sogh.issueComment('IC_1'), comment);
 });

@@ -125,29 +125,4 @@ export default class Loader {
                 return out;
             });
     }
-    /** *************************************************************** *
-     *  Response
-     * **************************************************************** */
-    text2json (r) {
-        return r.ok ? r.json() : Promise.reject(r);
-    }
-    json2response (r, getData) {
-        if (r.errors) {
-            // GraphQL の errors は配列なので、message を連結して読める形にする。
-            const messages = r.errors.map(e=> (e && e.message) || JSON.stringify(e));
-            const error = new Error(messages.join('\n'));
-
-            error.errors = r.errors;
-
-            throw error;
-        }
-
-        return {
-            type: 'success',
-            data: getData(r),
-        };
-    }
-    error2response (error) {
-        return { type: 'error', data: error };
-    }
 }

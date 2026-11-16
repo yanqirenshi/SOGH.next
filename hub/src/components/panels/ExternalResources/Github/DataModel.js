@@ -211,7 +211,7 @@ export default function DataModel () {
                 <LI><C>sogh.get(id)</C> は、すべての Pool を順に探す。(node id は、種類をまたいで重ならない)</LI>
                 <LI>Pool から消す操作は、<C>remove(id)</C> と <C>clear()</C>。(0.5.0 で足した。<C>yanqirenshi/SOGH.next#69</C>)
                   <UL>
-                    <LI>sogh が自分で消すのは、コメントを削除したとき (<C>deleteIssueComment</C>) だけ。GitHub で消せたら、<C>issue-comment</C> の Pool からも消す。</LI>
+                    <LI>sogh が自分で消すのは、コメントを削除したとき (<C>asyncDeleteIssueComment</C>) だけ。GitHub で消せたら、<C>issue-comment</C> の Pool からも消す。</LI>
                     <LI>期限は無い。ほかは、ページを開いている間は、貯まり続ける。</LI>
                   </UL>
                 </LI>
