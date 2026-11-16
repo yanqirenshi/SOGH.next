@@ -48,12 +48,13 @@ function Overview ({ data }) {
             <P>Sogh の node2projectV2(node) が作り、Pool に入れる。(asyncFetchProjectsV2ByTeam() などで取得したとき)</P>
             <P>README に書いた「$名前: 値」の行から、プロジェクトを管理するための属性 (優先度・担当者・予定と実績の期間など) を読み出して持つ。</P>
             <P>core を差し替えると、README の属性を読み直す。</P>
+            <P>README に書いていない属性は、初めの値のまま。(priority()・readmeOwner()・type()・release() は '?'、action() などの文字列は ''、systems() は []。null では上書きしない。0.5.0 から。yanqirenshi/SOGH.next#90) 取り直しで README から属性が消えたときも、初めの値に戻る。</P>
             <Plane>{README_EXAMPLE}</Plane>
             <P>node2projectV2(node) は、Pool に入れる前に、Matchmaker の projectV2(node) で、入れ子で来た creator・owner・items もモデルにして Pool に入れる。</P>
             <P>アイテムは、items() で ProjectV2Item のモデルの配列を得る。(itemsWith2ProjectV2Item() は、items() と同じものを返す古い名前)</P>
             <P>creator() は、作った人を、__typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) で返す。</P>
             <P>owner() は、GitHub の owner (持ち主) を、User・Organization・Issue・PullRequest のどれかのモデルで返す。(Repository の owner() と同じ意味。0.5.0 から。yanqirenshi/SOGH.next#71)</P>
-            <P>README の $Owner の値 (文字列) は、readmeOwner(v) で読み書きする。(0.5.0 で、owner(v) から名前を変えた。README に $Owner が無いときは null)</P>
+            <P>README の $Owner の値 (文字列) は、readmeOwner(v) で読み書きする。(0.5.0 で、owner(v) から名前を変えた。README に $Owner が無いときは '?')</P>
             <P>readmeOwner(v) と同じ値を読み書きしていた maneger(v) は、0.5.0 で消した。(yanqirenshi/SOGH.next#86)</P>
           </Section>
 

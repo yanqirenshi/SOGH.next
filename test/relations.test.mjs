@@ -343,7 +343,7 @@ test('ProjectV2 の owner() は、Issue・PullRequest のモデルも返す。�
     const c = sogh.node2projectV2({ __typename: 'ProjectV2', id: 'PVT_3', updatedAt: T1 });
 
     assert.equal(c.owner(), null);
-    assert.equal(c.readmeOwner(), null); // README に $Owner が無い
+    assert.equal(c.readmeOwner(), '?'); // README に $Owner が無いときは、初めの値。(yanqirenshi/SOGH.next#90)
 });
 
 test('Sogh の href("project-v2") は、creator() のモデルの login() を読む', ()=> {

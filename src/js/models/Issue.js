@@ -10,7 +10,7 @@ export default class Issue extends GraphQLNode {
         this._points = { plan: null, result: null, results: null };
 
         if (arguments.length===1)
-            this.addAnotetionValueNew(data);
+            this.parseBody(data);
 
         this.regex = {
             point: {
@@ -31,7 +31,7 @@ export default class Issue extends GraphQLNode {
 
             // 再取得などで core が差し替わったら、本文の注釈 ($Point など) を解析し直す。
             if (this._core)
-                this.addAnotetionValueNew(this._core);
+                this.parseBody(this._core);
         }
 
         return super.core();
@@ -185,7 +185,7 @@ export default class Issue extends GraphQLNode {
         core.body = v || '';
 
         // 本文が変わったので注釈 ($Point など) を解析し直す。
-        this.addAnotetionValueNew(core);
+        this.parseBody(core);
 
         return core.body;
     }
@@ -289,9 +289,11 @@ export default class Issue extends GraphQLNode {
         return next_action ? next_action[1] : null;;
     }
     /* **************************************************************** *
-     * ???
+     * 本文の注釈
      * **************************************************************** */
-    addAnotetionValueNew (issue) {
+    // 本文の注釈 ($Point・$Date.Due・$Date.Next・$Owner) を読み出して持つ。
+    // (0.5.0 で addAnotetionValueNew(issue) から名前を変えた。yanqirenshi/SOGH.next#91)
+    parseBody (issue) {
         // body を取得していないノード (ProjectV2Item の content など) もあるので空文字で扱う。
         const body = issue.body || '';
 

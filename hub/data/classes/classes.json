@@ -5179,7 +5179,7 @@
                 "initialValue": "null",
                 "description": [
                     "本文の $Owner の値 (担当者)。",
-                    "addAnotetionValueNew(issue) が、getOwnerFromBody(body) の値を入れる。(constructor・core(v)・body(v) から呼ばれる)",
+                    "parseBody(issue) が、getOwnerFromBody(body) の値を入れる。(constructor・core(v)・body(v) から呼ばれる)",
                     "本文に $Owner が無いときは null になる。",
                     "GitHub の Issue の assignees (担当者) とは別のもの。"
                 ],
@@ -5189,7 +5189,7 @@
                     "// => \"octocat\""
                 ],
                 "affectedBy": [
-                    "addAnotetionValueNew(issue)",
+                    "parseBody(issue)",
                     "constructor",
                     "core(v)",
                     "body(v)"
@@ -5206,7 +5206,7 @@
                 "initialValue": "null",
                 "description": [
                     "本文の $Date.Next の値 (次のアクションの日)。",
-                    "addAnotetionValueNew(issue) が、getNextActionFromBody(body) の値を入れる。",
+                    "parseBody(issue) が、getNextActionFromBody(body) の値を入れる。",
                     "本文に $Date.Next が無いときは null になる。",
                     "この値を返すメソッドは無い。(nextActionDate(v) は、ProjectV2 のフィールド NextAction.Date の値を返す)"
                 ],
@@ -5216,7 +5216,7 @@
                     "// => \"2026-11-20\""
                 ],
                 "affectedBy": [
-                    "addAnotetionValueNew(issue)",
+                    "parseBody(issue)",
                     "constructor",
                     "core(v)",
                     "body(v)"
@@ -5233,7 +5233,7 @@
                 "initialValue": "null",
                 "description": [
                     "本文の $Date.Due (または $Due.Date) の値 (期日)。",
-                    "addAnotetionValueNew(issue) が、getDueDateFromBody(body) の値を入れる。",
+                    "parseBody(issue) が、getDueDateFromBody(body) の値を入れる。",
                     "本文に無いときは null になる。",
                     "この値を返すメソッドは無い。(dueDate(v) は、ProjectV2 のフィールド Due.Date の値を返す)"
                 ],
@@ -5243,7 +5243,7 @@
                     "// => \"2026-11-30\""
                 ],
                 "affectedBy": [
-                    "addAnotetionValueNew(issue)",
+                    "parseBody(issue)",
                     "constructor",
                     "core(v)",
                     "body(v)"
@@ -5260,7 +5260,7 @@
                 "initialValue": "{ plan: null, result: null, results: null }",
                 "description": [
                     "本文の $Point.Plan・$Point.Result から読んだポイント (予定と実績)。",
-                    "addAnotetionValueNew(issue) が、getPointFromBody(body) の値を入れる。",
+                    "parseBody(issue) が、getPointFromBody(body) の値を入れる。",
                     "plan・result は数値か null。",
                     "results は人ごとの実績 ({ total, details }) か null。"
                 ],
@@ -5272,7 +5272,7 @@
                     "// => { plan: 3, result: 2, results: null }"
                 ],
                 "affectedBy": [
-                    "addAnotetionValueNew(issue)",
+                    "parseBody(issue)",
                     "constructor",
                     "core(v)",
                     "body(v)"
@@ -5337,7 +5337,7 @@
                 ],
                 "description": [
                     "GraphQL から取得した Issue のノード (core) を読み書きする。",
-                    "引数を渡したときは core を差し替え、addAnotetionValueNew(issue) で本文の注釈を読み直す。",
+                    "引数を渡したときは core を差し替え、parseBody(issue) で本文の注釈を読み直す。",
                     "null などを渡したときは core が null になり、注釈は読み直さない。(前の値のまま)",
                     "Pool が同じ id のノードを取得し直したときは、merge(node) が、重ねたあとの core を、ここで入れる。"
                 ],
@@ -5895,7 +5895,7 @@
                 ],
                 "description": [
                     "Issue の本文 (Markdown) を読み書きする。",
-                    "引数を渡したときは core の body を書き換え、addAnotetionValueNew(issue) で注釈を読み直す。",
+                    "引数を渡したときは core の body を書き換え、parseBody(issue) で注釈を読み直す。",
                     "書き換えるのは手元の core だけで、GitHub の Issue は変わらない。",
                     "null などを渡したときは、空文字にする。",
                     "読むとき、本文が無いとき (空のとき、取得していないとき) は null を返す。"
@@ -6201,7 +6201,7 @@
                 ]
             },
             {
-                "name": "addAnotetionValueNew",
+                "name": "parseBody",
                 "parameters": [
                     "issue"
                 ],
@@ -6228,10 +6228,10 @@
                     "body が無いノード (ProjectV2Item の content など) は、空文字として読む。(注釈はすべて無しになる)",
                     "constructor・core(v)・body(v) が呼ぶ。",
                     "引数のノードは変えない。",
-                    "名前の Anotetion は、Annotation の綴り違い。"
+                    "0.5.0 で、addAnotetionValueNew(issue) から名前を変えた。(引数と、することは同じ。yanqirenshi/SOGH.next#91)"
                 ],
                 "examples": [
-                    "issue.addAnotetionValueNew({ body: '$Owner octocat' });",
+                    "issue.parseBody({ body: '$Owner octocat' });",
                     "issue.bodyOwner();",
                     "// => \"octocat\""
                 ]
@@ -7155,13 +7155,13 @@
             {
                 "name": "_priority",
                 "visibility": "private",
-                "type": "String | null",
+                "type": "String",
                 "initialValue": "\"?\"",
                 "description": [
                     "README の $Priority の値 (優先度)。",
                     "initReadmeAttributes() が \"?\" にし、そのあと parseReadme() が README の値にする。",
                     "値は s (緊急)・h (高い)・n (普通)・l (低い) のどれか。(README からは、先頭の 1 文字だけを読む)",
-                    "README に $Priority が無いときは null になる。"
+                    "README に $Priority が無いときは、初めの値 (\"?\") のまま。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Priority: high",
@@ -7183,12 +7183,12 @@
             {
                 "name": "_owner",
                 "visibility": "private",
-                "type": "String | null",
+                "type": "String",
                 "initialValue": "\"?\"",
                 "description": [
                     "README の $Owner の値 (担当者)。",
                     "initReadmeAttributes() が \"?\" にし、そのあと parseReadme() が README の値にする。",
-                    "README に $Owner が無いときは null になる。",
+                    "README に $Owner が無いときは、初めの値 (\"?\") のまま。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)",
                     "GitHub の ProjectV2 の owner (持ち主のユーザーや組織) ではない。(それは owner() で引く)"
                 ],
                 "examples": [
@@ -7209,12 +7209,12 @@
             {
                 "name": "_type",
                 "visibility": "private",
-                "type": "String | null",
+                "type": "String",
                 "initialValue": "\"?\"",
                 "description": [
                     "README の $Type の値 (プロジェクトの種類)。",
                     "initReadmeAttributes() が \"?\" にし、そのあと parseReadme() が README の値にする。",
-                    "README に $Type が無いときは null になる。"
+                    "README に $Type が無いときは、初めの値 (\"?\") のまま。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Type: 開発",
@@ -7234,12 +7234,12 @@
             {
                 "name": "_release",
                 "visibility": "private",
-                "type": "String | null",
+                "type": "String",
                 "initialValue": "\"?\"",
                 "description": [
                     "README の $Release の値 (リリース)。",
                     "initReadmeAttributes() が \"?\" にし、そのあと parseReadme() が README の値にする。",
-                    "README に $Release が無いときは null になる。"
+                    "README に $Release が無いときは、初めの値 (\"?\") のまま。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Release: v0.3.1",
@@ -7315,12 +7315,12 @@
             {
                 "name": "_action",
                 "visibility": "private",
-                "type": "String | null",
+                "type": "String",
                 "initialValue": "\"\"",
                 "description": [
                     "README の $Action の値 (次のアクション)。",
                     "initReadmeAttributes() が \"\" にし、そのあと parseReadme() が README の値にする。",
-                    "README に $Action が無いときは null になる。"
+                    "README に $Action が無いときは、初めの値 (\"\") のまま。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Action: 見積もりを出す",
@@ -7340,12 +7340,12 @@
             {
                 "name": "_backlog",
                 "visibility": "private",
-                "type": "String | null",
+                "type": "String",
                 "initialValue": "\"\"",
                 "description": [
                     "README の $Backlog の値 (バックログ)。",
                     "initReadmeAttributes() が \"\" にし、そのあと parseReadme() が README の値にする。",
-                    "README に $Backlog が無いときは null になる。"
+                    "README に $Backlog が無いときは、初めの値 (\"\") のまま。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Backlog: クラス図",
@@ -7365,13 +7365,13 @@
             {
                 "name": "_systems",
                 "visibility": "private",
-                "type": "String | null",
+                "type": "String | Array",
                 "initialValue": "[]",
                 "description": [
                     "README の $Systems の値 (関係するシステム)。",
                     "initReadmeAttributes() が [] にし、そのあと parseReadme() が README の値にする。",
-                    "README に $Systems が無いときは null になる。",
-                    "初めの値は [] だが、README を読むと文字列か null になる。"
+                    "README に $Systems が無いときは、初めの値 ([]) のまま。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)",
+                    "初めの値は [] だが、README に書いてあるときは文字列になる。"
                 ],
                 "examples": [
                     "// README: $Systems: iHub",
@@ -7391,12 +7391,12 @@
             {
                 "name": "_customer",
                 "visibility": "private",
-                "type": "String | null",
+                "type": "String",
                 "initialValue": "\"\"",
                 "description": [
                     "README の $Customer の値 (顧客)。",
                     "initReadmeAttributes() が \"\" にし、そのあと parseReadme() が README の値にする。",
-                    "README に $Customer が無いときは null になる。"
+                    "README に $Customer が無いときは、初めの値 (\"\") のまま。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Customer: B社",
@@ -7416,12 +7416,12 @@
             {
                 "name": "_agency",
                 "visibility": "private",
-                "type": "String | null",
+                "type": "String",
                 "initialValue": "\"\"",
                 "description": [
                     "README の $Agency の値 (代理店)。",
                     "initReadmeAttributes() が \"\" にし、そのあと parseReadme() が README の値にする。",
-                    "README に $Agency が無いときは null になる。"
+                    "README に $Agency が無いときは、初めの値 (\"\") のまま。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Agency: A社",
@@ -7441,12 +7441,12 @@
             {
                 "name": "_scenario",
                 "visibility": "private",
-                "type": "String | null",
+                "type": "String",
                 "initialValue": "\"\"",
                 "description": [
                     "README の $Scenario の値 (シナリオ)。",
                     "initReadmeAttributes() が \"\" にし、そのあと parseReadme() が README の値にする。",
-                    "README に $Scenario が無いときは null になる。"
+                    "README に $Scenario が無いときは、初めの値 (\"\") のまま。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Scenario: 移行",
@@ -7466,12 +7466,12 @@
             {
                 "name": "_progress",
                 "visibility": "private",
-                "type": "String | null",
+                "type": "String",
                 "initialValue": "\"\"",
                 "description": [
                     "README の $Progress の値 (進捗)。",
                     "initReadmeAttributes() が \"\" にし、そのあと parseReadme() が README の値にする。",
-                    "README に $Progress が無いときは null になる。",
+                    "README に $Progress が無いときは、初めの値 (\"\") のまま。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)",
                     "値は数字の文字列。(数値ではない)"
                 ],
                 "examples": [
@@ -7563,7 +7563,8 @@
                 "description": [
                     "README の属性を、初めの値に戻す。",
                     "priority・owner・type・release は \"?\"、plan・result は start・end が null の Term、action・backlog・customer・agency・scenario・progress は \"\"、systems は [] にする。",
-                    "constructor と core(v) が、parseReadme() の前に呼ぶ。"
+                    "constructor と core(v) が、parseReadme() の前に呼ぶ。",
+                    "README に書いていない属性は、parseReadme() のあとも、この値のまま。(取り直しで README から属性が消えたときも、この値に戻る)"
                 ],
                 "examples": [
                     "projectV2.initReadmeAttributes();",
@@ -7718,7 +7719,7 @@
                 "returns": null,
                 "description": [
                     "readme() の文章から、README の属性をすべて読み出して入れる。",
-                    "文字列の属性 (priority・owner など) は、README に無いときは null になる。",
+                    "文字列の属性 (priority・owner など) と systems は、README に書いてあるときだけ、その値を入れる。書いていないときは、initReadmeAttributes() の初めの値のまま。(null で上書きしない。0.5.0 から。yanqirenshi/SOGH.next#90)",
                     "plan は、README に無いときは今のまま。",
                     "result は、README に無いときは start・end とも null の期間になる。",
                     "_regexs に知らない名前があるときは、Error を投げる。"
@@ -7732,7 +7733,7 @@
                     "projectV2.priority();",
                     "// => \"h\"",
                     "projectV2.type();",
-                    "// => null"
+                    "// => \"?\" (README に書いていないので、初めの値のまま)"
                 ]
             },
             {
@@ -7914,7 +7915,7 @@
                 "visibility": "public",
                 "returns": {
                     "name": "owner",
-                    "type": "String | null",
+                    "type": "String",
                     "description": [
                         "今の 担当者。"
                     ]
@@ -7932,7 +7933,7 @@
                 "description": [
                     "README の $Owner の値 (担当者) を読み書きする。",
                     "引数を渡したときは、その値にする。",
-                    "README に $Owner が無いときは null。",
+                    "README に $Owner が無いときは \"?\"。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)",
                     "GitHub の ProjectV2 の owner (持ち主のユーザーや組織) ではない。(それは owner() で引く)",
                     "0.5.0 で、owner(v) から名前を変えた。(yanqirenshi/SOGH.next#71)"
                 ],
@@ -8019,7 +8020,7 @@
                 "visibility": "public",
                 "returns": {
                     "name": "priority",
-                    "type": "String | null",
+                    "type": "String",
                     "description": [
                         "今の優先度。"
                     ]
@@ -8037,7 +8038,7 @@
                 "description": [
                     "README の $Priority の値 (優先度) を読み書きする。",
                     "値は s (緊急)・h (高い)・n (普通)・l (低い) のどれか。(README からは、先頭の 1 文字だけを読む)",
-                    "README に $Priority が無いときは null。",
+                    "README に $Priority が無いときは \"?\"。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)",
                     "画面に出すときは priorityData() を使う。"
                 ],
                 "examples": [
@@ -8060,7 +8061,8 @@
                 },
                 "description": [
                     "priority() の値を、画面に出すためのデータにして返す。",
-                    "s・h・n・l・? 以外 (null を含む) のときは、label が「なぞ」、label_short が「謎」のデータを返す。"
+                    "s・h・n・l・? 以外 (null を含む) のときは、label が「なぞ」、label_short が「謎」のデータを返す。",
+                    "README に $Priority が無いときは、priority() が \"?\" なので、{ code: \"?\", label: \"なぞ\", label_short: \"謎\" } を返す。(0.5.0 から。それまでは code が null だった)"
                 ],
                 "examples": [
                     "projectV2.priorityData();",
@@ -8076,7 +8078,7 @@
                 "visibility": "public",
                 "returns": {
                     "name": "type",
-                    "type": "String | null",
+                    "type": "String",
                     "description": [
                         "今の プロジェクトの種類。"
                     ]
@@ -8094,7 +8096,7 @@
                 "description": [
                     "README の $Type の値 (プロジェクトの種類) を読み書きする。",
                     "引数を渡したときは、その値にする。",
-                    "README に $Type が無いときは null。"
+                    "README に $Type が無いときは \"?\"。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Type: 開発",
@@ -8111,7 +8113,7 @@
                 "visibility": "public",
                 "returns": {
                     "name": "release",
-                    "type": "String | null",
+                    "type": "String",
                     "description": [
                         "今の リリース。"
                     ]
@@ -8129,7 +8131,7 @@
                 "description": [
                     "README の $Release の値 (リリース) を読み書きする。",
                     "引数を渡したときは、その値にする。",
-                    "README に $Release が無いときは null。"
+                    "README に $Release が無いときは \"?\"。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Release: v0.3.1",
@@ -8243,7 +8245,7 @@
                 "visibility": "public",
                 "returns": {
                     "name": "action",
-                    "type": "String | null",
+                    "type": "String",
                     "description": [
                         "今の 次のアクション。"
                     ]
@@ -8261,7 +8263,7 @@
                 "description": [
                     "README の $Action の値 (次のアクション) を読み書きする。",
                     "引数を渡したときは、その値にする。",
-                    "README に $Action が無いときは null。"
+                    "README に $Action が無いときは \"\"。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Action: 見積もりを出す",
@@ -8278,7 +8280,7 @@
                 "visibility": "public",
                 "returns": {
                     "name": "backlog",
-                    "type": "String | null",
+                    "type": "String",
                     "description": [
                         "今の バックログ。"
                     ]
@@ -8296,7 +8298,7 @@
                 "description": [
                     "README の $Backlog の値 (バックログ) を読み書きする。",
                     "引数を渡したときは、その値にする。",
-                    "README に $Backlog が無いときは null。"
+                    "README に $Backlog が無いときは \"\"。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Backlog: クラス図",
@@ -8313,7 +8315,7 @@
                 "visibility": "public",
                 "returns": {
                     "name": "systems",
-                    "type": "String | null",
+                    "type": "String | Array",
                     "description": [
                         "今の 関係するシステム。"
                     ]
@@ -8331,8 +8333,8 @@
                 "description": [
                     "README の $Systems の値 (関係するシステム) を読み書きする。",
                     "引数を渡したときは、その値にする。",
-                    "README に $Systems が無いときは null。",
-                    "初めの値は [] だが、README を読むと文字列か null になる。"
+                    "README に $Systems が無いときは []。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)",
+                    "初めの値は [] だが、README に書いてあるときは文字列になる。"
                 ],
                 "examples": [
                     "// README: $Systems: iHub",
@@ -8349,7 +8351,7 @@
                 "visibility": "public",
                 "returns": {
                     "name": "agency",
-                    "type": "String | null",
+                    "type": "String",
                     "description": [
                         "今の 代理店。"
                     ]
@@ -8367,7 +8369,7 @@
                 "description": [
                     "README の $Agency の値 (代理店) を読み書きする。",
                     "引数を渡したときは、その値にする。",
-                    "README に $Agency が無いときは null。"
+                    "README に $Agency が無いときは \"\"。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Agency: A社",
@@ -8384,7 +8386,7 @@
                 "visibility": "public",
                 "returns": {
                     "name": "customer",
-                    "type": "String | null",
+                    "type": "String",
                     "description": [
                         "今の 顧客。"
                     ]
@@ -8402,7 +8404,7 @@
                 "description": [
                     "README の $Customer の値 (顧客) を読み書きする。",
                     "引数を渡したときは、その値にする。",
-                    "README に $Customer が無いときは null。"
+                    "README に $Customer が無いときは \"\"。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Customer: B社",
@@ -8419,7 +8421,7 @@
                 "visibility": "public",
                 "returns": {
                     "name": "scenario",
-                    "type": "String | null",
+                    "type": "String",
                     "description": [
                         "今の シナリオ。"
                     ]
@@ -8437,7 +8439,7 @@
                 "description": [
                     "README の $Scenario の値 (シナリオ) を読み書きする。",
                     "引数を渡したときは、その値にする。",
-                    "README に $Scenario が無いときは null。"
+                    "README に $Scenario が無いときは \"\"。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)"
                 ],
                 "examples": [
                     "// README: $Scenario: 移行",
@@ -8454,7 +8456,7 @@
                 "visibility": "public",
                 "returns": {
                     "name": "progress",
-                    "type": "String | null",
+                    "type": "String",
                     "description": [
                         "今の 進捗。"
                     ]
@@ -8472,7 +8474,7 @@
                 "description": [
                     "README の $Progress の値 (進捗) を読み書きする。",
                     "引数を渡したときは、その値にする。",
-                    "README に $Progress が無いときは null。",
+                    "README に $Progress が無いときは \"\"。(0.5.0 から。それまでは null になった。yanqirenshi/SOGH.next#90)",
                     "値は数字の文字列。(数値ではない)"
                 ],
                 "examples": [

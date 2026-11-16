@@ -100,7 +100,7 @@ const COLUMNS = [
         },
     },
     {
-        code: 'owner',
+        code: 'readmeOwner',
         label: 'Owner',
         sx: {whiteSpace: 'nowrap'},
         val: (column, project, actions)=> {

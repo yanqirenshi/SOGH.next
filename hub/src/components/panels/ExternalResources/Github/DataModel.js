@@ -66,7 +66,7 @@ const ANNOTATIONS = [
       note: '点数は「$Point.Result <人> <日付> <点>」の行を合計する。$Owner の値は bodyOwner() で読む (0.5.0 から。Issue に owner() は無い)' },
     { place: 'ProjectV2 の README',
       keys: ['$Priority', '$Owner', '$Type', '$Release', '$Plan', '$Result', '$Action', '$Backlog', '$Customer', '$Agency', '$Systems', '$Scenario', '$Progress'],
-      note: '$Priority は s (緊急)・h (高い)・n (普通)・l (低い)。$Owner の値は readmeOwner() で読む (0.5.0 から。owner() は GitHub の owner のモデル)' },
+      note: '$Priority は s (緊急)・h (高い)・n (普通)・l (低い)。$Owner の値は readmeOwner() で読む (0.5.0 から。owner() は GitHub の owner のモデル)。書いていない属性は、初めの値 (\'?\'・\'\'・[]) のまま (0.5.0 から。それまでは null)' },
     { place: 'ProjectV2Item のフィールド (利用者が作る)',
       keys: ['Plan.Start', 'Plan.End', 'Plan.Points', 'Result.Points', 'Due.Date', 'NextAction.Date', 'Archived'],
       note: 'フィールドの名前で引く' },
