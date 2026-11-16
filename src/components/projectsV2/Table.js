@@ -1,17 +1,13 @@
 import React from 'react';
-import moment from 'moment';
 
 import TableContainer from '@mui/material/TableContainer';
 import MTable from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import Cell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 import TableBodyRow from './TableBodyRow.js';
-import TableBodyRowProject from './TableBodyRowProject.js';
-import TableBodyRowTasks from './TableBodyRowTasks.js';
 import HeadCell from './HeadCell.js';
 
 export default function Table (props) {
@@ -29,11 +25,13 @@ export default function Table (props) {
             new_state[id] = true;
 
         setOpenTasksProjects(new_state);
+
+        // 開いたときだけ、外に知らせる。(Item の取得は、利用側がする。yanqirenshi/SOGH.next#102)
+        if (new_state[id]===true)
+            notifyTasksOpen(actions, id);
     };
 
     const header_rows = makeHeaderRows(columns);
-
-    const now = moment();
 
     return (
         <TableContainer component={Paper}>
@@ -66,9 +64,8 @@ export default function Table (props) {
                       <TableBodyRow key={project_id}
                                     project={project}
                                     columns={columns}
-                                    now={now}
                                     actions={actions}
-                                    is_opened={is_opened}
+                                    opened={is_opened}
                                     onChange={onChangeOpenTaskProject}/>
                   );
               })}
@@ -79,6 +76,18 @@ export default function Table (props) {
     );
 }
 
+// actions.tasks.open(project_id) を呼ぶ。(渡されていないときは、何もしない)
+function notifyTasksOpen (actions, project_id) {
+    const tasks = actions ? actions.tasks : null;
+
+    if (tasks && typeof tasks.open === 'function')
+        tasks.open(project_id);
+}
+
+// 見出しの行の配列を返す。([行, …]。行は [{ label, row_span, col_span }, …])
+//   - グループ (group) の付いた列があるときは、2 行。(1 行目: グループと、グループの無い列。2 行目: グループの中の列)
+//   - グループの付いた列が無いときは、1 行。(yanqirenshi/SOGH.next#105)
+//   - 列が 0 個のときは、行も 0 個。
 function makeHeaderRows (columns) {
     const tmp = columns.reduce((out, column)=> {
         const group = column.group || null;
@@ -114,8 +123,16 @@ function makeHeaderRows (columns) {
         list: [],
     });
 
+    // 最後の列がグループの中にあるときは、そのグループが残っているので、足す。(yanqirenshi/SOGH.next#105)
+    if (tmp.group)
+        tmp.list.push(tmp.group);
+
+    if (tmp.list.length===0)
+        return [];
+
+    // グループの付いた列が無いときは、行を 1 つ返す。(前は、列の配列をそのまま返していて、表が落ちた。yanqirenshi/SOGH.next#105)
     if (!tmp.is_double_row)
-        return tmp.list;
+        return [tmp.list.map(column=> ({ label: column.label, row_span: 1, col_span: 1 }))];
 
     return tmp.list.reduce((out, data)=> {
         if ('group'===data.__type) {

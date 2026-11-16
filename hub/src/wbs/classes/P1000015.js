@@ -45,6 +45,7 @@ function Overview ({ data }) {
             <P>{"project()・content()・creator() と、関連のフィールドを読むメソッド (assignees()・labels()・milestone()・repository()・linkedPullRequests()・reviewers()) は、JSON の id で Pool からモデルを引いて返す。"}</P>
             <P>{"content() は Issue・PullRequest・DraftIssue のどれか、creator() は User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか、reviewers() の要素は User・Team・Mannequin・Bot のどれかのモデルになる。"}</P>
             <P>{"フィールドの値は、フィールドの名前で fieldValues() から探して読む。(getFieldValueByName(name))"}</P>
+            <P>{"fieldValues を取得していないとき・nodes が配列でないときは、fieldValues() は [] を返し、getFieldValueByName(name) は null と field の無いノードを飛ばす。そのため、値を読むメソッドは null、関連を読むメソッドは [] を返し、落ちない。(0.5.0 から。Issue と同じ守り。yanqirenshi/SOGH.next#103)"}</P>
             <P>{"フィールドの値 (fieldValues() の箱) と、箱に付いている creator は、モデルにせず、JSON のまま返す。"}</P>
             <P>{"contentTypename()・projectNumber()・projectOwnerLogin()・projectPath() は、モデルではなく、core の JSON を読む。"}</P>
             <P>{"値が無いときは null (配列を返すメソッドは []) を返すが、同じ名前で種類の違うフィールド (例: テキストの Archived) のときは undefined を返す。(関連を返すメソッドは、そのときも null か [] を返す)"}</P>

@@ -11,12 +11,14 @@ export default class ProjectV2Item extends GraphQLNode {
     }
     // fieldValues そのものはモデルにしないので、箱は JSON のまま返す。(yanqirenshi/SOGH.next#29)
     // 箱の中の関連のモデルは、assignees()・labels() などで引く。
+    // fieldValues が無いとき・nodes が配列でないときは、空の配列。(Issue と同じ守り。yanqirenshi/SOGH.next#103)
     fieldValues () {
-        return this._core.fieldValues.nodes || [];
+        return fieldValuesOf(this._core);
     }
+    // null と、field の無いものは、飛ばす。(yanqirenshi/SOGH.next#103)
     getFieldValueByName(name) {
         const field_value = this.fieldValues().find(fv=> {
-            return fv.field.name === name;
+            return fv && fv.field && fv.field.name === name;
         });
 
         if (!field_value)
@@ -205,4 +207,14 @@ export default class ProjectV2Item extends GraphQLNode {
     // after () {
     //     return [];
     // }
+}
+
+// ProjectV2Item の JSON (core) から、fieldValues の nodes を取り出す。
+// core が無いとき・fieldValues が無いとき・nodes が配列でないときは、空の配列。
+// (Issue.js の fieldValuesOf と同じ。yanqirenshi/SOGH.next#59・yanqirenshi/SOGH.next#103)
+function fieldValuesOf (item) {
+    if (!item || !item.fieldValues || !Array.isArray(item.fieldValues.nodes))
+        return [];
+
+    return item.fieldValues.nodes;
 }
