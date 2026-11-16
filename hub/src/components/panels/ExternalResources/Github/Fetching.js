@@ -40,7 +40,7 @@ const VALUE_COLUMNS = [
 
 const VALUES = [
     { how: 'GraphQL の variables で渡す',
-      queries: '取得のクエリ (15 個。viewer は、変数が無い) と、コメントの追加・更新・削除 (3 個)',
+      queries: '取得のクエリ (15 個。viewer は、変数が無い)・コメントの追加・更新・削除 (3 個)・Issue の本文の書き換え (1 個)',
       syntax: ['query ($id: ID!, $after: String)', 'request(query, { id, after })', 'mutation ($id: ID!, $body: String!)', 'postData(query, { id, body })'] },
 ];
 
@@ -56,7 +56,7 @@ const CHECK_COMMAND = [
     'npm run check:queries -- --schema <...> --compare before.json',
 ].join('\n');
 
-// いまのクエリを検査した結果。(18 個)
+// いまのクエリを検査した結果。(19 個)
 const CHECK_COLUMNS = [
     { code: 'kind',    label: '種類',   key: 'kind' },
     { code: 'count',   label: '個数',   key: 'count' },
@@ -162,13 +162,14 @@ const LIVES = [
       ],
       note: '組織 (org) とチームのクエリ。.env.local に対象を書くと、送る' },
     { kind: '送らない',
-      count: 3,
+      count: 4,
       queries: [
           'create_issue_comment',
+          'update_issue_body',
           'update_issue_comment',
           'delete_issue_comment',
       ],
-      note: '書き込みのため。(このときは projects_next_items_by_id も、スキーマの検査で NG のため送らなかった。0.5.0 で消した)' },
+      note: '書き込みのため。(このときは projects_next_items_by_id も、スキーマの検査で NG のため送らなかった。0.5.0 で消した。update_issue_body は、この記録のあとに、飛ばす一覧へ足した。check:live は、書き込みのクエリを、名前を挙げて飛ばす)' },
 ];
 
 // 取得メソッドの一覧。(src/js/Sogh.js)
@@ -196,7 +197,8 @@ const METHODS = [
     { target: 'Issue (org・repo・番号)',    methods: ['asyncFetchIssueByOrgRepoIssueNumber'],                                                                      style: ASYNC,    paging: '-',        returns: 'id',        failed: THROW },
     { target: 'viewer の Issue (OPEN)',     methods: ['asyncFetchIssueByViewer'],                                                                                  style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW },
     { target: 'Issue のコメント',           methods: ['asyncFetchIssueCommentsByID', 'asyncFetchIssueCommentsByOrgRepoIssueNumber'],                               style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW },
-    { target: 'コメントの追加・更新・削除', methods: ['createIssueComment', 'updateIssueComment', 'deleteIssueComment'],                                           style: CALLBACK, paging: '-',        returns: '-',         failed: FAILED },
+    { target: 'Issue の本文の書き換え',    methods: ['asyncUpdateIssueBody'],                                                                                     style: ASYNC,    paging: '-',        returns: 'id',        failed: THROW },
+    { target: 'コメントの追加・更新・削除', methods: ['asyncCreateIssueComment', 'asyncUpdateIssueComment', 'asyncDeleteIssueComment'],                                           style: ASYNC,    paging: '-',        returns: 'id',        failed: THROW },
     { target: 'ProjectV2 (viewer)',         methods: ['asyncFetchProjectsV2ByViewer'],                                                                             style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW },
     { target: 'ProjectV2 (team)',           methods: ['asyncFetchProjectsV2ByTeam', 'asyncFetchProjectsV2WithItemsByTeam'],                                        style: ASYNC,    paging: '全件',     returns: 'id の配列', failed: THROW_AFTER_FAILED },
     { target: 'ProjectV2 (1 件)',           methods: ['asyncFetchProjectV2ByUserLoginProjectV2Number', 'asyncFetchProjectV2ByOrgLoginProjectV2Number'],            style: ASYNC,    paging: '-',        returns: 'id',        failed: THROW_AFTER_FAILED },
@@ -219,7 +221,7 @@ export default function Fetching () {
               </LI>
               <LI>クエリの本体。(src/js/queries/ の 1 ファイルに 1 クエリ)
                 <UL>
-                  <LI>GraphQL の形 (どこから、何を入れ子で取るか) を書いた文字列。18 個ある。</LI>
+                  <LI>GraphQL の形 (どこから、何を入れ子で取るか) を書いた文字列。19 個ある。</LI>
                   <LI>クエリの頭で、変数 (<C>$id: ID!</C> など) を宣言する。値は、GraphQL の variables で渡す。</LI>
                   <LI>項目のところに、項目の部品を埋め込む。</LI>
                   <LI>ファイルは、クエリの文字列 <C>query</C> と、応答の data から取り出す値を返す関数 <C>pick</C> を、<C>{'{ query, pick }'}</C> の形で export する。(<C>yanqirenshi/SOGH.next#65</C>)</LI>
@@ -306,7 +308,6 @@ export default function Fetching () {
                   <LI>ProjectV2 の 2 つ (<C>asyncFetchProjectV2By〜LoginProjectV2Number</C>) は、<C>failed(error, login, number)</C>。</LI>
                 </UL>
               </LI>
-              <LI>コメントの追加・更新・削除の <C>failed</C> は、1 つめの引数が <C>{"{ type: 'error', data: error }"}</C>。(例外は投げない)</LI>
             </OL>
           </Section>
 
@@ -323,9 +324,9 @@ export default function Fetching () {
               <LI>途中のページで失敗したときも、投げる。途中まで集めた分は、返さない。</LI>
               <LI>成功したときの戻り値 (id か、id の配列。<C>asyncFetchViewer()</C> は User) は、0.5.0 の前と変わらない。</LI>
               <LI><C>GitHubError</C> は、パッケージの入口から、名前付きで export している。(<C>{"import { GitHubError } from 'sogh'"}</C>。<C>e instanceof GitHubError</C> で見分ける)</LI>
-              <LI>コメントの追加・更新・削除と <C>connect</C> は、例外を投げない。
+              <LI>コメントの追加・更新・削除は、Promise の形 (<C>asyncCreateIssueComment</C>・<C>asyncUpdateIssueComment</C>・<C>asyncDeleteIssueComment</C>)。失敗したときは、<C>GitHubError</C> を投げる。(0.5.0 から。callbacks の形の <C>createIssueComment</C> などは、消した。<C>yanqirenshi/SOGH.next#122</C>)</LI>
+              <LI><C>connect</C> は、例外を投げない。
                 <UL>
-                  <LI>コメントの追加・更新・削除は、HTTP のステータスが 2xx でなければ <C>text2json(r)</C> が失敗 (reject) にし、HTTP 200 でも errors があれば <C>json2response(r, getData)</C> が Error を投げる。それを <C>error2response(error)</C> で <C>{"{ type: 'error', data: error }"}</C> にして、<C>failed</C> に渡す。</LI>
                   <LI><C>connect</C> は、<C>fetchX</C> で送り、失敗したときは <C>{"failed({ status: 'error', error })"}</C> を呼ぶ。</LI>
                 </UL>
               </LI>
@@ -333,15 +334,16 @@ export default function Fetching () {
           </Section>
 
           <Section title="クエリの使われ方" num="3.6" lev="5">
-            <P>クエリは 18 個あり、どれも Sogh のメソッドから使われています。</P>
+            <P>クエリは 19 個あり、どれも Sogh のメソッドから使われています。</P>
             <OL>
               <LI>viewer・リポジトリ・Issue・コメント・ProjectV2・ProjectV2Item のクエリ。
                 <UL>
                   <LI>Sogh のメソッドは、名前でクエリを引く。(<C>query</C>・<C>queryDefinition</C>・<C>fetchNode</C>・<C>fetchPages</C>・<C>fetchProjectsV2OfTeam</C> に名前を渡す)</LI>
                   <LI>名前のつづりは、0.5.0 で直した。(<C>viewer</C>・<C>issues_by_viewer</C>。<C>yanqirenshi/SOGH.next#73</C>)</LI>
+                  <LI>Issue の本文を書き換える <C>update_issue_body</C> は、<C>asyncUpdateIssueBody(id, body)</C> が使う。(中身は、0.5.0 で作り直した。値を variables で渡し、Projects (classic) の項目を取らず、戻りの項目は <C>issue_by_id</C> と同じ。<C>yanqirenshi/SOGH.next#119</C>)</LI>
                 </UL>
               </LI>
-              <LI>使われていなかったクエリ (18 個) は、0.5.0 で消した。(<C>yanqirenshi/SOGH.next#66</C>)
+              <LI>使われていなかったクエリ (17 個) は、0.5.0 で消した。(<C>yanqirenshi/SOGH.next#66</C>)
                 <UL>
                   <LI>消したクエリの名前は、<C>CHANGELOG.md</C> の「0.5.0」を見る。</LI>
                   <LI>項目の部品のうち、どのクエリからも使われなくなった 7 個も、消した。(Projects (classic) 用と、古い Projects 用)</LI>

@@ -218,76 +218,123 @@ test('asyncFetchProjectV2ByUserLoginProjectV2Number・ByOrg〜: 失敗したら�
 });
 
 /* ****************************************************************
- * コメントの追加・更新・削除 (書き込み)
+ * コメントの追加・更新・削除 (書き込み。yanqirenshi/SOGH.next#122)
+ *   3 個とも、asyncFetch〜 と同じ Promise の形。コメントの id を返し、失敗したときは GitHubError を投げる。
  *   取り出す所は、クエリのファイルの pick を使う。(yanqirenshi/SOGH.next#65)
- *   失敗しても、例外は投げず、failed を呼ぶ。(前と同じ)
  * **************************************************************** */
-
-// successed か failed が呼ばれるまで待つ。(コメントのメソッドは、終わりを待たずに戻るため)
-function untilDone (run) {
-    return new Promise((resolve)=> {
-        const calls = [];
-        const callbacks = {};
-
-        for (const name of ['start', 'successed', 'failed'])
-            callbacks[name] = (...args)=> {
-                calls.push([name, args]);
-
-                if (name !== 'start')
-                    resolve(calls);
-            };
-
-        run(callbacks);
-    });
-}
 
 const COMMENT_NODE = { __typename: 'IssueComment', id: 'IC_1', body: 'hello', updatedAt: '2026-11-01T09:00:00Z' };
 
-test('createIssueComment・updateIssueComment: 応答から pick で取り出したコメントの id を、successed に渡す', async ()=> {
-    const cases = [
-        ['createIssueComment', { addComment: { commentEdge: { node: COMMENT_NODE } } }],
-        ['updateIssueComment', { updateIssueComment: { issueComment: COMMENT_NODE } }],
-    ];
+// メソッド・引数・にせの応答の data・送る variables。
+const COMMENT_CALLS = [
+    ['asyncCreateIssueComment', ['X_1', 'hello'], { addComment: { commentEdge: { node: COMMENT_NODE } } }, { id: 'X_1', body: 'hello' }],
+    ['asyncUpdateIssueComment', ['IC_1', 'hello'], { updateIssueComment: { issueComment: COMMENT_NODE } }, { id: 'IC_1', body: 'hello' }],
+    ['asyncDeleteIssueComment', ['IC_1'],          { deleteIssueComment: { clientMutationId: null } },     { id: 'IC_1' }],
+];
 
-    for (const [method, data] of cases) {
+test('asyncCreateIssueComment・asyncUpdateIssueComment: コメントの id を返し、コメントを Pool に入れる。送るのは 1 回で、mutation と variables', async ()=> {
+    for (const [method, args, data, variables] of COMMENT_CALLS.slice(0, 2)) {
         const sogh = new Sogh();
         const fake = fakeFetch([{ json: { data } }]);
 
-        const calls = await untilDone((callbacks)=> withFetch(fake, async ()=> sogh[method]('X_1', 'hello', callbacks)));
+        const id = await withFetch(fake, ()=> sogh[method](...args));
 
-        assert.deepEqual(calls.map(c=> c[0]), ['start', 'successed'], method);
-        assert.deepEqual(calls[1][1], ['IC_1', 'X_1', 'hello'], method);
-        assert.equal(sogh.issueComment('IC_1').id(), 'IC_1', method);
-        assert.deepEqual(fake.requests[0].variables, { id: 'X_1', body: 'hello' }, method);
+        assert.equal(id, 'IC_1', method);
+        assert.equal(typeof id, 'string', method);
+        assert.equal(sogh.issueComment(id).body(), 'hello', method);
+
+        assert.equal(fake.requests.length, 1, method);
+        assert.match(fake.requests[0].query, /^mutation /, method);
+        assert.deepEqual(fake.requests[0].variables, variables, method);
     }
 });
 
-test('deleteIssueComment: 成功したら successed(id) を呼ぶ', async ()=> {
+test('asyncUpdateIssueComment: Pool にある同じコメントの本文が、書き換わる', async ()=> {
     const sogh = new Sogh();
-    const fake = fakeFetch([{ json: { data: { deleteIssueComment: { clientMutationId: null } } } }]);
 
-    const calls = await untilDone((callbacks)=> withFetch(fake, async ()=> sogh.deleteIssueComment('IC_1', callbacks)));
+    const comment = sogh.node2issueComment({ ...COMMENT_NODE, body: 'before', updatedAt: T1 });
 
-    assert.deepEqual(calls.map(c=> c[0]), ['start', 'successed']);
-    assert.deepEqual(calls[1][1], ['IC_1']);
+    const data = { updateIssueComment: { issueComment: { ...COMMENT_NODE, body: 'after', updatedAt: '2026-11-02T09:00:00Z' } } };
+
+    const id = await withFetch(fakeFetch([{ json: { data } }]), ()=> sogh.asyncUpdateIssueComment('IC_1', 'after'));
+
+    assert.equal(sogh.issueComment(id), comment);
+    assert.equal(comment.body(), 'after');
+});
+
+test('asyncDeleteIssueComment: 消したコメントの id を返す。送るのは 1 回で、mutation と variables', async ()=> {
+    const sogh = new Sogh();
+    const fake = fakeFetch([{ json: { data: COMMENT_CALLS[2][2] } }]);
+
+    const id = await withFetch(fake, ()=> sogh.asyncDeleteIssueComment('IC_1'));
+
+    assert.equal(id, 'IC_1');
+    assert.equal(fake.requests.length, 1);
+    assert.match(fake.requests[0].query, /^mutation /);
     assert.deepEqual(fake.requests[0].variables, { id: 'IC_1' });
 });
 
-test('コメントの 3 つ: GraphQL のエラーのときは、例外を投げず、failed を呼ぶ', async ()=> {
-    const cases = [
-        ['createIssueComment', ['X_1', 'hello']],
-        ['updateIssueComment', ['IC_1', 'hello']],
-        ['deleteIssueComment', ['IC_1']],
+test('asyncDeleteIssueComment: 応答の clientMutationId が null でも、文字でも、空のオブジェクトでも、成功する (取り出す値が無いとはしない)', async ()=> {
+    for (const payload of [{ clientMutationId: null }, { clientMutationId: 'm1' }, {}]) {
+        const sogh = new Sogh();
+
+        sogh.node2issueComment({ ...COMMENT_NODE });
+
+        const id = await withFetch(fakeFetch([{ json: { data: { deleteIssueComment: payload } } }]), ()=> sogh.asyncDeleteIssueComment('IC_1'));
+
+        assert.equal(id, 'IC_1', JSON.stringify(payload));
+        assert.equal(sogh.issueComment('IC_1'), null, JSON.stringify(payload));
+    }
+});
+
+test('コメントの 3 つ: 失敗したら (GraphQL のエラー・HTTP のエラー・つながらない)、GitHubError を投げる。失敗した 1 回だけ送り、Pool は変わらない', async ()=> {
+    const pages = [
+        GRAPHQL_ERROR,
+        { status: 403 },
+        { throws: new TypeError('fetch failed') },
     ];
 
-    for (const [method, args] of cases) {
-        const sogh = new Sogh();
-        const fake = fakeFetch([GRAPHQL_ERROR]);
+    for (const [method, args] of COMMENT_CALLS) {
+        for (const page of pages) {
+            const sogh = new Sogh();
+            const comment = sogh.node2issueComment({ ...COMMENT_NODE, body: 'before' });
+            const fake = fakeFetch([page]);
 
-        const calls = await untilDone((callbacks)=> withFetch(fake, async ()=> sogh[method](...args, callbacks)));
+            await assert.rejects(withFetch(fake, ()=> sogh[method](...args)), (e)=> {
+                assert.ok(e instanceof GitHubError);
+                return true;
+            }, method);
 
-        assert.deepEqual(calls.map(c=> c[0]), ['start', 'failed'], method);
-        assert.equal(calls[1][1][0].type, 'error', method);
-        assert.deepEqual(calls[1][1].slice(1), args, method);
+            assert.equal(fake.requests.length, 1, method);
+            assert.equal(sogh.issueComment('IC_1'), comment, method);
+            assert.equal(comment.body(), 'before', method);
+        }
     }
+});
+
+test('コメントの 3 つ: GraphQL のエラーは、errors と status を持つ GitHubError。HTTP のエラーは、status と response を持つ', async ()=> {
+    for (const [method, args] of COMMENT_CALLS) {
+        await assert.rejects(withFetch(fakeFetch([GRAPHQL_ERROR]), ()=> new Sogh()[method](...args)), (e)=> {
+            assert.deepEqual(e.errors, ERRORS);
+            assert.equal(e.status, 200);
+            return true;
+        }, method);
+
+        await assert.rejects(withFetch(fakeFetch([{ status: 401 }]), ()=> new Sogh()[method](...args)), (e)=> {
+            assert.equal(e.status, 401);
+            assert.ok(e.response);
+            return true;
+        }, method);
+    }
+});
+
+test('コメントの 3 つ: 応答に、取り出す値が無い (null) ときも、GitHubError を投げる', async ()=> {
+    const empty = [
+        ['asyncCreateIssueComment', ['X_1', 'hello'], { addComment: { commentEdge: { node: null } } }],
+        ['asyncUpdateIssueComment', ['IC_1', 'hello'], { updateIssueComment: { issueComment: null } }],
+        ['asyncDeleteIssueComment', ['IC_1'],          { deleteIssueComment: null }],
+    ];
+
+    for (const [method, args, data] of empty)
+        await assert.rejects(withFetch(fakeFetch([{ json: { data } }]), ()=> new Sogh()[method](...args)), GitHubError, method);
 });

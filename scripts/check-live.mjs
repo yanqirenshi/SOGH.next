@@ -182,6 +182,7 @@ async function checkQueries (sogh, conf) {
 
     // 送らないもの
     skip('create_issue_comment', '書き込みなので、送らない');
+    skip('update_issue_body', '書き込みなので、送らない');
     skip('update_issue_comment', '書き込みなので、送らない');
     skip('delete_issue_comment', '書き込みなので、送らない');
 

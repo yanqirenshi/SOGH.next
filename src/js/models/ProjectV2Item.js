@@ -1,4 +1,5 @@
 import GraphQLNode from './GraphQLNode.js';
+import { fieldValueOf, fieldValuesOf } from './fieldValue.js';
 
 export default class ProjectV2Item extends GraphQLNode {
     // constructor (data) { super(data); }
@@ -206,7 +207,7 @@ export default class ProjectV2Item extends GraphQLNode {
     //   project    … この Item の core の project (JSON)
     //   item       … この Item の core (JSON)
     //   field_item … フィールドの値 (JSON。field の id・name・dataType を持つ)
-    //   value      … フィールドの種類ごとの値。(DATE なら { date })
+    //   value      … フィールドの種類ごとの値。(DATE なら { date }。知らない種類のときは null。yanqirenshi/SOGH.next#120)
     // 名前の合う値が無いときは、null。(Issue の画面の部品が、Item を渡されたときに読む。yanqirenshi/SOGH.next#114)
     fieldValueContents (name) {
         const field_item = this.getFieldValueByName(name);
@@ -229,30 +230,4 @@ export default class ProjectV2Item extends GraphQLNode {
     // after () {
     //     return [];
     // }
-}
-
-// フィールドの値 (JSON) から、種類ごとの値を取り出す。(Issue の fieldValueContents(name) と同じ)
-function fieldValueOf (field_item) {
-    const type = field_item.field.dataType;
-
-    switch (type) {
-    case 'ASSIGNEES':     return { users:      field_item.users };
-    case 'REPOSITORY':    return { repository: field_item.repository };
-    case 'LABELS':        return { labels:     field_item.labels };
-    case 'TITLE':         return { text:       field_item.text };
-    case 'SINGLE_SELECT': return { optionId:   field_item.optionId };
-    case 'DATE':          return { date:       field_item.date };
-    default:
-        throw new Error('Not Supported yet. dataType=' + type);
-    }
-}
-
-// ProjectV2Item の JSON (core) から、fieldValues の nodes を取り出す。
-// core が無いとき・fieldValues が無いとき・nodes が配列でないときは、空の配列。
-// (Issue.js の fieldValuesOf と同じ。yanqirenshi/SOGH.next#59・yanqirenshi/SOGH.next#103)
-function fieldValuesOf (item) {
-    if (!item || !item.fieldValues || !Array.isArray(item.fieldValues.nodes))
-        return [];
-
-    return item.fieldValues.nodes;
 }

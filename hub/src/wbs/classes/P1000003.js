@@ -44,7 +44,7 @@ function Overview ({ data }) {
             <P>{"ensure で返すオブジェクトには、sogh(v) で Sogh を入れる。"}</P>
             <P>{"remove(id) は、id のオブジェクトを、表と配列の両方から消して返す。(無ければ null。0.5.0 から。yanqirenshi/SOGH.next#69)"}</P>
             <P>{"clear() は、すべて消す。(0.5.0 から)"}</P>
-            <P>{"期限で消す仕組みは無い。sogh が自分で消すのは、Sogh の deleteIssueComment で、コメントを GitHub から消せたときだけ。"}</P>
+            <P>{"期限で消す仕組みは無い。sogh が自分で消すのは、Sogh の asyncDeleteIssueComment で、コメントを GitHub から消せたときだけ。"}</P>
             <Plane>{CODE}</Plane>
           </Section>
 

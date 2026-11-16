@@ -5,6 +5,8 @@
 //   - 書き換えに要る情報が作れないときは、日付を変えても落ちず、利用側の関数を呼ばない。
 //   - コメントを書く所は、情報が作れないときも、次の行動の日の情報を付けずに送る。
 //   - ProjectV2Item の fieldValueContents(name) は、Issue のものと同じ形を返す。
+//   - 日付の欄 2 か所は、ラベルを上に寄せる指定を slotProps.inputLabel で受け取り、InputLabelProps は受け取らない。(yanqirenshi/SOGH.next#117)
+//   - 日付の欄 2 か所は、日付が無いとき、value に空の文字を受け取る。(yanqirenshi/SOGH.next#118)
 //
 // 動かし方:
 //   npm test
@@ -188,8 +190,9 @@ test('projectItems の無い Issue (asyncFetchIssueByID の形) でも、落ち�
 
     const dates = dateFields(tree);
 
-    assert.equal(dates['Due Date'].props.value, null);
-    assert.equal(dates['Next Action Date'].props.value, null);
+    // 日付が無いときは、欄に空の文字を渡す。(yanqirenshi/SOGH.next#118)
+    assert.equal(dates['Due Date'].props.value, '');
+    assert.equal(dates['Next Action Date'].props.value, '');
 });
 
 test('Item を Pool から消したあとの Issue でも、落ちずに描ける (yanqirenshi/SOGH.next#108)', ()=> {
@@ -392,4 +395,64 @@ test('ProjectV2Item の fieldValueContents(name) は、Issue のものと同じ�
     const bare = sogh.node2projectV2Item({ __typename: 'ProjectV2Item', id: 'PVTI_X', updatedAt: T1 });
 
     assert.equal(bare.fieldValueContents('Due.Date'), null);
+});
+
+/* ****************************************************************
+ * 日付の欄 (yanqirenshi/SOGH.next#117・#118)
+ * **************************************************************** */
+
+// [見出し, 部品に渡すもの, 期限の欄の value, 次の行動の日の欄の value]
+const DATE_FIELD_CASES = [
+    ['Issue を渡す・日付がある', ()=> {
+        const sogh = new Sogh();
+        return { data: sogh.node2issue(withProjectItems()) };
+    }, '2026-11-30', '2026-11-05'],
+    ['Issue を渡す・日付が無い', ()=> {
+        const sogh = new Sogh();
+        return { data: sogh.node2issue(issueNode()) };
+    }, '', ''],
+    ['Item を渡す・日付がある', ()=> {
+        const sogh = new Sogh();
+        return {
+            data: sogh.node2issue(issueNode()),
+            item: sogh.node2projectV2Item(itemNode('PVTI_B', projectNode('PVT_B', 'B', 2), [['Due.Date', '2027-01-31'], ['NextAction.Date', '2027-01-10']])),
+        };
+    }, '2027-01-31', '2027-01-10'],
+    ['Item を渡す・日付が無い', ()=> {
+        const sogh = new Sogh();
+        // Issue の側には日付があっても、渡した Item に無ければ、空。
+        return {
+            data: sogh.node2issue(withProjectItems()),
+            item: sogh.node2projectV2Item(itemNode('PVTI_B', projectNode('PVT_B', 'B', 2), [])),
+        };
+    }, '', ''],
+];
+
+test('日付の欄 2 か所は、ラベルを上に寄せる指定を slotProps.inputLabel で受け取り、InputLabelProps は受け取らない (yanqirenshi/SOGH.next#117)', ()=> {
+    for (const [label, make] of DATE_FIELD_CASES) {
+        const dates = dateFields(draw({ ...make(), actions: recorder().actions }));
+
+        for (const name of ['Due Date', 'Next Action Date']) {
+            const props = dates[name].props;
+
+            assert.deepEqual(props.slotProps, { inputLabel: { shrink: true } }, `${label}: ${name}`);
+            assert.equal('InputLabelProps' in props, false, `${label}: ${name}`);
+        }
+    }
+});
+
+test('日付の欄 2 か所は、日付が無いとき value に空の文字、あるときはその日付を受け取る (yanqirenshi/SOGH.next#118)', ()=> {
+    for (const [label, make, due, next] of DATE_FIELD_CASES) {
+        const dates = dateFields(draw({ ...make(), actions: recorder().actions }));
+
+        assert.equal(dates['Due Date'].props.value, due, label);
+        assert.equal(dates['Next Action Date'].props.value, next, label);
+    }
+
+    // モデルの戻り値は、変えない。(日付が無いときは null のまま)
+    const sogh = new Sogh();
+
+    assert.equal(sogh.node2issue(issueNode()).dueDate(), null);
+    assert.equal(sogh.node2issue(issueNode()).nextActionDate(), null);
+    assert.equal(sogh.node2projectV2Item(itemNode('PVTI_B', projectNode('PVT_B', 'B', 2), [])).dueDate(), null);
 });

@@ -75,10 +75,44 @@ test('取得のメソッドは、asyncFetch〜 の 16 個 (と、取得の部品
     assert.deepEqual(fetches, [...ASYNC_FETCHES, 'fetchNode', 'fetchPages', 'fetchProjectsV2OfTeam', 'fetchX'].sort());
 });
 
-test('接続とコメントの追加・更新・削除のメソッドと、取得の部品は、残っている。makeQuery・node2objs は無い', ()=> {
+test('コメントの追加・更新・削除は Promise の形で、callbacks の形の古い名前 3 個は無い (yanqirenshi/SOGH.next#122)', ()=> {
+    const sogh = new Sogh();
+
+    for (const name of ['asyncCreateIssueComment', 'asyncUpdateIssueComment', 'asyncDeleteIssueComment', 'asyncUpdateIssueBody']) {
+        assert.equal(typeof sogh[name], 'function', name);
+        assert.equal(sogh[name].constructor.name, 'AsyncFunction', name);
+    }
+
+    // 引数は、callbacks を持たない。
+    assert.equal(sogh.asyncCreateIssueComment.length, 2);
+    assert.equal(sogh.asyncUpdateIssueComment.length, 2);
+    assert.equal(sogh.asyncDeleteIssueComment.length, 1);
+
+    const names = methodNames(sogh);
+
+    for (const name of ['createIssueComment', 'updateIssueComment', 'deleteIssueComment'])
+        assert.equal(names.has(name), false, name);
+});
+
+test('Loader の text2json・json2response・error2response は無い (callbacks の形のコメントの 3 個だけが使っていた。yanqirenshi/SOGH.next#122)', ()=> {
+    const sogh = new Sogh();
+
+    const names = methodNames(sogh);
+
+    for (const name of ['text2json', 'json2response', 'error2response']) {
+        assert.equal(names.has(name), false, name);
+        assert.equal(name in sogh, false, name);
+    }
+
+    // 残っている Loader のメソッド。
+    for (const name of ['endpoint', 'token', 'viewer', 'isConnected', 'request', 'makeHeader', 'postData', 'fetchX'])
+        assert.equal(typeof sogh[name], 'function', name);
+});
+
+test('接続とコメントの追加・更新・削除のメソッド (Promise の形)・本文の書き換えと、取得の部品は、残っている。makeQuery・node2objs は無い', ()=> {
     const names = methodNames(new Sogh());
 
-    for (const name of ['connect', 'createIssueComment', 'updateIssueComment', 'deleteIssueComment', 'request', 'query', 'queryDefinition', 'connection2ids'])
+    for (const name of ['connect', 'asyncCreateIssueComment', 'asyncUpdateIssueComment', 'asyncDeleteIssueComment', 'asyncUpdateIssueBody', 'request', 'query', 'queryDefinition', 'connection2ids'])
         assert.ok(names.has(name), name);
 
     // ページ送りの印を書き換える makeQuery は、variables にしたので、消した。(yanqirenshi/SOGH.next#63)
@@ -95,7 +129,7 @@ test('Sogh のメソッドから使われていないクエリは、無い (yanq
         'assignees_by_repository', 'create_issue', 'issues_by_milestone', 'issues_by_report_label',
         'issues_by_repository', 'issues_open_by_label', 'issues_open_by_project_column', 'issues_open_by_repository',
         'labels_by_repository', 'milestones_by_repository', 'project_by_id', 'projects_by_repository',
-        'repository', 'search_issues', 'update_issue_body',
+        'repository', 'search_issues',
         'user_by_id', 'projects_next_by_id', 'projectsv2_items_by_projects_v2',
         // 0.5.0 で、名前のつづりを直したクエリの、古い名前。(yanqirenshi/SOGH.next#73)
         'viwer', 'issues_by_viwer',
@@ -104,12 +138,13 @@ test('Sogh のメソッドから使われていないクエリは、無い (yanq
     for (const code of removed)
         assert.equal(code in queries, false, code);
 
-    // 残ったクエリは 18 個で、どれも Sogh.js から、名前で使われている。
+    // 残ったクエリは 19 個で、どれも Sogh.js から、名前で使われている。
+    // (update_issue_body は、残る。中身を、値を variables で渡す形に作り直し、Issue の本文を書き換える asyncUpdateIssueBody が使う。yanqirenshi/SOGH.next#119)
     // (this.query('…')・this.queryDefinition('…')・this.fetchNode('…')・this.fetchPages('…')・this.fetchProjectsV2OfTeam('…'))
     const source = fs.readFileSync(new URL('../src/js/Sogh.js', import.meta.url), 'utf8');
     const used = new Set([...source.matchAll(/this\.(?:query|queryDefinition|fetchNode|fetchPages|fetchProjectsV2OfTeam)\('([a-z0-9_]+)'/g)].map(m=> m[1]));
 
-    assert.equal(Object.keys(queries).length, 18);
+    assert.equal(Object.keys(queries).length, 19);
     assert.deepEqual(Object.keys(queries).sort(), [...used].sort());
 
     // query(code) は、残ったクエリを返し、消したクエリは返さない。
