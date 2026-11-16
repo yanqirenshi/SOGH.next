@@ -111,7 +111,8 @@ function CellAssignees (props) {
         <Cell>
           {item.assignees().map(ass=> {
               return (
-                  <Box sx={{display:'flex', alignItems:'center'}}>
+                  <Box key={ass.id()}
+                       sx={{display:'flex', alignItems:'center'}}>
                     <Box sx={{mr:0.5}}>
                       <Avatar alt={ass.login()} src={ass.avatarUrl()}
                               sx={{ width: 18, height: 18 }} />
