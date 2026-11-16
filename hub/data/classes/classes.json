@@ -5255,6 +5255,30 @@
                 ]
             },
             {
+                "name": "typename",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "typename",
+                    "type": "String | null",
+                    "description": [
+                        "型の名前 (core の __typename)。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "ノードの型の名前 (GraphQL の __typename) を返す。(例: \"User\"・\"Bot\"・\"Issue\")",
+                    "型が複数ある関連 (Issue の author()・ProjectV2Item の content()・reviewers() など) が返したモデルを、見分けるのに使う。",
+                    "core に __typename が無いときは null を返す。クラスの名前からは、推し量らない。(node2user(node) などで、型を決めて作ったときも、__typename が無ければ null)",
+                    "core が無いとき (null や undefined) は、エラーになる。"
+                ],
+                "examples": [
+                    "issue.author().typename();",
+                    "// => \"Bot\""
+                ]
+            },
+            {
                 "name": "createdAt",
                 "parameters": [],
                 "returnType": "any",

@@ -18,6 +18,10 @@ import {Milestone}   from './js/models/index.js';
 import {Project}     from './js/models/index.js';
 import {Repository}  from './js/models/index.js';
 
+// モデルを、まとめて 1 つの名前で export する。(yanqirenshi/SOGH.next#38)
+// 部品の ProjectV2Item と名前が重なるので、モデルは models.ProjectV2Item のように読む。
+import * as models   from './js/models/index.js';
+
 export default Sogh;
 
 export {
@@ -40,4 +44,8 @@ export {
     Milestone,
     Project,
     Repository,
+}
+
+export {
+    models,
 }

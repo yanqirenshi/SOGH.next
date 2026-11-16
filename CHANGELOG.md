@@ -4,7 +4,8 @@
 
 ProjectV2 の Item の表で、Item の content が無いときに落ちる場合があったのと、閉じた日の書式の誤りを、直しました。
 また、使われていなかったファイルを 20 個 (部品 19 個・モデル 1 個) 消しました。
-(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45)
+入口からモデルを export し、モデルの型の名前を返す `typename()` を足しました。
+(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#38・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45)
 
 ### 直したもの
 
@@ -48,6 +49,18 @@ ProjectV2 の Item の表で、Item の content が無いときに落ちる場�
   - モデル (1 個)
     - `src/js/models/Relationship.js`
   - 同じ名前のモデル (`src/js/models/DraftIssue.js`・`PullRequest.js`・`ProjectV2.js`) は、消していません。
+
+### 足したもの
+
+- パッケージの入口から、モデルを、まとめて `models` という 1 つの名前で export する。(#38)
+  - 使い方: `import { models } from 'sogh'` として、`models.ProjectV2Item`・`models.User` のように読む。
+  - `models` には、18 個のモデルが、すべて入る。(Bot・Card・Column・DraftIssue・EnterpriseUserAccount・Issue・IssueComment・Label・Mannequin・Milestone・Organization・Project・ProjectV2・ProjectV2Item・PullRequest・Repository・Team・User)
+  - 1 つずつの名前にしないのは、モデルの ProjectV2Item が、入口がすでに export している部品の `ProjectV2Item` と、名前が重なるため。
+  - いままでの export (部品と、モデルの Card・Column・Issue・Label・Milestone・Project・Repository) は、そのまま。`models.Issue` と `Issue` は、同じクラス。
+- GraphQLNode に、型の名前を返す `typename()` を足した。(#38)
+  - core の `__typename` を返す。(例: `"User"`・`"Bot"`・`"Issue"`)
+  - core に `__typename` が無いときは、null を返す。
+  - 型が複数ある関連 (`issue.author()`・`item.content()`・`item.reviewers()` など) が返したモデルを、見分けるのに使う。`instanceof models.Bot` のように、クラスでも見分けられる。
 
 ## 0.4.1
 

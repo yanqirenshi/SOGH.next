@@ -19,6 +19,12 @@ export default class GraphQLNode {
     id () {
         return this._core.id || null;
     }
+    // 型の名前。(core の __typename。例: "User"・"Bot"・"Issue")
+    // 型が複数ある関連 (issue.author()・item.content() など) が返したモデルを、見分けるのに使う。
+    // core に __typename が無いときは null。(クラスの名前からは、推し量らない)
+    typename () {
+        return this._core.__typename || null;
+    }
     createdAt () {
         return this._core.createdAt || null;
     }

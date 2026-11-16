@@ -137,3 +137,45 @@ test('新しいモデルは、core の値を読める', ()=> {
     assert.equal(milestone.title(), 'v1');
     assert.equal(sogh.milestone('MS_1'), milestone);
 });
+
+/* ****************************************************************
+ * typename() (yanqirenshi/SOGH.next#38)
+ * **************************************************************** */
+
+test('typename() は、core の __typename を返す', ()=> {
+    const sogh = new Sogh();
+
+    const typenames = [
+        'User', 'Organization', 'Bot', 'Mannequin', 'EnterpriseUserAccount', 'Team', 'DraftIssue', 'Label',
+        'Milestone', 'Repository', 'Issue', 'IssueComment', 'PullRequest', 'ProjectV2', 'ProjectV2Item',
+    ];
+
+    for (const typename of typenames) {
+        const obj = sogh.node2model({ __typename: typename, id: `ID_${typename}`, updatedAt: T1 });
+
+        assert.equal(obj.typename(), typename);
+    }
+});
+
+test('typename() は、型が複数ある関連が返したモデルを、見分けられる', ()=> {
+    const sogh = new Sogh();
+
+    const issue = sogh.node2issue({
+        __typename: 'Issue', id: 'I_1', updatedAt: T1,
+        author: { __typename: 'Bot', id: 'B_1', login: 'dependabot', updatedAt: T1 },
+    });
+
+    assert.equal(issue.author().typename(), 'Bot');
+    assert.ok(issue.author() instanceof model.Bot);
+});
+
+test('typename() は、core に __typename が無いときは null を返す', ()=> {
+    const sogh = new Sogh();
+
+    // node2〜 で、型を決めて作ったときも、__typename が無ければ null。(クラスの名前からは、推し量らない)
+    const user = sogh.node2user({ id: 'U_1', login: 'octocat', updatedAt: T1 });
+    const label = new model.Label({ id: 'L_1', name: 'bug', __typename: '' });
+
+    assert.equal(user.typename(), null);
+    assert.equal(label.typename(), null);
+});
