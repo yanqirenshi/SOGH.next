@@ -13,6 +13,8 @@ import CreateComment from './CreateComment.js';
 
 export default function Issue (props) {
     const issue = props.data;
+    // Item (ProjectV2Item のモデル)。渡されたときは、プロジェクトと日付を、この Item から読む。(省ける。yanqirenshi/SOGH.next#114)
+    const item = props.item || null;
     const actions = props.actions;
     const is_view_description = props.view_description;
     const is_view_add_comment = props.view_add_comment;
@@ -36,11 +38,13 @@ export default function Issue (props) {
           <Title issue={issue}/>
 
           <SubTitle issue={issue}
+                    item={item}
                     view_description={is_view_description}
                     onChange={changeView}
                     actions={actions}/>
 
           <Operators issue={issue}
+                     item={item}
                      view_description={is_view_description}
                      view_add_comment={is_view_add_comment}
                      onChange={changeView}
@@ -49,6 +53,7 @@ export default function Issue (props) {
           {is_view_add_comment &&
            <Card sx={{mt:1, pb:2}}>
              <CreateComment issue={issue}
+                            item={item}
                             actions={actions}
                             onClick={clickCreate}
                             onChange={onChange}

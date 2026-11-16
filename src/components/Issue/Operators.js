@@ -7,13 +7,21 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 
 export default function Operators (props) {
     const issue = props.issue;
+    const item = props.item || null;
     const is_view_description = props.view_description;
     const is_view_add_comment = props.view_add_comment;
     const onChange = props.onChange;
     const actions = props.actions;
 
+    // 日付を読む所と、書き換えるときに利用側へ渡す値。Item を渡されたときは、その Item から読む。(yanqirenshi/SOGH.next#114)
+    const source = item || issue;
+
     const changeNextActionDate = (e)=> {
-        const field = issue.fieldValueContents('NextAction.Date');
+        const field = source.fieldValueContents('NextAction.Date');
+
+        // 書き換えに要る情報が作れないとき (Item が無い・その日付の値が無い) は、利用側の関数を呼ばない。
+        if (!field)
+            return;
 
         actions.issue.next_action_date.change(
             e.target.value,
@@ -25,7 +33,10 @@ export default function Operators (props) {
     };
 
     const changeDueDate = (e)=> {
-        const field = issue.fieldValueContents('Due.Date');
+        const field = source.fieldValueContents('Due.Date');
+
+        if (!field)
+            return;
 
         actions.issue.due_date.change(
             e.target.value,
@@ -83,7 +94,7 @@ export default function Operators (props) {
                          InputLabelProps={{
                              shrink: true,
                          }}
-                         value={issue.nextActionDate()}
+                         value={source.nextActionDate()}
                          onChange={changeNextActionDate} />
             </Box>
 
@@ -100,7 +111,7 @@ export default function Operators (props) {
                          InputLabelProps={{
                              shrink: true,
                          }}
-                         value={issue.dueDate()}
+                         value={source.dueDate()}
                          onChange={changeDueDate} />
             </Box>
 

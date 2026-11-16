@@ -41,7 +41,7 @@ export default function Cell (props) {
         case 'MILESTONE':            return <cell.Milestone value={val} />;
         case 'REPOSITORY':           return <cell.Repository value={val} />;
         case 'LINKED_PULL_REQUESTS': return <TableCell/>;// TODO: 未調整
-        case 'REVIEWERS':            return <TableCell/>;// TODO: 未調整
+        case 'REVIEWERS':            return <cell.Reviewers row={row} />;
         case 'TRACKS':               return <TableCell/>;// TODO: 未調整
         default:                     return <TableCell/>;
         }

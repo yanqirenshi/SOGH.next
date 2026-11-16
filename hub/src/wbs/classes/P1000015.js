@@ -42,11 +42,14 @@ function Overview ({ data }) {
             <P>{"node2projectV2Item(node) は、Pool に入れる前に、Matchmaker の projectV2Item(node) で、入れ子で来た project・content・creator と、フィールドの値の中の関連 (担当者・ラベル・マイルストーン・リポジトリ・Pull request・レビューする人) もモデルにして Pool に入れる。"}</P>
             <P>{"content の PullRequest は、state を別名 pullRequestState で取る。node2projectV2Item(node) は、Pool に入れる前に、content の pullRequestState を state に戻したノードにする。(元のノードは変えない。0.5.0 から。yanqirenshi/SOGH.next#68)"}</P>
             <P>{"そのため、core().content の PullRequest の state は、取り方によらず state の名前になる。(content() が返す PullRequest のモデルの core も、state)"}</P>
+            <P>{"fieldValues の reviewers の Team も、name と avatarUrl を別名 teamName・teamAvatarUrl で取る。node2projectV2Item(node) は、Pool に入れる前に、これも name・avatarUrl に戻したノードにする。(元のノードは変えない。0.5.0 から。yanqirenshi/SOGH.next#39)"}</P>
+            <P>{"そのため、core().fieldValues の reviewers の Team も、取り方によらず name・avatarUrl の名前になる。"}</P>
             <P>{"project()・content()・creator() と、関連のフィールドを読むメソッド (assignees()・labels()・milestone()・repository()・linkedPullRequests()・reviewers()) は、JSON の id で Pool からモデルを引いて返す。"}</P>
-            <P>{"content() は Issue・PullRequest・DraftIssue のどれか、creator() は User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか、reviewers() の要素は User・Team・Mannequin・Bot のどれかのモデルになる。"}</P>
+            <P>{"content() は Issue・PullRequest・DraftIssue のどれか、creator() は User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか、reviewers() の要素は User・Team・Mannequin・Bot のどれかのモデルになる。(id の無い空のもの、たとえばクエリで取らない EnterpriseTeam は、外れる)"}</P>
             <P>{"フィールドの値は、フィールドの名前で fieldValues() から探して読む。(getFieldValueByName(name))"}</P>
             <P>{"fieldValues を取得していないとき・nodes が配列でないときは、fieldValues() は [] を返し、getFieldValueByName(name) は null と field の無いノードを飛ばす。そのため、値を読むメソッドは null、関連を読むメソッドは [] を返し、落ちない。(0.5.0 から。Issue と同じ守り。yanqirenshi/SOGH.next#103)"}</P>
             <P>{"フィールドの値 (fieldValues() の箱) と、箱に付いている creator は、モデルにせず、JSON のまま返す。"}</P>
+            <P>{"fieldValueContents(name) は、名前が name のフィールドの値を書き換えるときに利用側へ渡す値 { project, item, field_item, value } を、Issue の fieldValueContents(name) と同じ形 (JSON のまま) で返す。(値が無いときは null。Issue の画面の部品 (PanelIssue) に item として渡したときに、部品が読む。0.5.0 から。yanqirenshi/SOGH.next#114)"}</P>
             <P>{"contentTypename()・projectNumber()・projectOwnerLogin()・projectPath() は、モデルではなく、core の JSON を読む。"}</P>
             <P>{"値が無いときは null (配列を返すメソッドは []) を返すが、同じ名前で種類の違うフィールド (例: テキストの Archived) のときは undefined を返す。(関連を返すメソッドは、そのときも null か [] を返す)"}</P>
             <P>{"path() と projectPath() は Sogh の href(to, data) を使うので、Sogh を持っていないとき (Pool を通さずに作ったとき) はエラーになる。"}</P>

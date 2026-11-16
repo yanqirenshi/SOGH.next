@@ -400,14 +400,29 @@ createdAt
 updatedAt`;
 }
 
-// Team の参照の組。(ProjectV2Item の reviewers)
-// name と avatarUrl は、User と型が違う (null がありうるかどうかが違う) ので、取らない。
+// Team の参照の組。(チームの ProjectV2 を取るクエリの、根の Team)
+// name と avatarUrl は、含めない。(reviewers の Team は、teamReviewerRef を使う)
 export function teamRef () {
     return `__typename
 id
 slug
 createdAt
 updatedAt`;
+}
+
+// ProjectV2Item の reviewers に入る Team の組。
+// reviewers には、User・Team・Mannequin・Bot が、同じ場所に来る。
+// Team の name (String!) と avatarUrl (URI) は、User などの name (String)・avatarUrl (URI!) と、
+// null がありうるかどうかが違い、同じ名前では、一緒に取れない。(GraphQL の決まりに合わない)
+// そのため、別名 teamName・teamAvatarUrl で取る。
+// url は、どの型も URI! で同じなので、別名は要らない。
+// 別名で取った値は、Pooler の node2team(node) と node2projectV2Item(node) が、Pool に入れる前に name・avatarUrl に戻す。
+// (PullRequest の state と同じやり方。pullRequestRef を見る。yanqirenshi/SOGH.next#39)
+export function teamReviewerRef () {
+    return `${teamRef()}
+teamName: name
+teamAvatarUrl: avatarUrl
+url`;
 }
 
 /* ****************************************************************
@@ -500,7 +515,7 @@ field { ${projectV2FieldValueField()} }
 reviewers(first: 10) {
   nodes {
     ... on User { ${userRef()} }
-    ... on Team { ${teamRef()} }
+    ... on Team { ${teamReviewerRef()} }
     ... on Mannequin { ${mannequinRef()} }
     ... on Bot { ${botRef()} }
   }

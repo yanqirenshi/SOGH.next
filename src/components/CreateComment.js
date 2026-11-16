@@ -10,6 +10,7 @@ import TabMemo from './CreateComment/TabMemo.js';
 
 export default function CreateComment (props) {
     const issue = props.issue;
+    const item = props.item || null;
     const onClick = props.onClick;
     const members = props.members;
     const tabs = props.tabs;
@@ -27,9 +28,23 @@ export default function CreateComment (props) {
         onChange(new_tabs);
     };
 
-    const click = ()=> {
-        const field = issue.fieldValueContents('NextAction.Date');
+    // 次の行動の日を書き換えるときに、利用側へ渡す値。Item を渡されたときは、その Item から読む。(yanqirenshi/SOGH.next#114)
+    // 作れないとき (null) は、次の行動の日の情報 (project・item・field_item・next_action_date) を付けずに送る。
+    const nextActionOf = (tab)=> {
+        const field = (item || issue).fieldValueContents('NextAction.Date');
 
+        if (!field)
+            return {};
+
+        return {
+            project: field.project,
+            item: field.item,
+            field_item: field.field_item,
+            next_action_date: tab.next_action_date,
+        };
+    };
+
+    const click = ()=> {
         const tab = tabs.list.find(tab=> {
             return tab.code===tabs.selected;
         });
@@ -48,10 +63,7 @@ export default function CreateComment (props) {
                 type: tab.code,
                 to_parson: tab.parson,
                 contents: tab.contents,
-                project: field.project,
-                item: field.item,
-                field_item: field.field_item,
-                next_action_date: tab.next_action_date,
+                ...nextActionOf(tab),
             });
         }
 
@@ -59,10 +71,7 @@ export default function CreateComment (props) {
             onClick({
                 type: tab.code,
                 contents: tab.contents,
-                project: field.project,
-                item: field.item,
-                field_item: field.field_item,
-                next_action_date: tab.next_action_date,
+                ...nextActionOf(tab),
             });
         }
     };

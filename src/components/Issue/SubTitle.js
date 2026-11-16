@@ -9,11 +9,14 @@ import Link from '../common/Link.js';
 
 export default function SubTitle (props) {
     const issue = props.issue;
+    const item = props.item;
     const actions = props.actions;
 
     const milestone = issue.milestone();
 
-    const project = issue.projectV2();
+    // Item を渡されたときは、その Item の ProjectV2。渡されないときは、Issue の最初の Item の ProjectV2。(yanqirenshi/SOGH.next#114)
+    // どちらも Pool のモデル。無いとき (null) は、プロジェクトの所を出さない。
+    const project = item ? item.project() : issue.projectV2();
 
     const clickProject = ()=> {
         // owner は User か Organization のモデル。
@@ -40,18 +43,19 @@ export default function SubTitle (props) {
               </Link>
             </Box>
 
-            <Box>
-              <span onClick={clickProject}>
-                {project.title()}
-              </span>
-              <span style={{marginLeft:11}}>
-                (
-                <Link href={project.url()}>
-                  {project.number()}
-                </Link>
-                )
-              </span>
-            </Box>
+            {project &&
+             <Box>
+               <span onClick={clickProject}>
+                 {project.title()}
+               </span>
+               <span style={{marginLeft:11}}>
+                 (
+                 <Link href={project.url()}>
+                   {project.number()}
+                 </Link>
+                 )
+               </span>
+             </Box>}
 
           </Box>
 
