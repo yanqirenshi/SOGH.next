@@ -208,13 +208,14 @@ export default class Issue extends GraphQLNode {
         return project_items.edges[0].node;
     }
     // fieldValues を直接読むので、返す値は JSON のまま。(yanqirenshi/SOGH.next#29)
+    // Item が無いとき・Item に fieldValues が無いとき・名前の合う値が無いときは、null。(yanqirenshi/SOGH.next#59)
     fieldValueContents (name) {
         const item = this.fieldItem();
 
         if (!item)
             return null;
 
-        const fieldItem = item.fieldValues.nodes.find(n=> name===n.field.name);
+        const fieldItem = fieldValuesOf(item).find(n=> n && n.field && name===n.field.name);
 
         if (!fieldItem)
             return null;
@@ -241,20 +242,20 @@ export default class Issue extends GraphQLNode {
             value: getValue(fieldItem),
         };
     }
+    // 最初の Item の fieldValues の nodes。(JSON のまま)
+    // projectItems を取得していないとき (issue_by_id・issues_by_viwer など)・プロジェクトに入っていないとき・
+    // Item に fieldValues が無いときは、空の配列。(yanqirenshi/SOGH.next#59)
     fieldValues () {
-        const items = this.core().projectItems.edges;
-
-        if (!items)
-            return []; // TODO: このケースある？
-
-        return items.map(edge=>edge.node.fieldValues.nodes)[0] || [];
+        return fieldValuesOf(this.fieldItem());
     }
+    // 名前が name のフィールドの値。(JSON のまま) 無いときは null。
+    // field の無い値 (null の node など) が混ざっていても、読み飛ばす。
     getFieldValueByName (name) {
         if (!name)
             return null;
 
         const field_value = this.fieldValues().find(fv=> {
-            return fv.field.name === name;
+            return fv && fv.field && fv.field.name === name;
         });
 
         return field_value || null;
@@ -425,4 +426,13 @@ export default class Issue extends GraphQLNode {
     projectIds () {
         return this.projects().map(d=>d.id);
     }
+}
+
+// ProjectV2Item の JSON から、fieldValues の nodes を取り出す。
+// Item が無いとき・fieldValues が無いとき・nodes が配列でないときは、空の配列。(yanqirenshi/SOGH.next#59)
+function fieldValuesOf (item) {
+    if (!item || !item.fieldValues || !Array.isArray(item.fieldValues.nodes))
+        return [];
+
+    return item.fieldValues.nodes;
 }
