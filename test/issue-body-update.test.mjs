@@ -484,8 +484,9 @@ test('本文の所: 表示は、本文の HTML。空のときは、空だと伝�
 test('コメントの所 (IssueComment.js) は、これまでどおり、comment の update・delete を呼ぶ', ()=> {
     const src = fs.readFileSync(new URL('IssueComment.js', SRC), 'utf8');
 
-    assert.match(src, /actions\.issue\.comment\.update\(comment_id, value\)/);
-    assert.match(src, /actions\.issue\.comment\.delete\(comment_id\)/);
+    // commentActionsOf(actions) は actions.issue.comment。(呼び方と this は、test/issue-comments.test.mjs・test/issue-comment-edit.test.mjs が見る。yanqirenshi/SOGH.next#124)
+    assert.match(src, /commentActionsOf\(actions\)\.update\(comment_id, value\)/);
+    assert.match(src, /commentActionsOf\(actions\)\.delete\(comment_id\)/);
 
     const first = fs.readFileSync(new URL('Issue/FirstComment.js', SRC), 'utf8');
 
