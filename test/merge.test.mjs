@@ -213,12 +213,12 @@ test('ProjectV2 は、新しい README を重ねると、注釈を読み取り�
     const project = sogh.node2projectV2({ id: 'PVT_1', number: 1, readme: '$Priority: h\n$Owner: foo', updatedAt: T1 });
 
     assert.equal(project.priority(), 'h');
-    assert.equal(project.owner(), 'foo');
+    assert.equal(project.readmeOwner(), 'foo');
 
     sogh.node2projectV2({ id: 'PVT_1', number: 1, readme: '$Priority: l\n$Owner: bar', updatedAt: T2 });
 
     assert.equal(project.priority(), 'l');
-    assert.equal(project.owner(), 'bar');
+    assert.equal(project.readmeOwner(), 'bar');
 });
 
 test('ProjectV2 は、README の無い node (参照の組) を重ねても、注釈は消えない', ()=> {

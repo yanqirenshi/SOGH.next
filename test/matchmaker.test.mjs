@@ -384,7 +384,7 @@ test('入れ子で先に入ったモデルに、同じ日時の親の node が�
     const project = sogh.projectV2('PVT_1');
 
     assert.equal(project.title(), 'full');
-    assert.equal(project.owner(), 'foo');
+    assert.equal(project.readmeOwner(), 'foo');
 });
 
 /* ****************************************************************
@@ -405,13 +405,13 @@ test('ProjectV2 を Item 付きで取り直すと、README の属性と items() 
 
     const project = sogh.node2projectV2(node(T1, '$Owner: alice', ['PVTI_1']));
 
-    assert.equal(project.owner(), 'alice');
+    assert.equal(project.readmeOwner(), 'alice');
     assert.equal(project.items().length, 1);
 
     // GitHub で README が変わり、Item が 1 つ増えた。
     sogh.node2projectV2(node(T2, '$Owner: bob', ['PVTI_1', 'PVTI_2']));
 
-    assert.equal(project.owner(), 'bob');
+    assert.equal(project.readmeOwner(), 'bob');
     assert.equal(project.items().length, 2);
 });
 

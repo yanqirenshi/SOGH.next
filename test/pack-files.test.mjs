@@ -16,7 +16,7 @@ const GOOD = [
     'package.json',
     'dist/index.js',
     'dist/js/Sogh.js',
-    'dist/js/README.md',
+    'dist/js/models/Issue.js',
 ];
 
 test('入ってよいものだけなら、OK', ()=> {

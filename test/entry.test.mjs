@@ -58,11 +58,18 @@ test('asyncFetch〜 が投げる例外は、入口の GitHubError で instanceof
     });
 });
 
-test('入口の export は、前の名前に GitHubError を足しただけ', ()=> {
+test('入口の export は、GitHubError を足し、Projects (classic) の Project・Card・Column を消したもの', ()=> {
     assert.deepEqual(Object.keys(entry).sort(), [
-        'Card', 'Column', 'GitHubError', 'Issue', 'Label', 'Milestone',
-        'PanelIssue', 'PanelIssueComments', 'Project', 'ProjectV2Contents', 'ProjectV2Details',
+        'GitHubError', 'Issue', 'Label', 'Milestone',
+        'PanelIssue', 'PanelIssueComments', 'ProjectV2Contents', 'ProjectV2Details',
         'ProjectV2Item', 'ProjectV2Items', 'ProjectsV2', 'Repositories', 'Repository',
         'TableProjectV2Items', 'default', 'models',
     ].sort());
+});
+
+test('Projects (classic) のモデル (Project・Card・Column) は、入口にも models にも無い (yanqirenshi/SOGH.next#81)', ()=> {
+    for (const name of ['Project', 'Card', 'Column']) {
+        assert.equal(name in entry, false, name);
+        assert.equal(name in entry.models, false, `models.${name}`);
+    }
 });

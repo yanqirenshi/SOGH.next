@@ -43,7 +43,8 @@ function Overview ({ data }) {
             <P>{"request は、失敗したときに、例外 GitHubError を投げる。(つながらない・HTTP のエラー・GraphQL のエラー。0.5.0 から。yanqirenshi/SOGH.next#61)"}</P>
             <P>{"GitHubError は、Loader.js にある Error のクラスで、name ('GitHubError')・status (HTTP の状態コード)・errors (GitHub の errors)・response (fetch の Response)・cause (元の例外) を持つ。パッケージの入口からも、名前付きで export している。(import { GitHubError } from 'sogh')"}</P>
             <P>{"text2json(r)・json2response(r, getData)・error2response(error) は、Sogh のコメントの追加・更新・削除が使い、結果を { type, data } にする。"}</P>
-            <P>{"fetchX(query, response2data, success, error) は、結果を { status, data } の形でコールバックに渡す古い形で、Sogh の connect(token, successed, failed) が使う。"}</P>
+            <P>{"fetchX(query, response2data, success, error) は、結果を { status, data } の形でコールバックに渡す古い形で、Sogh の connect(token, successed, failed) が使う。送り先は、request と同じく endpoint()。(0.5.0 から。yanqirenshi/SOGH.next#76)"}</P>
+            <P>{"使われていなかった fetch(query, success, error) と、クエリに埋め込む文字列を作るメソッド (2 個) は、0.5.0 で消した。(yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#83)"}</P>
             <Plane>{CODE}</Plane>
           </Section>
 

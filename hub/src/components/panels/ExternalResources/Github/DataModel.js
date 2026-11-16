@@ -24,8 +24,7 @@ const CLASSES = [
     '  ├─ Label',
     '  ├─ Milestone',
     '  ├─ ProjectV2        … README の注釈 ($Priority・$Plan など) を読み取る',
-    '  ├─ ProjectV2Item    … fieldValues を、フィールドの名前で引く',
-    '  └─ Project / Card / Column  … Projects (classic)。廃止予定',
+    '  └─ ProjectV2Item    … fieldValues を、フィールドの名前で引く',
 ].join('\n');
 
 // Pool の種類。(src/js/Pooler.js)
@@ -67,7 +66,7 @@ const ANNOTATIONS = [
       note: '点数は「$Point.Result <人> <日付> <点>」の行を合計する' },
     { place: 'ProjectV2 の README',
       keys: ['$Priority', '$Owner', '$Type', '$Release', '$Plan', '$Result', '$Action', '$Backlog', '$Customer', '$Agency', '$Systems', '$Scenario', '$Progress'],
-      note: '$Priority は s (緊急)・h (高い)・n (普通)・l (低い)' },
+      note: '$Priority は s (緊急)・h (高い)・n (普通)・l (低い)。$Owner の値は readmeOwner() で読む (0.5.0 から。owner() は GitHub の owner のモデル)' },
     { place: 'ProjectV2Item のフィールド (利用者が作る)',
       keys: ['Plan.Start', 'Plan.End', 'Plan.Points', 'Result.Points', 'Due.Date', 'NextAction.Date', 'Archived'],
       note: 'フィールドの名前で引く' },
@@ -191,6 +190,7 @@ export default function DataModel () {
                 <LI>関連を返すメソッドは、Pool からモデルを引いて返す。(「4.3 モデルどうしのつながり」を見る)</LI>
                 <LI>人は、型ごとのモデル。(User・Organization・Bot・Mannequin・EnterpriseUserAccount)</LI>
                 <LI><C>Viewer</C> と <C>Assignee</C> のクラスは、0.4.0 で消した。(どちらも、User を使う)</LI>
+                <LI>Projects (classic) 用の <C>Project</C>・<C>Card</C>・<C>Column</C> のクラスは、0.5.0 で消した。(GitHub で廃止されたため。<C>yanqirenshi/SOGH.next#81</C>)</LI>
                 <LI>クラスごとの属性と振舞は、「クラス」のページを見る。</LI>
               </OL>
             </Section>
@@ -208,10 +208,14 @@ export default function DataModel () {
                 <LI>無ければ、モデルを作って入れる。</LI>
                 <LI><C>Issue</C> と <C>ProjectV2</C> は、core が変わると、注釈を読み取り直す。</LI>
                 <LI><C>sogh.get(id)</C> は、すべての Pool を順に探す。(node id は、種類をまたいで重ならない)</LI>
-                <LI>Pool から消す操作は無い。ページを開いている間は、貯まり続ける。</LI>
+                <LI>Pool から消す操作は、<C>remove(id)</C> と <C>clear()</C>。(0.5.0 で足した。<C>yanqirenshi/SOGH.next#69</C>)
+                  <UL>
+                    <LI>sogh が自分で消すのは、コメントを削除したとき (<C>deleteIssueComment</C>) だけ。GitHub で消せたら、<C>issue-comment</C> の Pool からも消す。</LI>
+                    <LI>期限は無い。ほかは、ページを開いている間は、貯まり続ける。</LI>
+                  </UL>
+                </LI>
                 <LI>型が複数ある関連の node は、<C>node2model(node)</C> が、<C>__typename</C> に合う Pool に入れる。</LI>
                 <LI>viewer は、<C>user</C> の Pool に入る。(<C>connect</C> でも、<C>asyncFetchViewer</C> でも、同じ)</LI>
-                <LI>Project・Card・Column (Projects classic) は、Pool を持たない。</LI>
               </OL>
             </Section>
 

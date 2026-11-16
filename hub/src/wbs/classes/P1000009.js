@@ -46,7 +46,8 @@ function Overview ({ data }) {
             <P>{"期日 (dueDate(v)) と次のアクションの日 (nextActionDate(v)) は、本文の注釈ではなく、ProjectV2 のフィールド (Due.Date・NextAction.Date) から読む。"}</P>
             <P>{"ProjectV2 のアイテム (projectItems) を取得していないとき (asyncFetchIssueByID() で取得したときなど) も、フィールドの値を読むメソッドは落ちずに、fieldValues() は []、fieldItem()・getFieldValueByName(name)・fieldValueContents(name)・dueDate()・nextActionDate() は null を返す。(0.4.2 から。yanqirenshi/SOGH.next#59)"}</P>
             <P>{"Issue をプロジェクトに足す・外すときや、Item のフィールドの値を変えたとき、GitHub は Issue の updatedAt を動かさない。そのため、projectItems だけは、取り直したときに日時が同じでも、中身が違えば重ねる。(sameTimeKeys() が ['projectItems'] を返す。yanqirenshi/SOGH.next#51)"}</P>
-            <P>{"Projects (classic) 用のメソッド (projectCards() など) も残っているが、Projects (classic) は GitHub で廃止された。"}</P>
+            <P>{"Projects (classic) 用のメソッド (6 個) は、0.5.0 で消した。(Projects (classic) は GitHub で廃止されたため。yanqirenshi/SOGH.next#82)"}</P>
+            <P>{"Issue を作るためのデータを作るメソッド (3 個) も、0.5.0 で消した。(使うクエリが、もう無いため。yanqirenshi/SOGH.next#83)"}</P>
             <Plane>{CODE}</Plane>
           </Section>
 

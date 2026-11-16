@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 import GraphQLNode from './GraphQLNode.js';
 
 export default class Issue extends GraphQLNode {
@@ -312,61 +310,6 @@ export default class Issue extends GraphQLNode {
 
         return issue;
     }
-    // for create form
-    makeIssueData () {
-        return {
-            repository: null,
-            title: '',
-            description: '',
-            projects: [],
-            milestone: null,
-            labels: [],
-            assignees: [],
-            owner: '',
-            due_date: moment().add(3, 'd').format('YYYY-MM-DD'),
-            next_action_date: moment().add(1, 'd').format('YYYY-MM-DD'),
-        };
-    }
-    issueData2requestDataDescription (data) {
-        const description = data.description;
-
-        const pos = description.indexOf('---\n- $');
-
-        const owner = (v) => (!v || v.length===0) ? '???' : v;
-        const date = (v) => (!v || v.length===0) ? 'yyyy-mm-dd' : v;
-
-        const x = '\n'
-              + `$Owner ${owner(data.owner)}\n`
-              + `$Date.Due ${date(data.due_date)}\n`
-              + `$Date.Next ${date(data.next_action_date)}\n`;
-
-        if (pos===-1)
-            return description + x;
-
-        return description.slice(0, pos+3)
-            + x
-            + description.slice(pos+3);
-    }
-    issueData2requestData (data) {
-        // id の文字列・JSON・モデルの、どれでもよい。
-        const id = (d) => {
-            if ((typeof d)==='string')
-                return d;
-            return (typeof d.id)==='function' ? d.id() : d.id;
-        };
-
-        const ids = (l) => l.map(d=>id(d));
-
-        return {
-            repositoryId: data.repository.id(),
-            title:        data.title,
-            body:         this.issueData2requestDataDescription(data),
-            projectIds:   ids(data.projects),
-            milestoneId:  data.milestone ? id(data.milestone) : null,
-            labelIds:     ids(data.labels),
-            assigneeIds:  ids(data.assignees),
-        };
-    }
     /* ****************************************************************
      * ProjectV2
      * **************************************************************** */
@@ -387,44 +330,11 @@ export default class Issue extends GraphQLNode {
         return this.projectsV2()[0] || null;
     }
     /* ****************************************************************
-     * Project (Classic)
+     * Milestone
      * **************************************************************** */
-    projectCards () {
-        if (!this._core.projectCards)
-            return [];
-
-        return this._core.projectCards.nodes;
-    }
-    getColumnFirst () {
-        const cards = this.projectCards();
-
-        if (!cards)
-            return null;
-
-        return cards[0] ? cards[0].column : null;
-    }
-    getFirstColumnProject () {
-        const column = this.getColumnFirst();
-
-        if (!column)
-            return null;
-
-        return column.project;
-    }
-    getFirstColumnProjectID () {
-        const project = this.getFirstColumnProject();
-
-        return project ? project.id : null;
-    }
     milestoneId () {
         const m = this.milestone();
         return m ? m.id() : null;
-    }
-    projects () {
-        return this.projectCards().map(d=> d.column.project);
-    }
-    projectIds () {
-        return this.projects().map(d=>d.id);
     }
 }
 

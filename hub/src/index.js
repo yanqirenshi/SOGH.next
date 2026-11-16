@@ -62,7 +62,7 @@ const config = {
                 colors: {
                     infra:      '#E4E3EF',  // js/ (取得・キャッシュ)。藤鼠を薄く
                     model:      '#F3E9F1',  // js/models/ (データモデル)。梅紫を薄く
-                    deprecated: '#EEEEEE',  // Projects (classic)。廃止予定
+                    deprecated: '#EEEEEE',  // 廃止予定のクラス。(いまは無い。Projects (classic) のクラスは、0.5.0 で消した)
                 },
             },
         },

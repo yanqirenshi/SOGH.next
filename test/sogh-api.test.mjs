@@ -57,18 +57,22 @@ test('古い世代の fetch〜 (8 個) と、それだけが使っていた補�
         'data2data',
         'zzz',
         'ensureEndCursor',
+        // 0.5.0 の片付けで消したもの。(yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84)
+        'fetch',
+        'makeGraphQLData',
+        'makeGraphQLDataItem',
     ];
 
     for (const name of removed)
         assert.equal(names.has(name), false, name);
 });
 
-test('取得のメソッドは、asyncFetch〜 の 16 個 (と、取得の部品 fetchNode・fetchPages・fetchProjectsV2OfTeam、Loader の fetch・fetchX)', ()=> {
+test('取得のメソッドは、asyncFetch〜 の 16 個 (と、取得の部品 fetchNode・fetchPages・fetchProjectsV2OfTeam、Loader の fetchX)', ()=> {
     const names = methodNames(new Sogh());
 
     const fetches = [...names].filter(name=> /^(async)?[Ff]etch/.test(name)).sort();
 
-    assert.deepEqual(fetches, [...ASYNC_FETCHES, 'fetchNode', 'fetchPages', 'fetchProjectsV2OfTeam', 'fetch', 'fetchX'].sort());
+    assert.deepEqual(fetches, [...ASYNC_FETCHES, 'fetchNode', 'fetchPages', 'fetchProjectsV2OfTeam', 'fetchX'].sort());
 });
 
 test('接続とコメントの追加・更新・削除のメソッドと、取得の部品は、残っている。makeQuery・node2objs は無い', ()=> {

@@ -180,6 +180,9 @@ export default class Sogh extends Pooler {
                 // json2response が throw して catch (failed) に回る。
                 this.json2response(response, d=> pick(d.data));
 
+                // GitHub から消せたので、Pool からも消す。(successed の前に。yanqirenshi/SOGH.next#69)
+                this.pool('issue-comment').remove(id);
+
                 callback('successed', callbacks, [id]);
             })
             .catch(err => {

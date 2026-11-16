@@ -321,7 +321,7 @@ async function checkRelations (sogh, repositories, projects) {
 
     for (const p of projects) {
         expectOne('ProjectV2.creator', p.core().creator, p.creator());
-        expectOne('ProjectV2.owner', p.core().owner, p.ownerNode());
+        expectOne('ProjectV2.owner', p.core().owner, p.owner());
         expectList('ProjectV2.items', p.core().items, p.items());
     }
 

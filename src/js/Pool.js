@@ -28,6 +28,25 @@ export default class Pool {
     get (id) {
         return this._ht[id] || null;
     }
+    // id のモデルを、表と一覧の両方から消す。消したモデルを返す。(無ければ null。yanqirenshi/SOGH.next#69)
+    // 関連を引くメソッド (relation・relations) は、Pool に無いものを null にするか外すので、消しても壊れない。
+    remove (id) {
+        const obj = this.get(id);
+
+        if (!obj)
+            return null;
+
+        delete this._ht[id];
+
+        this._list = this._list.filter(d=> d!==obj);
+
+        return obj;
+    }
+    // すべて消す。(yanqirenshi/SOGH.next#69)
+    clear () {
+        this._ht = {};
+        this._list = [];
+    }
     // いま入れようとしている node が、入れ子で来たものかどうか。(Matchmaker が辿っている途中かどうか)
     isNesting () {
         const matchmaker = this._sogh ? this._sogh.matchmaker : null;

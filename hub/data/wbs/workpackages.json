@@ -35,20 +35,6 @@
         "type": "classes"
     },
     {
-        "id": 1000006,
-        "parent": 1031,
-        "name": "Card",
-        "description": "src/js/models/Card.js　Projects (classic) 用のクラス。GitHub では廃止。",
-        "type": "classes"
-    },
-    {
-        "id": 1000007,
-        "parent": 1031,
-        "name": "Column",
-        "description": "src/js/models/Column.js　Projects (classic) 用のクラス。GitHub では廃止。",
-        "type": "classes"
-    },
-    {
         "id": 1000008,
         "parent": 1030,
         "name": "GraphQLNode",
@@ -81,13 +67,6 @@
         "parent": 1030,
         "name": "Milestone",
         "description": "src/js/models/Milestone.js (extends GraphQLNode)",
-        "type": "classes"
-    },
-    {
-        "id": 1000013,
-        "parent": 1031,
-        "name": "Project",
-        "description": "src/js/models/Project.js (extends GraphQLNode)　Projects (classic) 用のクラス。GitHub では廃止。",
         "type": "classes"
     },
     {

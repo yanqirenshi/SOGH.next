@@ -25,7 +25,7 @@ const LAYERS = [
     '  node2xxx() で node をモデルにして Pool に入れる',
     '    | extends',
     'Loader (src/js/Loader.js)',
-    '  token / endpoint / request / fetch / postData',
+    '  token / endpoint / request / postData',
     '    |',
     '    v',
     'POST https://api.github.com/graphql',

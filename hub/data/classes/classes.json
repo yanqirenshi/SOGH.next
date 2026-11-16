@@ -73,8 +73,8 @@
                 "description": [
                     "GraphQL API の URL。",
                     "constructor が入れる。(書き換えるメソッドは無い)",
-                    "endpoint() が返し、request(query, variables) (Sogh の asyncFetch〜 が使う)・fetch(query, success, error) と、Sogh のコメントの追加・更新・削除が送り先に使う。",
-                    "fetchX(query, response2data, success, error) は、これを使わず、同じ URL を直に書いている。(_endpoint を書き換えても、fetchX の送り先は変わらない)"
+                    "endpoint() が返し、request(query, variables) (Sogh の asyncFetch〜 が使う)・fetchX(query, response2data, success, error) (Sogh の connect(token, successed, failed) が使う) と、Sogh のコメントの追加・更新・削除が送り先に使う。",
+                    "fetchX(query, response2data, success, error) も、0.5.0 から、endpoint() に送る。(それまでは、同じ URL を直に書いていた。yanqirenshi/SOGH.next#76)"
                 ],
                 "examples": [
                     "sogh._endpoint;",
@@ -85,7 +85,6 @@
                 ],
                 "seeAlso": [
                     "endpoint()",
-                    "fetch(query, success, error)",
                     "fetchX(query, response2data, success, error)"
                 ]
             },
@@ -126,7 +125,7 @@
                 },
                 "description": [
                     "GraphQL API の URL (_endpoint) を返す。",
-                    "request(query, variables) (Sogh の asyncFetch〜 が使う)・fetch(query, success, error) と、Sogh のコメントの追加・更新・削除が、送り先に使う。"
+                    "request(query, variables) (Sogh の asyncFetch〜 が使う)・fetchX(query, response2data, success, error) (Sogh の connect(token, successed, failed) が使う) と、Sogh のコメントの追加・更新・削除が、送り先に使う。"
                 ],
                 "examples": [
                     "sogh.endpoint();",
@@ -354,7 +353,7 @@
                     "headers は makeHeader() の値、body は { query, variables } を JSON の文字列にしたもの。",
                     "variables を渡さないとき (null など) は、body に variables を入れない。",
                     "値をクエリの文字列に埋め込まず variables で渡すので、改行や \" を含む値でもクエリが壊れない。",
-                    "request(query, variables) (Sogh の asyncFetch〜 が使う)・fetch(query, success, error)・fetchX(query, response2data, success, error) (Sogh の connect(token, successed, failed) が使う) と、Sogh のコメントの追加・更新・削除 (updateIssueComment(id, body, callbacks) など) が使う。"
+                    "request(query, variables) (Sogh の asyncFetch〜 が使う)・fetchX(query, response2data, success, error) (Sogh の connect(token, successed, failed) が使う) と、Sogh のコメントの追加・更新・削除 (updateIssueComment(id, body, callbacks) など) が使う。"
                 ],
                 "examples": [
                     "sogh.postData('mutation($id: ID!, $body: String!) { ... }', { id: 'IC_kwDOAB', body: 'LGTM' });",
@@ -363,69 +362,6 @@
                     "//   headers: { Authorization: \"bearer ghp_xxxxxxxx\", ... },",
                     "//   body: '{\"query\":\"mutation($id: ID!, $body: String!) { ... }\",\"variables\":{\"id\":\"IC_kwDOAB\",\"body\":\"LGTM\"}}',",
                     "// }"
-                ]
-            },
-            {
-                "name": "fetch",
-                "parameters": [
-                    "query",
-                    "success",
-                    "error"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "promise",
-                    "type": "Promise",
-                    "description": [
-                        "success・error に渡したものと同じオブジェクトで resolve する Promise。",
-                        "失敗したときも reject しない。(status で見分ける)"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "query",
-                        "type": "String",
-                        "description": [
-                            "GraphQL のクエリ。"
-                        ]
-                    },
-                    {
-                        "name": "success",
-                        "type": "Function",
-                        "description": [
-                            "成功したときに呼ぶ関数。",
-                            "{ status: \"success\", data } を受け取る。"
-                        ],
-                        "optional": true
-                    },
-                    {
-                        "name": "error",
-                        "type": "Function",
-                        "description": [
-                            "失敗したときに呼ぶ関数。",
-                            "{ status: \"error\", error } を受け取る。"
-                        ],
-                        "optional": true
-                    }
-                ],
-                "description": [
-                    "クエリを endpoint() に POST して、結果を { status, data } か { status, error } の形にする。",
-                    "成功したときは { status: \"success\", data: レスポンスの data } を success に渡し、それで resolve する。",
-                    "失敗したときは { status: \"error\", error } を error に渡し、それで resolve する。(error が無いときは、console.error に出す)",
-                    "error は、HTTP のエラーのときは Response、通信のエラーのときは例外 (Error)。",
-                    "HTTP 200 で GraphQL の errors が返ったときも、成功として扱う。(data はレスポンスの data のまま (null など) で、errors は渡さない)",
-                    "success の中で例外が起きたときも、error が呼ばれ、{ status: \"error\" } になる。",
-                    "fetchX(query, response2data, success, error) とは、data の形 (レスポンスの data か、レスポンス全体か) と送り先 (endpoint() か、直に書いた URL か) が違う。",
-                    "SOGH の中では、呼ぶところが無い。"
-                ],
-                "examples": [
-                    "await sogh.fetch('{ viewer { login } }');",
-                    "// => { status: \"success\", data: { viewer: { login: \"octocat\" } } }",
-                    "",
-                    "// トークンが正しくないとき (HTTP 401)",
-                    "await sogh.fetch('{ viewer { login } }', null, out=> console.log(out.error.status));",
-                    "// => { status: \"error\", error: Response }"
                 ]
             },
             {
@@ -483,13 +419,13 @@
                     }
                 ],
                 "description": [
-                    "クエリを GraphQL API に POST して、レスポンスを response2data で変換したものを、{ status, data } の形にする。",
+                    "クエリを endpoint() に POST して、レスポンスを response2data で変換したものを、{ status, data } の形にする。",
                     "成功したときは { status: \"success\", data: response2data(レスポンス) } を success に渡し、それで resolve する。",
-                    "fetch(query, success, error) と違い、response2data にはレスポンスの data ではなく、レスポンス全体 ({ data, errors }) を渡す。(response2data が無いときは、レスポンス全体が data になる)",
+                    "response2data には、レスポンスの data ではなく、レスポンス全体 ({ data, errors }) を渡す。(response2data が無いときは、レスポンス全体が data になる)",
                     "失敗したときは { status: \"error\", error } を error に渡し、それで resolve する。(error が無いときは、何も出さない)",
                     "HTTP 200 で GraphQL の errors が返ったときは、errors を見ない。(response2data の中で例外が起きれば、失敗になる)",
                     "response2data や success の中で例外が起きたときも、失敗になる。",
-                    "送り先は endpoint() ではなく、直に書いた \"https://api.github.com/graphql\"。",
+                    "送り先は endpoint()。(0.5.0 から。それまでは、直に書いた \"https://api.github.com/graphql\" に送っていた。yanqirenshi/SOGH.next#76)",
                     "Sogh の connect(token, successed, failed) が使う。"
                 ],
                 "examples": [
@@ -498,82 +434,6 @@
                     "",
                     "await sogh.fetchX('{ viewer { login } }');",
                     "// => { status: \"success\", data: { data: { viewer: { login: \"octocat\" } } } }"
-                ]
-            },
-            {
-                "name": "makeGraphQLDataItem",
-                "parameters": [
-                    "v"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "literal",
-                    "type": "String | *",
-                    "description": [
-                        "文字列か配列のときは、リテラルの文字列。",
-                        "それ以外のときは、v そのもの。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "v",
-                        "type": "*",
-                        "description": [
-                            "変換する値。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "値を、GraphQL のクエリに書く形 (リテラル) にする。",
-                    "文字列は JSON.stringify で \" で囲み、配列は要素ごとに変換して [a, b] の形の文字列にする。",
-                    "それ以外 (数値・真偽値・null・オブジェクトなど) は、変換せずにそのまま返す。",
-                    "makeGraphQLData(data) が使う。"
-                ],
-                "examples": [
-                    "sogh.makeGraphQLDataItem('octocat');",
-                    "// => '\"octocat\"'",
-                    "",
-                    "sogh.makeGraphQLDataItem(['bug', 'docs']);",
-                    "// => '[\"bug\", \"docs\"]'",
-                    "",
-                    "sogh.makeGraphQLDataItem(3);",
-                    "// => 3"
-                ]
-            },
-            {
-                "name": "makeGraphQLData",
-                "parameters": [
-                    "data"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "data",
-                    "type": "String",
-                    "description": [
-                        "{ key: value, ... } の形の文字列。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "data",
-                        "type": "Object",
-                        "description": [
-                            "キー → 値 のオブジェクト。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "オブジェクトを、GraphQL のクエリに書く入力オブジェクトの形 ({ key: value, ... }) の文字列にする。",
-                    "値は makeGraphQLDataItem(v) で変換する。",
-                    "値が null か空の配列のキーは、出さない。",
-                    "値が undefined やオブジェクトのときは変換されず、文字列の中では undefined・[object Object] になる。",
-                    "SOGH の中では、呼ぶところが無い。"
-                ],
-                "examples": [
-                    "sogh.makeGraphQLData({ title: 'Found a bug', labelIds: ['LA_1', 'LA_2'], milestoneId: null, assigneeIds: [] });",
-                    "// => '{ title: \"Found a bug\", labelIds: [\"LA_1\", \"LA_2\"] }'"
                 ]
             },
             {
@@ -649,7 +509,7 @@
                     "レスポンスに errors があるときは、data があっても Error を投げる。",
                     "投げる Error の message は、errors の message を改行でつないだもの。(message が無い要素は、JSON の文字列にする)",
                     "投げる Error の errors には、元の errors の配列が入る。",
-                    "fetch(query, success, error) などの { status, data } と違い、キーの名前は type。",
+                    "fetchX(query, response2data, success, error) の { status, data } と違い、キーの名前は type。",
                     "Sogh のコメントの追加・更新・削除は、投げた Error を catch で受けて error2response(error) にし、failed に渡す。(asyncFetch〜 は使わない。request(query, variables) が GitHubError を投げる)"
                 ],
                 "examples": [
@@ -2710,11 +2570,12 @@
                     "id のコメントを消す。(GraphQL の deleteIssueComment)",
                     "id は、クエリに埋め込まず、GraphQL の variables で送る。",
                     "応答から取り出す所は、クエリのファイルの pick を使う。(queryDefinition(code) で取る。yanqirenshi/SOGH.next#65)",
-                    "Pool からは消さない。(消したあとも、issueComment(id) で引ける)",
+                    "GitHub で消せたときは、issue-comment の Pool からも消す。(pool('issue-comment').remove(id)。0.5.0 から。yanqirenshi/SOGH.next#69)",
                     "始めに、callbacks の start(id) を呼ぶ。",
-                    "成功したときは、successed(id) を呼ぶ。",
+                    "成功したときは、Pool から消してから、successed(id) を呼ぶ。(successed の中では、issueComment(id) は null)",
                     "失敗したときは、failed({ type: 'error', data: error }, id) を呼ぶ。",
                     "HTTP 200 でも GraphQL の errors が返ったときは、失敗として failed を呼ぶ。",
+                    "失敗したときは、Pool から消さない。",
                     "結果を待たずに、すぐ空の配列を返す。(Promise は返さない)"
                 ],
                 "examples": [
@@ -3675,7 +3536,7 @@
                     "id → オブジェクト の表。",
                     "add(data) が入れる。(ensure(node, makeInstance, updater) も、新しく作ったときは add(data) で入れる)",
                     "get(id) が、ここから引く。",
-                    "消すメソッドは無い。"
+                    "remove(id) が 1 つ消し、clear() が空にする。(0.5.0 から。yanqirenshi/SOGH.next#69)"
                 ],
                 "examples": [
                     "sogh.pool('issue')._ht['I_kwDOAB'].title();",
@@ -3684,7 +3545,9 @@
                 "affectedBy": [
                     "constructor",
                     "add(data)",
-                    "ensure(node, makeInstance, updater)"
+                    "ensure(node, makeInstance, updater)",
+                    "remove(id)",
+                    "clear()"
                 ],
                 "seeAlso": [
                     "ht()",
@@ -3701,7 +3564,7 @@
                     "入れたオブジェクトの配列。(入れた順)",
                     "add(data) が、_ht と一緒に入れる。",
                     "_ht と同じオブジェクトが入る。",
-                    "消すメソッドは無い。"
+                    "remove(id) が 1 つ消し (消したものを除いた、新しい配列に置き換える)、clear() が空の配列にする。(0.5.0 から。yanqirenshi/SOGH.next#69)"
                 ],
                 "examples": [
                     "sogh.pool('issue')._list.length;",
@@ -3710,7 +3573,9 @@
                 "affectedBy": [
                     "constructor",
                     "add(data)",
-                    "ensure(node, makeInstance, updater)"
+                    "ensure(node, makeInstance, updater)",
+                    "remove(id)",
+                    "clear()"
                 ],
                 "seeAlso": [
                     "list()",
@@ -3850,6 +3715,70 @@
                     "",
                     "sogh.pool('issue').get('xxx');",
                     "// => null"
+                ]
+            },
+            {
+                "name": "remove",
+                "parameters": [
+                    "id"
+                ],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "object",
+                    "type": "GraphQLNode | null",
+                    "description": [
+                        "消したオブジェクト。",
+                        "無いときは null。"
+                    ]
+                },
+                "arguments": [
+                    {
+                        "name": "id",
+                        "type": "String",
+                        "description": [
+                            "消すオブジェクトの id。"
+                        ]
+                    }
+                ],
+                "description": [
+                    "id のオブジェクトを、表 (_ht) と配列 (_list) の両方から消して、返す。",
+                    "その id のオブジェクトが無いときは、何もせずに null を返す。",
+                    "_list は、消したものを除いた、新しい配列に置き換える。(前に list() で受け取った配列は、変わらない)",
+                    "関連を引くメソッド (GraphQLNode の relation(node)・relations(connection)) は、Pool に無いものを null にするか外すので、消しても壊れない。",
+                    "Sogh の deleteIssueComment(id, callbacks) が、GitHub でコメントを消せたときに使う。",
+                    "0.5.0 で足した。(yanqirenshi/SOGH.next#69)"
+                ],
+                "examples": [
+                    "const pool = sogh.pool('issue-comment');",
+                    "",
+                    "pool.remove('IC_kwDOAB').body();",
+                    "// => \"LGTM\"",
+                    "pool.get('IC_kwDOAB');",
+                    "// => null",
+                    "",
+                    "pool.remove('xxx');",
+                    "// => null"
+                ]
+            },
+            {
+                "name": "clear",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": null,
+                "description": [
+                    "入れたオブジェクトを、すべて消す。(_ht を {} に、_list を [] にする)",
+                    "前に list() で受け取った配列は、変わらない。",
+                    "sogh の中では、呼ぶところが無い。(使う側が、Pool を空にしたいときに呼ぶ)",
+                    "0.5.0 で足した。(yanqirenshi/SOGH.next#69)"
+                ],
+                "examples": [
+                    "const pool = sogh.pool('issue');",
+                    "",
+                    "pool.clear();",
+                    "pool.list().length;",
+                    "// => 0"
                 ]
             },
             {
@@ -4560,46 +4489,6 @@
         "size": {
             "w": 160
         }
-    },
-    {
-        "id": "Card",
-        "name": "Card",
-        "layer": "deprecated",
-        "filePath": "src/js/models/Card.js",
-        "description": [
-            "src/js/models/Card.js",
-            "Projects (classic) 用のクラス。GitHub では廃止。"
-        ],
-        "attributes": [],
-        "methods": [],
-        "position": {
-            "x": 3820,
-            "y": 1720
-        },
-        "size": {
-            "w": 160
-        },
-        "stereotype": "classic・廃止予定"
-    },
-    {
-        "id": "Column",
-        "name": "Column",
-        "layer": "deprecated",
-        "filePath": "src/js/models/Column.js",
-        "description": [
-            "src/js/models/Column.js",
-            "Projects (classic) 用のクラス。GitHub では廃止。"
-        ],
-        "attributes": [],
-        "methods": [],
-        "position": {
-            "x": 4030,
-            "y": 1720
-        },
-        "size": {
-            "w": 160
-        },
-        "stereotype": "classic・廃止予定"
     },
     {
         "id": "DraftIssue",
@@ -6388,110 +6277,6 @@
                 ]
             },
             {
-                "name": "makeIssueData",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "issueData",
-                    "type": "Object",
-                    "description": [
-                        "フォームの初めの値のデータ。"
-                    ]
-                },
-                "description": [
-                    "Issue を作る画面 (フォーム) の、初めの値のデータを返す。",
-                    "due_date は 3 日後、next_action_date は 1 日後の日付 (YYYY-MM-DD) にする。(moment で今日から数える)",
-                    "ほかは空にする。(repository・milestone は null、title・description・owner は \"\"、projects・labels・assignees は [])",
-                    "this の値は使わない。",
-                    "issueData2requestData(data) で、Issue を作るリクエストのデータにする。"
-                ],
-                "examples": [
-                    "// 今日が 2026-11-15 のとき",
-                    "issue.makeIssueData();",
-                    "// => { repository: null, title: \"\", description: \"\", projects: [], milestone: null,",
-                    "//      labels: [], assignees: [], owner: \"\", due_date: \"2026-11-18\", next_action_date: \"2026-11-16\" }"
-                ]
-            },
-            {
-                "name": "issueData2requestDataDescription",
-                "parameters": [
-                    "data"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "description",
-                    "type": "String",
-                    "description": [
-                        "作る Issue の本文。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "data",
-                        "type": "Object",
-                        "description": [
-                            "makeIssueData() の形のデータ。(description・owner・due_date・next_action_date を使う)"
-                        ]
-                    }
-                ],
-                "description": [
-                    "フォームのデータから、作る Issue の本文を作って返す。",
-                    "data.description に、$Owner・$Date.Due・$Date.Next の行を足す。",
-                    "description に「---\\n- $」があるときは、その「---」の行のすぐあとに入れ、無いときは最後に足す。",
-                    "owner が空のときは「???」、日付が空のときは「yyyy-mm-dd」と書く。",
-                    "description に同じ注釈がすでにあっても、消さずに足す。",
-                    "data.description が無いときは、エラーになる。"
-                ],
-                "examples": [
-                    "issue.issueData2requestDataDescription({ description: 'クラス図を描く。', owner: 'octocat', due_date: '2026-11-30', next_action_date: '' });",
-                    "// => \"クラス図を描く。\\n$Owner octocat\\n$Date.Due 2026-11-30\\n$Date.Next yyyy-mm-dd\\n\""
-                ]
-            },
-            {
-                "name": "issueData2requestData",
-                "parameters": [
-                    "data"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "requestData",
-                    "type": "Object",
-                    "description": [
-                        "{ repositoryId, title, body, projectIds, milestoneId, labelIds, assigneeIds } の形のデータ。"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "data",
-                        "type": "Object",
-                        "description": [
-                            "makeIssueData() の形のデータ。"
-                        ]
-                    }
-                ],
-                "description": [
-                    "フォームのデータを、Issue を作るリクエスト (GraphQL の createIssue の input) の形にして返す。",
-                    "body は、issueData2requestDataDescription(data) で作る。",
-                    "repository は、id() メソッドを持つもの (Repository など) でなければならない。",
-                    "projects・milestone・labels・assignees は、id の文字列・id プロパティを持つノード (JSON)・id() メソッドを持つモデル (Label・User など) の、どれでもよい。",
-                    "labels()・assignees() などが返すモデルを、そのまま渡せる。"
-                ],
-                "examples": [
-                    "issue.issueData2requestData({",
-                    "    ...issue.makeIssueData(),",
-                    "    repository: repository,",
-                    "    title: 'クラス図を描く',",
-                    "    labels: ['LA_kwDOAbc123'],",
-                    "});",
-                    "// => { repositoryId: \"R_kgDOAbc123\", title: \"クラス図を描く\",",
-                    "//      body: \"\\n$Owner ???\\n$Date.Due 2026-11-18\\n$Date.Next 2026-11-16\\n\",",
-                    "//      projectIds: [], milestoneId: null, labelIds: [\"LA_kwDOAbc123\"], assigneeIds: [] }"
-                ]
-            },
-            {
                 "name": "projectV2Items",
                 "parameters": [],
                 "returnType": "any",
@@ -6582,91 +6367,6 @@
                 ]
             },
             {
-                "name": "projectCards",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "projectCards",
-                    "type": "Object[]",
-                    "description": [
-                        "カードのノード (id・url・note・state・column) の配列。"
-                    ]
-                },
-                "description": [
-                    "Issue の Projects (classic) のカードのノードを返す。(core の projectCards.nodes)",
-                    "projectCards を取得していないときは []。",
-                    "Projects (classic) は GitHub で廃止された。"
-                ],
-                "examples": [
-                    "issue.projectCards().map(card=> card.column.name);",
-                    "// => [\"Todo\"]"
-                ]
-            },
-            {
-                "name": "getColumnFirst",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "column",
-                    "type": "Object | null",
-                    "description": [
-                        "Projects (classic) の列のノード。"
-                    ]
-                },
-                "description": [
-                    "projectCards() の最初のカードの、列 (column) のノードを返す。",
-                    "カードが無いときは null。"
-                ],
-                "examples": [
-                    "issue.getColumnFirst().name;",
-                    "// => \"Todo\""
-                ]
-            },
-            {
-                "name": "getFirstColumnProject",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "project",
-                    "type": "Object | null",
-                    "description": [
-                        "Projects (classic) のプロジェクトのノード。"
-                    ]
-                },
-                "description": [
-                    "getColumnFirst() の列の、Projects (classic) のプロジェクトのノードを返す。",
-                    "列が無いときは null。"
-                ],
-                "examples": [
-                    "issue.getFirstColumnProject().name;",
-                    "// => \"障害対応\""
-                ]
-            },
-            {
-                "name": "getFirstColumnProjectID",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "projectId",
-                    "type": "String | null",
-                    "description": [
-                        "Projects (classic) のプロジェクトの id。"
-                    ]
-                },
-                "description": [
-                    "getFirstColumnProject() のプロジェクトの id を返す。",
-                    "プロジェクトが無いときは null。"
-                ],
-                "examples": [
-                    "issue.getFirstColumnProjectID();",
-                    "// => \"PRO_kwLOAbc123\""
-                ]
-            },
-            {
                 "name": "milestoneId",
                 "parameters": [],
                 "returnType": "any",
@@ -6685,49 +6385,6 @@
                 "examples": [
                     "issue.milestoneId();",
                     "// => \"MI_kwDOAbc123\""
-                ]
-            },
-            {
-                "name": "projects",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "projects",
-                    "type": "Object[]",
-                    "description": [
-                        "Projects (classic) のプロジェクトのノードの配列。"
-                    ]
-                },
-                "description": [
-                    "Issue が入っている Projects (classic) のプロジェクトのノードを返す。(カードごとの column.project)",
-                    "カードが無いときは []。",
-                    "ProjectV2 ではない。(ProjectV2 は projectsV2() で得る)"
-                ],
-                "examples": [
-                    "issue.projects().map(project=> project.name);",
-                    "// => [\"障害対応\"]"
-                ]
-            },
-            {
-                "name": "projectIds",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "projectIds",
-                    "type": "String[]",
-                    "description": [
-                        "Projects (classic) のプロジェクトの id の配列。"
-                    ]
-                },
-                "description": [
-                    "projects() のプロジェクトの id を返す。",
-                    "カードが無いときは []。"
-                ],
-                "examples": [
-                    "issue.projectIds();",
-                    "// => [\"PRO_kwLOAbc123\"]"
                 ]
             }
         ],
@@ -7504,587 +7161,6 @@
         }
     },
     {
-        "id": "Project",
-        "name": "Project",
-        "layer": "deprecated",
-        "filePath": "src/js/models/Project.js",
-        "description": [
-            "src/js/models/Project.js",
-            "extends GraphQLNode",
-            "Projects (classic) 用のクラス。GitHub では廃止。"
-        ],
-        "attributes": [
-            {
-                "name": "_type",
-                "visibility": "private",
-                "type": "String | null",
-                "initialValue": "null",
-                "description": [
-                    "本文の @Type の値 (プロジェクトの種類)。",
-                    "constructor が null にしたあと、addAnotetionValue(project) が本文の値にする。",
-                    "本文に「@Type: 値」の行が無いときは null になる。"
-                ],
-                "examples": [
-                    "// 本文: @Type: 障害",
-                    "project.type();",
-                    "// => \"障害\""
-                ],
-                "affectedBy": [
-                    "addAnotetionValue(project)",
-                    "constructor"
-                ],
-                "seeAlso": [
-                    "type()"
-                ]
-            },
-            {
-                "name": "_priority",
-                "visibility": "private",
-                "type": "String",
-                "initialValue": "null",
-                "description": [
-                    "本文の @Priority の値 (優先度)。",
-                    "constructor が null にしたあと、addAnotetionValue(project) が本文の値にする。",
-                    "値は c (急)・h (高)・n (普)・l (低) のどれか。(本文からは、先頭の 1 文字だけを読む)",
-                    "本文に「@Priority: 値」の行が無いとき、値が c・h・n・l で始まらないときは \"l\" になる。",
-                    "正規表現が [c|h|n|l] なので、「|」も値として読んでしまう。"
-                ],
-                "examples": [
-                    "// 本文: @Priority: high",
-                    "project.priority();",
-                    "// => \"h\""
-                ],
-                "affectedBy": [
-                    "addAnotetionValue(project)",
-                    "constructor"
-                ],
-                "seeAlso": [
-                    "priority()",
-                    "priorityLabel()",
-                    "colorByPriority()"
-                ]
-            },
-            {
-                "name": "_assignee",
-                "visibility": "private",
-                "type": "String | null",
-                "initialValue": "null",
-                "description": [
-                    "本文の @assignee の値 (担当者)。",
-                    "constructor が null にしたあと、addAnotetionValue(project) が本文の値にする。",
-                    "名前は小文字で始まる「@assignee」だけで、「@Assignee」は読まない。",
-                    "本文に無いときは null になる。"
-                ],
-                "examples": [
-                    "// 本文: @assignee: octocat",
-                    "project.assignee();",
-                    "// => \"octocat\""
-                ],
-                "affectedBy": [
-                    "addAnotetionValue(project)",
-                    "constructor"
-                ],
-                "seeAlso": [
-                    "assignee()"
-                ]
-            },
-            {
-                "name": "_plan",
-                "visibility": "private",
-                "type": "Object",
-                "initialValue": "null",
-                "description": [
-                    "予定の期間 (本文の @Plan)。",
-                    "constructor が null にしたあと、addAnotetionValue(project) が本文の値にする。",
-                    "{ start, end } の形で、start・end は moment の日付か null。",
-                    "本文には「@Plan: 開始日, 終了日」と、2 つの日付を「,」で区切って書く。",
-                    "本文に無いときは、start・end とも null になる。",
-                    "ProjectV2 の plan と違い、Term ではない。"
-                ],
-                "examples": [
-                    "// 本文: @Plan: 2026-11-01, 2026-11-30",
-                    "project.plan().start.format('YYYY-MM-DD');",
-                    "// => \"2026-11-01\""
-                ],
-                "affectedBy": [
-                    "addAnotetionValue(project)",
-                    "constructor"
-                ],
-                "seeAlso": [
-                    "plan()",
-                    "_result"
-                ]
-            },
-            {
-                "name": "_result",
-                "visibility": "private",
-                "type": "Object",
-                "initialValue": "null",
-                "description": [
-                    "実績の期間 (本文の @Result)。",
-                    "constructor が null にしたあと、addAnotetionValue(project) が本文の値にする。",
-                    "{ start, end } の形で、start・end は moment の日付か null。",
-                    "本文には「@Result: 開始日, 終了日」と、2 つの日付を「,」で区切って書く。",
-                    "本文に無いときは、start・end とも null になる。"
-                ],
-                "examples": [
-                    "// 本文: @Result: 2026-11-03, 2026-11-28",
-                    "project.result().end.format('YYYY-MM-DD');",
-                    "// => \"2026-11-28\""
-                ],
-                "affectedBy": [
-                    "addAnotetionValue(project)",
-                    "constructor"
-                ],
-                "seeAlso": [
-                    "result()",
-                    "_plan"
-                ]
-            },
-            {
-                "name": "_issues",
-                "visibility": "private",
-                "type": "Array",
-                "initialValue": "[]",
-                "description": [
-                    "プロジェクトの Issue を入れておくための配列。",
-                    "constructor が [] にする。",
-                    "このクラスには値を入れるメソッドが無いので、[] のまま。"
-                ],
-                "examples": [
-                    "project.issues();",
-                    "// => []"
-                ],
-                "affectedBy": [
-                    "constructor"
-                ],
-                "seeAlso": [
-                    "issues()"
-                ]
-            }
-        ],
-        "methods": [
-            {
-                "name": "number",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "number",
-                    "type": "Number | null",
-                    "description": [
-                        "Project の番号。",
-                        "無いときは null。"
-                    ]
-                },
-                "description": [
-                    "Project の番号 (URL の /projects/{number} の数字) を返す。"
-                ],
-                "examples": [
-                    "project.number();",
-                    "// => 1"
-                ]
-            },
-            {
-                "name": "name",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "name",
-                    "type": "String | null",
-                    "description": [
-                        "Project の名前。",
-                        "無いときは null。"
-                    ]
-                },
-                "description": [
-                    "Project の名前を返す。"
-                ],
-                "examples": [
-                    "project.name();",
-                    "// => \"障害対応\""
-                ]
-            },
-            {
-                "name": "url",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "url",
-                    "type": "String | null",
-                    "description": [
-                        "Project のページの URL。",
-                        "無いときは null。"
-                    ]
-                },
-                "description": [
-                    "GitHub の Project のページの URL を返す。"
-                ],
-                "examples": [
-                    "project.url();",
-                    "// => \"https://github.com/octocat/hello-world/projects/1\""
-                ]
-            },
-            {
-                "name": "state",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "state",
-                    "type": "String | null",
-                    "description": [
-                        "Project の状態。"
-                    ]
-                },
-                "description": [
-                    "Project の状態 (OPEN・CLOSED) を返す。",
-                    "取得していないときは null。"
-                ],
-                "examples": [
-                    "project.state();",
-                    "// => \"OPEN\""
-                ]
-            },
-            {
-                "name": "closedAt",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "closedAt",
-                    "type": "String | null",
-                    "description": [
-                        "閉じた日時 (ISO 8601 の文字列)。"
-                    ]
-                },
-                "description": [
-                    "Project を閉じた日時を返す。",
-                    "閉じていないときは null。"
-                ],
-                "examples": [
-                    "project.closedAt();",
-                    "// => \"2026-11-14T09:30:00Z\""
-                ]
-            },
-            {
-                "name": "closed",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "closed",
-                    "type": "Boolean | null",
-                    "description": [
-                        "閉じているときは true、ほかは null。"
-                    ]
-                },
-                "description": [
-                    "Project が閉じているかを返す。",
-                    "閉じているときは true を返し、閉じていないとき (false のとき) は null を返す。"
-                ],
-                "examples": [
-                    "project.closed();",
-                    "// => true"
-                ]
-            },
-            {
-                "name": "body",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "body",
-                    "type": "String | null",
-                    "description": [
-                        "本文。",
-                        "無いときは null。"
-                    ]
-                },
-                "description": [
-                    "Project の本文 (説明) を返す。",
-                    "@Priority などの値は、この本文から読む。"
-                ],
-                "examples": [
-                    "project.body();",
-                    "// => \"@Type: 障害\\n@Priority: h\\n...\""
-                ]
-            },
-            {
-                "name": "progress",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "progress",
-                    "type": "Object | null",
-                    "description": [
-                        "進み具合のデータ。"
-                    ]
-                },
-                "description": [
-                    "Project の進み具合のデータ (todoCount・donePercentage など) を返す。",
-                    "取得していないときは null。"
-                ],
-                "examples": [
-                    "project.progress().donePercentage;",
-                    "// => 40"
-                ]
-            },
-            {
-                "name": "type",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "type",
-                    "type": "String | null",
-                    "description": [
-                        "プロジェクトの種類。"
-                    ]
-                },
-                "description": [
-                    "本文の @Type の値 (プロジェクトの種類) を返す。",
-                    "本文に無いときは null。"
-                ],
-                "examples": [
-                    "// 本文: @Type: 障害",
-                    "project.type();",
-                    "// => \"障害\""
-                ]
-            },
-            {
-                "name": "priority",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "priority",
-                    "type": "String",
-                    "description": [
-                        "優先度の 1 文字。"
-                    ]
-                },
-                "description": [
-                    "本文の @Priority の値 (優先度) を返す。",
-                    "値は c (急)・h (高)・n (普)・l (低) のどれか。(本文からは、先頭の 1 文字だけを読む)",
-                    "本文に無いときは \"l\"。",
-                    "画面に出すときは priorityLabel() や colorByPriority() を使う。"
-                ],
-                "examples": [
-                    "// 本文: @Priority: h",
-                    "project.priority();",
-                    "// => \"h\""
-                ]
-            },
-            {
-                "name": "assignee",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "assignee",
-                    "type": "String | null",
-                    "description": [
-                        "担当者。"
-                    ]
-                },
-                "description": [
-                    "本文の @assignee の値 (担当者) を返す。",
-                    "本文に無いときは null。"
-                ],
-                "examples": [
-                    "// 本文: @assignee: octocat",
-                    "project.assignee();",
-                    "// => \"octocat\""
-                ]
-            },
-            {
-                "name": "plan",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "plan",
-                    "type": "Object",
-                    "description": [
-                        "{ start, end } の形のデータ。",
-                        "start・end は moment の日付か null。"
-                    ]
-                },
-                "description": [
-                    "予定の期間 (本文の @Plan) を返す。",
-                    "本文に無いときは、start・end とも null。"
-                ],
-                "examples": [
-                    "// 本文: @Plan: 2026-11-01, 2026-11-30",
-                    "project.plan().end.format('YYYY-MM-DD');",
-                    "// => \"2026-11-30\""
-                ]
-            },
-            {
-                "name": "result",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "result",
-                    "type": "Object",
-                    "description": [
-                        "{ start, end } の形のデータ。",
-                        "start・end は moment の日付か null。"
-                    ]
-                },
-                "description": [
-                    "実績の期間 (本文の @Result) を返す。",
-                    "本文に無いときは、start・end とも null。"
-                ],
-                "examples": [
-                    "// 本文: @Result: 2026-11-03, 2026-11-28",
-                    "project.result().start.format('YYYY-MM-DD');",
-                    "// => \"2026-11-03\""
-                ]
-            },
-            {
-                "name": "issues",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "issues",
-                    "type": "Array",
-                    "description": [
-                        "Issue の配列。"
-                    ]
-                },
-                "description": [
-                    "プロジェクトの Issue の配列 (_issues) を返す。",
-                    "このクラスには値を入れるメソッドが無いので、[] のまま。"
-                ],
-                "examples": [
-                    "project.issues();",
-                    "// => []"
-                ]
-            },
-            {
-                "name": "columns",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "columns",
-                    "type": "Object[]",
-                    "description": [
-                        "列のノードの配列。"
-                    ]
-                },
-                "description": [
-                    "Project の列のノード (id・name・url・purpose) を返す。(core の columns.nodes)",
-                    "取得していないときは []。"
-                ],
-                "examples": [
-                    "project.columns().map(column=> column.name);",
-                    "// => [\"Todo\", \"In progress\", \"Done\"]"
-                ]
-            },
-            {
-                "name": "addAnotetionValue",
-                "parameters": [
-                    "project"
-                ],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "project",
-                    "type": "Object",
-                    "description": [
-                        "引数の project。(そのまま)"
-                    ]
-                },
-                "arguments": [
-                    {
-                        "name": "project",
-                        "type": "Object",
-                        "description": [
-                            "Project のノード。(body を持つもの)"
-                        ]
-                    }
-                ],
-                "description": [
-                    "ノードの body から「@名前: 値」の行を読み出し、_type・_priority・_assignee・_plan・_result に入れる。",
-                    "読む行は「@Type: 値」「@Priority: 値」「@assignee: 値」「@Plan: 開始日, 終了日」「@Result: 開始日, 終了日」。",
-                    "名前のあとには「:」と空白が要り、名前の大文字・小文字は区別する。",
-                    "無いときは、priority は \"l\"、plan・result は start・end とも null、ほかは null にする。",
-                    "期間の日付は、moment の日付にする。",
-                    "constructor が呼ぶ。(core(v) で core を差し替えても、呼ばれない)",
-                    "null や undefined を渡すと、エラーになる。(constructor に引数を渡さないときも)",
-                    "名前の Anotetion は、Annotation の綴り違い。"
-                ],
-                "examples": [
-                    "project.addAnotetionValue({ body: '@Priority: c' });",
-                    "project.priority();",
-                    "// => \"c\""
-                ]
-            },
-            {
-                "name": "colorByPriority",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "style",
-                    "type": "Object",
-                    "description": [
-                        "{ background, color } の形のデータ。"
-                    ]
-                },
-                "description": [
-                    "優先度から、画面に出すときの色を返す。",
-                    "背景は、c は赤 (#e83929)、h は黄 (#fcc800)、n は青 (#89c3eb)、l は灰色 (#dcdddd)。",
-                    "閉じているとき (closed() が true のとき) は、優先度によらず { background: \"none\", color: \"#333\" }。",
-                    "表に無い優先度 (「|」) のときは undefined。"
-                ],
-                "examples": [
-                    "// 本文: @Priority: h",
-                    "project.colorByPriority();",
-                    "// => { background: \"#fcc800\", color: \"#333\" }"
-                ]
-            },
-            {
-                "name": "priorityLabel",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "label",
-                    "type": "String",
-                    "description": [
-                        "優先度のラベル。"
-                    ]
-                },
-                "description": [
-                    "優先度の 1 文字のラベル (急・高・普・低) を返す。",
-                    "表に無い優先度のときは \"??\"。"
-                ],
-                "examples": [
-                    "// 本文: @Priority: h",
-                    "project.priorityLabel();",
-                    "// => \"高\""
-                ]
-            }
-        ],
-        "position": {
-            "x": 3510,
-            "y": 1720
-        },
-        "size": {
-            "w": 260
-        },
-        "stereotype": "classic・廃止予定"
-    },
-    {
         "id": "ProjectV2",
         "name": "ProjectV2",
         "layer": "model",
@@ -8153,22 +7229,22 @@
                     "README の $Owner の値 (担当者)。",
                     "initReadmeAttributes() が \"?\" にし、そのあと parseReadme() が README の値にする。",
                     "README に $Owner が無いときは null になる。",
-                    "GitHub の ProjectV2 の owner (持ち主のユーザーや組織) ではない。(それは ownerNode() で引く)"
+                    "GitHub の ProjectV2 の owner (持ち主のユーザーや組織) ではない。(それは owner() で引く)"
                 ],
                 "examples": [
                     "// README: $Owner: octocat",
-                    "projectV2.owner();",
+                    "projectV2.readmeOwner();",
                     "// => \"octocat\""
                 ],
                 "affectedBy": [
-                    "owner(v)",
+                    "readmeOwner(v)",
                     "maneger(v)",
                     "initReadmeAttributes()",
                     "parseReadme()",
                     "core(v)"
                 ],
                 "seeAlso": [
-                    "owner(v)",
+                    "readmeOwner(v)",
                     "maneger(v)"
                 ]
             },
@@ -8849,6 +7925,30 @@
             },
             {
                 "name": "owner",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "owner",
+                    "type": "User | Organization | Issue | PullRequest | null",
+                    "description": [
+                        "持ち主のモデル。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "GitHub の ProjectV2 の owner (持ち主) を、__typename に合うモデル (User・Organization・Issue・PullRequest のどれか) で返す。(core の owner の id で、Pool から引く)",
+                    "Repository の owner() と同じ意味。",
+                    "owner を取得していないときは null。",
+                    "0.5.0 から。それまでは、README の $Owner の値 (文字列) を返し、GitHub の owner は ownerNode() で返していた。(README の値は readmeOwner(v) で読む。ownerNode() は消した。yanqirenshi/SOGH.next#71)"
+                ],
+                "examples": [
+                    "projectV2.owner().login();",
+                    "// => \"octocat\""
+                ]
+            },
+            {
+                "name": "readmeOwner",
                 "parameters": [
                     "v"
                 ],
@@ -8875,35 +7975,13 @@
                     "README の $Owner の値 (担当者) を読み書きする。",
                     "引数を渡したときは、その値にする。",
                     "README に $Owner が無いときは null。",
-                    "GitHub の ProjectV2 の owner (持ち主のユーザーや組織) ではない。(それは ownerNode() で引く)",
-                    "maneger(v) と同じ値を読み書きする。"
+                    "GitHub の ProjectV2 の owner (持ち主のユーザーや組織) ではない。(それは owner() で引く)",
+                    "maneger(v) と同じ値を読み書きする。",
+                    "0.5.0 で、owner(v) から名前を変えた。(yanqirenshi/SOGH.next#71)"
                 ],
                 "examples": [
                     "// README: $Owner: octocat",
-                    "projectV2.owner();",
-                    "// => \"octocat\""
-                ]
-            },
-            {
-                "name": "ownerNode",
-                "parameters": [],
-                "returnType": "any",
-                "visibility": "public",
-                "returns": {
-                    "name": "owner",
-                    "type": "User | Organization | Issue | PullRequest | null",
-                    "description": [
-                        "持ち主のモデル。",
-                        "無いときは null。"
-                    ]
-                },
-                "description": [
-                    "GitHub の ProjectV2 の owner (持ち主) を、__typename に合うモデル (User・Organization・Issue・PullRequest のどれか) で返す。(core の owner の id で、Pool から引く)",
-                    "owner(v) は README の $Owner の値 (文字列) を返すので、別の名前にしてある。",
-                    "owner を取得していないときは null。"
-                ],
-                "examples": [
-                    "projectV2.ownerNode().login();",
+                    "projectV2.readmeOwner();",
                     "// => \"octocat\""
                 ]
             },
@@ -9060,7 +8138,7 @@
                     "README の $Owner の値 (担当者) を読み書きする。",
                     "引数を渡したときは、その値にする。",
                     "README に $Owner が無いときは null。",
-                    "owner(v) と同じ値を読み書きする。"
+                    "readmeOwner(v) と同じ値を読み書きする。"
                 ],
                 "examples": [
                     "// README: $Owner: octocat",

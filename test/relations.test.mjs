@@ -225,27 +225,6 @@ test('projectItems があるときは、これまでどおりの値を返す', (
     assert.equal(issue.fieldValueContents('NextAction.Date').item.id, 'PVTI_1');
 });
 
-test('Issue の issueData2requestData() は、モデルの id も読める', ()=> {
-    const sogh = new Sogh();
-
-    const issue = sogh.node2issue(issueNode());
-
-    const data = issue.issueData2requestData({
-        repository: issue.repository(),
-        title: 't',
-        description: '',
-        projects: [],
-        milestone: issue.milestone(),
-        labels: issue.labels(),
-        assignees: [...issue.assignees(), 'U_3'],
-    });
-
-    assert.equal(data.repositoryId, 'R_1');
-    assert.equal(data.milestoneId, 'MS_1');
-    assert.deepEqual(data.labelIds, ['L_1']);
-    assert.deepEqual(data.assigneeIds, ['U_1', 'U_2', 'U_3']);
-});
-
 /* ****************************************************************
  * IssueComment
  * **************************************************************** */
@@ -317,7 +296,7 @@ test('PullRequest の repository()・author() は、モデルを返す。無い�
  * ProjectV2
  * **************************************************************** */
 
-test('ProjectV2 の creator()・ownerNode()・items() は、モデルを返す。owner() は README の $Owner のまま', ()=> {
+test('ProjectV2 の creator()・owner()・items() は、モデルを返す。README の $Owner は readmeOwner() で読む (yanqirenshi/SOGH.next#71)', ()=> {
     const sogh = new Sogh();
 
     const project = sogh.node2projectV2({
@@ -337,13 +316,16 @@ test('ProjectV2 の creator()・ownerNode()・items() は、モデルを返す�
     });
 
     assert.equal(project.creator(), sogh.user('U_1'));
-    assert.equal(project.ownerNode(), sogh.organization('O_1'));
-    assert.equal(project.owner(), 'yanqirenshi');
+    assert.equal(project.owner(), sogh.organization('O_1'));
+    assert.equal(project.readmeOwner(), 'yanqirenshi');
+
+    // ownerNode() は、owner() にそろえたので、消した。
+    assert.equal(typeof project.ownerNode, 'undefined');
     assert.deepEqual(project.items(), [sogh.projectV2Item('PVTI_1'), sogh.projectV2Item('PVTI_2')]);
     assert.deepEqual(project.itemsWith2ProjectV2Item(), project.items());
 });
 
-test('ProjectV2 の ownerNode() は、Issue・PullRequest のモデルも返す', ()=> {
+test('ProjectV2 の owner() は、Issue・PullRequest のモデルも返す。取得していないときは null', ()=> {
     const sogh = new Sogh();
 
     const a = sogh.node2projectV2({
@@ -355,8 +337,13 @@ test('ProjectV2 の ownerNode() は、Issue・PullRequest のモデルも返す'
         owner: { __typename: 'PullRequest', id: 'PR_1', number: 2, updatedAt: T1 },
     });
 
-    assert.equal(a.ownerNode(), sogh.issue('I_1'));
-    assert.equal(b.ownerNode(), sogh.pullRequest('PR_1'));
+    assert.equal(a.owner(), sogh.issue('I_1'));
+    assert.equal(b.owner(), sogh.pullRequest('PR_1'));
+
+    const c = sogh.node2projectV2({ __typename: 'ProjectV2', id: 'PVT_3', updatedAt: T1 });
+
+    assert.equal(c.owner(), null);
+    assert.equal(c.readmeOwner(), null); // README に $Owner が無い
 });
 
 test('Sogh の href("project-v2") は、creator() のモデルの login() を読む', ()=> {

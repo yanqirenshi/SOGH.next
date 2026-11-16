@@ -42,9 +42,6 @@ const VALUES = [
     { how: 'GraphQL の variables で渡す',
       queries: '取得のクエリ (15 個。viewer は、変数が無い) と、コメントの追加・更新・削除 (3 個)',
       syntax: ['query ($id: ID!, $after: String)', 'request(query, { id, after })', 'mutation ($id: ID!, $body: String!)', 'postData(query, { id, body })'] },
-    { how: 'オブジェクトを文字列にして、埋め込む',
-      queries: '無い (Issue の作成・本文の更新のクエリ 2 個は、0.5.0 で消した。makeGraphQLData は、Loader に残っている)',
-      syntax: ['createIssue(input:@issue-data)', 'makeGraphQLData(data)'] },
 ];
 
 // クエリを検査するコマンド。
@@ -250,10 +247,11 @@ export default function Fetching () {
               <LI><C>pageInfo.hasNextPage</C> が true なら、after に <C>pageInfo.endCursor</C> を入れて、送るところに戻る。</LI>
             </OL>
 
-            <P>値の渡し方は、2 通りあります。いま使っているのは、variables だけです。</P>
+            <P>値の渡し方は、1 通りです。(GraphQL の variables だけ)</P>
             <Table columns={VALUE_COLUMNS} rows={VALUES} ids={TABLE_IDS}/>
             <OL sx={SX_AFTER_TABLE}>
               <LI>取得のクエリの値を、クエリの文字列に置き換えで埋め込む渡し方は、0.5.0 で無くした。(取得のクエリも、variables にした。<C>yanqirenshi/SOGH.next#63</C>)</LI>
+              <LI>オブジェクトを文字列にして、クエリに埋め込む渡し方も、0.5.0 で無くした。(使うクエリ (Issue の作成・本文の更新の 2 個) は先に消していた。Loader と Issue に残っていた、データを作るメソッドも消した。<C>yanqirenshi/SOGH.next#83</C>)</LI>
               <LI>番号 (Issue の番号・ProjectV2 の番号) は、数値にしてから送る。(クエリの変数の型は <C>Int!</C>。メソッドには、これまでどおり文字列でも渡せる)</LI>
             </OL>
           </Section>

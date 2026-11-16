@@ -56,11 +56,17 @@ export default function Notes () {
                   <LI>ProjectV2Item の core に残る content の JSON も、Pool に入れる前に <C>node2projectV2Item(node)</C> が state に戻す。</LI>
                 </UL>
               </LI>
-              <LI>Pool に、消す操作と期限が無い。(取り直しは、重ねるだけ)</LI>
-              <LI>個人用アクセストークンを、REACT_APP_ の環境変数で渡している。
+              <LI>Pool に、消す操作と期限が無かった。(取り直しは、重ねるだけ。0.5.0 で直した)
+                <UL>
+                  <LI>0.5.0 で、Pool に <C>remove(id)</C> と <C>clear()</C> を足した。(Issue 69)</LI>
+                  <LI><C>deleteIssueComment</C> は、GitHub で消せたら、<C>issue-comment</C> の Pool からも消す。(<C>successed</C> を呼ぶ前に)</LI>
+                  <LI>期限は、付けていない。</LI>
+                </UL>
+              </LI>
+              <LI>個人用アクセストークンを、REACT_APP_ の環境変数で渡している。(0.5.0 で、このままにすると決めた)
                 <UL>
                   <LI>ビルドした JS に埋め込まれる。</LI>
-                  <LI>公開するビルドには含めない、という使い方が前提になる。</LI>
+                  <LI>ビルドは、自分の PC のほかには置かない。(<C>hub/.env.local.template</C> にも書いた。Issue 70)</LI>
                 </UL>
               </LI>
             </OL>
@@ -68,7 +74,12 @@ export default function Notes () {
 
           <Section title="小さな不ぞろい" num="6.3" lev="5">
             <OL>
-              <LI>ProjectV2 の <C>owner()</C> は、GitHub の owner ではなく、README の <C>$Owner</C> の値を返す。(GitHub の owner は、<C>ownerNode()</C>)</LI>
+              <LI>ProjectV2 の <C>owner()</C> は、GitHub の owner ではなく、README の <C>$Owner</C> の値を返していた。(0.5.0 で直した)
+                <UL>
+                  <LI>0.5.0 で、<C>owner()</C> は、GitHub の owner のモデルを返すようにした。(Repository の <C>owner()</C> と同じ意味。Issue 71)</LI>
+                  <LI>README の <C>$Owner</C> の値は、<C>readmeOwner()</C> で読む。GitHub の owner を読んでいた <C>ownerNode()</C> は、消した。</LI>
+                </UL>
+              </LI>
               <LI>環境変数の名前が <C>REACT_APP_GITHU_PARSONAL_TOKEN</C>。(GITHU・PARSONAL のつづり)</LI>
               <LI>クエリの名前に <C>viwer</C> があった。(0.5.0 で、<C>viewer</C>・<C>issues_by_viewer</C> に直した。Issue 73)</LI>
               <LI>項目の部品の名前の付け方が、3 通りあった。(下線でつなぐもの・小文字で始まるもの・大文字で始まるもの。0.5.0 で、小文字で始まり途中が大文字、にそろえた。Issue 74)</LI>
@@ -81,8 +92,8 @@ export default function Notes () {
                 </UL>
               </LI>
               <LI>組織 (org) のクエリでも、値の印の名前が、ユーザーの login の印になっていた。(0.5.0 で、値の印は無くなった。組織のクエリの変数は <C>$org</C>)</LI>
-              <LI><C>fetchX</C> は、エンドポイントを直に書いている。(<C>endpoint()</C> を使っていない)</LI>
-              <LI>src/js/models/README.markdown が、古い。</LI>
+              <LI><C>fetchX</C> は、エンドポイントを直に書いていた。(<C>endpoint()</C> を使っていなかった。0.5.0 で、<C>endpoint()</C> に送るようにした。Issue 76)</LI>
+              <LI>src/js/README.md と src/js/models/README.markdown が、古かった。(0.5.0 で、どちらも消した。Issue 77)</LI>
             </OL>
             <P>どれから手を付けるかは、まだ決めていません。</P>
           </Section>

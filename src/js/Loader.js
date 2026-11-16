@@ -101,36 +101,11 @@ export default class Loader {
             body: JSON.stringify(body)
         };
     }
-    fetch (query, success, error) {
-        const post_data = this.postData(query);
-
-        // Promis を返す
-        return fetch(this.endpoint(), post_data)
-            .then(r => r.ok ? r.json() : Promise.reject(r))
-            .then(r => {
-                const out = { status: 'success', data: r.data };
-
-                // コールバック関数に結果を返す。
-                // SOGH の処理用。
-                if (success) success(out);
-
-                return out;
-            })
-            .catch(err => {
-                const out = { status: 'error', error: err };
-
-                // コールバック関数に結果を返す。
-                // SOGH の処理用。
-                error ? error(out) : console.error(err);
-
-                return out;
-            });
-    }
     fetchX (query, response2data, success, error) {
-        const endpoint = 'https://api.github.com/graphql';
         const post_data = this.postData(query);
 
-        return fetch(endpoint, post_data)
+        // 送り先は endpoint() にそろえる。(URL を直に書かない。yanqirenshi/SOGH.next#76)
+        return fetch(this.endpoint(), post_data)
             .then(r => r.ok ? r.json() : Promise.reject(r))
             .then(r => {
                 const out = {
@@ -149,31 +124,6 @@ export default class Loader {
 
                 return out;
             });
-    }
-    /** *************************************************************** *
-     *  Terminate ?
-     * **************************************************************** */
-    makeGraphQLDataItem (v) {
-        if ("string"===(typeof v))
-            return JSON.stringify(v);
-
-        if (Array.isArray(v))
-            return '[' + v.map(d => this.makeGraphQLDataItem(d)).join(', ') + ']';
-
-        return v;
-    }
-    makeGraphQLData (data) {
-        const x = Object.keys(data).map(key => {
-            const val = data[key];
-
-            if (val===null
-                || (Array.isArray(val) && val.length===0))
-                return null;
-
-            return key + ': ' + this.makeGraphQLDataItem(data[key]);
-        });
-
-        return '{ ' + x.filter(d=>d!==null).join(', ') + ' }';
     }
     /** *************************************************************** *
      *  Response
