@@ -10,6 +10,9 @@ export default function TableCellTitleIssue (props) {
     const actions = props.actions;
 
     const repository = item.repository();
+
+    // content は、Item の content を取得していないときは null (または、無い)。
+    // そのときは、Title フィールドの値を出す。(リンクとクリックの動きは付けない)
     const issue = item.core().content;
 
     const click = ()=> {
@@ -22,7 +25,8 @@ export default function TableCellTitleIssue (props) {
     return (
         <TableCell>
           <S>
-            {issue.number &&
+            {!issue && item.title()}
+            {issue && issue.number &&
              <>
                <span onClick={()=> click()}>
                  {issue.title}

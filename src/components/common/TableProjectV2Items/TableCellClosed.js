@@ -15,6 +15,13 @@ export default function TableCellClosed (props) {
 
     const issue = item.core().content;
 
+    // content を取得していないとき (null、または、無い) は、空のセルを出す。
+    if (!issue)
+        return (
+            <TableCell>
+            </TableCell>
+        );
+
     const d = DateTime.fromISO(issue.closedAt);
 
     if (!d.isValid)
@@ -25,7 +32,7 @@ export default function TableCellClosed (props) {
 
     return (
         <TableCell title={issue.closedAt}>
-          {d.toFormat('yyyy-dd-mm')}
+          {d.toFormat('yyyy-LL-dd')}
         </TableCell>
     );
 }

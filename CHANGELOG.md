@@ -2,13 +2,20 @@
 
 ## 0.4.2
 
-ProjectV2 の Item の表の Title の列が、落ちる場合があったのを、直しました。
-(yanqirenshi/SOGH.next#36)
+ProjectV2 の Item の表で、Item の content が無いときに落ちる場合があったのと、閉じた日の書式の誤りを、直しました。
+(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42)
 
 ### 直したもの
 
-- ProjectV2 の Item の表 (`ProjectV2Items`) の Title の列が、Item の `type()` が ISSUE で、`content()` が null のときに、TypeError で落ちていた。
+- ProjectV2 の Item の表 (`ProjectV2Items`) の Title の列が、Item の `type()` が ISSUE で、`content()` が null のときに、TypeError で落ちていた。(#36)
   - Title フィールドの値を出すようにした。(`type()` が DRAFT_ISSUE のときと同じ表示)
+  - 0.3.0 からあった不具合です。
+- ProjectV2 の Item の表 (`TableProjectV2Items`) の Title の列と Closed の列が、Item の type が ISSUE で、content が null (または、無い) のときに、TypeError で落ちていた。(#41)
+  - Title の列は、Title フィールドの値を出すようにした。(リンクとクリックの動きは付けない)
+  - Closed の列は、空のセルを出すようにした。(type が ISSUE でないときと同じ表示)
+  - 0.3.0 からあった不具合です。
+- `TableProjectV2Items` の Closed の列が、閉じた日を `年-日-分` の書式で出していた。(#42)
+  - `年-月-日` (例: `2026-03-09`) で出すようにした。
   - 0.3.0 からあった不具合です。
 
 ## 0.4.1
