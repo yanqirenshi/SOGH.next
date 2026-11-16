@@ -7,7 +7,7 @@ ProjectV2 の Item の表で、Item の content が無いときに落ちる場�
 入口からモデルを export し、モデルの型の名前を返す `typename()` を足しました。
 PullRequest の `repository()`・`author()` も、モデルを返すようにしました。
 Issue を取り直したときに、プロジェクトへの出し入れと、Item のフィールドの値の変更が、反映されない場合があったのを、直しました。
-(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#38・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45・yanqirenshi/SOGH.next#49・yanqirenshi/SOGH.next#51・yanqirenshi/SOGH.next#54・yanqirenshi/SOGH.next#59・yanqirenshi/SOGH.next#60)
+(yanqirenshi/SOGH.next#36・yanqirenshi/SOGH.next#37・yanqirenshi/SOGH.next#38・yanqirenshi/SOGH.next#41・yanqirenshi/SOGH.next#42・yanqirenshi/SOGH.next#45・yanqirenshi/SOGH.next#49・yanqirenshi/SOGH.next#51・yanqirenshi/SOGH.next#54・yanqirenshi/SOGH.next#59・yanqirenshi/SOGH.next#60・yanqirenshi/SOGH.next#64)
 
 ### 直したもの
 
@@ -38,6 +38,11 @@ Issue を取り直したときに、プロジェクトへの出し入れと、It
   - 0.3.0 からあった不具合です。
 - Issue の部品 (`PanelIssue`) の再取得のボタンが、`actions.issue.refresh` の 1 つめの引数に、Issue の id の値ではなく、メソッド (`issue.id`) そのものを渡していた。(#60)
   - id の値 (`issue.id()`) を渡すようにした。
+  - 0.3.0 からあった不具合です。
+- ProjectV2 の Item を取る `asyncFetchProjectV2ItemsByUserLoginProjectV2Number` と `asyncFetchProjectV2ItemsByOrgLoginProjectV2Number` が、最初のページ (100 件) しか取っていなかった。(#64)
+  - 最後のページまで取るようにした。(クエリで `pageInfo` を取り、`hasNextPage` が false になるまで繰り返す)
+  - 戻り値は、これまでどおり、Item の id の配列。(全ページ分) 途中で失敗したときも、これまでどおり、エラーを返す。
+  - 古い世代の `fetchProjectV2ItemsByProjectNext` は、まだ最初のページだけを取る。
   - 0.3.0 からあった不具合です。
 
 ### 変わった動き

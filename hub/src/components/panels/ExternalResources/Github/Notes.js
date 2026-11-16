@@ -47,9 +47,11 @@ export default function Notes () {
                   <LI>更新は variables を使っているので、取得もそろえたい。</LI>
                 </UL>
               </LI>
-              <LI>ProjectV2 の Item を取る asyncFetch〜 は、繰り返していないので、1 ページ (100 件) で止まる。
+              <LI>ProjectV2 の Item を取る古い世代の <C>fetchProjectV2ItemsByProjectNext</C> は、1 ページ (100 件) で止まる。
                 <UL>
-                  <LI>Item を取る 3 つのクエリは、ページ送りの印はあるが、<C>pageInfo</C> を取っていない。</LI>
+                  <LI>クエリ <C>projectsv2_items_by_projects_v2</C> は、ページ送りの印はあるが、<C>pageInfo</C> を取っていない。</LI>
+                  <LI>fetch〜 を消すかどうかを、先に決める。(Issue 62)</LI>
+                  <LI>asyncFetch〜 の 2 つ (<C>asyncFetchProjectV2ItemsByUserLoginProjectV2Number</C>・<C>asyncFetchProjectV2ItemsByOrgLoginProjectV2Number</C>) は、0.4.2 で、最後のページまで取るように直した。(Issue 64)</LI>
                 </UL>
               </LI>
               <LI>クエリと、応答の取り出し (<C>d.data.node.comments</C> など) が、別の場所にある。

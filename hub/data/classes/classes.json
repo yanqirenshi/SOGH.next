@@ -3729,8 +3729,8 @@
                     "name": "projectV2ItemIds",
                     "type": "Promise<String[] | Error | Response>",
                     "description": [
-                        "ProjectV2Item の id の配列。",
-                        "失敗したときは、エラー。"
+                        "ProjectV2Item の id の配列。(全ページ分)",
+                        "失敗したときは、エラー。(途中まで集めた分は返さない)"
                     ]
                 },
                 "arguments": [
@@ -3751,10 +3751,11 @@
                 ],
                 "description": [
                     "ユーザー (login) の、番号 (number) の ProjectV2 のアイテムを取得し、ProjectV2Item にして Pool に入れる。",
-                    "ページ送りはせず、先頭の 100 件だけを取得する。",
-                    "クエリの after: \"\", を makeQuery で消さずに、そのまま送る。",
-                    "ProjectV2 そのものは Pool に入れない。",
-                    "失敗したときは、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない)"
+                    "pageInfo の hasNextPage が false になるまで、100 件ずつ繰り返して、すべてのアイテムを取得する。(0.4.2 から。yanqirenshi/SOGH.next#64。それまでは、先頭の 100 件だけだった)",
+                    "ページ送りの印 (クエリの items の after: \"\",) は、makeQuery で、1 回めは消し、2 回め以降は前の回の endCursor にする。",
+                    "2 回め以降も、ProjectV2 の項目 (fields など) を毎回取り直す。",
+                    "応答の ProjectV2 そのもの (fields を含む) は、Pool に入れない。(アイテムの project は、Matchmaker が Pool に入れる)",
+                    "失敗したときは、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない。途中のページで失敗したときも、途中まで集めた分は返さない)"
                 ],
                 "examples": [
                     "const ids = await sogh.asyncFetchProjectV2ItemsByUserLoginProjectV2Number('octocat', 3);",
@@ -3774,8 +3775,8 @@
                     "name": "projectV2ItemIds",
                     "type": "Promise<String[] | Error | Response>",
                     "description": [
-                        "ProjectV2Item の id の配列。",
-                        "失敗したときは、エラー。"
+                        "ProjectV2Item の id の配列。(全ページ分)",
+                        "失敗したときは、エラー。(途中まで集めた分は返さない)"
                     ]
                 },
                 "arguments": [
@@ -3796,10 +3797,11 @@
                 ],
                 "description": [
                     "組織 (login) の、番号 (number) の ProjectV2 のアイテムを取得し、ProjectV2Item にして Pool に入れる。",
-                    "ページ送りはせず、先頭の 100 件だけを取得する。",
-                    "クエリの after: \"\", を makeQuery で消さずに、そのまま送る。",
-                    "ProjectV2 そのものは Pool に入れない。",
-                    "失敗したときは、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない)"
+                    "pageInfo の hasNextPage が false になるまで、100 件ずつ繰り返して、すべてのアイテムを取得する。(0.4.2 から。yanqirenshi/SOGH.next#64。それまでは、先頭の 100 件だけだった)",
+                    "ページ送りの印 (クエリの items の after: \"\",) は、makeQuery で、1 回めは消し、2 回め以降は前の回の endCursor にする。",
+                    "2 回め以降も、ProjectV2 の項目 (fields など) を毎回取り直す。",
+                    "応答の ProjectV2 そのもの (fields を含む) は、Pool に入れない。(アイテムの project は、Matchmaker が Pool に入れる)",
+                    "失敗したときは、エラー (GraphQL のエラーは Error、HTTP のエラーは fetch の Response) をそのまま返す。(reject しない。途中のページで失敗したときも、途中まで集めた分は返さない)"
                 ],
                 "examples": [
                     "const ids = await sogh.asyncFetchProjectV2ItemsByOrgLoginProjectV2Number('octo-org', 4);",
