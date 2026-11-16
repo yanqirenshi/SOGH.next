@@ -53,6 +53,7 @@ function Overview ({ data }) {
             <P>node2projectV2(node) は、Pool に入れる前に、Matchmaker の projectV2(node) で、入れ子で来た creator・owner・items もモデルにして Pool に入れる。</P>
             <P>アイテムは、items() で ProjectV2Item のモデルの配列を得る。(ProjectV2 の中身に入っているアイテム)</P>
             <P>itemsInPool() は、items() と、別に取って Pool に入ったアイテム (core の project の id が、この ProjectV2 のもの) を合わせて返す。並び順は、items() のあとに、Pool に入った順。同じアイテムは 1 回だけ。取得はしない。(0.5.0 から。ProjectsV2 の部品の Item の表が読む。yanqirenshi/SOGH.next#102)</P>
+            <P>別に取ったアイテムを選ぶ所は、Pooler の projectV2ItemsOf(project_id)。Item を取り直して外れたアイテムは Pool から消える (Sogh の asyncFetchProjectV2ItemsBy〜) ので、core の items に id が残っていても、items()・itemsInPool() には出ない。(yanqirenshi/SOGH.next#108)</P>
             <P>items() と同じものを返していた古い名前 itemsWith2ProjectV2Item() は、0.5.0 で消した。(yanqirenshi/SOGH.next#104)</P>
             <P>creator() は、作った人を、__typename に合うモデル (User・Organization・Bot・Mannequin・EnterpriseUserAccount のどれか) で返す。</P>
             <P>owner() は、GitHub の owner (持ち主) を、User・Organization・Issue・PullRequest のどれかのモデルで返す。(Repository の owner() と同じ意味。0.5.0 から。yanqirenshi/SOGH.next#71)</P>

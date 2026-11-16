@@ -191,23 +191,19 @@ export default class ProjectV2 extends GraphQLNode {
     //   2. 別に取って Pool に入った Item (core の project の id が、この ProjectV2 のもの) を、Pool に入った順に。
     // 同じ Item は、1 回だけ。取得はしない。(取得するのは、利用側)
     // sogh が入っていないとき (Pool を引けないとき) は、items() と同じ。(関連も引けないので、[])
+    // 2 を選ぶ所は、Pooler の projectV2ItemsOf(project_id)。(Pool から消すときと同じ見方。yanqirenshi/SOGH.next#108)
     itemsInPool () {
         const out = this.items();
 
         const sogh = this.sogh();
-        const pool = sogh && typeof sogh.pool === 'function' ? sogh.pool('project-v2-item') : null;
 
-        if (!pool)
+        if (!sogh || typeof sogh.projectV2ItemsOf !== 'function')
             return out;
 
         const ids = new Set(out.map(item=> item.id()));
-        const project_id = this.id();
 
-        for (const item of pool.list()) {
-            const core = item.core();
-            const project = core ? core.project : null;
-
-            if (!project || project.id !== project_id || ids.has(item.id()))
+        for (const item of sogh.projectV2ItemsOf(this.id())) {
+            if (ids.has(item.id()))
                 continue;
 
             ids.add(item.id());

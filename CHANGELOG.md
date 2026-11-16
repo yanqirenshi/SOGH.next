@@ -6,7 +6,7 @@
 また、Sogh のメソッドから使われていないクエリを、すべて消しました。
 取得のクエリを、値を GraphQL の variables で渡す形に書き直し、`asyncFetch〜` が失敗したときは例外を投げるようにしました。
 あわせて、Projects (classic) のモデルや、Issue を作るための部品など、使われていない古いものを消しました。
-(yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100・yanqirenshi/SOGH.next#101・yanqirenshi/SOGH.next#102・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#104・yanqirenshi/SOGH.next#105)
+(yanqirenshi/SOGH.next#61・yanqirenshi/SOGH.next#62・yanqirenshi/SOGH.next#63・yanqirenshi/SOGH.next#65・yanqirenshi/SOGH.next#66・yanqirenshi/SOGH.next#67・yanqirenshi/SOGH.next#68・yanqirenshi/SOGH.next#69・yanqirenshi/SOGH.next#70・yanqirenshi/SOGH.next#71・yanqirenshi/SOGH.next#73・yanqirenshi/SOGH.next#74・yanqirenshi/SOGH.next#75・yanqirenshi/SOGH.next#76・yanqirenshi/SOGH.next#77・yanqirenshi/SOGH.next#81・yanqirenshi/SOGH.next#82・yanqirenshi/SOGH.next#83・yanqirenshi/SOGH.next#84・yanqirenshi/SOGH.next#85・yanqirenshi/SOGH.next#86・yanqirenshi/SOGH.next#87・yanqirenshi/SOGH.next#89・yanqirenshi/SOGH.next#90・yanqirenshi/SOGH.next#91・yanqirenshi/SOGH.next#94・yanqirenshi/SOGH.next#95・yanqirenshi/SOGH.next#98・yanqirenshi/SOGH.next#99・yanqirenshi/SOGH.next#100・yanqirenshi/SOGH.next#101・yanqirenshi/SOGH.next#102・yanqirenshi/SOGH.next#103・yanqirenshi/SOGH.next#104・yanqirenshi/SOGH.next#105・yanqirenshi/SOGH.next#108・yanqirenshi/SOGH.next#111)
 
 ### 利用側への影響 (破壊的な変更です)
 
@@ -52,6 +52,7 @@
   - `sogh.query(code)` は、これまでどおり、クエリの文字列を返します。
   - 新しく、`sogh.queryDefinition(code)` で、`{ query, pick }` を取れます。(`pick` は、応答の `data` から、取り出す値を返す関数。yanqirenshi/SOGH.next#65)
   - 番号の引数 (Issue の番号・ProjectV2 の番号) は、数値にしてから送ります。(これまでどおり、文字列でも渡せます)
+  - ProjectV2 の Item を取る 2 つのクエリ (`projectv2items_by_user_login_projectv2_number`・`projectv2items_by_org_login_projectv2_number`) の `pick` は、Item の一覧ではなく、ProjectV2 (`id` と、一覧の `items` を持つ) を返します。(Item が 0 個のときも、どの ProjectV2 かが分かるように。クエリの文字列は、変わりません。yanqirenshi/SOGH.next#108)
 - `Loader` の `makeQuery(query, endCursor)` を消しました。(ページ送りの印を書き換える部品。variables にしたので、使わなくなった)
 - ProjectV2Item の content の PullRequest は、`state` を別名 `pullRequestState` で取ります。(yanqirenshi/SOGH.next#68)
   - Pool に入れる前に `state` に戻すので、これまでと同じく `state` の名前で読めます。
@@ -134,12 +135,21 @@
 - `ProjectsV2` の表の見出しを作る所を、直しました。既定の列の見出しは、変わりません。(yanqirenshi/SOGH.next#105)
   - グループ (`group`) の付いた列が 1 つも無い `columns` を渡すと、落ちていました。いまは、見出しを 1 行で描きます。
   - 最後の列がグループの中にあると、そのグループが見出しに出ず、見出しと列がずれていました。いまは、そのグループも出します。
+- ProjectV2 の Item を取り直すと、外した Item が Pool から消えるようになりました。(yanqirenshi/SOGH.next#108)
+  - `asyncFetchProjectV2ItemsByUserLoginProjectV2Number`・`asyncFetchProjectV2ItemsByOrgLoginProjectV2Number` は、最後のページまで取り終えたときに、その ProjectV2 の Item (Item の core の project の id で見る) のうち、今回取れなかったものを、Pool から消します。Item が 0 個になったときも、消します。
+  - 消すのは、最後のページまで取り終えたときだけです。途中で失敗したとき (例外を投げるとき) は、何も消しません。
+  - 消すのは、ProjectV2Item のモデルだけです。中身 (Issue・PullRequest・DraftIssue) と、ほかの ProjectV2 の Item は、残します。
+  - 消した Item は、ProjectV2 の `items()`・`itemsInPool()` に出ません。(ProjectV2 の core の items に id が残っていても、Pool に無い Item は外す)
+  - 戻り値 (取った Item の id の配列) は、変わりません。
+  - ほかの取得 (チームの Item 付き・組織の番号の ProjectV2 など) は、消しません。(取る Item の数に上限があり、「すべて取った」と言えないため)
+- `ProjectsV2` の表の見出しのセルの `key` を、見出しの文字と、何番めかの数で作るようにしました。(これまでは "[object Object]_0" のような文字でした。画面と動きは変わりません。yanqirenshi/SOGH.next#111)
 
 ### 足したもの
 
 - `Loader` の `request(query, variables)`: クエリを 1 回送り、応答の `data` を返す。失敗したときは `GitHubError` を投げる。
 - `Sogh` の `queryDefinition(code)`: クエリの定義 `{ query, pick }` を返す。
-- `Sogh` の取得の部品 `fetchNode(code, variables)`・`fetchPages(code, variables, onPage)`・`connection2ids(connection, make)`・`fetchProjectsV2OfTeam(code, team_id, callbacks)`。(`asyncFetch〜` が使う)
+- `Sogh` の取得の部品 `fetchNode(code, variables)`・`fetchPages(code, variables, onPage, connectionOf)`・`connection2ids(connection, make)`・`fetchProjectsV2OfTeam(code, team_id, callbacks)`。(`asyncFetch〜` が使う。`connectionOf(picked)` は、pick が一覧の親を返すときに、pageInfo を持つ一覧を指す関数。既定は picked そのもの)
+- `Pooler` の `projectV2ItemsOf(project_id)`・`removeProjectV2ItemsExcept(project_id, ids)`。(Pool にある、その ProjectV2 の Item を選ぶ・今回取れなかった Item を消す。ProjectV2 の `itemsInPool()` と、Item を取るメソッドが使う。yanqirenshi/SOGH.next#108)
 - 例外のクラス `GitHubError`。(`src/js/Loader.js`。パッケージの入口から、名前付きで export している。`import { GitHubError } from 'sogh'`)
 - `Pool` の `remove(id)` と `clear()`。(yanqirenshi/SOGH.next#69)
   - `remove(id)`: id のモデルを、表と一覧の両方から消し、消したモデルを返す。無いときは null。
