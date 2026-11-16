@@ -109,6 +109,7 @@ const PARTS = [
     { type: 'Mannequin',     kind: REF,  part: 'mannequinRef()',   fields: '__typename, id, login, avatarUrl, url, resourcePath, email, createdAt, updatedAt' },
     { type: 'EnterpriseUserAccount', kind: REF, part: 'enterpriseUserAccountRef()', fields: '__typename, id, login, name, avatarUrl, url, resourcePath, createdAt, updatedAt' },
     { type: 'Team',          kind: REF,  part: 'teamRef()',        fields: '__typename, id, slug, createdAt, updatedAt' },
+    { type: 'Team',          kind: '参照 (reviewers)', part: 'teamReviewerRef()', fields: '参照の組 + teamName: name, teamAvatarUrl: avatarUrl, url' },
 ];
 
 // 型が複数ある場所の、項目の部品。
@@ -148,7 +149,7 @@ const UNIONS = [
       where: 'ProjectV2Item の reviewers',
       how: [
           'User は userRef()',
-          'Team は teamRef()',
+          'Team は teamReviewerRef()。name と avatarUrl は、別名 teamName・teamAvatarUrl で取る',
           'Mannequin は mannequinRef()',
           'Bot は botRef()',
       ] },
@@ -302,7 +303,14 @@ export default function DataModel () {
                     <LI>email と company は、型が User と決まっている場所 (assignees など) で、<C>user()</C> で取る。</LI>
                   </UL>
                 </LI>
-                <LI>Team の name と avatarUrl も、同じ理由で取らない。(User と型が違う)</LI>
+                <LI>Team の name (<C>String!</C>) と avatarUrl (<C>URI</C>) も、User などの name (<C>String</C>)・avatarUrl (<C>URI!</C>) と、null がありうるかどうかが違う。そのため、reviewers の Team は、別名 <C>teamName</C>・<C>teamAvatarUrl</C> で取る。(0.5.0 から。<C>yanqirenshi/SOGH.next#39</C>)
+                  <UL>
+                    <LI>部品は <C>teamReviewerRef()</C>。(url は、どの型も同じ型なので、別名は要らない)</LI>
+                    <LI>Pool に入れる前に、Pooler の <C>node2team(node)</C> が、name・avatarUrl に戻す。(Team の core は、取り方によらず name・avatarUrl)</LI>
+                    <LI>ProjectV2Item の core に残る fieldValues の中の Team も、Pooler の <C>node2projectV2Item(node)</C> が、Pool に入れる前に戻す。</LI>
+                    <LI>チームの ProjectV2 を取るクエリの根の Team (<C>teamRef()</C>) は、そのまま。</LI>
+                  </UL>
+                </LI>
                 <LI>ProjectV2Item の content では、Issue の state (<C>IssueState!</C>) と PullRequest の state (<C>PullRequestState!</C>) が、同じ場所に来る。そのため、PullRequest の state は、別名 <C>pullRequestState</C> で取る。(0.5.0 から。<C>yanqirenshi/SOGH.next#68</C>)
                   <UL>
                     <LI>部品は <C>{"pullRequestRef('pullRequestState: state')"}</C>。(<C>projectV2ItemContentPullRequest()</C>)</LI>

@@ -46,6 +46,8 @@ function Overview ({ data }) {
             <P>{"Sogh の asyncFetch〜 が、取得したノードを node2〜(node) に渡す。"}</P>
             <P>{"node2pullRequest(node) は、ProjectV2Item の content として別名 pullRequestState で来た state を、Pool に入れる前に state に戻す。(0.5.0 から。yanqirenshi/SOGH.next#68)"}</P>
             <P>{"node2projectV2Item(node) も、Pool に入れる前に、content の pullRequestState を state に戻す。(ProjectV2Item の core に残る content も、取り方によらず state になる)"}</P>
+            <P>{"node2team(node) は、reviewers の Team が別名 teamName・teamAvatarUrl で取った値を、Pool に入れる前に、name・avatarUrl に戻す。(0.5.0 から。yanqirenshi/SOGH.next#39)"}</P>
+            <P>{"node2projectV2Item(node) も、Pool に入れる前に、fieldValues の reviewers の中の Team を、name・avatarUrl に戻す。(ProjectV2Item の core に残る Team も、取り方によらず name・avatarUrl になる)"}</P>
             <Plane>{CODE}</Plane>
           </Section>
 

@@ -134,6 +134,20 @@
 - `ProjectsV2` の表の見出しを作る所を、直しました。既定の列の見出しは、変わりません。(yanqirenshi/SOGH.next#105)
   - グループ (`group`) の付いた列が 1 つも無い `columns` を渡すと、落ちていました。いまは、見出しを 1 行で描きます。
   - 最後の列がグループの中にあると、そのグループが見出しに出ず、見出しと列がずれていました。いまは、そのグループも出します。
+- Item の表 (`ProjectV2Items`) の REVIEWERS の列を、出すようにしました。(これまでは、列が隠れていて、中身は空でした。yanqirenshi/SOGH.next#39)
+  - 名前を、リンクにして、1 人ずつ並べます。(担当者の列と、同じ出し方です。User・Team・Mannequin・Bot)
+  - 名前は、`name()` があれば `name()`、無ければ `login()`、それも無ければ `slug()` です。(Mannequin と Bot は `login()`)
+  - 担当者 (ASSIGNEES)・ラベル・マイルストーンなど、ほかの隠れている列は、変わりません。
+- Item の表 (`TableProjectV2Items`・`ProjectV2Details`) に、Reviewers の列を足しました。(Assignees の右。yanqirenshi/SOGH.next#39)
+  - 担当者の列と同じく、アイコンを並べます。(alt は名前、src は `avatarUrl()`)
+  - アイコンが無いチーム (`avatarUrl()` が null) は、名前の頭文字 (1 文字め。大文字) を出します。(名前が無いときは、Avatar の既定の絵です)
+  - 列が 1 つ増えるので、この表の見た目が変わります。
+- reviewers のクエリは、Team の `name`・`avatarUrl` を、別名 `teamName`・`teamAvatarUrl` で取り、`url` も取るようになりました。(yanqirenshi/SOGH.next#39)
+  - 取る項目は、Team の 3 つ (name・avatarUrl・url) だけ増えます。
+  - Pool に入れる前に、`name`・`avatarUrl` に戻します。(`Pooler` の `node2team(node)` と `node2projectV2Item(node)`。PullRequest の state と同じやり方です)
+  - そのため、`Team` の core も、ProjectV2Item の core の fieldValues の中の Team も、取り方によらず `name`・`avatarUrl` です。(`teamName`・`teamAvatarUrl` は、残りません)
+  - チームの ProjectV2 を取るクエリの根の Team (`teamRef()`) は、変わりません。
+  - 企業のチーム (EnterpriseTeam) は、いまも取らず、`reviewers()` に入りません。(yanqirenshi/SOGH.next#112)
 
 ### 足したもの
 
@@ -150,6 +164,9 @@
   - 並び順は、`items()` (中身に入っている Item) をその順に、そのあとに、別に取って Pool に入った Item (core の project の id が、この ProjectV2 のもの) を、Pool に入った順に。同じ Item は、1 回だけ。
   - 取得はしません。sogh が入っていないモデルでは、`items()` と同じです。
 - `ProjectsV2` の部品の `actions` の `tasks.open(project_id)`: Task の列で、行が開いたときに呼ぶ。(既定の actions では、何もしない。ほかの関数を渡さずに、これだけを渡してもよい。yanqirenshi/SOGH.next#102)
+- `Team` の `name()`・`url()`・`avatarUrl()`。(yanqirenshi/SOGH.next#39)
+  - `avatarUrl()` は、アイコンが無いチームでは null です。
+  - `login()` は、ありません。(Team には login が無い。名前は、`name()` と `slug()` で読みます)
 
 ## 0.4.2
 

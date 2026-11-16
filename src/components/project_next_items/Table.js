@@ -14,7 +14,7 @@ const columns = [
     { num:  4, show: false, type: 'FIELD',     label: null,          dataType: 'MILESTONE',            name: null },
     { num:  5, show:  true, type: 'FIELD',     label: null,          dataType: 'REPOSITORY',           name: null },
     { num:  7, show: false, type: 'FIELD',     label: null,          dataType: 'LINKED_PULL_REQUESTS', name: null },
-    { num:  6, show: false, type: 'FIELD',     label: null,          dataType: 'REVIEWERS',            name: null },
+    { num:  6, show:  true, type: 'FIELD',     label: null,          dataType: 'REVIEWERS',           name: null },
     { num:  8, show: false, type: 'FIELD',     label: null,          dataType: 'TRACKS',               name: null },
     { num:  9, show:  true, type: 'ATTRIBUTE', label: 'type',        dataType: 'text',     value: (row)=>row.type() },
     { num: 10, show:  true, type: 'ATTRIBUTE', label: 'is_archived', dataType: 'text',     value: (row)=>row.isArchived() },

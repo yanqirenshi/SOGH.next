@@ -11,6 +11,7 @@ import Paper from '@mui/material/Paper';
 import TableCellTitle from './TableProjectV2Items/TableCellTitle.js';
 import TableCellDate from './TableProjectV2Items/TableCellDate.js';
 import TableCellAssignees from './TableProjectV2Items/TableCellAssignees.js';
+import TableCellReviewers from './TableProjectV2Items/TableCellReviewers.js';
 import TableCellClosed from './TableProjectV2Items/TableCellClosed.js';
 
 export default function TableProjectV2Items (props) {
@@ -27,6 +28,7 @@ export default function TableProjectV2Items (props) {
                 <TableCell>Title</TableCell>
 
                 <TableCell>Assignees</TableCell>
+                <TableCell>Reviewers</TableCell>
 
                 <TableCell>Due</TableCell>
                 <TableCell>NextAction</TableCell>
@@ -46,6 +48,8 @@ export default function TableProjectV2Items (props) {
                         <TableCellTitle item={item} actions={actions}/>
 
                         <TableCellAssignees item={item}/>
+
+                        <TableCellReviewers item={item}/>
 
                         <TableCellDate date={item.dueDate()} status={status}/>
 

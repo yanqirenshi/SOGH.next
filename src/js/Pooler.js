@@ -125,10 +125,13 @@ export default class Pooler extends Loader {
      * **************************************************************** */
     // content の PullRequest は、state を別名 pullRequestState で取っている。(yanqirenshi/SOGH.next#68)
     // Pool に入れる前に、state の名前に戻す。(Item の core に残る content も、取り方で変わらないように)
+    // fieldValues の reviewers の Team は、name・avatarUrl を別名で取っている。(yanqirenshi/SOGH.next#39)
+    // こちらも、Pool に入れる前に、name・avatarUrl の名前に戻す。
     node2projectV2Item (node) {
         const pool = this.pool('project-v2-item');
 
         node = restoreContentPullRequestState(node);
+        node = restoreFieldValuesTeamAlias(node);
 
         this.matchmaker.projectV2Item(node);
 
@@ -238,7 +241,12 @@ export default class Pooler extends Loader {
     /* **************************************************************** *
      *  Team                                                            *
      * **************************************************************** */
+    // reviewers の Team は、name と avatarUrl を、別名 teamName・teamAvatarUrl で取っている。
+    // (User などと型が違い、同じ場所で取れないため。yanqirenshi/SOGH.next#39)
+    // Pool に入れる前に、name・avatarUrl の名前に戻す。
     node2team (node) {
+        node = restoreTeamAlias(node);
+
         return this.pool('team').ensure(node, (d)=> new model.Team(d));
     }
     team (v) {
@@ -318,4 +326,49 @@ function restoreContentPullRequestState (node) {
         return node;
 
     return { ...node, content: restorePullRequestState(node.content) };
+}
+
+// 別名 teamName・teamAvatarUrl で取った値を、name・avatarUrl に戻した node を返す。(元の node は変えない)
+// 別名が無いときは、そのまま返す。
+function restoreTeamAlias (node) {
+    if (!node || (node.teamName===undefined && node.teamAvatarUrl===undefined))
+        return node;
+
+    const { teamName, teamAvatarUrl, ...rest } = node;
+
+    if (teamName!==undefined)
+        rest.name = teamName;
+
+    if (teamAvatarUrl!==undefined)
+        rest.avatarUrl = teamAvatarUrl;
+
+    return rest;
+}
+
+// ProjectV2Item の node の fieldValues の中の、reviewers の Team を、name・avatarUrl に戻した node を返す。(元の node は変えない)
+// 戻すものが無いときは、そのまま返す。(fieldValues が無い・nodes が配列でない・null が混ざる、も落ちない)
+function restoreFieldValuesTeamAlias (node) {
+    if (!node || !node.fieldValues || !Array.isArray(node.fieldValues.nodes))
+        return node;
+
+    let changed = false;
+
+    const nodes = node.fieldValues.nodes.map(value=> {
+        if (!value || !value.reviewers || !Array.isArray(value.reviewers.nodes))
+            return value;
+
+        const reviewers = value.reviewers.nodes.map(restoreTeamAlias);
+
+        if (reviewers.every((d, i)=> d===value.reviewers.nodes[i]))
+            return value;
+
+        changed = true;
+
+        return { ...value, reviewers: { ...value.reviewers, nodes: reviewers } };
+    });
+
+    if (!changed)
+        return node;
+
+    return { ...node, fieldValues: { ...node.fieldValues, nodes: nodes } };
 }

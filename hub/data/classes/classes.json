@@ -1091,6 +1091,8 @@
                     "ProjectV2 のアイテムのノードを、ProjectV2Item にして Pool に入れて返す。",
                     "content が PullRequest のときは、state を別名 pullRequestState で取っているので、はじめに content の pullRequestState を state に戻したノードにする。(元のノードは変えない。yanqirenshi/SOGH.next#68。0.5.0 から)",
                     "そのため、ProjectV2Item の core の content も、取り方によらず state になる。",
+                    "fieldValues の reviewers に入る Team も、name と avatarUrl を別名 teamName・teamAvatarUrl で取っているので、あわせて name・avatarUrl に戻したノードにする。(元のノードは変えない。yanqirenshi/SOGH.next#39。0.5.0 から)",
+                    "そのため、ProjectV2Item の core の fieldValues の中の Team も、取り方によらず name・avatarUrl になる。",
                     "先に matchmaker.projectV2Item(node) で、入れ子の project・content・creator と、fieldValues の中の関連をモデルにして Pool に入れる。(core には JSON をそのまま残す)",
                     "同じ id の ProjectV2Item があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
                     "Pool に入れたあとで、もう一度 sogh(v) に自分を入れる。(Pool も入れるので、結果は同じ)",
@@ -1784,15 +1786,17 @@
                 ],
                 "description": [
                     "Team のノードを、Team にして Pool に入れて返す。",
+                    "reviewers のクエリは、Team の name と avatarUrl を、別名 teamName・teamAvatarUrl で取っている。(User などと型が違い、同じ場所で取れないため)",
+                    "そのため、はじめに teamName を name に、teamAvatarUrl を avatarUrl に戻したノードにする。(元のノードは変えない。yanqirenshi/SOGH.next#39。0.5.0 から)",
                     "同じ id の Team があるときは、新しく作らず、その core にノードを重ねる。(GraphQLNode の merge(node))",
                     "Matchmaker は呼ばない。(Team の入れ子の関連は辿らない)",
                     "node2model(node) が、__typename が Team のノードに使う。(ProjectV2Item の reviewers)"
                 ],
                 "examples": [
-                    "const team = sogh.node2team({ __typename: 'Team', id: 'T_kwDOAB', slug: 'core' });",
+                    "const team = sogh.node2team({ __typename: 'Team', id: 'T_kwDOAB', slug: 'core', teamName: 'Core Team', teamAvatarUrl: null });",
                     "",
-                    "team.slug();",
-                    "// => \"core\""
+                    "team.name();",
+                    "// => \"Core Team\""
                 ]
             },
             {
@@ -8876,7 +8880,9 @@
                 "description": [
                     "'Reviewers' フィールドの値 (レビューする人やチーム) を、__typename に合うモデル (User・Team・Mannequin・Bot のどれか) の配列で返す。(フィールドの値の reviewers の id で、Pool から引く)",
                     "クエリは 10 件まで取得する。",
-                    "フィールドの値が無いときは []。"
+                    "フィールドの値が無いときは []。",
+                    "モデルにならないもの (id の無い空のもの。クエリで取らない EnterpriseTeam など) は、配列に入らない。",
+                    "名前・リンク・アイコンは、型によって読むメソッドが違う。User は name()・login()、Team は name()・slug()、Mannequin と Bot は login() と、url()・avatarUrl()。(Team に login() は無い。Mannequin と Bot に name() は無い)"
                 ],
                 "examples": [
                     "projectV2Item.reviewers().map(reviewer=> reviewer.id());",
@@ -9568,6 +9574,73 @@
                 "examples": [
                     "team.slug();",
                     "// => \"core\""
+                ]
+            },
+            {
+                "name": "name",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "name",
+                    "type": "String | null",
+                    "description": [
+                        "チームの名前。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "Team の名前 (表示用) を返す。",
+                    "reviewers のクエリは、別名 teamName で取り、Pool に入れる前に name に戻す。(Pooler の node2team。yanqirenshi/SOGH.next#39)",
+                    "人 (User) の name() と同じ名前のメソッド。(User と違い、GitHub 側は必ず値がある)"
+                ],
+                "examples": [
+                    "team.name();",
+                    "// => \"Core Team\""
+                ]
+            },
+            {
+                "name": "url",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "url",
+                    "type": "String | null",
+                    "description": [
+                        "チームのページの URL。",
+                        "無いときは null。"
+                    ]
+                },
+                "description": [
+                    "Team のページの URL を返す。"
+                ],
+                "examples": [
+                    "team.url();",
+                    "// => \"https://github.com/orgs/example/teams/core\""
+                ]
+            },
+            {
+                "name": "avatarUrl",
+                "parameters": [],
+                "returnType": "any",
+                "visibility": "public",
+                "returns": {
+                    "name": "avatarUrl",
+                    "type": "String | null",
+                    "description": [
+                        "アイコンの URL。",
+                        "アイコンが無いチームでは null。"
+                    ]
+                },
+                "description": [
+                    "Team のアイコンの URL を返す。",
+                    "reviewers のクエリは、別名 teamAvatarUrl で取り、Pool に入れる前に avatarUrl に戻す。(Pooler の node2team。yanqirenshi/SOGH.next#39)",
+                    "GitHub 側で、アイコンが無いチームは null になる。(User などは、必ず値がある)"
+                ],
+                "examples": [
+                    "team.avatarUrl();",
+                    "// => null"
                 ]
             }
         ],
